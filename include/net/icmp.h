@@ -22,6 +22,10 @@
 
 #include <net/inet_sock.h>
 #include <net/snmp.h>
+<<<<<<< HEAD
+=======
+#include <net/ip.h>
+>>>>>>> common/deprecated/android-3.18
 
 struct icmp_err {
   int		errno;
@@ -39,7 +43,17 @@ struct net_proto_family;
 struct sk_buff;
 struct net;
 
+<<<<<<< HEAD
 void icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info);
+=======
+void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
+		 const struct ip_options *opt);
+static inline void icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info)
+{
+	__icmp_send(skb_in, type, code, info, &IPCB(skb_in)->opt);
+}
+
+>>>>>>> common/deprecated/android-3.18
 int icmp_rcv(struct sk_buff *skb);
 void icmp_err(struct sk_buff *skb, u32 info);
 int icmp_init(void);

@@ -27,7 +27,11 @@
 static inline long do_strnlen_user(const char __user *src, unsigned long count, unsigned long max)
 {
 	const struct word_at_a_time constants = WORD_AT_A_TIME_CONSTANTS;
+<<<<<<< HEAD
 	long align, res = 0;
+=======
+	unsigned long align, res = 0;
+>>>>>>> common/deprecated/android-3.18
 	unsigned long c;
 
 	/*
@@ -41,12 +45,20 @@ static inline long do_strnlen_user(const char __user *src, unsigned long count, 
 	 * Do everything aligned. But that means that we
 	 * need to also expand the maximum..
 	 */
+<<<<<<< HEAD
 	align = (sizeof(long) - 1) & (unsigned long)src;
 	src -= align;
 	max += align;
 
 	if (unlikely(__get_user(c,(unsigned long __user *)src)))
 		return 0;
+=======
+	align = (sizeof(unsigned long) - 1) & (unsigned long)src;
+	src -= align;
+	max += align;
+
+	unsafe_get_user(c, (unsigned long __user *)src, efault);
+>>>>>>> common/deprecated/android-3.18
 	c |= aligned_byte_mask(align);
 
 	for (;;) {
@@ -57,11 +69,19 @@ static inline long do_strnlen_user(const char __user *src, unsigned long count, 
 			return res + find_zero(data) + 1 - align;
 		}
 		res += sizeof(unsigned long);
+<<<<<<< HEAD
 		if (unlikely(max < sizeof(unsigned long)))
 			break;
 		max -= sizeof(unsigned long);
 		if (unlikely(__get_user(c,(unsigned long __user *)(src+res))))
 			return 0;
+=======
+		/* We already handled 'unsigned long' bytes. Did we do it all ? */
+		if (unlikely(max <= sizeof(unsigned long)))
+			break;
+		max -= sizeof(unsigned long);
+		unsafe_get_user(c, (unsigned long __user *)(src+res), efault);
+>>>>>>> common/deprecated/android-3.18
 	}
 	res -= align;
 
@@ -76,6 +96,10 @@ static inline long do_strnlen_user(const char __user *src, unsigned long count, 
 	 * Nope: we hit the address space limit, and we still had more
 	 * characters the caller would have wanted. That's 0.
 	 */
+<<<<<<< HEAD
+=======
+efault:
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -103,7 +127,16 @@ long strnlen_user(const char __user *str, long count)
 	src_addr = (unsigned long)str;
 	if (likely(src_addr < max_addr)) {
 		unsigned long max = max_addr - src_addr;
+<<<<<<< HEAD
 		return do_strnlen_user(str, count, max);
+=======
+		long retval;
+
+		user_access_begin();
+		retval = do_strnlen_user(str, count, max);
+		user_access_end();
+		return retval;
+>>>>>>> common/deprecated/android-3.18
 	}
 	return 0;
 }
@@ -131,7 +164,16 @@ long strlen_user(const char __user *str)
 	src_addr = (unsigned long)str;
 	if (likely(src_addr < max_addr)) {
 		unsigned long max = max_addr - src_addr;
+<<<<<<< HEAD
 		return do_strnlen_user(str, ~0ul, max);
+=======
+		long retval;
+
+		user_access_begin();
+		retval = do_strnlen_user(str, ~0ul, max);
+		user_access_end();
+		return retval;
+>>>>>>> common/deprecated/android-3.18
 	}
 	return 0;
 }

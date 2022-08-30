@@ -33,7 +33,11 @@ struct cpa_data {
 	pgd_t		*pgd;
 	pgprot_t	mask_set;
 	pgprot_t	mask_clr;
+<<<<<<< HEAD
 	int		numpages;
+=======
+	unsigned long	numpages;
+>>>>>>> common/deprecated/android-3.18
 	int		flags;
 	unsigned long	pfn;
 	unsigned	force_split : 1;
@@ -281,7 +285,11 @@ static inline pgprot_t static_protections(pgprot_t prot, unsigned long address,
 		   __pa_symbol(__end_rodata) >> PAGE_SHIFT))
 		pgprot_val(forbidden) |= _PAGE_RW;
 
+<<<<<<< HEAD
 #if defined(CONFIG_X86_64) && defined(CONFIG_DEBUG_RODATA)
+=======
+#if defined(CONFIG_X86_64)
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Once the kernel maps the text as RO (kernel_set_to_readonly is set),
 	 * kernel text mappings for the large page aligned text, rodata sections
@@ -873,11 +881,19 @@ static void populate_pte(struct cpa_data *cpa,
 	}
 }
 
+<<<<<<< HEAD
 static int populate_pmd(struct cpa_data *cpa,
 			unsigned long start, unsigned long end,
 			unsigned num_pages, pud_t *pud, pgprot_t pgprot)
 {
 	unsigned int cur_pages = 0;
+=======
+static long populate_pmd(struct cpa_data *cpa,
+			 unsigned long start, unsigned long end,
+			 unsigned num_pages, pud_t *pud, pgprot_t pgprot)
+{
+	long cur_pages = 0;
+>>>>>>> common/deprecated/android-3.18
 	pmd_t *pmd;
 
 	/*
@@ -943,12 +959,21 @@ static int populate_pmd(struct cpa_data *cpa,
 	return num_pages;
 }
 
+<<<<<<< HEAD
 static int populate_pud(struct cpa_data *cpa, unsigned long start, pgd_t *pgd,
 			pgprot_t pgprot)
 {
 	pud_t *pud;
 	unsigned long end;
 	int cur_pages = 0;
+=======
+static long populate_pud(struct cpa_data *cpa, unsigned long start, pgd_t *pgd,
+			 pgprot_t pgprot)
+{
+	pud_t *pud;
+	unsigned long end;
+	long cur_pages = 0;
+>>>>>>> common/deprecated/android-3.18
 
 	end = start + (cpa->numpages << PAGE_SHIFT);
 
@@ -1001,7 +1026,11 @@ static int populate_pud(struct cpa_data *cpa, unsigned long start, pgd_t *pgd,
 
 	/* Map trailing leftover */
 	if (start < end) {
+<<<<<<< HEAD
 		int tmp;
+=======
+		long tmp;
+>>>>>>> common/deprecated/android-3.18
 
 		pud = pud_offset(pgd, start);
 		if (pud_none(*pud))
@@ -1027,7 +1056,11 @@ static int populate_pgd(struct cpa_data *cpa, unsigned long addr)
 	pgprot_t pgprot = __pgprot(_KERNPG_TABLE);
 	pud_t *pud = NULL;	/* shut up gcc */
 	pgd_t *pgd_entry;
+<<<<<<< HEAD
 	int ret;
+=======
+	long ret;
+>>>>>>> common/deprecated/android-3.18
 
 	pgd_entry = cpa->pgd + pgd_index(addr);
 
@@ -1262,7 +1295,12 @@ static int cpa_process_alias(struct cpa_data *cpa)
 
 static int __change_page_attr_set_clr(struct cpa_data *cpa, int checkalias)
 {
+<<<<<<< HEAD
 	int ret, numpages = cpa->numpages;
+=======
+	unsigned long numpages = cpa->numpages;
+	int ret;
+>>>>>>> common/deprecated/android-3.18
 
 	while (numpages) {
 		/*
@@ -1293,7 +1331,11 @@ static int __change_page_attr_set_clr(struct cpa_data *cpa, int checkalias)
 		 * CPA operation. Either a large page has been
 		 * preserved or a single page update happened.
 		 */
+<<<<<<< HEAD
 		BUG_ON(cpa->numpages > numpages);
+=======
+		BUG_ON(cpa->numpages > numpages || !cpa->numpages);
+>>>>>>> common/deprecated/android-3.18
 		numpages -= cpa->numpages;
 		if (cpa->flags & (CPA_PAGES_ARRAY | CPA_ARRAY))
 			cpa->curpage++;

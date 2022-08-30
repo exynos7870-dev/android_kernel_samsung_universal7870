@@ -2828,7 +2828,11 @@ out:
 	return err;
 
 out_free_irq:
+<<<<<<< HEAD
 	free_irq(dev->irq, dev);
+=======
+	free_irq(irq, dev);
+>>>>>>> common/deprecated/android-3.18
 out_free:
 	kfree(dev);
 out_release:

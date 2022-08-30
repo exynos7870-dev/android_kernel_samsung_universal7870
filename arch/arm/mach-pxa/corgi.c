@@ -18,6 +18,10 @@
 #include <linux/major.h>
 #include <linux/fs.h>
 #include <linux/interrupt.h>
+<<<<<<< HEAD
+=======
+#include <linux/leds.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/mmc/host.h>
 #include <linux/mtd/physmap.h>
 #include <linux/pm.h>

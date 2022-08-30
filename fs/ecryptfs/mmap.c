@@ -66,6 +66,7 @@ static int ecryptfs_writepage(struct page *page, struct writeback_control *wbc)
 {
 	int rc;
 
+<<<<<<< HEAD
 	// WTL_EDM_START
 	/* MDM 3.1 START */
 	struct inode *inode;
@@ -95,6 +96,8 @@ static int ecryptfs_writepage(struct page *page, struct writeback_control *wbc)
 	/* MDM 3.1 END */
 	// WTL_EDM_END
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	rc = ecryptfs_encrypt_page(page);
 	if (rc) {
 		ecryptfs_printk(KERN_WARNING, "Error encrypting "

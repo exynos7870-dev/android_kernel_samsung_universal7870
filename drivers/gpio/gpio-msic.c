@@ -266,8 +266,13 @@ static int platform_msic_gpio_probe(struct platform_device *pdev)
 	int i;
 
 	if (irq < 0) {
+<<<<<<< HEAD
 		dev_err(dev, "no IRQ line\n");
 		return -EINVAL;
+=======
+		dev_err(dev, "no IRQ line: %d\n", irq);
+		return irq;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (!pdata || !pdata->gpio_base) {

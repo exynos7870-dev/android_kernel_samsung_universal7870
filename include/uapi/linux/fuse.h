@@ -205,10 +205,18 @@ struct fuse_file_lock {
  * FOPEN_DIRECT_IO: bypass page cache for this open file
  * FOPEN_KEEP_CACHE: don't invalidate the data cache on open
  * FOPEN_NONSEEKABLE: the file is not seekable
+<<<<<<< HEAD
+=======
+ * FOPEN_STREAM: the file is stream-like (no file position at all)
+>>>>>>> common/deprecated/android-3.18
  */
 #define FOPEN_DIRECT_IO		(1 << 0)
 #define FOPEN_KEEP_CACHE	(1 << 1)
 #define FOPEN_NONSEEKABLE	(1 << 2)
+<<<<<<< HEAD
+=======
+#define FOPEN_STREAM		(1 << 4)
+>>>>>>> common/deprecated/android-3.18
 
 /**
  * INIT request/reply flags
@@ -251,9 +259,12 @@ struct fuse_file_lock {
 #define FUSE_WRITEBACK_CACHE	(1 << 16)
 #define FUSE_NO_OPEN_SUPPORT	(1 << 17)
 
+<<<<<<< HEAD
 #define FUSE_RESERVE_SPACE	(1 << 30)
 #define FUSE_SHORTCIRCUIT	(1 << 31)
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /**
  * CUSE INIT request/reply flags
  *
@@ -361,6 +372,10 @@ enum fuse_opcode {
 	FUSE_FALLOCATE     = 43,
 	FUSE_READDIRPLUS   = 44,
 	FUSE_RENAME2       = 45,
+<<<<<<< HEAD
+=======
+	FUSE_CANONICAL_PATH= 2016,
+>>>>>>> common/deprecated/android-3.18
 
 	/* CUSE specific operations */
 	CUSE_INIT          = 4096,
@@ -483,7 +498,11 @@ struct fuse_create_in {
 struct fuse_open_out {
 	uint64_t	fh;
 	uint32_t	open_flags;
+<<<<<<< HEAD
 	int32_t         lower_fd;/* lower layer file descriptor */
+=======
+	uint32_t	padding;
+>>>>>>> common/deprecated/android-3.18
 };
 
 struct fuse_release_in {
@@ -590,8 +609,12 @@ struct fuse_init_out {
 	uint16_t	congestion_threshold;
 	uint32_t	max_write;
 	uint32_t	time_gran;
+<<<<<<< HEAD
 	uint32_t	reserved_space_mb;
 	uint32_t	unused[8];
+=======
+	uint32_t	unused[9];
+>>>>>>> common/deprecated/android-3.18
 };
 
 #define CUSE_INIT_INFO_MAX 4096

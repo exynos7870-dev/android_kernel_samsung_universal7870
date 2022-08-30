@@ -135,6 +135,11 @@ struct qxl_crtc {
 	int index;
 	int cur_x;
 	int cur_y;
+<<<<<<< HEAD
+=======
+	int hot_spot_x;
+	int hot_spot_y;
+>>>>>>> common/deprecated/android-3.18
 };
 
 struct qxl_output {
@@ -325,6 +330,11 @@ struct qxl_device {
 	struct work_struct fb_work;
 
 	struct drm_property *hotplug_mode_update_property;
+<<<<<<< HEAD
+=======
+	int monitors_config_width;
+	int monitors_config_height;
+>>>>>>> common/deprecated/android-3.18
 };
 
 /* forward declaration for QXL_INFO_IO */

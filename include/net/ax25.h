@@ -197,6 +197,21 @@ static inline void ax25_hold_route(ax25_route *ax25_rt)
 
 void __ax25_put_route(ax25_route *ax25_rt);
 
+<<<<<<< HEAD
+=======
+extern rwlock_t ax25_route_lock;
+
+static inline void ax25_route_lock_use(void)
+{
+	read_lock(&ax25_route_lock);
+}
+
+static inline void ax25_route_lock_unuse(void)
+{
+	read_unlock(&ax25_route_lock);
+}
+
+>>>>>>> common/deprecated/android-3.18
 static inline void ax25_put_route(ax25_route *ax25_rt)
 {
 	if (atomic_dec_and_test(&ax25_rt->refcount))

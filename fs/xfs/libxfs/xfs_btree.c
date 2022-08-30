@@ -4051,7 +4051,11 @@ xfs_btree_change_owner(
 			xfs_btree_readahead_ptr(cur, ptr, 1);
 
 			/* save for the next iteration of the loop */
+<<<<<<< HEAD
 			lptr = *ptr;
+=======
+			xfs_btree_copy_ptrs(cur, &lptr, ptr, 1);
+>>>>>>> common/deprecated/android-3.18
 		}
 
 		/* for each buffer in the level */

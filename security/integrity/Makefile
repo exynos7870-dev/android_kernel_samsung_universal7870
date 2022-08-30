@@ -13,5 +13,8 @@ subdir-$(CONFIG_IMA)			+= ima
 obj-$(CONFIG_IMA)			+= ima/
 subdir-$(CONFIG_EVM)			+= evm
 obj-$(CONFIG_EVM)			+= evm/
+<<<<<<< HEAD
 subdir-$(CONFIG_FIVE)			+= five
 obj-$(CONFIG_FIVE)			+= five/
+=======
+>>>>>>> common/deprecated/android-3.18

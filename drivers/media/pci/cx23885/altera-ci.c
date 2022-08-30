@@ -662,6 +662,13 @@ static int altera_hw_filt_init(struct altera_ci_config *config, int hw_filt_nr)
 		}
 
 		temp_int = append_internal(inter);
+<<<<<<< HEAD
+=======
+		if (!temp_int) {
+			ret = -ENOMEM;
+			goto err;
+		}
+>>>>>>> common/deprecated/android-3.18
 		inter->filts_used = 1;
 		inter->dev = config->dev;
 		inter->fpga_rw = config->fpga_rw;
@@ -696,6 +703,10 @@ err:
 		     __func__, ret);
 
 	kfree(pid_filt);
+<<<<<<< HEAD
+=======
+	kfree(inter);
+>>>>>>> common/deprecated/android-3.18
 
 	return ret;
 }
@@ -731,6 +742,13 @@ int altera_ci_init(struct altera_ci_config *config, int ci_nr)
 		}
 
 		temp_int = append_internal(inter);
+<<<<<<< HEAD
+=======
+		if (!temp_int) {
+			ret = -ENOMEM;
+			goto err;
+		}
+>>>>>>> common/deprecated/android-3.18
 		inter->cis_used = 1;
 		inter->dev = config->dev;
 		inter->fpga_rw = config->fpga_rw;
@@ -799,6 +817,10 @@ err:
 	ci_dbg_print("%s: Cannot initialize CI: Error %d.\n", __func__, ret);
 
 	kfree(state);
+<<<<<<< HEAD
+=======
+	kfree(inter);
+>>>>>>> common/deprecated/android-3.18
 
 	return ret;
 }

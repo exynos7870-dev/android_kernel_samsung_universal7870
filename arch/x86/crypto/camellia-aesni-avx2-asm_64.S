@@ -11,6 +11,10 @@
  */
 
 #include <linux/linkage.h>
+<<<<<<< HEAD
+=======
+#include <asm/nospec-branch.h>
+>>>>>>> common/deprecated/android-3.18
 
 #define CAMELLIA_TABLE_BYTE_LEN 272
 
@@ -1323,7 +1327,11 @@ camellia_xts_crypt_32way:
 	vpxor 14 * 32(%rax), %ymm15, %ymm14;
 	vpxor 15 * 32(%rax), %ymm15, %ymm15;
 
+<<<<<<< HEAD
 	call *%r9;
+=======
+	CALL_NOSPEC %r9;
+>>>>>>> common/deprecated/android-3.18
 
 	addq $(16 * 32), %rsp;
 

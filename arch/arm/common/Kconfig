@@ -20,7 +20,10 @@ config SHARP_SCOOP
 
 config TI_PRIV_EDMA
 	bool
+<<<<<<< HEAD
 
 config FIQ_GLUE
 	bool
 	select FIQ
+=======
+>>>>>>> common/deprecated/android-3.18

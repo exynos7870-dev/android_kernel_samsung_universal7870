@@ -63,6 +63,7 @@
 #include <uapi/linux/module.h>
 #include "module-internal.h"
 
+<<<<<<< HEAD
 #ifdef	CONFIG_TIMA_LKMAUTH_CODE_PROT
 #include <asm/tlbflush.h>
 #endif/*CONFIG_TIMA_LKMAUTH_CODE_PROT*/
@@ -72,11 +73,16 @@
 #define TIMA_SET_PTE_RO 1
 #define TIMA_SET_PTE_NX 2
 #endif/*CONFIG_TIMA_LKMAUTH_CODE_PROT*/
+=======
+#define CREATE_TRACE_POINTS
+#include <trace/events/module.h>
+>>>>>>> common/deprecated/android-3.18
 
 #ifndef ARCH_SHF_SMALL
 #define ARCH_SHF_SMALL 0
 #endif
 
+<<<<<<< HEAD
 #ifdef TIMA_LKM_AUTH_ENABLED
 #define TIMA_ON_MC20
 
@@ -214,11 +220,14 @@ typedef struct {
 #endif /* End TIMA_LKM_AUTH_ENABLED */
 
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * Modules' sections will be aligned on page boundaries
  * to ensure complete separation of code and data, but
  * only when CONFIG_DEBUG_SET_MODULE_RONX=y
  */
+<<<<<<< HEAD
  
 #ifdef	CONFIG_TIMA_LKMAUTH_CODE_PROT
 # define debug_align(X) ALIGN(X, PAGE_SIZE)
@@ -226,13 +235,18 @@ typedef struct {
 #ifdef	TIMA_LKM_SET_PAGE_ATTRIB
 #define debug_align(X) ALIGN(X, PAGE_SIZE)
 #else
+=======
+>>>>>>> common/deprecated/android-3.18
 #ifdef CONFIG_DEBUG_SET_MODULE_RONX
 # define debug_align(X) ALIGN(X, PAGE_SIZE)
 #else
 # define debug_align(X) (X)
 #endif
+<<<<<<< HEAD
 #endif
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 /*
  * Given BASE and SIZE this macro calculates the number of pages the
@@ -332,6 +346,12 @@ struct load_info {
 	struct _ddebug *debug;
 	unsigned int num_debug;
 	bool sig_ok;
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_KALLSYMS
+	unsigned long mod_kallsyms_init_off;
+#endif
+>>>>>>> common/deprecated/android-3.18
 	struct {
 		unsigned int sym, str, mod, vers, info, pcpu;
 	} index;
@@ -1017,6 +1037,11 @@ SYSCALL_DEFINE2(delete_module, const char __user *, name_user,
 	strlcpy(last_unloaded_module, mod->name, sizeof(last_unloaded_module));
 
 	free_module(mod);
+<<<<<<< HEAD
+=======
+	/* someone could wait for the module in add_unformed_module() */
+	wake_up_all(&module_wq);
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 out:
 	mutex_unlock(&module_mutex);
@@ -1067,11 +1092,23 @@ void symbol_put_addr(void *addr)
 	if (core_kernel_text(a))
 		return;
 
+<<<<<<< HEAD
 	/* module_text_address is safe here: we're supposed to have reference
 	 * to module from symbol_get, so it can't go away. */
 	modaddr = __module_text_address(a);
 	BUG_ON(!modaddr);
 	module_put(modaddr);
+=======
+	/*
+	 * Even though we hold a reference on the module; we still need to
+	 * disable preemption in order to safely traverse the data structure.
+	 */
+	preempt_disable();
+	modaddr = __module_text_address(a);
+	BUG_ON(!modaddr);
+	module_put(modaddr);
+	preempt_enable();
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL_GPL(symbol_put_addr);
 
@@ -1762,7 +1799,10 @@ static int mod_sysfs_init(struct module *mod)
 	if (err)
 		mod_kobject_put(mod);
 
+<<<<<<< HEAD
 	/* delay uevent until full sysfs population */
+=======
+>>>>>>> common/deprecated/android-3.18
 out:
 	return err;
 }
@@ -1796,7 +1836,10 @@ static int mod_sysfs_setup(struct module *mod,
 	add_sect_attrs(mod, info);
 	add_notes_attrs(mod, info);
 
+<<<<<<< HEAD
 	kobject_uevent(&mod->mkobj.kobj, KOBJ_ADD);
+=======
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 
 out_unreg_param:
@@ -2086,6 +2129,24 @@ static int verify_export_symbols(struct module *mod)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+static bool ignore_undef_symbol(Elf_Half emachine, const char *name)
+{
+	/*
+	 * On x86, PIC code and Clang non-PIC code may have call foo@PLT. GNU as
+	 * before 2.37 produces an unreferenced _GLOBAL_OFFSET_TABLE_ on x86-64.
+	 * i386 has a similar problem but may not deserve a fix.
+	 *
+	 * If we ever have to ignore many symbols, consider refactoring the code to
+	 * only warn if referenced by a relocation.
+	 */
+	if (emachine == EM_386 || emachine == EM_X86_64)
+		return !strcmp(name, "_GLOBAL_OFFSET_TABLE_");
+	return false;
+}
+
+>>>>>>> common/deprecated/android-3.18
 /* Change all symbols so that st_value encodes the pointer directly. */
 static int simplify_symbols(struct module *mod, const struct load_info *info)
 {
@@ -2127,8 +2188,15 @@ static int simplify_symbols(struct module *mod, const struct load_info *info)
 				break;
 			}
 
+<<<<<<< HEAD
 			/* Ok if weak.  */
 			if (!ksym && ELF_ST_BIND(sym[i].st_info) == STB_WEAK)
+=======
+			/* Ok if weak or ignored.  */
+			if (!ksym &&
+			    (ELF_ST_BIND(sym[i].st_info) == STB_WEAK ||
+			     ignore_undef_symbol(info->hdr->e_machine, name)))
+>>>>>>> common/deprecated/android-3.18
 				break;
 
 			pr_warn("%s: Unknown symbol %s (err %li)\n",
@@ -2383,7 +2451,11 @@ static char elf_type(const Elf_Sym *sym, const struct load_info *info)
 	}
 	if (sym->st_shndx == SHN_UNDEF)
 		return 'U';
+<<<<<<< HEAD
 	if (sym->st_shndx == SHN_ABS)
+=======
+	if (sym->st_shndx == SHN_ABS || sym->st_shndx == info->index.pcpu)
+>>>>>>> common/deprecated/android-3.18
 		return 'a';
 	if (sym->st_shndx >= SHN_LORESERVE)
 		return '?';
@@ -2412,7 +2484,11 @@ static char elf_type(const Elf_Sym *sym, const struct load_info *info)
 }
 
 static bool is_core_symbol(const Elf_Sym *src, const Elf_Shdr *sechdrs,
+<<<<<<< HEAD
                            unsigned int shnum)
+=======
+			   unsigned int shnum, unsigned int pcpundx)
+>>>>>>> common/deprecated/android-3.18
 {
 	const Elf_Shdr *sec;
 
@@ -2421,6 +2497,14 @@ static bool is_core_symbol(const Elf_Sym *src, const Elf_Shdr *sechdrs,
 	    || !src->st_name)
 		return false;
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_KALLSYMS_ALL
+	if (src->st_shndx == pcpundx)
+		return true;
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 	sec = sechdrs + src->st_shndx;
 	if (!(sec->sh_flags & SHF_ALLOC)
 #ifndef CONFIG_KALLSYMS_ALL
@@ -2458,7 +2542,12 @@ static void layout_symtab(struct module *mod, struct load_info *info)
 	/* Compute total space required for the core symbols' strtab. */
 	for (ndst = i = 0; i < nsrc; i++) {
 		if (i == 0 ||
+<<<<<<< HEAD
 		    is_core_symbol(src+i, info->sechdrs, info->hdr->e_shnum)) {
+=======
+		    is_core_symbol(src+i, info->sechdrs, info->hdr->e_shnum,
+				   info->index.pcpu)) {
+>>>>>>> common/deprecated/android-3.18
 			strtab_size += strlen(&info->strtab[src[i].st_name])+1;
 			ndst++;
 		}
@@ -2474,8 +2563,25 @@ static void layout_symtab(struct module *mod, struct load_info *info)
 	strsect->sh_entsize = get_offset(mod, &mod->init_size, strsect,
 					 info->index.str) | INIT_OFFSET_MASK;
 	pr_debug("\t%s\n", info->secstrings + strsect->sh_name);
+<<<<<<< HEAD
 }
 
+=======
+
+	/* We'll tack temporary mod_kallsyms on the end. */
+	mod->init_size = ALIGN(mod->init_size,
+			       __alignof__(struct mod_kallsyms));
+	info->mod_kallsyms_init_off = mod->init_size;
+	mod->init_size += sizeof(struct mod_kallsyms);
+	mod->init_size = debug_align(mod->init_size);
+}
+
+/*
+ * We use the full symtab and strtab which layout_symtab arranged to
+ * be appended to the init section.  Later we switch to the cut-down
+ * core-only ones.
+ */
+>>>>>>> common/deprecated/android-3.18
 static void add_kallsyms(struct module *mod, const struct load_info *info)
 {
 	unsigned int i, ndst;
@@ -2484,6 +2590,7 @@ static void add_kallsyms(struct module *mod, const struct load_info *info)
 	char *s;
 	Elf_Shdr *symsec = &info->sechdrs[info->index.sym];
 
+<<<<<<< HEAD
 	mod->symtab = (void *)symsec->sh_addr;
 	mod->num_symtab = symsec->sh_size / sizeof(Elf_Sym);
 	/* Make sure we get permanent strtab: don't use info->strtab. */
@@ -2506,6 +2613,36 @@ static void add_kallsyms(struct module *mod, const struct load_info *info)
 		}
 	}
 	mod->core_num_syms = ndst;
+=======
+	/* Set up to point into init section. */
+	mod->kallsyms = mod->module_init + info->mod_kallsyms_init_off;
+
+	mod->kallsyms->symtab = (void *)symsec->sh_addr;
+	mod->kallsyms->num_symtab = symsec->sh_size / sizeof(Elf_Sym);
+	/* Make sure we get permanent strtab: don't use info->strtab. */
+	mod->kallsyms->strtab = (void *)info->sechdrs[info->index.str].sh_addr;
+
+	/* Set types up while we still have access to sections. */
+	for (i = 0; i < mod->kallsyms->num_symtab; i++)
+		mod->kallsyms->symtab[i].st_info
+			= elf_type(&mod->kallsyms->symtab[i], info);
+
+	/* Now populate the cut down core kallsyms for after init. */
+	mod->core_kallsyms.symtab = dst = mod->module_core + info->symoffs;
+	mod->core_kallsyms.strtab = s = mod->module_core + info->stroffs;
+	src = mod->kallsyms->symtab;
+	for (ndst = i = 0; i < mod->kallsyms->num_symtab; i++) {
+		if (i == 0 ||
+		    is_core_symbol(src+i, info->sechdrs, info->hdr->e_shnum,
+				   info->index.pcpu)) {
+			dst[ndst] = src[i];
+			dst[ndst++].st_name = s - mod->core_kallsyms.strtab;
+			s += strlcpy(s, &mod->kallsyms->strtab[src[i].st_name],
+				     KSYM_NAME_LEN) + 1;
+		}
+	}
+	mod->core_kallsyms.num_symtab = ndst;
+>>>>>>> common/deprecated/android-3.18
 }
 #else
 static inline void layout_symtab(struct module *mod, struct load_info *info)
@@ -2517,6 +2654,7 @@ static void add_kallsyms(struct module *mod, const struct load_info *info)
 }
 #endif /* CONFIG_KALLSYMS */
 
+<<<<<<< HEAD
 #ifdef	TIMA_LKM_AUTH_ENABLED
 
 #ifdef TIMA_ON_QSEE		/* lkmauth for QSEE */
@@ -3000,6 +3138,8 @@ lkmauth_ret:
 
 #endif /* End TIMA_LKM_AUTH_ENABLED */
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static void dynamic_debug_setup(struct _ddebug *debug, unsigned int num)
 {
 	if (!debug)
@@ -3066,13 +3206,26 @@ static inline void kmemleak_load_module(const struct module *mod,
 #endif
 
 #ifdef CONFIG_MODULE_SIG
+<<<<<<< HEAD
 static int module_sig_check(struct load_info *info)
+=======
+static int module_sig_check(struct load_info *info, int flags)
+>>>>>>> common/deprecated/android-3.18
 {
 	int err = -ENOKEY;
 	const unsigned long markerlen = sizeof(MODULE_SIG_STRING) - 1;
 	const void *mod = info->hdr;
 
+<<<<<<< HEAD
 	if (info->len > markerlen &&
+=======
+	/*
+	 * Require flags == 0, as a module with version information
+	 * removed is no longer the module that was signed
+	 */
+	if (flags == 0 &&
+	    info->len > markerlen &&
+>>>>>>> common/deprecated/android-3.18
 	    memcmp(mod + info->len - markerlen, MODULE_SIG_STRING, markerlen) == 0) {
 		/* We truncate the module to discard the signature */
 		info->len -= markerlen;
@@ -3091,7 +3244,11 @@ static int module_sig_check(struct load_info *info)
 	return err;
 }
 #else /* !CONFIG_MODULE_SIG */
+<<<<<<< HEAD
 static int module_sig_check(struct load_info *info)
+=======
+static int module_sig_check(struct load_info *info, int flags)
+>>>>>>> common/deprecated/android-3.18
 {
 	return 0;
 }
@@ -3114,6 +3271,7 @@ static int elf_header_check(struct load_info *info)
 		info->len - info->hdr->e_shoff))
 		return -ENOEXEC;
 
+<<<<<<< HEAD
 #ifdef TIMA_LKM_AUTH_ENABLED
 	if (lkmauth(info->hdr, info->len) != RET_LKMAUTH_SUCCESS) {
 		pr_err
@@ -3123,6 +3281,8 @@ static int elf_header_check(struct load_info *info)
 	}
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -3308,6 +3468,18 @@ static struct module *setup_load_info(struct load_info *info, int flags)
 	return mod;
 }
 
+<<<<<<< HEAD
+=======
+static void check_modinfo_retpoline(struct module *mod, struct load_info *info)
+{
+	if (retpoline_module_ok(get_modinfo(info, "retpoline")))
+		return;
+
+	pr_warn("%s: loading module not compiled with retpoline compiler.\n",
+		mod->name);
+}
+
+>>>>>>> common/deprecated/android-3.18
 static int check_modinfo(struct module *mod, struct load_info *info, int flags)
 {
 	const char *modmagic = get_modinfo(info, "vermagic");
@@ -3327,8 +3499,19 @@ static int check_modinfo(struct module *mod, struct load_info *info, int flags)
 		return -ENOEXEC;
 	}
 
+<<<<<<< HEAD
 	if (!get_modinfo(info, "intree"))
 		add_taint_module(mod, TAINT_OOT_MODULE, LOCKDEP_STILL_OK);
+=======
+	if (!get_modinfo(info, "intree")) {
+		if (!test_taint(TAINT_OOT_MODULE))
+			pr_warn("%s: loading out-of-tree module taints kernel.\n",
+				mod->name);
+		add_taint_module(mod, TAINT_OOT_MODULE, LOCKDEP_STILL_OK);
+	}
+
+	check_modinfo_retpoline(mod, info);
+>>>>>>> common/deprecated/android-3.18
 
 	if (get_modinfo(info, "staging")) {
 		add_taint_module(mod, TAINT_CRAP, LOCKDEP_STILL_OK);
@@ -3490,6 +3673,11 @@ static int move_module(struct module *mod, struct load_info *info)
 
 static int check_module_license_and_versions(struct module *mod)
 {
+<<<<<<< HEAD
+=======
+	int prev_taint = test_taint(TAINT_PROPRIETARY_MODULE);
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * ndiswrapper is under GPL by itself, but loads proprietary modules.
 	 * Don't use add_taint_module(), as it would prevent ndiswrapper from
@@ -3508,6 +3696,12 @@ static int check_module_license_and_versions(struct module *mod)
 		add_taint_module(mod, TAINT_PROPRIETARY_MODULE,
 				 LOCKDEP_NOW_UNRELIABLE);
 
+<<<<<<< HEAD
+=======
+	if (!prev_taint && test_taint(TAINT_PROPRIETARY_MODULE))
+		pr_warn("%s: module license taints kernel.\n", mod->name);
+
+>>>>>>> common/deprecated/android-3.18
 #ifdef CONFIG_MODVERSIONS
 	if ((mod->num_syms && !mod->crcs)
 	    || (mod->num_gpl_syms && !mod->gpl_crcs)
@@ -3634,8 +3828,12 @@ static bool finished_loading(const char *name)
 
 	mutex_lock(&module_mutex);
 	mod = find_module_all(name, strlen(name), true);
+<<<<<<< HEAD
 	ret = !mod || mod->state == MODULE_STATE_LIVE
 		|| mod->state == MODULE_STATE_GOING;
+=======
+	ret = !mod || mod->state == MODULE_STATE_LIVE;
+>>>>>>> common/deprecated/android-3.18
 	mutex_unlock(&module_mutex);
 
 	return ret;
@@ -3652,6 +3850,7 @@ static void do_mod_ctors(struct module *mod)
 #endif
 }
 
+<<<<<<< HEAD
 #ifdef	CONFIG_TIMA_LKMAUTH_CODE_PROT
 
 #ifndef TIMA_KERNEL_L1_MANAGE
@@ -3815,6 +4014,8 @@ void tima_mod_page_change_access(struct module *mod)
 
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /* This is where the real work happens */
 static int do_init_module(struct module *mod)
 {
@@ -3855,9 +4056,14 @@ static int do_init_module(struct module *mod)
 	blocking_notifier_call_chain(&module_notify_list,
 				     MODULE_STATE_LIVE, mod);
 
+<<<<<<< HEAD
 #ifdef	TIMA_LKM_SET_PAGE_ATTRIB
 	tima_mod_page_change_access(mod);
 #endif
+=======
+	/* Delay uevent until module has finished its init routine */
+	kobject_uevent(&mod->mkobj.kobj, KOBJ_ADD);
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * We need to finish all async code before the module init sequence
@@ -3884,9 +4090,14 @@ static int do_init_module(struct module *mod)
 	module_put(mod);
 	trim_init_extable(mod);
 #ifdef CONFIG_KALLSYMS
+<<<<<<< HEAD
 	mod->num_symtab = mod->core_num_syms;
 	mod->symtab = mod->core_symtab;
 	mod->strtab = mod->core_strtab;
+=======
+	/* Switch to core kallsyms now init is done: kallsyms may be walking! */
+	rcu_assign_pointer(mod->kallsyms, &mod->core_kallsyms);
+>>>>>>> common/deprecated/android-3.18
 #endif
 	unset_module_init_ro_nx(mod);
 	module_free(mod, mod->module_init);
@@ -3924,8 +4135,12 @@ again:
 	mutex_lock(&module_mutex);
 	old = find_module_all(mod->name, strlen(mod->name), true);
 	if (old != NULL) {
+<<<<<<< HEAD
 		if (old->state == MODULE_STATE_COMING
 		    || old->state == MODULE_STATE_UNFORMED) {
+=======
+		if (old->state != MODULE_STATE_LIVE) {
+>>>>>>> common/deprecated/android-3.18
 			/* Wait in case it fails to load. */
 			mutex_unlock(&module_mutex);
 			err = wait_event_interruptible(module_wq,
@@ -3960,10 +4175,13 @@ static int complete_formation(struct module *mod, struct load_info *info)
 	/* This relies on module_mutex for list integrity. */
 	module_bug_finalize(info->hdr, info->sechdrs, mod);
 
+<<<<<<< HEAD
 #ifdef	CONFIG_TIMA_LKMAUTH_CODE_PROT
 	tima_mod_page_change_access(mod);
 #endif/*CONFIG_TIMA_LKMAUTH_CODE_PROT*/
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* Set RO and NX regions for core */
 	set_section_ro_nx(mod->module_core,
 				mod->core_text_size,
@@ -4008,7 +4226,11 @@ static int load_module(struct load_info *info, const char __user *uargs,
 	long err;
 	char *after_dashes;
 
+<<<<<<< HEAD
 	err = module_sig_check(info);
+=======
+	err = module_sig_check(info, flags);
+>>>>>>> common/deprecated/android-3.18
 	if (err)
 		goto free_copy;
 
@@ -4118,11 +4340,21 @@ static int load_module(struct load_info *info, const char __user *uargs,
 	return do_init_module(mod);
 
  bug_cleanup:
+<<<<<<< HEAD
+=======
+	mod->state = MODULE_STATE_GOING;
+>>>>>>> common/deprecated/android-3.18
 	/* module_bug_cleanup needs module_mutex protection */
 	mutex_lock(&module_mutex);
 	module_bug_cleanup(mod);
 	mutex_unlock(&module_mutex);
 
+<<<<<<< HEAD
+=======
+	blocking_notifier_call_chain(&module_notify_list,
+				     MODULE_STATE_GOING, mod);
+
+>>>>>>> common/deprecated/android-3.18
 	/* we can't deallocate the module until we clear memory protection */
 	unset_module_init_ro_nx(mod);
 	unset_module_core_ro_nx(mod);
@@ -4210,6 +4442,14 @@ static inline int is_arm_mapping_symbol(const char *str)
 	       && (str[2] == '\0' || str[2] == '.');
 }
 
+<<<<<<< HEAD
+=======
+static const char *symname(struct mod_kallsyms *kallsyms, unsigned int symnum)
+{
+	return kallsyms->strtab + kallsyms->symtab[symnum].st_name;
+}
+
+>>>>>>> common/deprecated/android-3.18
 static const char *get_ksymbol(struct module *mod,
 			       unsigned long addr,
 			       unsigned long *size,
@@ -4217,6 +4457,10 @@ static const char *get_ksymbol(struct module *mod,
 {
 	unsigned int i, best = 0;
 	unsigned long nextval;
+<<<<<<< HEAD
+=======
+	struct mod_kallsyms *kallsyms = rcu_dereference_sched(mod->kallsyms);
+>>>>>>> common/deprecated/android-3.18
 
 	/* At worse, next value is at end of module */
 	if (within_module_init(addr, mod))
@@ -4226,12 +4470,18 @@ static const char *get_ksymbol(struct module *mod,
 
 	/* Scan for closest preceding symbol, and next symbol. (ELF
 	   starts real symbols at 1). */
+<<<<<<< HEAD
 	for (i = 1; i < mod->num_symtab; i++) {
 		if (mod->symtab[i].st_shndx == SHN_UNDEF)
+=======
+	for (i = 1; i < kallsyms->num_symtab; i++) {
+		if (kallsyms->symtab[i].st_shndx == SHN_UNDEF)
+>>>>>>> common/deprecated/android-3.18
 			continue;
 
 		/* We ignore unnamed symbols: they're uninformative
 		 * and inserted at a whim. */
+<<<<<<< HEAD
 		if (mod->symtab[i].st_value <= addr
 		    && mod->symtab[i].st_value > mod->symtab[best].st_value
 		    && *(mod->strtab + mod->symtab[i].st_name) != '\0'
@@ -4242,16 +4492,35 @@ static const char *get_ksymbol(struct module *mod,
 		    && *(mod->strtab + mod->symtab[i].st_name) != '\0'
 		    && !is_arm_mapping_symbol(mod->strtab + mod->symtab[i].st_name))
 			nextval = mod->symtab[i].st_value;
+=======
+		if (*symname(kallsyms, i) == '\0'
+		    || is_arm_mapping_symbol(symname(kallsyms, i)))
+			continue;
+
+		if (kallsyms->symtab[i].st_value <= addr
+		    && kallsyms->symtab[i].st_value > kallsyms->symtab[best].st_value)
+			best = i;
+		if (kallsyms->symtab[i].st_value > addr
+		    && kallsyms->symtab[i].st_value < nextval)
+			nextval = kallsyms->symtab[i].st_value;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (!best)
 		return NULL;
 
 	if (size)
+<<<<<<< HEAD
 		*size = nextval - mod->symtab[best].st_value;
 	if (offset)
 		*offset = addr - mod->symtab[best].st_value;
 	return mod->strtab + mod->symtab[best].st_name;
+=======
+		*size = nextval - kallsyms->symtab[best].st_value;
+	if (offset)
+		*offset = addr - kallsyms->symtab[best].st_value;
+	return symname(kallsyms, best);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /* For kallsyms to ask for address resolution.  NULL means not found.  Careful
@@ -4344,6 +4613,7 @@ int module_get_kallsym(unsigned int symnum, unsigned long *value, char *type,
 
 	preempt_disable();
 	list_for_each_entry_rcu(mod, &modules, list) {
+<<<<<<< HEAD
 		if (mod->state == MODULE_STATE_UNFORMED)
 			continue;
 		if (symnum < mod->num_symtab) {
@@ -4351,12 +4621,27 @@ int module_get_kallsym(unsigned int symnum, unsigned long *value, char *type,
 			*type = mod->symtab[symnum].st_info;
 			strlcpy(name, mod->strtab + mod->symtab[symnum].st_name,
 				KSYM_NAME_LEN);
+=======
+		struct mod_kallsyms *kallsyms;
+
+		if (mod->state == MODULE_STATE_UNFORMED)
+			continue;
+		kallsyms = rcu_dereference_sched(mod->kallsyms);
+		if (symnum < kallsyms->num_symtab) {
+			*value = kallsyms->symtab[symnum].st_value;
+			*type = kallsyms->symtab[symnum].st_info;
+			strlcpy(name, symname(kallsyms, symnum), KSYM_NAME_LEN);
+>>>>>>> common/deprecated/android-3.18
 			strlcpy(module_name, mod->name, MODULE_NAME_LEN);
 			*exported = is_exported(name, *value, mod);
 			preempt_enable();
 			return 0;
 		}
+<<<<<<< HEAD
 		symnum -= mod->num_symtab;
+=======
+		symnum -= kallsyms->num_symtab;
+>>>>>>> common/deprecated/android-3.18
 	}
 	preempt_enable();
 	return -ERANGE;
@@ -4365,11 +4650,20 @@ int module_get_kallsym(unsigned int symnum, unsigned long *value, char *type,
 static unsigned long mod_find_symname(struct module *mod, const char *name)
 {
 	unsigned int i;
+<<<<<<< HEAD
 
 	for (i = 0; i < mod->num_symtab; i++)
 		if (strcmp(name, mod->strtab+mod->symtab[i].st_name) == 0 &&
 		    mod->symtab[i].st_info != 'U')
 			return mod->symtab[i].st_value;
+=======
+	struct mod_kallsyms *kallsyms = rcu_dereference_sched(mod->kallsyms);
+
+	for (i = 0; i < kallsyms->num_symtab; i++)
+		if (strcmp(name, symname(kallsyms, i)) == 0 &&
+		    kallsyms->symtab[i].st_shndx != SHN_UNDEF)
+			return kallsyms->symtab[i].st_value;
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -4406,11 +4700,26 @@ int module_kallsyms_on_each_symbol(int (*fn)(void *, const char *,
 	int ret;
 
 	list_for_each_entry(mod, &modules, list) {
+<<<<<<< HEAD
 		if (mod->state == MODULE_STATE_UNFORMED)
 			continue;
 		for (i = 0; i < mod->num_symtab; i++) {
 			ret = fn(data, mod->strtab + mod->symtab[i].st_name,
 				 mod, mod->symtab[i].st_value);
+=======
+		/* We hold module_mutex: no need for rcu_dereference_sched */
+		struct mod_kallsyms *kallsyms = mod->kallsyms;
+
+		if (mod->state == MODULE_STATE_UNFORMED)
+			continue;
+		for (i = 0; i < kallsyms->num_symtab; i++) {
+
+			if (kallsyms->symtab[i].st_shndx == SHN_UNDEF)
+				continue;
+
+			ret = fn(data, symname(kallsyms, i),
+				 mod, kallsyms->symtab[i].st_value);
+>>>>>>> common/deprecated/android-3.18
 			if (ret != 0)
 				return ret;
 		}

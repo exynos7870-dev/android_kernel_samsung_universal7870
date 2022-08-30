@@ -30,7 +30,11 @@ struct cx24117_config {
 	u8 demod_address;
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_CX24117)
+=======
+#if IS_REACHABLE(CONFIG_DVB_CX24117)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend *cx24117_attach(
 	const struct cx24117_config *config,
 	struct i2c_adapter *i2c);

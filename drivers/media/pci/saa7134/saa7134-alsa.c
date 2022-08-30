@@ -1220,6 +1220,11 @@ static int alsa_device_init(struct saa7134_dev *dev)
 
 static int alsa_device_exit(struct saa7134_dev *dev)
 {
+<<<<<<< HEAD
+=======
+	if (!snd_saa7134_cards[dev->nr])
+		return 1;
+>>>>>>> common/deprecated/android-3.18
 
 	snd_card_free(snd_saa7134_cards[dev->nr]);
 	snd_saa7134_cards[dev->nr] = NULL;
@@ -1269,7 +1274,12 @@ static void saa7134_alsa_exit(void)
 	int idx;
 
 	for (idx = 0; idx < SNDRV_CARDS; idx++) {
+<<<<<<< HEAD
 		snd_card_free(snd_saa7134_cards[idx]);
+=======
+		if (snd_saa7134_cards[idx])
+			snd_card_free(snd_saa7134_cards[idx]);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	saa7134_dmasound_init = NULL;

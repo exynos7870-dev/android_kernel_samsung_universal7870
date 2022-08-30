@@ -52,12 +52,25 @@ void sort_extable(struct exception_table_entry *start,
 	int i;
 
 	/* Normalize entries to being relative to the start of the section */
+<<<<<<< HEAD
 	for (p = start, i = 0; p < finish; p++, i += 8)
 		p->insn += i;
 	sort(start, finish - start, sizeof(*start), cmp_ex, NULL);
 	/* Denormalize all entries */
 	for (p = start, i = 0; p < finish; p++, i += 8)
 		p->insn -= i;
+=======
+	for (p = start, i = 0; p < finish; p++, i += 8) {
+		p->insn += i;
+		p->fixup += i + 4;
+	}
+	sort(start, finish - start, sizeof(*start), cmp_ex, NULL);
+	/* Denormalize all entries */
+	for (p = start, i = 0; p < finish; p++, i += 8) {
+		p->insn -= i;
+		p->fixup -= i + 4;
+	}
+>>>>>>> common/deprecated/android-3.18
 }
 
 #ifdef CONFIG_MODULES

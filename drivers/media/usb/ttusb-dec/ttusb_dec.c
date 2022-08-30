@@ -272,7 +272,11 @@ static int ttusb_dec_send_command(struct ttusb_dec *dec, const u8 command,
 
 	dprintk("%s\n", __func__);
 
+<<<<<<< HEAD
 	b = kmalloc(COMMAND_PACKET_SIZE + 4, GFP_KERNEL);
+=======
+	b = kzalloc(COMMAND_PACKET_SIZE + 4, GFP_KERNEL);
+>>>>>>> common/deprecated/android-3.18
 	if (!b)
 		return -ENOMEM;
 

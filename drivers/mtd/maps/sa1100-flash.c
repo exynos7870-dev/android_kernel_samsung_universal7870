@@ -231,8 +231,15 @@ static struct sa_info *sa1100_setup_mtd(struct platform_device *pdev,
 
 		info->mtd = mtd_concat_create(cdev, info->num_subdev,
 					      plat->name);
+<<<<<<< HEAD
 		if (info->mtd == NULL)
 			ret = -ENXIO;
+=======
+		if (info->mtd == NULL) {
+			ret = -ENXIO;
+			goto err;
+		}
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (ret == 0)

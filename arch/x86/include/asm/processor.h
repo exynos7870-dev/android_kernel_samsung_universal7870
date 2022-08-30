@@ -83,7 +83,11 @@ struct cpuinfo_x86 {
 	__u8			x86;		/* CPU family */
 	__u8			x86_vendor;	/* CPU vendor */
 	__u8			x86_model;
+<<<<<<< HEAD
 	__u8			x86_mask;
+=======
+	__u8			x86_stepping;
+>>>>>>> common/deprecated/android-3.18
 #ifdef CONFIG_X86_32
 	char			wp_works_ok;	/* It doesn't on 386's */
 
@@ -107,7 +111,11 @@ struct cpuinfo_x86 {
 	char			x86_vendor_id[16];
 	char			x86_model_id[64];
 	/* in KB - valid for CPUS which support this call: */
+<<<<<<< HEAD
 	int			x86_cache_size;
+=======
+	unsigned int		x86_cache_size;
+>>>>>>> common/deprecated/android-3.18
 	int			x86_cache_alignment;	/* In bytes */
 	int			x86_power;
 	unsigned long		loops_per_jiffy;
@@ -147,8 +155,13 @@ extern struct cpuinfo_x86	boot_cpu_data;
 extern struct cpuinfo_x86	new_cpu_data;
 
 extern struct tss_struct	doublefault_tss;
+<<<<<<< HEAD
 extern __u32			cpu_caps_cleared[NCAPINTS];
 extern __u32			cpu_caps_set[NCAPINTS];
+=======
+extern __u32			cpu_caps_cleared[NCAPINTS + NBUGINTS];
+extern __u32			cpu_caps_set[NCAPINTS + NBUGINTS];
+>>>>>>> common/deprecated/android-3.18
 
 #ifdef CONFIG_SMP
 DECLARE_PER_CPU_SHARED_ALIGNED(struct cpuinfo_x86, cpu_info);
@@ -198,6 +211,27 @@ static inline void native_cpuid(unsigned int *eax, unsigned int *ebx,
 	    : "memory");
 }
 
+<<<<<<< HEAD
+=======
+#define native_cpuid_reg(reg)					\
+static inline unsigned int native_cpuid_##reg(unsigned int op)	\
+{								\
+	unsigned int eax = op, ebx, ecx = 0, edx;		\
+								\
+	native_cpuid(&eax, &ebx, &ecx, &edx);			\
+								\
+	return reg;						\
+}
+
+/*
+ * Native CPUID functions returning a single datum.
+ */
+native_cpuid_reg(eax)
+native_cpuid_reg(ebx)
+native_cpuid_reg(ecx)
+native_cpuid_reg(edx)
+
+>>>>>>> common/deprecated/android-3.18
 static inline void load_cr3(pgd_t *pgdir)
 {
 	write_cr3(__pa(pgdir));
@@ -578,6 +612,7 @@ static inline void load_sp0(struct tss_struct *tss,
 #define set_iopl_mask native_set_iopl_mask
 #endif /* CONFIG_PARAVIRT */
 
+<<<<<<< HEAD
 /*
  * Save the cr4 feature set we're using (ie
  * Pentium 4MB enable and PPro Global page
@@ -611,6 +646,8 @@ static inline void clear_in_cr4(unsigned long mask)
 	write_cr4(cr4);
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 typedef struct {
 	unsigned long		seg;
 } mm_segment_t;
@@ -702,7 +739,11 @@ static inline void sync_core(void)
 {
 	int tmp;
 
+<<<<<<< HEAD
 #ifdef CONFIG_M486
+=======
+#ifdef CONFIG_X86_32
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Do a CPUID if available, otherwise do a jump.  The jump
 	 * can conveniently enough be the jump around CPUID.
@@ -885,7 +926,12 @@ extern unsigned long thread_saved_pc(struct task_struct *tsk);
 #define task_pt_regs(task)                                             \
 ({                                                                     \
        struct pt_regs *__regs__;                                       \
+<<<<<<< HEAD
        __regs__ = (struct pt_regs *)(KSTK_TOP(task_stack_page(task))-8); \
+=======
+       __regs__ = (struct pt_regs *)(KSTK_TOP(task_stack_page(task)) - \
+				     TOP_OF_KERNEL_STACK_PADDING);     \
+>>>>>>> common/deprecated/android-3.18
        __regs__ - 1;                                                   \
 })
 

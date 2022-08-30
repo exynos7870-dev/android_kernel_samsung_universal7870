@@ -41,4 +41,8 @@ ENTRY(memchr)
 	ret
 2:	mov	x0, #0
 	ret
+<<<<<<< HEAD
 ENDPROC(memchr)
+=======
+ENDPIPROC(memchr)
+>>>>>>> common/deprecated/android-3.18

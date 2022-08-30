@@ -49,7 +49,11 @@ static void *thread_fn(void *arg)
 {
 	struct thread_data *td = arg;
 	ssize_t ret;
+<<<<<<< HEAD
 	int go;
+=======
+	int go = 0;
+>>>>>>> common/deprecated/android-3.18
 
 	if (thread_init(td))
 		return NULL;

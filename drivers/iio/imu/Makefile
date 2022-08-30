@@ -14,5 +14,8 @@ adis_lib-$(CONFIG_IIO_ADIS_LIB_BUFFER) += adis_buffer.o
 obj-$(CONFIG_IIO_ADIS_LIB) += adis_lib.o
 
 obj-y += inv_mpu6050/
+<<<<<<< HEAD
 obj-y += inv_mpu6515/
 
+=======
+>>>>>>> common/deprecated/android-3.18

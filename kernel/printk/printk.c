@@ -47,12 +47,16 @@
 #include <linux/utsname.h>
 #include <linux/ctype.h>
 
+<<<<<<< HEAD
 #ifdef CONFIG_SEC_DEBUG_AUTO_SUMMARY
 #include <linux/sec_debug.h>
 #endif
 
 #include <asm/uaccess.h>
 #include <asm/cputype.h>
+=======
+#include <asm/uaccess.h>
+>>>>>>> common/deprecated/android-3.18
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/printk.h>
@@ -232,6 +236,7 @@ struct printk_log {
 	u8 facility;		/* syslog facility */
 	u8 flags:5;		/* internal record flags */
 	u8 level:3;		/* syslog level */
+<<<<<<< HEAD
 #ifdef CONFIG_PRINTK_PROCESS
 	char process[16];	/* process name */
 	pid_t pid;		/* process id */
@@ -242,6 +247,8 @@ struct printk_log {
 	u8 for_auto_summary;
 	u8 type_auto_summary;
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 /*
@@ -276,6 +283,7 @@ static enum log_flags console_prev;
 static u64 clear_seq;
 static u32 clear_idx;
 
+<<<<<<< HEAD
 /* { SecProductFeature_KNOX.SEC_PRODUCT_FEATURE_KNOX_SUPPORT_MDM - the next printk record to read after the last 'clear_knox' command */
 static u64 clear_seq_knox;
 static u32 clear_idx_knox;
@@ -288,6 +296,9 @@ static u32 clear_idx_knox;
 #else
 #define PREFIX_MAX		32
 #endif
+=======
+#define PREFIX_MAX		32
+>>>>>>> common/deprecated/android-3.18
 #define LOG_LINE_MAX		(1024 - PREFIX_MAX)
 
 /* record buffer */
@@ -297,6 +308,10 @@ static u32 clear_idx_knox;
 #define LOG_ALIGN __alignof__(struct printk_log)
 #endif
 #define __LOG_BUF_LEN (1 << CONFIG_LOG_BUF_SHIFT)
+<<<<<<< HEAD
+=======
+#define LOG_BUF_LEN_MAX (u32)(1 << 31)
+>>>>>>> common/deprecated/android-3.18
 static char __log_buf[__LOG_BUF_LEN] __aligned(LOG_ALIGN);
 static char *log_buf = __log_buf;
 static u32 log_buf_len = __LOG_BUF_LEN;
@@ -411,6 +426,7 @@ static u32 msg_used_size(u16 text_len, u16 dict_len, u32 *pad_len)
 	return size;
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_PRINTK_PROCESS
 static bool printk_process = 1;
 static size_t print_process(const struct printk_log *msg, char *buf)
@@ -482,6 +498,8 @@ EXPORT_SYMBOL(register_hook_logbuf);
 #endif
 
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * Define how much of the log buffer we could take at maximum. The value
  * must be greater than two. Note that only half of the buffer is available
@@ -551,6 +569,7 @@ static int log_store(int facility, int level,
 	memcpy(log_dict(msg), dict, dict_len);
 	msg->dict_len = dict_len;
 	msg->facility = facility;
+<<<<<<< HEAD
 
 #ifdef CONFIG_SEC_DEBUG_AUTO_SUMMARY
 	msg->for_auto_summary = (level / 10 == 9) ? 1 : 0;
@@ -558,6 +577,8 @@ static int log_store(int facility, int level,
 	level = (msg->for_auto_summary) ? 0 : level;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	msg->level = level & 7;
 	msg->flags = flags & 0x1f;
 	if (ts_nsec > 0)
@@ -567,6 +588,7 @@ static int log_store(int facility, int level,
 	memset(log_dict(msg) + dict_len, 0, pad_len);
 	msg->len = size;
 
+<<<<<<< HEAD
 #ifdef CONFIG_PRINTK_PROCESS
 	if (printk_process) {
 		strncpy(msg->process, current->comm, sizeof(msg->process));
@@ -587,6 +609,8 @@ static int log_store(int facility, int level,
 #endif		
 	}
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* insert message */
 	log_next_idx += msg->len;
 	log_next_seq++;
@@ -615,11 +639,19 @@ static int check_syslog_permissions(int type, bool from_file)
 	 * already done the capabilities checks at open time.
 	 */
 	if (from_file && type != SYSLOG_ACTION_OPEN)
+<<<<<<< HEAD
 		return 0;
 
 	if (syslog_action_restricted(type)) {
 		if (capable(CAP_SYSLOG))
 			return 0;
+=======
+		goto ok;
+
+	if (syslog_action_restricted(type)) {
+		if (capable(CAP_SYSLOG))
+			goto ok;
+>>>>>>> common/deprecated/android-3.18
 		/*
 		 * For historical reasons, accept CAP_SYS_ADMIN too, with
 		 * a warning.
@@ -629,10 +661,18 @@ static int check_syslog_permissions(int type, bool from_file)
 				     "CAP_SYS_ADMIN but no CAP_SYSLOG "
 				     "(deprecated).\n",
 				 current->comm, task_pid_nr(current));
+<<<<<<< HEAD
 			return 0;
 		}
 		return -EPERM;
 	}
+=======
+			goto ok;
+		}
+		return -EPERM;
+	}
+ok:
+>>>>>>> common/deprecated/android-3.18
 	return security_syslog(type);
 }
 
@@ -960,18 +1000,41 @@ void log_buf_kexec_setup(void)
 static unsigned long __initdata new_log_buf_len;
 
 /* we practice scaling the ring buffer by powers of 2 */
+<<<<<<< HEAD
 static void __init log_buf_len_update(unsigned size)
 {
 	if (size)
 		size = roundup_pow_of_two(size);
 	if (size > log_buf_len)
 		new_log_buf_len = size;
+=======
+static void __init log_buf_len_update(u64 size)
+{
+	if (size > (u64)LOG_BUF_LEN_MAX) {
+		size = (u64)LOG_BUF_LEN_MAX;
+		pr_err("log_buf over 2G is not supported.\n");
+	}
+
+	if (size)
+		size = roundup_pow_of_two(size);
+	if (size > log_buf_len)
+		new_log_buf_len = (unsigned long)size;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /* save requested log_buf_len since it's too early to process it */
 static int __init log_buf_len_setup(char *str)
 {
+<<<<<<< HEAD
 	unsigned size = memparse(str, &str);
+=======
+	u64 size;
+
+	if (!str)
+		return -EINVAL;
+
+	size = memparse(str, &str);
+>>>>>>> common/deprecated/android-3.18
 
 	log_buf_len_update(size);
 
@@ -1016,7 +1079,11 @@ void __init setup_log_buf(int early)
 {
 	unsigned long flags;
 	char *new_log_buf;
+<<<<<<< HEAD
 	int free;
+=======
+	unsigned int free;
+>>>>>>> common/deprecated/android-3.18
 
 	if (log_buf != __log_buf)
 		return;
@@ -1036,7 +1103,11 @@ void __init setup_log_buf(int early)
 	}
 
 	if (unlikely(!new_log_buf)) {
+<<<<<<< HEAD
 		pr_err("log_buf_len: %ld bytes not available\n",
+=======
+		pr_err("log_buf_len: %lu bytes not available\n",
+>>>>>>> common/deprecated/android-3.18
 			new_log_buf_len);
 		return;
 	}
@@ -1049,8 +1120,13 @@ void __init setup_log_buf(int early)
 	memcpy(log_buf, __log_buf, __LOG_BUF_LEN);
 	raw_spin_unlock_irqrestore(&logbuf_lock, flags);
 
+<<<<<<< HEAD
 	pr_info("log_buf_len: %d bytes\n", log_buf_len);
 	pr_info("early log buf free: %d(%d%%)\n",
+=======
+	pr_info("log_buf_len: %u bytes\n", log_buf_len);
+	pr_info("early log buf free: %u(%u%%)\n",
+>>>>>>> common/deprecated/android-3.18
 		free, (free * 100) / __LOG_BUF_LEN);
 }
 
@@ -1124,9 +1200,12 @@ static inline void boot_delay_msec(int level)
 }
 #endif
 
+<<<<<<< HEAD
 static bool printk_core_num = IS_ENABLED(CONFIG_PRINTK_CORE_NUM);
 module_param_named(core_num, printk_core_num, bool, S_IRUGO | S_IWUSR);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static bool printk_time = IS_ENABLED(CONFIG_PRINTK_TIME);
 module_param_named(time, printk_time, bool, S_IRUGO | S_IWUSR);
 
@@ -1166,7 +1245,10 @@ static size_t print_prefix(const struct printk_log *msg, bool syslog, char *buf)
 	}
 
 	len += print_time(msg->ts_nsec, buf ? buf + len : NULL);
+<<<<<<< HEAD
 	len += print_process(msg, buf ? buf + len : NULL);
+=======
+>>>>>>> common/deprecated/android-3.18
 	return len;
 }
 
@@ -1293,7 +1375,11 @@ static int syslog_print(char __user *buf, int size)
 	return len;
 }
 
+<<<<<<< HEAD
 static int syslog_print_all(char __user *buf, int size, bool clear, bool knox)
+=======
+static int syslog_print_all(char __user *buf, int size, bool clear)
+>>>>>>> common/deprecated/android-3.18
 {
 	char *text;
 	int len = 0;
@@ -1308,6 +1394,7 @@ static int syslog_print_all(char __user *buf, int size, bool clear, bool knox)
 		u64 seq;
 		u32 idx;
 		enum log_flags prev;
+<<<<<<< HEAD
 		
 		/* { SecProductFeature_KNOX.SEC_PRODUCT_FEATURE_KNOX_SUPPORT_MDM */
 		/* messages are gone, move to first available one */
@@ -1319,11 +1406,20 @@ static int syslog_print_all(char __user *buf, int size, bool clear, bool knox)
 				clear_idx_knox = log_first_idx;
 		}
 		/* } SecProductFeature_KNOX.SEC_PRODUCT_FEATURE_KNOX_SUPPORT_MDM */
+=======
+
+		if (clear_seq < log_first_seq) {
+			/* messages are gone, move to first available one */
+			clear_seq = log_first_seq;
+			clear_idx = log_first_idx;
+		}
+>>>>>>> common/deprecated/android-3.18
 
 		/*
 		 * Find first record that fits, including all following records,
 		 * into the user-provided buffer for this dump.
 		 */
+<<<<<<< HEAD
 		 
 		/* { SecProductFeature_KNOX.SEC_PRODUCT_FEATURE_KNOX_SUPPORT_MDM */ 
 		if(!knox) {
@@ -1335,6 +1431,10 @@ static int syslog_print_all(char __user *buf, int size, bool clear, bool knox)
 		}
 		/* } SecProductFeature_KNOX.SEC_PRODUCT_FEATURE_KNOX_SUPPORT_MDM */
 		
+=======
+		seq = clear_seq;
+		idx = clear_idx;
+>>>>>>> common/deprecated/android-3.18
 		prev = 0;
 		while (seq < log_next_seq) {
 			struct printk_log *msg = log_from_idx(idx);
@@ -1344,6 +1444,7 @@ static int syslog_print_all(char __user *buf, int size, bool clear, bool knox)
 			idx = log_next(idx);
 			seq++;
 		}
+<<<<<<< HEAD
 		
 		/* { SecProductFeature_KNOX.SEC_PRODUCT_FEATURE_KNOX_SUPPORT_MDM */
 		/* move first record forward until length fits into the buffer */
@@ -1356,6 +1457,12 @@ static int syslog_print_all(char __user *buf, int size, bool clear, bool knox)
 		}
 		/* } SecProductFeature_KNOX.SEC_PRODUCT_FEATURE_KNOX_SUPPORT_MDM */
 
+=======
+
+		/* move first record forward until length fits into the buffer */
+		seq = clear_seq;
+		idx = clear_idx;
+>>>>>>> common/deprecated/android-3.18
 		prev = 0;
 		while (len > size && seq < log_next_seq) {
 			struct printk_log *msg = log_from_idx(idx);
@@ -1400,6 +1507,7 @@ static int syslog_print_all(char __user *buf, int size, bool clear, bool knox)
 		}
 	}
 
+<<<<<<< HEAD
 	/* { SecProductFeature_KNOX.SEC_PRODUCT_FEATURE_KNOX_SUPPORT_MDM */
 	if (clear) {
 		if (!knox) {
@@ -1412,6 +1520,12 @@ static int syslog_print_all(char __user *buf, int size, bool clear, bool knox)
 	}
 	/* } SecProductFeature_KNOX.SEC_PRODUCT_FEATURE_KNOX_SUPPORT_MDM */
 
+=======
+	if (clear) {
+		clear_seq = log_next_seq;
+		clear_idx = log_next_idx;
+	}
+>>>>>>> common/deprecated/android-3.18
 	raw_spin_unlock_irq(&logbuf_lock);
 
 	kfree(text);
@@ -1428,10 +1542,13 @@ int do_syslog(int type, char __user *buf, int len, bool from_file)
 	if (error)
 		goto out;
 
+<<<<<<< HEAD
 	error = security_syslog(type);
 	if (error)
 		return error;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	switch (type) {
 	case SYSLOG_ACTION_CLOSE:	/* Close log */
 		break;
@@ -1470,11 +1587,19 @@ int do_syslog(int type, char __user *buf, int len, bool from_file)
 			error = -EFAULT;
 			goto out;
 		}
+<<<<<<< HEAD
 		error = syslog_print_all(buf, len, clear, false);
 		break;
 	/* Clear ring buffer */
 	case SYSLOG_ACTION_CLEAR:
 		syslog_print_all(NULL, 0, true, false);
+=======
+		error = syslog_print_all(buf, len, clear);
+		break;
+	/* Clear ring buffer */
+	case SYSLOG_ACTION_CLEAR:
+		syslog_print_all(NULL, 0, true);
+>>>>>>> common/deprecated/android-3.18
 		break;
 	/* Disable logging to console */
 	case SYSLOG_ACTION_CONSOLE_OFF:
@@ -1540,6 +1665,7 @@ int do_syslog(int type, char __user *buf, int len, bool from_file)
 	case SYSLOG_ACTION_SIZE_BUFFER:
 		error = log_buf_len;
 		break;
+<<<<<<< HEAD
 	/* { SecProductFeature_KNOX.SEC_PRODUCT_FEATURE_KNOX_SUPPORT_MDM edmaudit Read last kernel messages */
 	case SYSLOG_ACTION_READ_CLEAR_KNOX:
 		error = -EINVAL;
@@ -1555,6 +1681,8 @@ int do_syslog(int type, char __user *buf, int len, bool from_file)
 		error = syslog_print_all(buf, len, /* clear */ true, /* knox */true);
 		break;
 	/* } SecProductFeature_KNOX.SEC_PRODUCT_FEATURE_KNOX_SUPPORT_MDM */
+=======
+>>>>>>> common/deprecated/android-3.18
 	default:
 		error = -EINVAL;
 		break;
@@ -1577,7 +1705,11 @@ static void call_console_drivers(int level, const char *text, size_t len)
 {
 	struct console *con;
 
+<<<<<<< HEAD
 	trace_console(text, len);
+=======
+	trace_console_rcuidle(text, len);
+>>>>>>> common/deprecated/android-3.18
 
 	if (level >= console_loglevel && !ignore_loglevel)
 		return;
@@ -1769,8 +1901,11 @@ static size_t cont_print_text(char *text, size_t size)
 
 	if (cont.cons == 0 && (console_prev & LOG_NEWLINE)) {
 		textlen += print_time(cont.ts_nsec, text);
+<<<<<<< HEAD
 		*(text+textlen) = ' ';
 		textlen += print_process(NULL, NULL);
+=======
+>>>>>>> common/deprecated/android-3.18
 		size -= textlen;
 	}
 
@@ -1805,8 +1940,11 @@ asmlinkage int vprintk_emit(int facility, int level,
 	int this_cpu;
 	int printed_len = 0;
 	bool in_sched = false;
+<<<<<<< HEAD
 	static bool prev_new_line = true;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* cpu currently holding logbuf_lock in this function */
 	static volatile unsigned int logbuf_cpu = UINT_MAX;
 
@@ -1860,6 +1998,7 @@ asmlinkage int vprintk_emit(int facility, int level,
 	 * The printf needs to come first; we need the syslog
 	 * prefix which might be passed-in as a parameter.
 	 */
+<<<<<<< HEAD
 	if (printk_core_num && prev_new_line) {
 		char tempbuf[LOG_LINE_MAX];
 		char *temp = tempbuf;
@@ -1875,14 +2014,20 @@ asmlinkage int vprintk_emit(int facility, int level,
 	} else {
 		text_len = vscnprintf(text, sizeof(textbuf), fmt, args);
 	}
+=======
+	text_len = vscnprintf(text, sizeof(textbuf), fmt, args);
+>>>>>>> common/deprecated/android-3.18
 
 	/* mark and strip a trailing newline */
 	if (text_len && text[text_len-1] == '\n') {
 		text_len--;
 		lflags |= LOG_NEWLINE;
+<<<<<<< HEAD
 		prev_new_line = true;
 	} else {
 		prev_new_line = false;
+=======
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/* strip kernel syslog prefix and extract log level or control flags */
@@ -1895,6 +2040,7 @@ asmlinkage int vprintk_emit(int facility, int level,
 			case '0' ... '7':
 				if (level == -1)
 					level = kern_level - '0';
+<<<<<<< HEAD
 				/* fallthrough */
 #ifdef CONFIG_SEC_DEBUG_AUTO_SUMMARY
 			case 'B' ... 'J':
@@ -1902,6 +2048,8 @@ asmlinkage int vprintk_emit(int facility, int level,
 					level = LOGLEVEL_PR_AUTO_BASE + (kern_level - 'A'); /* 91 ~ 99 */
 				/* fallthrough */
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 			case 'd':	/* KERN_DEFAULT */
 				lflags |= LOG_PREFIX;
 			}
@@ -2150,6 +2298,12 @@ static int __init console_setup(char *str)
 	char *s, *options, *brl_options = NULL;
 	int idx;
 
+<<<<<<< HEAD
+=======
+	if (str[0] == 0)
+		return 1;
+
+>>>>>>> common/deprecated/android-3.18
 	if (_braille_console_setup(&str, &brl_options))
 		return 1;
 
@@ -2259,6 +2413,7 @@ void resume_console(void)
 }
 
 /**
+<<<<<<< HEAD
  * console_flush - flush dmesg if console isn't suspended
  *
  * console_unlock always flushes the dmesg buffer, so just try to
@@ -2273,6 +2428,8 @@ void console_flush(void)
 }
 
 /**
+=======
+>>>>>>> common/deprecated/android-3.18
  * console_cpu_notify - print deferred console messages after CPU hotplug
  * @self: notifier struct
  * @action: CPU hotplug event
@@ -2291,7 +2448,12 @@ static int console_cpu_notify(struct notifier_block *self,
 	case CPU_DEAD:
 	case CPU_DOWN_FAILED:
 	case CPU_UP_CANCELED:
+<<<<<<< HEAD
 		console_flush();
+=======
+		console_lock();
+		console_unlock();
+>>>>>>> common/deprecated/android-3.18
 	}
 	return NOTIFY_OK;
 }
@@ -2392,20 +2554,41 @@ void console_unlock(void)
 	static u64 seen_seq;
 	unsigned long flags;
 	bool wake_klogd = false;
+<<<<<<< HEAD
 	bool retry;
 	u64 next_seq_in_this_turn;
+=======
+	bool do_cond_resched, retry;
+>>>>>>> common/deprecated/android-3.18
 
 	if (console_suspended) {
 		up_console_sem();
 		return;
 	}
 
+<<<<<<< HEAD
+=======
+	/*
+	 * Console drivers are called under logbuf_lock, so
+	 * @console_may_schedule should be cleared before; however, we may
+	 * end up dumping a lot of lines, for example, if called from
+	 * console registration path, and should invoke cond_resched()
+	 * between lines if allowable.  Not doing so can cause a very long
+	 * scheduling stall on a slow console leading to RCU stall and
+	 * softlockup warnings which exacerbate the issue with more
+	 * messages practically incapacitating the system.
+	 */
+	do_cond_resched = console_may_schedule;
+>>>>>>> common/deprecated/android-3.18
 	console_may_schedule = 0;
 
 	/* flush buffered message fragment immediately to console */
 	console_cont_flush(text, sizeof(text));
 again:
+<<<<<<< HEAD
 	next_seq_in_this_turn = log_next_seq;
+=======
+>>>>>>> common/deprecated/android-3.18
 	for (;;) {
 		struct printk_log *msg;
 		size_t len;
@@ -2429,7 +2612,11 @@ again:
 			len = 0;
 		}
 skip:
+<<<<<<< HEAD
 		if (console_seq >= next_seq_in_this_turn)
+=======
+		if (console_seq == log_next_seq)
+>>>>>>> common/deprecated/android-3.18
 			break;
 
 		msg = log_from_idx(console_idx);
@@ -2462,6 +2649,12 @@ skip:
 		call_console_drivers(level, text, len);
 		start_critical_timings();
 		local_irq_restore(flags);
+<<<<<<< HEAD
+=======
+
+		if (do_cond_resched)
+			cond_resched();
+>>>>>>> common/deprecated/android-3.18
 	}
 	console_locked = 0;
 
@@ -2529,6 +2722,28 @@ void console_unblank(void)
 	console_unlock();
 }
 
+<<<<<<< HEAD
+=======
+/**
+ * console_flush_on_panic - flush console content on panic
+ *
+ * Immediately output all pending messages no matter what.
+ */
+void console_flush_on_panic(void)
+{
+	/*
+	 * If someone else is holding the console lock, trylock will fail
+	 * and may_schedule may be set.  Ignore and proceed to unlock so
+	 * that messages are flushed out.  As this can be called from any
+	 * context and we don't want to get preempted while flushing,
+	 * ensure may_schedule is cleared.
+	 */
+	console_trylock();
+	console_may_schedule = 0;
+	console_unlock();
+}
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Return the console tty driver structure and its associated index
  */
@@ -3152,7 +3367,11 @@ bool kmsg_dump_get_buffer(struct kmsg_dumper *dumper, bool syslog,
 	seq = dumper->cur_seq;
 	idx = dumper->cur_idx;
 	prev = 0;
+<<<<<<< HEAD
 	while (l > size && seq < dumper->next_seq) {
+=======
+	while (l >= size && seq < dumper->next_seq) {
+>>>>>>> common/deprecated/android-3.18
 		struct printk_log *msg = log_from_idx(idx);
 
 		l -= msg_print_text(msg, prev, true, NULL, 0);
@@ -3253,6 +3472,7 @@ void __init dump_stack_set_arch_desc(const char *fmt, ...)
  */
 void dump_stack_print_info(const char *log_lvl)
 {
+<<<<<<< HEAD
 #ifdef CONFIG_ARM64
 	printk("%sCPU: %d MPIDR: %llx PID: %d Comm: %.20s %s %s %.*s\n",
 	       log_lvl, raw_smp_processor_id(), read_cpuid_mpidr(),
@@ -3262,13 +3482,18 @@ void dump_stack_print_info(const char *log_lvl)
 	       init_utsname()->version);
 
 #else
+=======
+>>>>>>> common/deprecated/android-3.18
 	printk("%sCPU: %d PID: %d Comm: %.20s %s %s %.*s\n",
 	       log_lvl, raw_smp_processor_id(), current->pid, current->comm,
 	       print_tainted(), init_utsname()->release,
 	       (int)strcspn(init_utsname()->version, " "),
 	       init_utsname()->version);
 
+<<<<<<< HEAD
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (dump_stack_arch_desc_str[0] != '\0')
 		printk("%sHardware name: %s\n",
 		       log_lvl, dump_stack_arch_desc_str);

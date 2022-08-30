@@ -61,7 +61,11 @@ static int vexpress_syscfg_exec(struct vexpress_syscfg_func *func,
 	int tries;
 	long timeout;
 
+<<<<<<< HEAD
 	if (WARN_ON(index > func->num_templates))
+=======
+	if (WARN_ON(index >= func->num_templates))
+>>>>>>> common/deprecated/android-3.18
 		return -EINVAL;
 
 	command = readl(syscfg->base + SYS_CFGCTRL);

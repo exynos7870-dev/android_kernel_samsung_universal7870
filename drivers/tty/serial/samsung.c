@@ -32,7 +32,10 @@
 #include <linux/ioport.h>
 #include <linux/io.h>
 #include <linux/platform_device.h>
+<<<<<<< HEAD
 #include <linux/slab.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 #include <linux/init.h>
 #include <linux/sysrq.h>
 #include <linux/console.h>
@@ -43,6 +46,7 @@
 #include <linux/serial_s3c.h>
 #include <linux/delay.h>
 #include <linux/clk.h>
+<<<<<<< HEAD
 #include <linux/suspend.h>
 #include <linux/of.h>
 #include <soc/samsung/exynos-pmu.h>
@@ -65,6 +69,14 @@
 #endif
 #include <linux/proc_fs.h>
 #include <linux/seq_file.h>
+=======
+#include <linux/cpufreq.h>
+#include <linux/of.h>
+
+#include <asm/irq.h>
+
+#include "samsung.h"
+>>>>>>> common/deprecated/android-3.18
 
 #if	defined(CONFIG_SERIAL_SAMSUNG_DEBUG) &&	\
 	defined(CONFIG_DEBUG_LL) &&		\
@@ -95,6 +107,7 @@ static void dbg(const char *fmt, ...)
 #define S3C24XX_SERIAL_MAJOR	204
 #define S3C24XX_SERIAL_MINOR	64
 
+<<<<<<< HEAD
 #ifndef CONFIG_SAMSUNG_PRODUCT_SHIP
 #define SERIAL_UART_TRACE 1
 #define PROC_SERIAL_DIR	"serial/uart"
@@ -105,6 +118,8 @@ static void dbg(const char *fmt, ...)
 #define MAX_BAUD	3000000
 #define MIN_BAUD	0
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /* macros to change one thing to another */
 
 #define tx_enabled(port) ((port)->unused[0])
@@ -113,6 +128,7 @@ static void dbg(const char *fmt, ...)
 /* flag to ignore all characters coming in */
 #define RXSTAT_DUMMY_READ (0x10000000)
 
+<<<<<<< HEAD
 static LIST_HEAD(drvdata_list);
 s3c_wake_peer_t s3c2410_serial_wake_peer[CONFIG_SERIAL_SAMSUNG_UARTS];
 EXPORT_SYMBOL_GPL(s3c2410_serial_wake_peer);
@@ -307,6 +323,8 @@ static inline void uart_clock_disable(struct s3c24xx_uart_port *ourport)
 struct pinctrl_state *uart_pin_state[MAX_AUD_UART_PIN_STATE];
 struct pinctrl *aud_uart_pinctrl;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static inline struct s3c24xx_uart_port *to_ourport(struct uart_port *port)
 {
 	return container_of(port, struct s3c24xx_uart_port, port);
@@ -447,6 +465,7 @@ static int s3c24xx_serial_rx_fifocnt(struct s3c24xx_uart_port *ourport,
 	return (ufstat & info->rx_fifomask) >> info->rx_fifoshift;
 }
 
+<<<<<<< HEAD
 static int s3c24xx_serial_tx_fifocnt(struct s3c24xx_uart_port *ourport,
 				     unsigned long ufstat)
 {
@@ -457,6 +476,8 @@ static int s3c24xx_serial_tx_fifocnt(struct s3c24xx_uart_port *ourport,
 
 	return (ufstat & info->tx_fifomask) >> info->tx_fifoshift;
 }
+=======
+>>>>>>> common/deprecated/android-3.18
 
 /* ? - where has parity gone?? */
 #define S3C2410_UERSTAT_PARITY (0x1000)
@@ -468,14 +489,19 @@ s3c24xx_serial_rx_chars(int irq, void *dev_id)
 	struct uart_port *port = &ourport->port;
 	unsigned int ufcon, ch, flag, ufstat, uerstat;
 	unsigned long flags;
+<<<<<<< HEAD
 	int fifocnt = 0;
 	int max_count = port->fifosize;
 	unsigned char trace_buf[256] = {0, };
 	int trace_cnt = 0;
+=======
+	int max_count = 64;
+>>>>>>> common/deprecated/android-3.18
 
 	spin_lock_irqsave(&port->lock, flags);
 
 	while (max_count-- > 0) {
+<<<<<<< HEAD
 		/*
 		 * Receive all characters known to be in FIFO
 		 * before reading FIFO level again
@@ -487,6 +513,13 @@ s3c24xx_serial_rx_chars(int irq, void *dev_id)
 				break;
 		}
 		fifocnt--;
+=======
+		ufcon = rd_regl(port, S3C2410_UFCON);
+		ufstat = rd_regl(port, S3C2410_UFSTAT);
+
+		if (s3c24xx_serial_rx_fifocnt(ourport, ufstat) == 0)
+			break;
+>>>>>>> common/deprecated/android-3.18
 
 		uerstat = rd_regl(port, S3C2410_UERSTAT);
 		ch = rd_regb(port, S3C2410_URXH);
@@ -501,7 +534,10 @@ s3c24xx_serial_rx_chars(int irq, void *dev_id)
 				}
 			} else {
 				if (txe) {
+<<<<<<< HEAD
 					ufcon = rd_regl(port, S3C2410_UFCON);
+=======
+>>>>>>> common/deprecated/android-3.18
 					ufcon |= S3C2410_UFCON_RESETRX;
 					wr_regl(port, S3C2410_UFCON, ufcon);
 					rx_enabled(port) = 1;
@@ -524,13 +560,17 @@ s3c24xx_serial_rx_chars(int irq, void *dev_id)
 
 			/* check for break */
 			if (uerstat & S3C2410_UERSTAT_BREAK) {
+<<<<<<< HEAD
 				printk("[UART] BREAK Error!\n");
+=======
+>>>>>>> common/deprecated/android-3.18
 				dbg("break!\n");
 				port->icount.brk++;
 				if (uart_handle_break(port))
 					goto ignore_char;
 			}
 
+<<<<<<< HEAD
 			if (uerstat & S3C2410_UERSTAT_FRAME) {
 				printk("[UART] Frame Error!\n");
 				port->icount.frame++;
@@ -539,6 +579,13 @@ s3c24xx_serial_rx_chars(int irq, void *dev_id)
 				printk("[UART] Overrun Error!\n");
 				port->icount.overrun++;
 			}
+=======
+			if (uerstat & S3C2410_UERSTAT_FRAME)
+				port->icount.frame++;
+			if (uerstat & S3C2410_UERSTAT_OVERRUN)
+				port->icount.overrun++;
+
+>>>>>>> common/deprecated/android-3.18
 			uerstat &= port->read_status_mask;
 
 			if (uerstat & S3C2410_UERSTAT_BREAK)
@@ -553,9 +600,12 @@ s3c24xx_serial_rx_chars(int irq, void *dev_id)
 		if (uart_handle_sysrq_char(port, ch))
 			goto ignore_char;
 
+<<<<<<< HEAD
 		if (ourport->uart_logging)
 			trace_buf[trace_cnt++] = ch;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		uart_insert_char(port, uerstat, S3C2410_UERSTAT_OVERRUN,
 				 ch, flag);
 
@@ -563,9 +613,12 @@ s3c24xx_serial_rx_chars(int irq, void *dev_id)
 		continue;
 	}
 
+<<<<<<< HEAD
 	if (ourport->uart_logging && trace_cnt)
 		uart_copy_to_local_buf(1, &ourport->uart_local_buf, trace_buf, trace_cnt);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	spin_unlock_irqrestore(&port->lock, flags);
 	tty_flip_buffer_push(&port->state->port);
 
@@ -579,16 +632,23 @@ static irqreturn_t s3c24xx_serial_tx_chars(int irq, void *id)
 	struct uart_port *port = &ourport->port;
 	struct circ_buf *xmit = &port->state->xmit;
 	unsigned long flags;
+<<<<<<< HEAD
 	int count = port->fifosize;
 	unsigned char trace_buf[256] = {0, };
 	int trace_cnt = 0;
+=======
+	int count = 256;
+>>>>>>> common/deprecated/android-3.18
 
 	spin_lock_irqsave(&port->lock, flags);
 
 	if (port->x_char) {
 		wr_regb(port, S3C2410_UTXH, port->x_char);
+<<<<<<< HEAD
 		if (ourport->uart_logging)
 			trace_buf[trace_cnt++] = port->x_char;
+=======
+>>>>>>> common/deprecated/android-3.18
 		port->icount.tx++;
 		port->x_char = 0;
 		goto out;
@@ -610,8 +670,11 @@ static irqreturn_t s3c24xx_serial_tx_chars(int irq, void *id)
 			break;
 
 		wr_regb(port, S3C2410_UTXH, xmit->buf[xmit->tail]);
+<<<<<<< HEAD
 		if (ourport->uart_logging)
 			trace_buf[trace_cnt++] = (unsigned char)xmit->buf[xmit->tail];
+=======
+>>>>>>> common/deprecated/android-3.18
 		xmit->tail = (xmit->tail + 1) & (UART_XMIT_SIZE - 1);
 		port->icount.tx++;
 	}
@@ -625,14 +688,19 @@ static irqreturn_t s3c24xx_serial_tx_chars(int irq, void *id)
 	if (uart_circ_empty(xmit))
 		s3c24xx_serial_stop_tx(port);
 
+<<<<<<< HEAD
 out:
 	if (ourport->uart_logging && trace_cnt)
 		uart_copy_to_local_buf(0, &ourport->uart_local_buf, trace_buf, trace_cnt);
 
+=======
+ out:
+>>>>>>> common/deprecated/android-3.18
 	spin_unlock_irqrestore(&port->lock, flags);
 	return IRQ_HANDLED;
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_ARM_EXYNOS_DEVFREQ
 static void s3c64xx_serial_qos_func(struct work_struct *work)
 {
@@ -653,6 +721,8 @@ static void s3c64xx_serial_qos_func(struct work_struct *work)
 }
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /* interrupt handler for s3c64xx and later SoC's.*/
 static irqreturn_t s3c64xx_serial_handle_irq(int irq, void *id)
 {
@@ -661,6 +731,7 @@ static irqreturn_t s3c64xx_serial_handle_irq(int irq, void *id)
 	unsigned int pend = rd_regl(port, S3C64XX_UINTP);
 	irqreturn_t ret = IRQ_HANDLED;
 
+<<<<<<< HEAD
 #ifdef CONFIG_PM_DEVFREQ
 	if ((ourport->mif_qos_val || ourport->cpu_qos_val)
 					&& ourport->qos_timeout)
@@ -668,6 +739,8 @@ static irqreturn_t s3c64xx_serial_handle_irq(int irq, void *id)
 						msecs_to_jiffies(100));
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (pend & S3C64XX_UINTM_RXD_MSK) {
 		ret = s3c24xx_serial_rx_chars(irq, id);
 		wr_regl(port, S3C64XX_UINTP, S3C64XX_UINTM_RXD_MSK);
@@ -682,11 +755,17 @@ static irqreturn_t s3c64xx_serial_handle_irq(int irq, void *id)
 static unsigned int s3c24xx_serial_tx_empty(struct uart_port *port)
 {
 	struct s3c24xx_uart_info *info = s3c24xx_port_to_info(port);
+<<<<<<< HEAD
 	unsigned long ufstat;
 	unsigned long ufcon;
 
 	ufstat = rd_regl(port, S3C2410_UFSTAT);
 	ufcon = rd_regl(port, S3C2410_UFCON);
+=======
+	unsigned long ufstat = rd_regl(port, S3C2410_UFSTAT);
+	unsigned long ufcon = rd_regl(port, S3C2410_UFCON);
+
+>>>>>>> common/deprecated/android-3.18
 	if (ufcon & S3C2410_UFCON_FIFOMODE) {
 		if ((ufstat & info->tx_fifomask) != 0 ||
 		    (ufstat & info->tx_fifofull))
@@ -701,9 +780,13 @@ static unsigned int s3c24xx_serial_tx_empty(struct uart_port *port)
 /* no modem control lines */
 static unsigned int s3c24xx_serial_get_mctrl(struct uart_port *port)
 {
+<<<<<<< HEAD
 	unsigned int umstat;
 
 	umstat = rd_regb(port, S3C2410_UMSTAT);
+=======
+	unsigned int umstat = rd_regb(port, S3C2410_UMSTAT);
+>>>>>>> common/deprecated/android-3.18
 
 	if (umstat & S3C2410_UMSTAT_CTS)
 		return TIOCM_CAR | TIOCM_DSR | TIOCM_CTS;
@@ -777,9 +860,12 @@ static int s3c24xx_serial_startup(struct uart_port *port)
 	dbg("s3c24xx_serial_startup: port=%p (%08llx,%p)\n",
 	    port, (unsigned long long)port->mapbase, port->membase);
 
+<<<<<<< HEAD
 	ourport->cfg->wake_peer[port->line] =
 				s3c2410_serial_wake_peer[port->line];
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	rx_enabled(port) = 1;
 
 	ret = request_irq(ourport->rx_irq, s3c24xx_serial_rx_chars, 0,
@@ -826,6 +912,7 @@ static int s3c64xx_serial_startup(struct uart_port *port)
 	dbg("s3c64xx_serial_startup: port=%p (%08llx,%p)\n",
 	    port, (unsigned long long)port->mapbase, port->membase);
 
+<<<<<<< HEAD
 	ourport->cfg->wake_peer[port->line] =
 				s3c2410_serial_wake_peer[port->line];
 
@@ -838,6 +925,12 @@ static int s3c64xx_serial_startup(struct uart_port *port)
 		ret = request_threaded_irq(port->irq, NULL, s3c64xx_serial_handle_irq,
 				IRQF_ONESHOT, s3c24xx_serial_portname(port), ourport);
 
+=======
+	wr_regl(port, S3C64XX_UINTM, 0xf);
+
+	ret = request_irq(port->irq, s3c64xx_serial_handle_irq, IRQF_SHARED,
+			  s3c24xx_serial_portname(port), ourport);
+>>>>>>> common/deprecated/android-3.18
 	if (ret) {
 		dev_err(port->dev, "cannot get irq %d\n", port->irq);
 		return ret;
@@ -855,6 +948,7 @@ static int s3c64xx_serial_startup(struct uart_port *port)
 	return ret;
 }
 
+<<<<<<< HEAD
 static void aud_uart_gpio_cfg(struct device *dev, int level)
 {
 #ifdef CONFIG_PINCTRL_SAMSUNG
@@ -906,10 +1000,15 @@ void aud_uart_gpio_idle(struct device *dev)
 }
 
 /* power power management control */
+=======
+/* power power management control */
+
+>>>>>>> common/deprecated/android-3.18
 static void s3c24xx_serial_pm(struct uart_port *port, unsigned int level,
 			      unsigned int old)
 {
 	struct s3c24xx_uart_port *ourport = to_ourport(port);
+<<<<<<< HEAD
 	unsigned int umcon;
 
 	switch (level) {
@@ -954,6 +1053,29 @@ static void s3c24xx_serial_pm(struct uart_port *port, unsigned int level,
 		}
 
 		s3c24xx_serial_resetport(port, s3c24xx_port_to_cfg(port));
+=======
+	int timeout = 10000;
+
+	ourport->pm_level = level;
+
+	switch (level) {
+	case 3:
+		while (--timeout && !s3c24xx_serial_txempty_nofifo(port))
+			udelay(100);
+
+		if (!IS_ERR(ourport->baudclk))
+			clk_disable_unprepare(ourport->baudclk);
+
+		clk_disable_unprepare(ourport->clk);
+		break;
+
+	case 0:
+		clk_prepare_enable(ourport->clk);
+
+		if (!IS_ERR(ourport->baudclk))
+			clk_prepare_enable(ourport->baudclk);
+
+>>>>>>> common/deprecated/android-3.18
 		break;
 	default:
 		dev_err(port->dev, "s3c24xx_serial: unknown pm %d\n", level);
@@ -975,6 +1097,40 @@ static void s3c24xx_serial_pm(struct uart_port *port, unsigned int level,
 
 #define MAX_CLK_NAME_LENGTH 15
 
+<<<<<<< HEAD
+=======
+static inline int s3c24xx_serial_getsource(struct uart_port *port)
+{
+	struct s3c24xx_uart_info *info = s3c24xx_port_to_info(port);
+	unsigned int ucon;
+
+	if (info->num_clks == 1)
+		return 0;
+
+	ucon = rd_regl(port, S3C2410_UCON);
+	ucon &= info->clksel_mask;
+	return ucon >> info->clksel_shift;
+}
+
+static void s3c24xx_serial_setsource(struct uart_port *port,
+			unsigned int clk_sel)
+{
+	struct s3c24xx_uart_info *info = s3c24xx_port_to_info(port);
+	unsigned int ucon;
+
+	if (info->num_clks == 1)
+		return;
+
+	ucon = rd_regl(port, S3C2410_UCON);
+	if ((ucon & info->clksel_mask) >> info->clksel_shift == clk_sel)
+		return;
+
+	ucon &= ~info->clksel_mask;
+	ucon |= clk_sel << info->clksel_shift;
+	wr_regl(port, S3C2410_UCON, ucon);
+}
+
+>>>>>>> common/deprecated/android-3.18
 static unsigned int s3c24xx_serial_getclk(struct s3c24xx_uart_port *ourport,
 			unsigned int req_baud, struct clk **best_clk,
 			unsigned int *clk_num)
@@ -982,6 +1138,7 @@ static unsigned int s3c24xx_serial_getclk(struct s3c24xx_uart_port *ourport,
 	struct s3c24xx_uart_info *info = ourport->info;
 	struct clk *clk;
 	unsigned long rate;
+<<<<<<< HEAD
 	unsigned int cnt, baud, quot, clk_sel, best_quot = 0;
 	char clkname[MAX_CLK_NAME_LENGTH];
 	int calc_deviation, deviation = (1 << 30) - 1;
@@ -993,15 +1150,31 @@ static unsigned int s3c24xx_serial_getclk(struct s3c24xx_uart_port *ourport,
 			continue;
 
 		snprintf(clkname, sizeof(clkname), "sclk_uart%d", ourport->port.line);
+=======
+	unsigned int cnt, baud, quot, best_quot = 0;
+	char clkname[MAX_CLK_NAME_LENGTH];
+	int calc_deviation, deviation = (1 << 30) - 1;
+
+	for (cnt = 0; cnt < info->num_clks; cnt++) {
+		/* Keep selected clock if provided */
+		if (ourport->cfg->clk_sel &&
+			!(ourport->cfg->clk_sel & (1 << cnt)))
+			continue;
+
+		sprintf(clkname, "clk_uart_baud%d", cnt);
+>>>>>>> common/deprecated/android-3.18
 		clk = clk_get(ourport->port.dev, clkname);
 		if (IS_ERR(clk))
 			continue;
 
 		rate = clk_get_rate(clk);
+<<<<<<< HEAD
 
 		if (ourport->dbg_mode & UART_DBG_MODE)
 			printk(" - Clock rate : %ld\n", rate);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		if (!rate)
 			continue;
 
@@ -1086,15 +1259,34 @@ static void s3c24xx_serial_set_termios(struct uart_port *port,
 	 * Ask the core to calculate the divisor for us.
 	 */
 
+<<<<<<< HEAD
 	baud = uart_get_baud_rate(port, termios, old, MIN_BAUD, MAX_BAUD);
+=======
+	baud = uart_get_baud_rate(port, termios, old, 0, 115200*8);
+>>>>>>> common/deprecated/android-3.18
 	quot = s3c24xx_serial_getclk(ourport, baud, &clk, &clk_sel);
 	if (baud == 38400 && (port->flags & UPF_SPD_MASK) == UPF_SPD_CUST)
 		quot = port->custom_divisor;
 	if (IS_ERR(clk))
 		return;
 
+<<<<<<< HEAD
 	/* setting clock for baud rate */
 	if (ourport->baudclk != clk) {
+=======
+	/* check to see if we need  to change clock source */
+
+	if (ourport->baudclk != clk) {
+		clk_prepare_enable(clk);
+
+		s3c24xx_serial_setsource(port, clk_sel);
+
+		if (!IS_ERR(ourport->baudclk)) {
+			clk_disable_unprepare(ourport->baudclk);
+			ourport->baudclk = ERR_PTR(-EINVAL);
+		}
+
+>>>>>>> common/deprecated/android-3.18
 		ourport->baudclk = clk;
 		ourport->baudclk_rate = clk ? clk_get_rate(clk) : 0;
 	}
@@ -1172,9 +1364,12 @@ static void s3c24xx_serial_set_termios(struct uart_port *port,
 	    rd_regl(port, S3C2410_UCON),
 	    rd_regl(port, S3C2410_UFCON));
 
+<<<<<<< HEAD
 	if (ourport->dbg_mode & UART_DBG_MODE)
 		print_uart_mode(port, termios, baud);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Update the per-port timeout.
 	 */
@@ -1257,6 +1452,7 @@ s3c24xx_serial_verify_port(struct uart_port *port, struct serial_struct *ser)
 	return 0;
 }
 
+<<<<<<< HEAD
 static void s3c24xx_serial_wake_peer(struct uart_port *port)
 {
 	struct s3c2410_uartcfg *cfg = s3c24xx_port_to_cfg(port);
@@ -1264,6 +1460,8 @@ static void s3c24xx_serial_wake_peer(struct uart_port *port)
 	if (cfg->wake_peer[port->line])
 		cfg->wake_peer[port->line](port);
 }
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #ifdef CONFIG_SERIAL_SAMSUNG_CONSOLE
 
@@ -1271,6 +1469,7 @@ static struct console s3c24xx_serial_console;
 
 static int __init s3c24xx_serial_console_init(void)
 {
+<<<<<<< HEAD
 	struct clk *console_clk;
 	char pclk_name[16], sclk_name[16];
 
@@ -1295,6 +1494,8 @@ static int __init s3c24xx_serial_console_init(void)
 		clk_prepare_enable(console_clk);
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	register_console(&s3c24xx_serial_console);
 	return 0;
 }
@@ -1328,7 +1529,10 @@ static struct uart_ops s3c24xx_serial_ops = {
 	.request_port	= s3c24xx_serial_request_port,
 	.config_port	= s3c24xx_serial_config_port,
 	.verify_port	= s3c24xx_serial_verify_port,
+<<<<<<< HEAD
 	.wake_peer	= s3c24xx_serial_wake_peer,
+=======
+>>>>>>> common/deprecated/android-3.18
 #if defined(CONFIG_SERIAL_SAMSUNG_CONSOLE) && defined(CONFIG_CONSOLE_POLL)
 	.poll_get_char = s3c24xx_serial_get_poll_char,
 	.poll_put_char = s3c24xx_serial_put_poll_char,
@@ -1393,6 +1597,7 @@ static struct s3c24xx_uart_port s3c24xx_serial_ports[CONFIG_SERIAL_SAMSUNG_UARTS
 			.flags		= UPF_BOOT_AUTOCONF,
 			.line		= 3,
 		}
+<<<<<<< HEAD
 	},
 #endif
 #if CONFIG_SERIAL_SAMSUNG_UARTS > 4
@@ -1438,6 +1643,12 @@ static struct s3c24xx_uart_port *exynos_serial_default_port(int port_index)
 	return &s3c24xx_serial_ports[port_index];
 }
 
+=======
+	}
+#endif
+};
+
+>>>>>>> common/deprecated/android-3.18
 /* s3c24xx_serial_resetport
  *
  * reset the fifos and other the settings.
@@ -1447,7 +1658,10 @@ static void s3c24xx_serial_resetport(struct uart_port *port,
 				   struct s3c2410_uartcfg *cfg)
 {
 	struct s3c24xx_uart_info *info = s3c24xx_port_to_info(port);
+<<<<<<< HEAD
 	struct s3c24xx_uart_port *ourport = to_ourport(port);
+=======
+>>>>>>> common/deprecated/android-3.18
 	unsigned long ucon = rd_regl(port, S3C2410_UCON);
 	unsigned int ucon_mask;
 
@@ -1456,11 +1670,14 @@ static void s3c24xx_serial_resetport(struct uart_port *port,
 		ucon_mask |= S3C2440_UCON0_DIVMASK;
 
 	ucon &= ucon_mask;
+<<<<<<< HEAD
 	if (ourport->dbg_mode & UART_LOOPBACK_MODE) {
 		dev_err(port->dev, "Change Loopback mode!\n");
 		ucon |= S3C2443_UCON_LOOPBACK;
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	wr_regl(port, S3C2410_UCON,  ucon | cfg->ucon);
 
 	/* reset both fifos */
@@ -1471,6 +1688,92 @@ static void s3c24xx_serial_resetport(struct uart_port *port,
 	udelay(1);
 }
 
+<<<<<<< HEAD
+=======
+
+#ifdef CONFIG_CPU_FREQ
+
+static int s3c24xx_serial_cpufreq_transition(struct notifier_block *nb,
+					     unsigned long val, void *data)
+{
+	struct s3c24xx_uart_port *port;
+	struct uart_port *uport;
+
+	port = container_of(nb, struct s3c24xx_uart_port, freq_transition);
+	uport = &port->port;
+
+	/* check to see if port is enabled */
+
+	if (port->pm_level != 0)
+		return 0;
+
+	/* try and work out if the baudrate is changing, we can detect
+	 * a change in rate, but we do not have support for detecting
+	 * a disturbance in the clock-rate over the change.
+	 */
+
+	if (IS_ERR(port->baudclk))
+		goto exit;
+
+	if (port->baudclk_rate == clk_get_rate(port->baudclk))
+		goto exit;
+
+	if (val == CPUFREQ_PRECHANGE) {
+		/* we should really shut the port down whilst the
+		 * frequency change is in progress. */
+
+	} else if (val == CPUFREQ_POSTCHANGE) {
+		struct ktermios *termios;
+		struct tty_struct *tty;
+
+		if (uport->state == NULL)
+			goto exit;
+
+		tty = uport->state->port.tty;
+
+		if (tty == NULL)
+			goto exit;
+
+		termios = &tty->termios;
+
+		if (termios == NULL) {
+			dev_warn(uport->dev, "%s: no termios?\n", __func__);
+			goto exit;
+		}
+
+		s3c24xx_serial_set_termios(uport, termios, NULL);
+	}
+
+ exit:
+	return 0;
+}
+
+static inline int s3c24xx_serial_cpufreq_register(struct s3c24xx_uart_port *port)
+{
+	port->freq_transition.notifier_call = s3c24xx_serial_cpufreq_transition;
+
+	return cpufreq_register_notifier(&port->freq_transition,
+					 CPUFREQ_TRANSITION_NOTIFIER);
+}
+
+static inline void s3c24xx_serial_cpufreq_deregister(struct s3c24xx_uart_port *port)
+{
+	cpufreq_unregister_notifier(&port->freq_transition,
+				    CPUFREQ_TRANSITION_NOTIFIER);
+}
+
+#else
+static inline int s3c24xx_serial_cpufreq_register(struct s3c24xx_uart_port *port)
+{
+	return 0;
+}
+
+static inline void s3c24xx_serial_cpufreq_deregister(struct s3c24xx_uart_port *port)
+{
+}
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 /* s3c24xx_serial_init_port
  *
  * initialise a single serial port from the platform device given
@@ -1482,7 +1785,10 @@ static int s3c24xx_serial_init_port(struct s3c24xx_uart_port *ourport,
 	struct uart_port *port = &ourport->port;
 	struct s3c2410_uartcfg *cfg = ourport->cfg;
 	struct resource *res;
+<<<<<<< HEAD
 	char clkname[MAX_CLK_NAME_LENGTH];
+=======
+>>>>>>> common/deprecated/android-3.18
 	int ret;
 
 	dbg("s3c24xx_serial_init_port: port=%p, platdev=%p\n", port, platdev);
@@ -1491,11 +1797,18 @@ static int s3c24xx_serial_init_port(struct s3c24xx_uart_port *ourport,
 		return -ENODEV;
 
 	if (port->mapbase != 0)
+<<<<<<< HEAD
 		return 0;
 
 	/* setup info for port */
 	port->dev	= &platdev->dev;
 	ourport->pdev	= platdev;
+=======
+		return -EINVAL;
+
+	/* setup info for port */
+	port->dev	= &platdev->dev;
+>>>>>>> common/deprecated/android-3.18
 
 	/* Startup sequence is different for s3c64xx and higher SoC's */
 	if (s3c24xx_serial_has_interrupt_mask(port))
@@ -1534,6 +1847,7 @@ static int s3c24xx_serial_init_port(struct s3c24xx_uart_port *ourport,
 		ourport->tx_irq = ret + 1;
 	}
 
+<<<<<<< HEAD
 	ret = platform_get_irq(platdev, 1);
 	if (ret > 0)
 		ourport->tx_irq = ret;
@@ -1571,13 +1885,31 @@ static int s3c24xx_serial_init_port(struct s3c24xx_uart_port *ourport,
 			clk_put(ourport->separated_clk);
 			return ret;
 		}
+=======
+	if (!s3c24xx_serial_has_interrupt_mask(port)) {
+		ret = platform_get_irq(platdev, 1);
+		if (ret > 0)
+			ourport->tx_irq = ret;
+	}
+
+	ourport->clk	= clk_get(&platdev->dev, "uart");
+	if (IS_ERR(ourport->clk)) {
+		pr_err("%s: Controller clock not found\n",
+				dev_name(&platdev->dev));
+		ret = PTR_ERR(ourport->clk);
+		goto err;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	ret = clk_prepare_enable(ourport->clk);
 	if (ret) {
 		pr_err("uart: clock failed to prepare+enable: %d\n", ret);
 		clk_put(ourport->clk);
+<<<<<<< HEAD
 		return ret;
+=======
+		goto err;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/* Keep all interrupts masked and cleared */
@@ -1593,7 +1925,16 @@ static int s3c24xx_serial_init_port(struct s3c24xx_uart_port *ourport,
 
 	/* reset the fifos (and setup the uart) */
 	s3c24xx_serial_resetport(port, cfg);
+<<<<<<< HEAD
 	return 0;
+=======
+
+	return 0;
+
+err:
+	port->mapbase = 0;
+	return ret;
+>>>>>>> common/deprecated/android-3.18
 }
 
 #ifdef CONFIG_SAMSUNG_CLOCK
@@ -1633,6 +1974,7 @@ static inline struct s3c24xx_serial_drv_data *s3c24xx_get_driver_data(
 			platform_get_device_id(pdev)->driver_data;
 }
 
+<<<<<<< HEAD
 void s3c24xx_serial_fifo_wait(void)
 {
 	struct s3c24xx_uart_port *ourport;
@@ -1824,6 +2166,28 @@ static int s3c24xx_serial_probe(struct platform_device *pdev)
 
 	if (ourport->port.line != port_index)
 		ourport = exynos_serial_default_port(port_index);
+=======
+static int s3c24xx_serial_probe(struct platform_device *pdev)
+{
+	struct device_node *np = pdev->dev.of_node;
+	struct s3c24xx_uart_port *ourport;
+	int index = probe_index;
+	int ret;
+
+	if (np) {
+		ret = of_alias_get_id(np, "serial");
+		if (ret >= 0)
+			index = ret;
+	}
+
+	dbg("s3c24xx_serial_probe(%p) %d\n", pdev, index);
+
+	if (index >= ARRAY_SIZE(s3c24xx_serial_ports)) {
+		dev_err(&pdev->dev, "serial%d out of range\n", index);
+		return -EINVAL;
+	}
+	ourport = &s3c24xx_serial_ports[index];
+>>>>>>> common/deprecated/android-3.18
 
 	ourport->drv_data = s3c24xx_get_driver_data(pdev);
 	if (!ourport->drv_data) {
@@ -1837,6 +2201,7 @@ static int s3c24xx_serial_probe(struct platform_device *pdev)
 			dev_get_platdata(&pdev->dev) :
 			ourport->drv_data->def_cfg;
 
+<<<<<<< HEAD
 	ourport->port.fifosize = (ourport->info->fifosize) ?
 		ourport->info->fifosize :
 		ourport->drv_data->fifosize[port_index];
@@ -1909,10 +2274,25 @@ static int s3c24xx_serial_probe(struct platform_device *pdev)
 #endif
             pr_err("uart logging %d, index %d\n",ourport->uart_logging,port_index);
 
+=======
+	if (np)
+		of_property_read_u32(np,
+			"samsung,uart-fifosize", &ourport->port.fifosize);
+
+	if (!ourport->port.fifosize) {
+		ourport->port.fifosize = (ourport->info->fifosize) ?
+			ourport->info->fifosize :
+			ourport->drv_data->fifosize[index];
+	}
+
+	dbg("%s: initialising port %p...\n", __func__, ourport);
+
+>>>>>>> common/deprecated/android-3.18
 	ret = s3c24xx_serial_init_port(ourport, pdev);
 	if (ret < 0)
 		return ret;
 
+<<<<<<< HEAD
         if (ourport->uart_logging == 1) {
             /* Allocate memory for UART logging */
             ourport->uart_local_buf.buffer = kzalloc(LOG_BUFFER_SIZE, GFP_KERNEL);
@@ -1971,6 +2351,14 @@ static int s3c24xx_serial_probe(struct platform_device *pdev)
 		lpass_get_sync(&pdev->dev);
 		dev_err(&pdev->dev, "AUD-UART : Audio block power enable.\n");
 #endif
+=======
+	if (!s3c24xx_uart_drv.state) {
+		ret = uart_register_driver(&s3c24xx_uart_drv);
+		if (ret < 0) {
+			pr_err("Failed to register Samsung UART driver\n");
+			return ret;
+		}
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	dbg("%s: adding port\n", __func__);
@@ -1982,7 +2370,11 @@ static int s3c24xx_serial_probe(struct platform_device *pdev)
 	 * so that a potential re-enablement through the pm-callback overlaps
 	 * and keeps the clock enabled in this case.
 	 */
+<<<<<<< HEAD
 	uart_clock_disable(ourport);
+=======
+	clk_disable_unprepare(ourport->clk);
+>>>>>>> common/deprecated/android-3.18
 
 #ifdef CONFIG_SAMSUNG_CLOCK
 	ret = device_create_file(&pdev->dev, &dev_attr_clock_source);
@@ -1990,6 +2382,7 @@ static int s3c24xx_serial_probe(struct platform_device *pdev)
 		dev_err(&pdev->dev, "failed to add clock source attr.\n");
 #endif
 
+<<<<<<< HEAD
 	list_add_tail(&ourport->node, &drvdata_list);
 
 	ret = device_create_file(&pdev->dev, &dev_attr_uart_dbg);
@@ -2001,6 +2394,13 @@ static int s3c24xx_serial_probe(struct platform_device *pdev)
 		dev_err(&pdev->dev, "failed to create sysfs file.\n");
 
 	ourport->dbg_mode = 0;
+=======
+	ret = s3c24xx_serial_cpufreq_register(ourport);
+	if (ret < 0)
+		dev_err(&pdev->dev, "failed to add cpufreq notifier\n");
+
+	probe_index++;
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }
@@ -2009,6 +2409,7 @@ static int s3c24xx_serial_remove(struct platform_device *dev)
 {
 	struct uart_port *port = s3c24xx_dev_to_port(&dev->dev);
 
+<<<<<<< HEAD
 #ifdef CONFIG_PM_DEVFREQ
 	struct s3c24xx_uart_port *ourport = to_ourport(port);
 
@@ -2029,6 +2430,13 @@ static int s3c24xx_serial_remove(struct platform_device *dev)
 
 		if (ourport->uart_logging == 1)
 			kfree(ourport->uart_local_buf.buffer);
+=======
+	if (port) {
+		s3c24xx_serial_cpufreq_deregister(to_ourport(port));
+#ifdef CONFIG_SAMSUNG_CLOCK
+		device_remove_file(&dev->dev, &dev_attr_clock_source);
+#endif
+>>>>>>> common/deprecated/android-3.18
 		uart_remove_one_port(&s3c24xx_uart_drv, port);
 	}
 
@@ -2042,6 +2450,7 @@ static int s3c24xx_serial_remove(struct platform_device *dev)
 static int s3c24xx_serial_suspend(struct device *dev)
 {
 	struct uart_port *port = s3c24xx_dev_to_port(dev);
+<<<<<<< HEAD
 	struct s3c24xx_uart_port *ourport = to_ourport(port);
 
 	if (port) {
@@ -2049,6 +2458,11 @@ static int s3c24xx_serial_suspend(struct device *dev)
 		if (ourport->dbg_mode & UART_DBG_MODE)
 			dev_err(dev, "UART suspend notification for tty framework.\n");
 	}
+=======
+
+	if (port)
+		uart_suspend_port(&s3c24xx_uart_drv, port);
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }
@@ -2059,6 +2473,7 @@ static int s3c24xx_serial_resume(struct device *dev)
 	struct s3c24xx_uart_port *ourport = to_ourport(port);
 
 	if (port) {
+<<<<<<< HEAD
 		uart_clock_enable(ourport);
 		s3c24xx_serial_resetport(port, s3c24xx_port_to_cfg(port));
 		uart_clock_disable(ourport);
@@ -2066,6 +2481,13 @@ static int s3c24xx_serial_resume(struct device *dev)
 		uart_resume_port(&s3c24xx_uart_drv, port);
 		if (ourport->dbg_mode & UART_DBG_MODE)
 			dev_err(dev, "UART resume notification for tty framework.\n");
+=======
+		clk_prepare_enable(ourport->clk);
+		s3c24xx_serial_resetport(port, s3c24xx_port_to_cfg(port));
+		clk_disable_unprepare(ourport->clk);
+
+		uart_resume_port(&s3c24xx_uart_drv, port);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	return 0;
@@ -2074,7 +2496,10 @@ static int s3c24xx_serial_resume(struct device *dev)
 static int s3c24xx_serial_resume_noirq(struct device *dev)
 {
 	struct uart_port *port = s3c24xx_dev_to_port(dev);
+<<<<<<< HEAD
 	struct s3c24xx_uart_port *ourport = to_ourport(port);
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	if (port) {
 		/* restore IRQ mask */
@@ -2084,9 +2509,13 @@ static int s3c24xx_serial_resume_noirq(struct device *dev)
 				uintm &= ~S3C64XX_UINTM_TXD_MSK;
 			if (rx_enabled(port))
 				uintm &= ~S3C64XX_UINTM_RXD_MSK;
+<<<<<<< HEAD
 			uart_clock_enable(ourport);
 			wr_regl(port, S3C64XX_UINTM, uintm);
 			uart_clock_disable(ourport);
+=======
+			wr_regl(port, S3C64XX_UINTM, uintm);
+>>>>>>> common/deprecated/android-3.18
 		}
 	}
 
@@ -2204,6 +2633,10 @@ s3c24xx_serial_get_options(struct uart_port *port, int *baud,
 	unsigned int ucon;
 	unsigned int ubrdiv;
 	unsigned long rate;
+<<<<<<< HEAD
+=======
+	unsigned int clk_sel;
+>>>>>>> common/deprecated/android-3.18
 	char clk_name[MAX_CLK_NAME_LENGTH];
 
 	ulcon  = rd_regl(port, S3C2410_ULCON);
@@ -2247,7 +2680,12 @@ s3c24xx_serial_get_options(struct uart_port *port, int *baud,
 
 		/* now calculate the baud rate */
 
+<<<<<<< HEAD
 		snprintf(clk_name, sizeof(clk_name), "sclk_uart%d", port->line);
+=======
+		clk_sel = s3c24xx_serial_getsource(port);
+		sprintf(clk_name, "clk_uart_baud%d", clk_sel);
+>>>>>>> common/deprecated/android-3.18
 
 		clk = clk_get(port->dev, clk_name);
 		if (!IS_ERR(clk))
@@ -2313,6 +2751,7 @@ static struct console s3c24xx_serial_console = {
 	.setup		= s3c24xx_serial_console_setup,
 	.data		= &s3c24xx_uart_drv,
 };
+<<<<<<< HEAD
 
 #define UFCON		0x08
 #define FIFO_ENABLED	(1<<0)
@@ -2353,6 +2792,8 @@ exynos_serial_early_console_setup(struct earlycon_device *device, const char *op
 	return 0;
 }
 EARLYCON_DECLARE(exynos, exynos_serial_early_console_setup);
+=======
+>>>>>>> common/deprecated/android-3.18
 #endif /* CONFIG_SERIAL_SAMSUNG_CONSOLE */
 
 #ifdef CONFIG_CPU_S3C2410
@@ -2496,6 +2937,7 @@ static struct s3c24xx_serial_drv_data s5pv210_serial_drv_data = {
 #endif
 
 #if defined(CONFIG_ARCH_EXYNOS)
+<<<<<<< HEAD
 static struct s3c24xx_serial_drv_data exynos4210_serial_drv_data = {
 	.info = &(struct s3c24xx_uart_info) {
 		.name		= "Samsung Exynos4 UART",
@@ -2549,6 +2991,45 @@ static struct s3c24xx_serial_drv_data exynos_serial_drv_data = {
 #else
 #define EXYNOS4210_SERIAL_DRV_DATA (kernel_ulong_t)NULL
 #define EXYNOS_SERIAL_DRV_DATA (kernel_ulong_t)NULL
+=======
+#define EXYNOS_COMMON_SERIAL_DRV_DATA				\
+	.info = &(struct s3c24xx_uart_info) {			\
+		.name		= "Samsung Exynos UART",	\
+		.type		= PORT_S3C6400,			\
+		.has_divslot	= 1,				\
+		.rx_fifomask	= S5PV210_UFSTAT_RXMASK,	\
+		.rx_fifoshift	= S5PV210_UFSTAT_RXSHIFT,	\
+		.rx_fifofull	= S5PV210_UFSTAT_RXFULL,	\
+		.tx_fifofull	= S5PV210_UFSTAT_TXFULL,	\
+		.tx_fifomask	= S5PV210_UFSTAT_TXMASK,	\
+		.tx_fifoshift	= S5PV210_UFSTAT_TXSHIFT,	\
+		.def_clk_sel	= S3C2410_UCON_CLKSEL0,		\
+		.num_clks	= 1,				\
+		.clksel_mask	= 0,				\
+		.clksel_shift	= 0,				\
+	},							\
+	.def_cfg = &(struct s3c2410_uartcfg) {			\
+		.ucon		= S5PV210_UCON_DEFAULT,		\
+		.ufcon		= S5PV210_UFCON_DEFAULT,	\
+		.has_fracval	= 1,				\
+	}							\
+
+static struct s3c24xx_serial_drv_data exynos4210_serial_drv_data = {
+	EXYNOS_COMMON_SERIAL_DRV_DATA,
+	.fifosize = { 256, 64, 16, 16 },
+};
+
+static struct s3c24xx_serial_drv_data exynos5433_serial_drv_data = {
+	EXYNOS_COMMON_SERIAL_DRV_DATA,
+	.fifosize = { 64, 256, 16, 256 },
+};
+
+#define EXYNOS4210_SERIAL_DRV_DATA ((kernel_ulong_t)&exynos4210_serial_drv_data)
+#define EXYNOS5433_SERIAL_DRV_DATA ((kernel_ulong_t)&exynos5433_serial_drv_data)
+#else
+#define EXYNOS4210_SERIAL_DRV_DATA (kernel_ulong_t)NULL
+#define EXYNOS5433_SERIAL_DRV_DATA (kernel_ulong_t)NULL
+>>>>>>> common/deprecated/android-3.18
 #endif
 
 static struct platform_device_id s3c24xx_serial_driver_ids[] = {
@@ -2571,9 +3052,14 @@ static struct platform_device_id s3c24xx_serial_driver_ids[] = {
 		.name		= "exynos4210-uart",
 		.driver_data	= EXYNOS4210_SERIAL_DRV_DATA,
 	}, {
+<<<<<<< HEAD
 	}, {
 		.name		= "exynos-uart",
 		.driver_data	= EXYNOS_SERIAL_DRV_DATA,
+=======
+		.name		= "exynos5433-uart",
+		.driver_data	= EXYNOS5433_SERIAL_DRV_DATA,
+>>>>>>> common/deprecated/android-3.18
 	},
 	{ },
 };
@@ -2593,8 +3079,13 @@ static const struct of_device_id s3c24xx_uart_dt_match[] = {
 		.data = (void *)S5PV210_SERIAL_DRV_DATA },
 	{ .compatible = "samsung,exynos4210-uart",
 		.data = (void *)EXYNOS4210_SERIAL_DRV_DATA },
+<<<<<<< HEAD
 	{ .compatible = "samsung,exynos-uart",
 		.data = (void *)EXYNOS_SERIAL_DRV_DATA },
+=======
+	{ .compatible = "samsung,exynos5433-uart",
+		.data = (void *)EXYNOS5433_SERIAL_DRV_DATA },
+>>>>>>> common/deprecated/android-3.18
 	{},
 };
 MODULE_DEVICE_TABLE(of, s3c24xx_uart_dt_match);
@@ -2612,6 +3103,7 @@ static struct platform_driver samsung_serial_driver = {
 	},
 };
 
+<<<<<<< HEAD
 /* module initialisation code */
 
 static int __init s3c24xx_serial_modinit(void)
@@ -2639,6 +3131,9 @@ static void __exit s3c24xx_serial_modexit(void)
 
 module_init(s3c24xx_serial_modinit);
 module_exit(s3c24xx_serial_modexit);
+=======
+module_platform_driver(samsung_serial_driver);
+>>>>>>> common/deprecated/android-3.18
 
 MODULE_ALIAS("platform:samsung-uart");
 MODULE_DESCRIPTION("Samsung SoC Serial port driver");

@@ -16,7 +16,11 @@ static inline int xen_irqs_disabled(struct pt_regs *regs)
 	return raw_irqs_disabled_flags(regs->ARM_cpsr);
 }
 
+<<<<<<< HEAD
 #define xchg_xen_ulong(ptr, val) atomic64_xchg(container_of((ptr),	\
+=======
+#define xchg_xen_ulong(ptr, val) atomic64_xchg(container_of((long long*)(ptr),\
+>>>>>>> common/deprecated/android-3.18
 							    atomic64_t,	\
 							    counter), (val))
 

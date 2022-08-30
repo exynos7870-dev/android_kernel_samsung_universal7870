@@ -68,6 +68,10 @@
 #include <linux/vmalloc.h>
 #include <linux/workqueue.h>
 #include <linux/kmemleak.h>
+<<<<<<< HEAD
+=======
+#include <linux/sched.h>
+>>>>>>> common/deprecated/android-3.18
 
 #include <asm/cacheflush.h>
 #include <asm/sections.h>
@@ -1012,8 +1016,16 @@ area_found:
 		mutex_unlock(&pcpu_alloc_mutex);
 	}
 
+<<<<<<< HEAD
 	if (chunk != pcpu_reserved_chunk)
 		pcpu_nr_empty_pop_pages -= occ_pages;
+=======
+	if (chunk != pcpu_reserved_chunk) {
+		spin_lock_irqsave(&pcpu_lock, flags);
+		pcpu_nr_empty_pop_pages -= occ_pages;
+		spin_unlock_irqrestore(&pcpu_lock, flags);
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	if (pcpu_nr_empty_pop_pages < PCPU_EMPTY_POP_PAGES_LOW)
 		pcpu_schedule_balance_work();
@@ -1023,7 +1035,11 @@ area_found:
 		memset((void *)pcpu_chunk_addr(chunk, cpu, 0) + off, 0, size);
 
 	ptr = __addr_to_pcpu_ptr(chunk->base_addr + off);
+<<<<<<< HEAD
 	kmemleak_alloc_percpu(ptr, size);
+=======
+	kmemleak_alloc_percpu(ptr, size, gfp);
+>>>>>>> common/deprecated/android-3.18
 	return ptr;
 
 fail_unlock:

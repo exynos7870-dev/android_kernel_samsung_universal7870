@@ -26,6 +26,7 @@
 #include "ima.h"
 
 static int valid_policy = 1;
+<<<<<<< HEAD
 #define TMPBUFLEN 12
 static ssize_t ima_show_htable_value(char __user *buf, size_t count,
 				     loff_t *ppos, atomic_long_t *val)
@@ -34,6 +35,16 @@ static ssize_t ima_show_htable_value(char __user *buf, size_t count,
 	ssize_t len;
 
 	len = scnprintf(tmpbuf, TMPBUFLEN, "%li\n", atomic_long_read(val));
+=======
+
+static ssize_t ima_show_htable_value(char __user *buf, size_t count,
+				     loff_t *ppos, atomic_long_t *val)
+{
+	char tmpbuf[32];	/* greater than largest 'long' string value */
+	ssize_t len;
+
+	len = scnprintf(tmpbuf, sizeof(tmpbuf), "%li\n", atomic_long_read(val));
+>>>>>>> common/deprecated/android-3.18
 	return simple_read_from_buffer(buf, count, ppos, tmpbuf, len);
 }
 
@@ -186,9 +197,15 @@ static const struct file_operations ima_measurements_ops = {
 	.release = seq_release,
 };
 
+<<<<<<< HEAD
 void ima_print_digest(struct seq_file *m, u8 *digest, int size)
 {
 	int i;
+=======
+void ima_print_digest(struct seq_file *m, u8 *digest, u32 size)
+{
+	u32 i;
+>>>>>>> common/deprecated/android-3.18
 
 	for (i = 0; i < size; i++)
 		seq_printf(m, "%02x", *(digest + i));

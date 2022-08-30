@@ -112,6 +112,7 @@ config CPU_THERMAL
 
 	  If you want this support, you should say Y here.
 
+<<<<<<< HEAD
 config GPU_THERMAL
 	bool "generic gpu cooling support"
 	depends on THERMAL_OF
@@ -136,6 +137,8 @@ config ISP_THERMAL
 
 	  If you want this support, you should say Y here.
 
+=======
+>>>>>>> common/deprecated/android-3.18
 config THERMAL_EMULATION
 	bool "Thermal emulation mode support"
 	help
@@ -160,7 +163,11 @@ config IMX_THERMAL
 	  passive trip is crossed.
 
 config SPEAR_THERMAL
+<<<<<<< HEAD
 	bool "SPEAr thermal sensor driver"
+=======
+	tristate "SPEAr thermal sensor driver"
+>>>>>>> common/deprecated/android-3.18
 	depends on PLAT_SPEAR
 	depends on OF
 	help
@@ -183,6 +190,7 @@ config KIRKWOOD_THERMAL
 	  Support for the Kirkwood thermal sensor driver into the Linux thermal
 	  framework. Only kirkwood 88F6282 and 88F6283 have this sensor.
 
+<<<<<<< HEAD
 config EXYNOS_THERMAL
 	tristate "Temperature sensor on Samsung EXYNOS"
 	depends on (ARCH_EXYNOS4 || ARCH_EXYNOS5 || ARCH_EXYNOS7 || ARCH_EXYNOS8)
@@ -197,6 +205,8 @@ config EXYNOS_SWTRIP
 	help
 	  Support for SWTRIP uevent on SAMSUNG EXYNOS series of SOC
 
+=======
+>>>>>>> common/deprecated/android-3.18
 config DOVE_THERMAL
 	tristate "Temperature sensor on Marvell Dove SoCs"
 	depends on ARCH_DOVE || MACH_DOVE
@@ -206,8 +216,13 @@ config DOVE_THERMAL
 	  framework.
 
 config DB8500_THERMAL
+<<<<<<< HEAD
 	bool "DB8500 thermal management"
 	depends on ARCH_U8500
+=======
+	tristate "DB8500 thermal management"
+	depends on MFD_DB8500_PRCMU
+>>>>>>> common/deprecated/android-3.18
 	default y
 	help
 	  Adds DB8500 thermal management implementation according to the thermal
@@ -291,6 +306,7 @@ config ACPI_THERMAL_REL
 	tristate
 	depends on ACPI
 
+<<<<<<< HEAD
 config CPU_THERMAL_IPA
 	bool "Enable Intelligent Power Arbiter"
 	depends on THERMAL && CPU_FREQ && EXYNOS_THERMAL
@@ -315,6 +331,8 @@ config CPU_THERMAL_IPA_DEBUG
 	  estimates.  If you want to analyze IPA behaviour, you should
 	  say Y here.
 
+=======
+>>>>>>> common/deprecated/android-3.18
 menu "Texas Instruments thermal drivers"
 source "drivers/thermal/ti-soc-thermal/Kconfig"
 endmenu
@@ -330,8 +348,11 @@ source "drivers/thermal/st/Kconfig"
 endmenu
 
 endif
+<<<<<<< HEAD
 
 menu "Samsung thermal drivers"
 depends on ARCH_EXYNOS
 source "drivers/thermal/samsung/Kconfig"
 endmenu
+=======
+>>>>>>> common/deprecated/android-3.18

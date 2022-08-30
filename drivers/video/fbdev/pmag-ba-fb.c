@@ -129,7 +129,11 @@ static struct fb_ops pmagbafb_ops = {
 /*
  * Turn the hardware cursor off.
  */
+<<<<<<< HEAD
 static void __init pmagbafb_erase_cursor(struct fb_info *info)
+=======
+static void pmagbafb_erase_cursor(struct fb_info *info)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct pmagbafb_par *par = info->par;
 

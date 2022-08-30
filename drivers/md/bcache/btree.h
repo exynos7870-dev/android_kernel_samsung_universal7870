@@ -260,8 +260,12 @@ void bch_initial_mark_key(struct cache_set *, int, struct bkey *);
 
 static inline void wake_up_gc(struct cache_set *c)
 {
+<<<<<<< HEAD
 	if (c->gc_thread)
 		wake_up_process(c->gc_thread);
+=======
+	wake_up(&c->gc_wait);
+>>>>>>> common/deprecated/android-3.18
 }
 
 #define MAP_DONE	0

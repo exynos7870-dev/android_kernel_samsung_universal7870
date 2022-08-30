@@ -16,8 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+<<<<<<< HEAD
 #define pr_fmt(fmt) "alternative: " fmt
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #include <linux/types.h>
 #include <asm/cpu.h>
 #include <asm/cputype.h>
@@ -26,6 +29,7 @@
 #define MIDR_CORTEX_A53 MIDR_CPU_PART(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A53)
 #define MIDR_CORTEX_A57 MIDR_CPU_PART(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A57)
 
+<<<<<<< HEAD
 /*
  * Add a struct or another datatype to the union below if you need
  * different means to detect an affected CPU.
@@ -42,11 +46,17 @@ struct arm64_cpu_capabilities {
 	};
 };
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #define CPU_MODEL_MASK (MIDR_IMPLEMENTOR_MASK | MIDR_PARTNUM_MASK | \
 			MIDR_ARCHITECTURE_MASK)
 
 static bool __maybe_unused
+<<<<<<< HEAD
 is_affected_midr_range(struct arm64_cpu_capabilities *entry)
+=======
+is_affected_midr_range(const struct arm64_cpu_capabilities *entry)
+>>>>>>> common/deprecated/android-3.18
 {
 	u32 midr = read_cpuid_id();
 
@@ -59,12 +69,20 @@ is_affected_midr_range(struct arm64_cpu_capabilities *entry)
 }
 
 #define MIDR_RANGE(model, min, max) \
+<<<<<<< HEAD
 	.is_affected = is_affected_midr_range, \
+=======
+	.matches = is_affected_midr_range, \
+>>>>>>> common/deprecated/android-3.18
 	.midr_model = model, \
 	.midr_range_min = min, \
 	.midr_range_max = max
 
+<<<<<<< HEAD
 struct arm64_cpu_capabilities arm64_errata[] = {
+=======
+const struct arm64_cpu_capabilities arm64_errata[] = {
+>>>>>>> common/deprecated/android-3.18
 #if	defined(CONFIG_ARM64_ERRATUM_826319) || \
 	defined(CONFIG_ARM64_ERRATUM_827319) || \
 	defined(CONFIG_ARM64_ERRATUM_824069)
@@ -106,6 +124,7 @@ struct arm64_cpu_capabilities arm64_errata[] = {
 
 void check_local_cpu_errata(void)
 {
+<<<<<<< HEAD
 	struct arm64_cpu_capabilities *cpus = arm64_errata;
 	int i;
 
@@ -117,4 +136,7 @@ void check_local_cpu_errata(void)
 			pr_info("enabling workaround for %s\n", cpus[i].desc);
 		cpus_set_cap(cpus[i].capability);
 	}
+=======
+	update_cpu_capabilities(arm64_errata, "enabling workaround for");
+>>>>>>> common/deprecated/android-3.18
 }

@@ -151,6 +151,10 @@ int fixup_exception(struct pt_regs *regs)
 		struct exception_data *d;
 		d = this_cpu_ptr(&exception_data);
 		d->fault_ip = regs->iaoq[0];
+<<<<<<< HEAD
+=======
+		d->fault_gp = regs->gr[27];
+>>>>>>> common/deprecated/android-3.18
 		d->fault_space = regs->isr;
 		d->fault_addr = regs->ior;
 
@@ -302,7 +306,11 @@ bad_area:
 		case 15:	/* Data TLB miss fault/Data page fault */
 			/* send SIGSEGV when outside of vma */
 			if (!vma ||
+<<<<<<< HEAD
 			    address < vma->vm_start || address > vma->vm_end) {
+=======
+			    address < vma->vm_start || address >= vma->vm_end) {
+>>>>>>> common/deprecated/android-3.18
 				si.si_signo = SIGSEGV;
 				si.si_code = SEGV_MAPERR;
 				break;

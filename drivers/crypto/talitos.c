@@ -335,7 +335,11 @@ DEF_TALITOS_DONE(ch1_3, TALITOS_ISR_CH_1_3_DONE)
 /*
  * locate current (offending) descriptor
  */
+<<<<<<< HEAD
 static u32 current_desc_hdr(struct device *dev, int ch)
+=======
+static __be32 current_desc_hdr(struct device *dev, int ch)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct talitos_private *priv = dev_get_drvdata(dev);
 	int tail, iter;
@@ -366,13 +370,21 @@ static u32 current_desc_hdr(struct device *dev, int ch)
 /*
  * user diagnostics; report root cause of error based on execution unit status
  */
+<<<<<<< HEAD
 static void report_eu_error(struct device *dev, int ch, u32 desc_hdr)
+=======
+static void report_eu_error(struct device *dev, int ch, __be32 desc_hdr)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct talitos_private *priv = dev_get_drvdata(dev);
 	int i;
 
 	if (!desc_hdr)
+<<<<<<< HEAD
 		desc_hdr = in_be32(priv->chan[ch].reg + TALITOS_DESCBUF);
+=======
+		desc_hdr = cpu_to_be32(in_be32(priv->chan[ch].reg + TALITOS_DESCBUF));
+>>>>>>> common/deprecated/android-3.18
 
 	switch (desc_hdr & DESC_HDR_SEL0_MASK) {
 	case DESC_HDR_SEL0_AFEU:
@@ -634,7 +646,11 @@ static void talitos_unregister_rng(struct device *dev)
  * crypto alg
  */
 #define TALITOS_CRA_PRIORITY		3000
+<<<<<<< HEAD
 #define TALITOS_MAX_KEY_SIZE		96
+=======
+#define TALITOS_MAX_KEY_SIZE		(AES_MAX_KEY_SIZE + SHA512_BLOCK_SIZE)
+>>>>>>> common/deprecated/android-3.18
 #define TALITOS_MAX_IV_LENGTH		16 /* max of AES_BLOCK_SIZE, DES3_EDE_BLOCK_SIZE */
 
 #define MD5_BLOCK_SIZE    64
@@ -668,6 +684,19 @@ struct talitos_ahash_req_ctx {
 	struct scatterlist *psrc;
 };
 
+<<<<<<< HEAD
+=======
+struct talitos_export_state {
+	u32 hw_context[TALITOS_MDEU_MAX_CONTEXT_SIZE / sizeof(u32)];
+	u8 buf[HASH_MAX_BLOCK_SIZE];
+	unsigned int swinit;
+	unsigned int first;
+	unsigned int last;
+	unsigned int to_hash_later;
+	unsigned int nbuf;
+};
+
+>>>>>>> common/deprecated/android-3.18
 static int aead_setauthsize(struct crypto_aead *authenc,
 			    unsigned int authsize)
 {
@@ -927,7 +956,12 @@ static int sg_to_link_tbl(struct scatterlist *sg, int sg_count,
 		sg_count--;
 		link_tbl_ptr--;
 	}
+<<<<<<< HEAD
 	be16_add_cpu(&link_tbl_ptr->len, cryptlen);
+=======
+	link_tbl_ptr->len = cpu_to_be16(be16_to_cpu(link_tbl_ptr->len)
+					+ cryptlen);
+>>>>>>> common/deprecated/android-3.18
 
 	/* tag end of link table */
 	link_tbl_ptr->j_extent = DESC_PTR_LNKTBL_RETURN;
@@ -1323,12 +1357,35 @@ static int ablkcipher_setkey(struct crypto_ablkcipher *cipher,
 {
 	struct talitos_ctx *ctx = crypto_ablkcipher_ctx(cipher);
 
+<<<<<<< HEAD
+=======
+	if (keylen > TALITOS_MAX_KEY_SIZE) {
+		crypto_ablkcipher_set_flags(cipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
+		return -EINVAL;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	memcpy(&ctx->key, key, keylen);
 	ctx->keylen = keylen;
 
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+static int ablkcipher_aes_setkey(struct crypto_ablkcipher *cipher,
+				  const u8 *key, unsigned int keylen)
+{
+	if (keylen == AES_KEYSIZE_128 || keylen == AES_KEYSIZE_192 ||
+	    keylen == AES_KEYSIZE_256)
+		return ablkcipher_setkey(cipher, key, keylen);
+
+	crypto_ablkcipher_set_flags(cipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
+
+	return -EINVAL;
+}
+
+>>>>>>> common/deprecated/android-3.18
 static void common_nonsnoop_unmap(struct device *dev,
 				  struct talitos_edesc *edesc,
 				  struct ablkcipher_request *areq)
@@ -1349,11 +1406,21 @@ static void ablkcipher_done(struct device *dev,
 			    int err)
 {
 	struct ablkcipher_request *areq = context;
+<<<<<<< HEAD
+=======
+	struct crypto_ablkcipher *cipher = crypto_ablkcipher_reqtfm(areq);
+	struct talitos_ctx *ctx = crypto_ablkcipher_ctx(cipher);
+	unsigned int ivsize = crypto_ablkcipher_ivsize(cipher);
+>>>>>>> common/deprecated/android-3.18
 	struct talitos_edesc *edesc;
 
 	edesc = container_of(desc, struct talitos_edesc, desc);
 
 	common_nonsnoop_unmap(dev, edesc, areq);
+<<<<<<< HEAD
+=======
+	memcpy(areq->info, ctx->iv, ivsize);
+>>>>>>> common/deprecated/android-3.18
 
 	kfree(edesc);
 
@@ -1476,6 +1543,17 @@ static int ablkcipher_encrypt(struct ablkcipher_request *areq)
 	struct crypto_ablkcipher *cipher = crypto_ablkcipher_reqtfm(areq);
 	struct talitos_ctx *ctx = crypto_ablkcipher_ctx(cipher);
 	struct talitos_edesc *edesc;
+<<<<<<< HEAD
+=======
+	unsigned int blocksize =
+			crypto_tfm_alg_blocksize(crypto_ablkcipher_tfm(cipher));
+
+	if (!areq->nbytes)
+		return 0;
+
+	if (areq->nbytes % blocksize)
+		return -EINVAL;
+>>>>>>> common/deprecated/android-3.18
 
 	/* allocate extended descriptor */
 	edesc = ablkcipher_edesc_alloc(areq, true);
@@ -1493,6 +1571,17 @@ static int ablkcipher_decrypt(struct ablkcipher_request *areq)
 	struct crypto_ablkcipher *cipher = crypto_ablkcipher_reqtfm(areq);
 	struct talitos_ctx *ctx = crypto_ablkcipher_ctx(cipher);
 	struct talitos_edesc *edesc;
+<<<<<<< HEAD
+=======
+	unsigned int blocksize =
+			crypto_tfm_alg_blocksize(crypto_ablkcipher_tfm(cipher));
+
+	if (!areq->nbytes)
+		return 0;
+
+	if (areq->nbytes % blocksize)
+		return -EINVAL;
+>>>>>>> common/deprecated/android-3.18
 
 	/* allocate extended descriptor */
 	edesc = ablkcipher_edesc_alloc(areq, false);
@@ -1575,9 +1664,15 @@ static int common_nonsnoop_hash(struct talitos_edesc *edesc,
 		req_ctx->swinit = 0;
 	} else {
 		desc->ptr[1] = zero_entry;
+<<<<<<< HEAD
 		/* Indicate next op is not the first. */
 		req_ctx->first = 0;
 	}
+=======
+	}
+	/* Indicate next op is not the first. */
+	req_ctx->first = 0;
+>>>>>>> common/deprecated/android-3.18
 
 	/* HMAC key */
 	if (ctx->keylen)
@@ -1816,6 +1911,49 @@ static int ahash_digest(struct ahash_request *areq)
 	return ahash_process_req(areq, areq->nbytes);
 }
 
+<<<<<<< HEAD
+=======
+static int ahash_export(struct ahash_request *areq, void *out)
+{
+	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
+	struct talitos_export_state *export = out;
+
+	memcpy(export->hw_context, req_ctx->hw_context,
+	       req_ctx->hw_context_size);
+	memcpy(export->buf, req_ctx->buf, req_ctx->nbuf);
+	export->swinit = req_ctx->swinit;
+	export->first = req_ctx->first;
+	export->last = req_ctx->last;
+	export->to_hash_later = req_ctx->to_hash_later;
+	export->nbuf = req_ctx->nbuf;
+
+	return 0;
+}
+
+static int ahash_import(struct ahash_request *areq, const void *in)
+{
+	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
+	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
+	const struct talitos_export_state *export = in;
+
+	memset(req_ctx, 0, sizeof(*req_ctx));
+	req_ctx->hw_context_size =
+		(crypto_ahash_digestsize(tfm) <= SHA256_DIGEST_SIZE)
+			? TALITOS_MDEU_CONTEXT_SIZE_MD5_SHA1_SHA256
+			: TALITOS_MDEU_CONTEXT_SIZE_SHA384_SHA512;
+	memcpy(req_ctx->hw_context, export->hw_context,
+	       req_ctx->hw_context_size);
+	memcpy(req_ctx->buf, export->buf, export->nbuf);
+	req_ctx->swinit = export->swinit;
+	req_ctx->first = export->first;
+	req_ctx->last = export->last;
+	req_ctx->to_hash_later = export->to_hash_later;
+	req_ctx->nbuf = export->nbuf;
+
+	return 0;
+}
+
+>>>>>>> common/deprecated/android-3.18
 struct keyhash_result {
 	struct completion completion;
 	int err;
@@ -2164,6 +2302,10 @@ static struct talitos_alg_template driver_algs[] = {
 				.min_keysize = AES_MIN_KEY_SIZE,
 				.max_keysize = AES_MAX_KEY_SIZE,
 				.ivsize = AES_BLOCK_SIZE,
+<<<<<<< HEAD
+=======
+				.setkey = ablkcipher_aes_setkey,
+>>>>>>> common/deprecated/android-3.18
 			}
 		},
 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
@@ -2192,6 +2334,10 @@ static struct talitos_alg_template driver_algs[] = {
 	{	.type = CRYPTO_ALG_TYPE_AHASH,
 		.alg.hash = {
 			.halg.digestsize = MD5_DIGEST_SIZE,
+<<<<<<< HEAD
+=======
+			.halg.statesize = sizeof(struct talitos_export_state),
+>>>>>>> common/deprecated/android-3.18
 			.halg.base = {
 				.cra_name = "md5",
 				.cra_driver_name = "md5-talitos",
@@ -2207,6 +2353,10 @@ static struct talitos_alg_template driver_algs[] = {
 	{	.type = CRYPTO_ALG_TYPE_AHASH,
 		.alg.hash = {
 			.halg.digestsize = SHA1_DIGEST_SIZE,
+<<<<<<< HEAD
+=======
+			.halg.statesize = sizeof(struct talitos_export_state),
+>>>>>>> common/deprecated/android-3.18
 			.halg.base = {
 				.cra_name = "sha1",
 				.cra_driver_name = "sha1-talitos",
@@ -2222,6 +2372,10 @@ static struct talitos_alg_template driver_algs[] = {
 	{	.type = CRYPTO_ALG_TYPE_AHASH,
 		.alg.hash = {
 			.halg.digestsize = SHA224_DIGEST_SIZE,
+<<<<<<< HEAD
+=======
+			.halg.statesize = sizeof(struct talitos_export_state),
+>>>>>>> common/deprecated/android-3.18
 			.halg.base = {
 				.cra_name = "sha224",
 				.cra_driver_name = "sha224-talitos",
@@ -2237,6 +2391,10 @@ static struct talitos_alg_template driver_algs[] = {
 	{	.type = CRYPTO_ALG_TYPE_AHASH,
 		.alg.hash = {
 			.halg.digestsize = SHA256_DIGEST_SIZE,
+<<<<<<< HEAD
+=======
+			.halg.statesize = sizeof(struct talitos_export_state),
+>>>>>>> common/deprecated/android-3.18
 			.halg.base = {
 				.cra_name = "sha256",
 				.cra_driver_name = "sha256-talitos",
@@ -2252,6 +2410,10 @@ static struct talitos_alg_template driver_algs[] = {
 	{	.type = CRYPTO_ALG_TYPE_AHASH,
 		.alg.hash = {
 			.halg.digestsize = SHA384_DIGEST_SIZE,
+<<<<<<< HEAD
+=======
+			.halg.statesize = sizeof(struct talitos_export_state),
+>>>>>>> common/deprecated/android-3.18
 			.halg.base = {
 				.cra_name = "sha384",
 				.cra_driver_name = "sha384-talitos",
@@ -2267,6 +2429,10 @@ static struct talitos_alg_template driver_algs[] = {
 	{	.type = CRYPTO_ALG_TYPE_AHASH,
 		.alg.hash = {
 			.halg.digestsize = SHA512_DIGEST_SIZE,
+<<<<<<< HEAD
+=======
+			.halg.statesize = sizeof(struct talitos_export_state),
+>>>>>>> common/deprecated/android-3.18
 			.halg.base = {
 				.cra_name = "sha512",
 				.cra_driver_name = "sha512-talitos",
@@ -2282,6 +2448,10 @@ static struct talitos_alg_template driver_algs[] = {
 	{	.type = CRYPTO_ALG_TYPE_AHASH,
 		.alg.hash = {
 			.halg.digestsize = MD5_DIGEST_SIZE,
+<<<<<<< HEAD
+=======
+			.halg.statesize = sizeof(struct talitos_export_state),
+>>>>>>> common/deprecated/android-3.18
 			.halg.base = {
 				.cra_name = "hmac(md5)",
 				.cra_driver_name = "hmac-md5-talitos",
@@ -2297,6 +2467,10 @@ static struct talitos_alg_template driver_algs[] = {
 	{	.type = CRYPTO_ALG_TYPE_AHASH,
 		.alg.hash = {
 			.halg.digestsize = SHA1_DIGEST_SIZE,
+<<<<<<< HEAD
+=======
+			.halg.statesize = sizeof(struct talitos_export_state),
+>>>>>>> common/deprecated/android-3.18
 			.halg.base = {
 				.cra_name = "hmac(sha1)",
 				.cra_driver_name = "hmac-sha1-talitos",
@@ -2312,6 +2486,10 @@ static struct talitos_alg_template driver_algs[] = {
 	{	.type = CRYPTO_ALG_TYPE_AHASH,
 		.alg.hash = {
 			.halg.digestsize = SHA224_DIGEST_SIZE,
+<<<<<<< HEAD
+=======
+			.halg.statesize = sizeof(struct talitos_export_state),
+>>>>>>> common/deprecated/android-3.18
 			.halg.base = {
 				.cra_name = "hmac(sha224)",
 				.cra_driver_name = "hmac-sha224-talitos",
@@ -2327,6 +2505,10 @@ static struct talitos_alg_template driver_algs[] = {
 	{	.type = CRYPTO_ALG_TYPE_AHASH,
 		.alg.hash = {
 			.halg.digestsize = SHA256_DIGEST_SIZE,
+<<<<<<< HEAD
+=======
+			.halg.statesize = sizeof(struct talitos_export_state),
+>>>>>>> common/deprecated/android-3.18
 			.halg.base = {
 				.cra_name = "hmac(sha256)",
 				.cra_driver_name = "hmac-sha256-talitos",
@@ -2342,6 +2524,10 @@ static struct talitos_alg_template driver_algs[] = {
 	{	.type = CRYPTO_ALG_TYPE_AHASH,
 		.alg.hash = {
 			.halg.digestsize = SHA384_DIGEST_SIZE,
+<<<<<<< HEAD
+=======
+			.halg.statesize = sizeof(struct talitos_export_state),
+>>>>>>> common/deprecated/android-3.18
 			.halg.base = {
 				.cra_name = "hmac(sha384)",
 				.cra_driver_name = "hmac-sha384-talitos",
@@ -2357,6 +2543,10 @@ static struct talitos_alg_template driver_algs[] = {
 	{	.type = CRYPTO_ALG_TYPE_AHASH,
 		.alg.hash = {
 			.halg.digestsize = SHA512_DIGEST_SIZE,
+<<<<<<< HEAD
+=======
+			.halg.statesize = sizeof(struct talitos_export_state),
+>>>>>>> common/deprecated/android-3.18
 			.halg.base = {
 				.cra_name = "hmac(sha512)",
 				.cra_driver_name = "hmac-sha512-talitos",
@@ -2544,7 +2734,14 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
 		t_alg->algt.alg.hash.final = ahash_final;
 		t_alg->algt.alg.hash.finup = ahash_finup;
 		t_alg->algt.alg.hash.digest = ahash_digest;
+<<<<<<< HEAD
 		t_alg->algt.alg.hash.setkey = ahash_setkey;
+=======
+		if (!strncmp(alg->cra_name, "hmac", 4))
+			t_alg->algt.alg.hash.setkey = ahash_setkey;
+		t_alg->algt.alg.hash.import = ahash_import;
+		t_alg->algt.alg.hash.export = ahash_export;
+>>>>>>> common/deprecated/android-3.18
 
 		if (!(priv->features & TALITOS_FTR_HMAC_OK) &&
 		    !strncmp(alg->cra_name, "hmac", 4)) {
@@ -2563,6 +2760,10 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
 		break;
 	default:
 		dev_err(dev, "unknown algorithm type %d\n", t_alg->algt.type);
+<<<<<<< HEAD
+=======
+		kfree(t_alg);
+>>>>>>> common/deprecated/android-3.18
 		return ERR_PTR(-EINVAL);
 	}
 

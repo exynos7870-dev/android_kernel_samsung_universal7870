@@ -21,6 +21,10 @@
 #include <linux/fs.h>
 #include <linux/jiffies.h>
 #include <linux/slab.h>
+<<<<<<< HEAD
+=======
+#include <linux/pm_runtime.h>
+>>>>>>> common/deprecated/android-3.18
 
 #include <linux/mei.h>
 
@@ -265,6 +269,12 @@ static int mei_cl_irq_read(struct mei_cl *cl, struct mei_cl_cb *cb,
 		return ret;
 	}
 
+<<<<<<< HEAD
+=======
+	pm_runtime_mark_last_busy(dev->dev);
+	pm_request_autosuspend(dev->dev);
+
+>>>>>>> common/deprecated/android-3.18
 	list_move_tail(&cb->list, &dev->read_list.list);
 
 	return 0;

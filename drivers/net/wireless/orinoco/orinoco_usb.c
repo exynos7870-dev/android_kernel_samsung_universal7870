@@ -1226,6 +1226,7 @@ static netdev_tx_t ezusb_xmit(struct sk_buff *skb, struct net_device *dev)
 	if (skb->len < ETH_HLEN)
 		goto drop;
 
+<<<<<<< HEAD
 	ctx = ezusb_alloc_ctx(upriv, EZUSB_RID_TX, 0);
 	if (!ctx)
 		goto busy;
@@ -1233,6 +1234,8 @@ static netdev_tx_t ezusb_xmit(struct sk_buff *skb, struct net_device *dev)
 	memset(ctx->buf, 0, BULK_BUF_SIZE);
 	buf = ctx->buf->data;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	tx_control = 0;
 
 	err = orinoco_process_xmit_skb(skb, dev, priv, &tx_control,
@@ -1240,6 +1243,16 @@ static netdev_tx_t ezusb_xmit(struct sk_buff *skb, struct net_device *dev)
 	if (err)
 		goto drop;
 
+<<<<<<< HEAD
+=======
+	ctx = ezusb_alloc_ctx(upriv, EZUSB_RID_TX, 0);
+	if (!ctx)
+		goto drop;
+
+	memset(ctx->buf, 0, BULK_BUF_SIZE);
+	buf = ctx->buf->data;
+
+>>>>>>> common/deprecated/android-3.18
 	{
 		__le16 *tx_cntl = (__le16 *)buf;
 		*tx_cntl = cpu_to_le16(tx_control);
@@ -1353,7 +1366,12 @@ static int ezusb_init(struct hermes *hw)
 	int retval;
 
 	BUG_ON(in_interrupt());
+<<<<<<< HEAD
 	BUG_ON(!upriv);
+=======
+	if (!upriv)
+		return -EINVAL;
+>>>>>>> common/deprecated/android-3.18
 
 	upriv->reply_count = 0;
 	/* Write the MAGIC number on the simulated registers to keep
@@ -1601,9 +1619,15 @@ static int ezusb_probe(struct usb_interface *interface,
 	/* set up the endpoint information */
 	/* check out the endpoints */
 
+<<<<<<< HEAD
 	iface_desc = &interface->altsetting[0].desc;
 	for (i = 0; i < iface_desc->bNumEndpoints; ++i) {
 		ep = &interface->altsetting[0].endpoint[i].desc;
+=======
+	iface_desc = &interface->cur_altsetting->desc;
+	for (i = 0; i < iface_desc->bNumEndpoints; ++i) {
+		ep = &interface->cur_altsetting->endpoint[i].desc;
+>>>>>>> common/deprecated/android-3.18
 
 		if (usb_endpoint_is_bulk_in(ep)) {
 			/* we found a bulk in endpoint */

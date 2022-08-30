@@ -96,7 +96,11 @@ int platform_get_irq(struct platform_device *dev, unsigned int num)
 		int ret;
 
 		ret = of_irq_get(dev->dev.of_node, num);
+<<<<<<< HEAD
 		if (ret >= 0 || ret == -EPROBE_DEFER)
+=======
+		if (ret > 0 || ret == -EPROBE_DEFER)
+>>>>>>> common/deprecated/android-3.18
 			return ret;
 	}
 
@@ -154,7 +158,11 @@ int platform_get_irq_byname(struct platform_device *dev, const char *name)
 		int ret;
 
 		ret = of_irq_get_byname(dev->dev.of_node, name);
+<<<<<<< HEAD
 		if (ret >= 0 || ret == -EPROBE_DEFER)
+=======
+		if (ret > 0 || ret == -EPROBE_DEFER)
+>>>>>>> common/deprecated/android-3.18
 			return ret;
 	}
 
@@ -375,9 +383,13 @@ int platform_device_add(struct platform_device *pdev)
 
 	while (--i >= 0) {
 		struct resource *r = &pdev->resource[i];
+<<<<<<< HEAD
 		unsigned long type = resource_type(r);
 
 		if (type == IORESOURCE_MEM || type == IORESOURCE_IO)
+=======
+		if (r->parent)
+>>>>>>> common/deprecated/android-3.18
 			release_resource(r);
 	}
 
@@ -408,9 +420,13 @@ void platform_device_del(struct platform_device *pdev)
 
 		for (i = 0; i < pdev->num_resources; i++) {
 			struct resource *r = &pdev->resource[i];
+<<<<<<< HEAD
 			unsigned long type = resource_type(r);
 
 			if (type == IORESOURCE_MEM || type == IORESOURCE_IO)
+=======
+			if (r->parent)
+>>>>>>> common/deprecated/android-3.18
 				release_resource(r);
 		}
 	}
@@ -518,9 +534,20 @@ static int platform_drv_probe(struct device *_dev)
 
 	ret = dev_pm_domain_attach(_dev, true);
 	if (ret != -EPROBE_DEFER) {
+<<<<<<< HEAD
 		ret = drv->probe(dev);
 		if (ret)
 			dev_pm_domain_detach(_dev, true);
+=======
+		if (drv->probe) {
+			ret = drv->probe(dev);
+			if (ret)
+				dev_pm_domain_detach(_dev, true);
+		} else {
+			/* don't fail if just dev_pm_domain_attach failed */
+			ret = 0;
+		}
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (drv->prevent_deferred_probe && ret == -EPROBE_DEFER) {
@@ -624,6 +651,11 @@ int __init_or_module platform_driver_probe(struct platform_driver *drv,
 	/* temporary section violation during probe() */
 	drv->probe = probe;
 	retval = code = platform_driver_register(drv);
+<<<<<<< HEAD
+=======
+	if (retval)
+		return retval;
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * Fixup that section violation, being paranoid about code scanning

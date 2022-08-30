@@ -17,10 +17,13 @@
 #include <linux/of.h>
 #include <linux/sched.h>
 #include <linux/cputime.h>
+<<<<<<< HEAD
 #ifdef CONFIG_LOAD_BASED_CORE_CURRENT_CAL
 #include <soc/samsung/cpufreq.h>
 extern unsigned int get_cpu_load(int cpu);
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 static spinlock_t cpufreq_stats_lock;
 
@@ -53,9 +56,12 @@ struct cpufreq_power_stats {
 struct all_freq_table {
 	unsigned int *freq_table;
 	unsigned int table_size;
+<<<<<<< HEAD
 #ifdef CONFIG_LOAD_BASED_CORE_CURRENT_CAL
 	u64 *time_for_clust0;
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 static struct all_freq_table *all_freq_table;
@@ -74,11 +80,15 @@ static int cpufreq_stats_update(unsigned int cpu)
 	struct cpufreq_stats *stat;
 	struct all_cpufreq_stats *all_stat;
 	unsigned long long cur_time;
+<<<<<<< HEAD
 #ifdef CONFIG_LOAD_BASED_CORE_CURRENT_CAL
 	int i;
 	unsigned int curr_cpu_load;
 	unsigned long long update_highload_time;
 #endif
+=======
+
+>>>>>>> common/deprecated/android-3.18
 	cur_time = get_jiffies_64();
 	spin_lock(&cpufreq_stats_lock);
 	stat = per_cpu(cpufreq_stats_table, cpu);
@@ -93,6 +103,7 @@ static int cpufreq_stats_update(unsigned int cpu)
 		if (all_stat)
 			all_stat->time_in_state[stat->last_index] +=
 					cur_time - stat->last_time;
+<<<<<<< HEAD
 #ifdef CONFIG_LOAD_BASED_CORE_CURRENT_CAL
 		if (all_freq_table->time_for_clust0) {
 			for (i = cpu; i < cpu + NR_CLUST0_CPUS; i++) {
@@ -105,6 +116,8 @@ static int cpufreq_stats_update(unsigned int cpu)
 			}
 		}
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	}
 	stat->last_time = cur_time;
 	spin_unlock(&cpufreq_stats_lock);
@@ -191,6 +204,7 @@ static ssize_t show_current_in_state(struct kobject *kobj,
 	return len;
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_LOAD_BASED_CORE_CURRENT_CAL
 static ssize_t show_cpu_time_for_clust0(struct kobject *kobj,
 		struct kobj_attribute *attr, char *buf)
@@ -218,6 +232,8 @@ static ssize_t show_cpu_time_for_clust0(struct kobject *kobj,
 }
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static ssize_t show_all_time_in_state(struct kobject *kobj,
 		struct kobj_attribute *attr, char *buf)
 {
@@ -324,10 +340,13 @@ static struct attribute_group stats_attr_group = {
 	.name = "stats"
 };
 
+<<<<<<< HEAD
 #ifdef CONFIG_LOAD_BASED_CORE_CURRENT_CAL
 static struct kobj_attribute _attr_cpu_time_for_clust0 = __ATTR(time_in_load_state0,
 		0444, show_cpu_time_for_clust0, NULL);
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 static struct kobj_attribute _attr_all_time_in_state = __ATTR(all_time_in_state,
 		0444, show_all_time_in_state, NULL);
 
@@ -389,10 +408,13 @@ static void cpufreq_allstats_free(void)
 		per_cpu(all_cpufreq_stats, cpu) = NULL;
 	}
 	if (all_freq_table) {
+<<<<<<< HEAD
 #ifdef CONFIG_LOAD_BASED_CORE_CURRENT_CAL
 		sysfs_remove_file(cpufreq_global_kobject, &_attr_cpu_time_for_clust0.attr);
 		kfree(all_freq_table->time_for_clust0);
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 		kfree(all_freq_table->freq_table);
 		kfree(all_freq_table);
 		all_freq_table = NULL;
@@ -571,6 +593,7 @@ static void add_all_freq_table(unsigned int freq)
 		all_freq_table->freq_table = NULL;
 		return;
 	}
+<<<<<<< HEAD
 #ifdef CONFIG_LOAD_BASED_CORE_CURRENT_CAL
 	size = sizeof(unsigned long long) * (all_freq_table->table_size + 1);
 	all_freq_table->time_for_clust0 = krealloc(all_freq_table->time_for_clust0,
@@ -582,6 +605,8 @@ static void add_all_freq_table(unsigned int freq)
 	}
 	all_freq_table->time_for_clust0[all_freq_table->table_size] = 0ULL;
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	all_freq_table->freq_table[all_freq_table->table_size++] = freq;
 }
 
@@ -776,12 +801,15 @@ static int __init cpufreq_stats_init(void)
 	if (ret)
 		pr_warn("Cannot create sysfs file for cpufreq current stats\n");
 
+<<<<<<< HEAD
 #ifdef CONFIG_LOAD_BASED_CORE_CURRENT_CAL
 	ret = sysfs_create_file(cpufreq_global_kobject,
 		&_attr_cpu_time_for_clust0.attr);
 	if (ret)
 		pr_warn("Error creating sysfs file for time_for_clust0\n");
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 static void __exit cpufreq_stats_exit(void)

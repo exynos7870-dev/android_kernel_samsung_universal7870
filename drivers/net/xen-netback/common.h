@@ -195,6 +195,10 @@ struct xenvif_queue { /* Per-queue data for xenvif */
 	unsigned long   remaining_credit;
 	struct timer_list credit_timeout;
 	u64 credit_window_start;
+<<<<<<< HEAD
+=======
+	bool rate_limited;
+>>>>>>> common/deprecated/android-3.18
 
 	/* Statistics */
 	struct xenvif_stats stats;

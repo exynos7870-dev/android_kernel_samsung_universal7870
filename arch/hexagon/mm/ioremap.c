@@ -20,6 +20,10 @@
 
 #include <linux/io.h>
 #include <linux/vmalloc.h>
+<<<<<<< HEAD
+=======
+#include <linux/mm.h>
+>>>>>>> common/deprecated/android-3.18
 
 void __iomem *ioremap_nocache(unsigned long phys_addr, unsigned long size)
 {

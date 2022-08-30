@@ -173,8 +173,12 @@ static long clk_pll_get_best_div_mul(struct clk_pll *pll, unsigned long rate,
 	int i = 0;
 
 	/* Check if parent_rate is a valid input rate */
+<<<<<<< HEAD
 	if (parent_rate < characteristics->input.min ||
 	    parent_rate > characteristics->input.max)
+=======
+	if (parent_rate < characteristics->input.min)
+>>>>>>> common/deprecated/android-3.18
 		return -ERANGE;
 
 	/*
@@ -187,6 +191,18 @@ static long clk_pll_get_best_div_mul(struct clk_pll *pll, unsigned long rate,
 	if (!mindiv)
 		mindiv = 1;
 
+<<<<<<< HEAD
+=======
+	if (parent_rate > characteristics->input.max) {
+		tmpdiv = DIV_ROUND_UP(parent_rate, characteristics->input.max);
+		if (tmpdiv > PLL_DIV_MAX)
+			return -ERANGE;
+
+		if (tmpdiv > mindiv)
+			mindiv = tmpdiv;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Calculate the maximum divider which is limited by PLL register
 	 * layout (limited by the MUL or DIV field size).

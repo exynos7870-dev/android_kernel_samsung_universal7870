@@ -244,14 +244,22 @@ dccp_state_table[CT_DCCP_ROLE_MAX + 1][DCCP_PKT_SYNCACK + 1][CT_DCCP_MAX + 1] = 
 		 * We currently ignore Sync packets
 		 *
 		 *	sNO, sRQ, sRS, sPO, sOP, sCR, sCG, sTW */
+<<<<<<< HEAD
 			sIG, sIG, sIG, sIG, sIG, sIG, sIG, sIG,
+=======
+			sIV, sIG, sIG, sIG, sIG, sIG, sIG, sIG,
+>>>>>>> common/deprecated/android-3.18
 		},
 		[DCCP_PKT_SYNCACK] = {
 		/*
 		 * We currently ignore SyncAck packets
 		 *
 		 *	sNO, sRQ, sRS, sPO, sOP, sCR, sCG, sTW */
+<<<<<<< HEAD
 			sIG, sIG, sIG, sIG, sIG, sIG, sIG, sIG,
+=======
+			sIV, sIG, sIG, sIG, sIG, sIG, sIG, sIG,
+>>>>>>> common/deprecated/android-3.18
 		},
 	},
 	[CT_DCCP_ROLE_SERVER] = {
@@ -372,14 +380,22 @@ dccp_state_table[CT_DCCP_ROLE_MAX + 1][DCCP_PKT_SYNCACK + 1][CT_DCCP_MAX + 1] = 
 		 * We currently ignore Sync packets
 		 *
 		 *	sNO, sRQ, sRS, sPO, sOP, sCR, sCG, sTW */
+<<<<<<< HEAD
 			sIG, sIG, sIG, sIG, sIG, sIG, sIG, sIG,
+=======
+			sIV, sIG, sIG, sIG, sIG, sIG, sIG, sIG,
+>>>>>>> common/deprecated/android-3.18
 		},
 		[DCCP_PKT_SYNCACK] = {
 		/*
 		 * We currently ignore SyncAck packets
 		 *
 		 *	sNO, sRQ, sRS, sPO, sOP, sCR, sCG, sTW */
+<<<<<<< HEAD
 			sIG, sIG, sIG, sIG, sIG, sIG, sIG, sIG,
+=======
+			sIV, sIG, sIG, sIG, sIG, sIG, sIG, sIG,
+>>>>>>> common/deprecated/android-3.18
 		},
 	},
 };

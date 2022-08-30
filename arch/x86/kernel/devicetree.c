@@ -224,7 +224,11 @@ static int ioapic_xlate(struct irq_domain *domain,
 	return 0;
 }
 
+<<<<<<< HEAD
 const struct irq_domain_ops ioapic_irq_domain_ops = {
+=======
+static const struct irq_domain_ops ioapic_irq_domain_ops = {
+>>>>>>> common/deprecated/android-3.18
 	.map = mp_irqdomain_map,
 	.unmap = mp_irqdomain_unmap,
 	.xlate = ioapic_xlate,

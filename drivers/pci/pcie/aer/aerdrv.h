@@ -72,7 +72,10 @@ struct aer_rpc {
 					 * recovery on the same
 					 * root port hierarchy
 					 */
+<<<<<<< HEAD
 	wait_queue_head_t wait_release;
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 struct aer_broadcast_data {

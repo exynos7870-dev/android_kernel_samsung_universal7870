@@ -189,7 +189,11 @@ static int sharpsl_nand_probe(struct platform_device *pdev)
 	return 0;
 
 err_add:
+<<<<<<< HEAD
 	nand_release(&sharpsl->mtd);
+=======
+	nand_cleanup(this);
+>>>>>>> common/deprecated/android-3.18
 
 err_scan:
 	iounmap(sharpsl->io);

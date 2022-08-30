@@ -55,7 +55,11 @@
 #define APIC_BUS_CYCLE_NS 1
 
 /* #define apic_debug(fmt,arg...) printk(KERN_WARNING fmt,##arg) */
+<<<<<<< HEAD
 #define apic_debug(fmt, arg...)
+=======
+#define apic_debug(fmt, arg...) do {} while (0)
+>>>>>>> common/deprecated/android-3.18
 
 #define APIC_LVT_NUM			6
 /* 14 is the version for Xeon and Pentium 8.4.8*/
@@ -268,8 +272,21 @@ void kvm_apic_set_version(struct kvm_vcpu *vcpu)
 	if (!kvm_vcpu_has_lapic(vcpu))
 		return;
 
+<<<<<<< HEAD
 	feat = kvm_find_cpuid_entry(apic->vcpu, 0x1, 0);
 	if (feat && (feat->ecx & (1 << (X86_FEATURE_X2APIC & 31))))
+=======
+	/*
+	 * KVM emulates 82093AA datasheet (with in-kernel IOAPIC implementation)
+	 * which doesn't have EOI register; Some buggy OSes (e.g. Windows with
+	 * Hyper-V role) disable EOI broadcast in lapic not checking for IOAPIC
+	 * version first and level-triggered interrupts never get EOIed in
+	 * IOAPIC.
+	 */
+	feat = kvm_find_cpuid_entry(apic->vcpu, 0x1, 0);
+	if (feat && (feat->ecx & (1 << (X86_FEATURE_X2APIC & 31))) &&
+	    !ioapic_in_kernel(vcpu->kvm))
+>>>>>>> common/deprecated/android-3.18
 		v |= APIC_LVR_DIRECTED_EOI;
 	apic_set_reg(apic, APIC_LVR, v);
 }
@@ -492,9 +509,17 @@ static inline bool pv_eoi_enabled(struct kvm_vcpu *vcpu)
 static bool pv_eoi_get_pending(struct kvm_vcpu *vcpu)
 {
 	u8 val;
+<<<<<<< HEAD
 	if (pv_eoi_get_user(vcpu, &val) < 0)
 		apic_debug("Can't read EOI MSR value: 0x%llx\n",
 			   (unsigned long long)vcpu->arch.pv_eoi.msr_val);
+=======
+	if (pv_eoi_get_user(vcpu, &val) < 0) {
+		apic_debug("Can't read EOI MSR value: 0x%llx\n",
+			   (unsigned long long)vcpu->arch.pv_eoi.msr_val);
+		return false;
+	}
+>>>>>>> common/deprecated/android-3.18
 	return val & 0x1;
 }
 
@@ -1112,10 +1137,17 @@ static void apic_manage_nmi_watchdog(struct kvm_lapic *apic, u32 lvt0_val)
 		if (!nmi_wd_enabled) {
 			apic_debug("Receive NMI setting on APIC_LVT0 "
 				   "for cpu %d\n", apic->vcpu->vcpu_id);
+<<<<<<< HEAD
 			apic->vcpu->kvm->arch.vapics_in_nmi_mode++;
 		}
 	} else if (nmi_wd_enabled)
 		apic->vcpu->kvm->arch.vapics_in_nmi_mode--;
+=======
+			atomic_inc(&apic->vcpu->kvm->arch.vapics_in_nmi_mode);
+		}
+	} else if (nmi_wd_enabled)
+		atomic_dec(&apic->vcpu->kvm->arch.vapics_in_nmi_mode);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int apic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
@@ -1687,6 +1719,10 @@ void kvm_apic_post_state_restore(struct kvm_vcpu *vcpu,
 
 	apic_update_ppr(apic);
 	hrtimer_cancel(&apic->lapic_timer.timer);
+<<<<<<< HEAD
+=======
+	apic_manage_nmi_watchdog(apic, kvm_apic_get_reg(apic, APIC_LVT0));
+>>>>>>> common/deprecated/android-3.18
 	update_divide_count(apic);
 	start_apic_timer(apic);
 	apic->irr_pending = true;
@@ -1942,3 +1978,12 @@ void kvm_lapic_init(void)
 	jump_label_rate_limit(&apic_hw_disabled, HZ);
 	jump_label_rate_limit(&apic_sw_disabled, HZ);
 }
+<<<<<<< HEAD
+=======
+
+void kvm_lapic_exit(void)
+{
+	static_key_deferred_flush(&apic_hw_disabled);
+	static_key_deferred_flush(&apic_sw_disabled);
+}
+>>>>>>> common/deprecated/android-3.18

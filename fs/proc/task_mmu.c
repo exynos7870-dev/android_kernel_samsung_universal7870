@@ -293,6 +293,7 @@ static int do_maps_open(struct inode *inode, struct file *file,
 				sizeof(struct proc_maps_private));
 }
 
+<<<<<<< HEAD
 static pid_t pid_of_stack(struct proc_maps_private *priv,
 				struct vm_area_struct *vma, bool is_pid)
 {
@@ -310,6 +311,22 @@ static pid_t pid_of_stack(struct proc_maps_private *priv,
 	rcu_read_unlock();
 
 	return ret;
+=======
+/*
+ * Indicate if the VMA is a stack for the given task; for
+ * /proc/PID/maps that is the stack of the main task.
+ */
+static int is_stack(struct proc_maps_private *priv,
+		    struct vm_area_struct *vma)
+{
+	/*
+	 * We make no effort to guess what a given thread considers to be
+	 * its "stack".  It's not even well-defined for programs written
+	 * languages like Go.
+	 */
+	return vma->vm_start <= vma->vm_mm->start_stack &&
+		vma->vm_end >= vma->vm_mm->start_stack;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void
@@ -365,8 +382,11 @@ show_map_vma(struct seq_file *m, struct vm_area_struct *vma, int is_pid)
 
 	name = arch_vma_name(vma);
 	if (!name) {
+<<<<<<< HEAD
 		pid_t tid;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		if (!mm) {
 			name = "[vdso]";
 			goto done;
@@ -378,6 +398,7 @@ show_map_vma(struct seq_file *m, struct vm_area_struct *vma, int is_pid)
 			goto done;
 		}
 
+<<<<<<< HEAD
 		tid = pid_of_stack(priv, vma, is_pid);
 		if (tid != 0) {
 			/*
@@ -392,6 +413,10 @@ show_map_vma(struct seq_file *m, struct vm_area_struct *vma, int is_pid)
 				seq_pad(m, ' ');
 				seq_printf(m, "[stack:%d]", tid);
 			}
+=======
+		if (is_stack(priv, vma)) {
+			name = "[stack]";
+>>>>>>> common/deprecated/android-3.18
 			goto done;
 		}
 
@@ -500,32 +525,85 @@ struct mem_size_stats {
 	u64 swap_pss;
 };
 
+<<<<<<< HEAD
 
 static void smaps_pte_entry(pte_t ptent, unsigned long addr,
 		unsigned long ptent_size, struct mm_walk *walk)
+=======
+static void smaps_account(struct mem_size_stats *mss, struct page *page,
+		unsigned long size, bool young, bool dirty)
+{
+	int mapcount;
+
+	if (PageAnon(page))
+		mss->anonymous += size;
+
+	mss->resident += size;
+	/* Accumulate the size in pages that have been accessed. */
+	if (young || PageReferenced(page))
+		mss->referenced += size;
+	mapcount = page_mapcount(page);
+	if (mapcount >= 2) {
+		u64 pss_delta;
+
+		if (dirty || PageDirty(page))
+			mss->shared_dirty += size;
+		else
+			mss->shared_clean += size;
+		pss_delta = (u64)size << PSS_SHIFT;
+		do_div(pss_delta, mapcount);
+		mss->pss += pss_delta;
+	} else {
+		if (dirty || PageDirty(page))
+			mss->private_dirty += size;
+		else
+			mss->private_clean += size;
+		mss->pss += (u64)size << PSS_SHIFT;
+	}
+}
+
+static void smaps_pte_entry(pte_t *pte, unsigned long addr,
+		struct mm_walk *walk)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct mem_size_stats *mss = walk->private;
 	struct vm_area_struct *vma = mss->vma;
 	pgoff_t pgoff = linear_page_index(vma, addr);
 	struct page *page = NULL;
+<<<<<<< HEAD
 	int mapcount;
 
 	if (pte_present(ptent)) {
 		page = vm_normal_page(vma, addr, ptent);
 	} else if (is_swap_pte(ptent)) {
 		swp_entry_t swpent = pte_to_swp_entry(ptent);
+=======
+
+	if (pte_present(*pte)) {
+		page = vm_normal_page(vma, addr, *pte);
+	} else if (is_swap_pte(*pte)) {
+		swp_entry_t swpent = pte_to_swp_entry(*pte);
+>>>>>>> common/deprecated/android-3.18
 
 		if (!non_swap_entry(swpent)) {
 			int mapcount;
 
+<<<<<<< HEAD
 			mss->swap += ptent_size;
 			mapcount = swp_swapcount(swpent);
 			if (mapcount >= 2) {
 				u64 pss_delta = (u64)ptent_size << PSS_SHIFT;
+=======
+			mss->swap += PAGE_SIZE;
+			mapcount = swp_swapcount(swpent);
+			if (mapcount >= 2) {
+				u64 pss_delta = (u64)PAGE_SIZE << PSS_SHIFT;
+>>>>>>> common/deprecated/android-3.18
 
 				do_div(pss_delta, mapcount);
 				mss->swap_pss += pss_delta;
 			} else {
+<<<<<<< HEAD
 				mss->swap_pss += (u64)ptent_size << PSS_SHIFT;
 			}
 		} else if (is_migration_entry(swpent))
@@ -533,11 +611,21 @@ static void smaps_pte_entry(pte_t ptent, unsigned long addr,
 	} else if (pte_file(ptent)) {
 		if (pte_to_pgoff(ptent) != pgoff)
 			mss->nonlinear += ptent_size;
+=======
+				mss->swap_pss += (u64)PAGE_SIZE << PSS_SHIFT;
+			}
+		} else if (is_migration_entry(swpent))
+			page = migration_entry_to_page(swpent);
+	} else if (pte_file(*pte)) {
+		if (pte_to_pgoff(*pte) != pgoff)
+			mss->nonlinear += PAGE_SIZE;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (!page)
 		return;
 
+<<<<<<< HEAD
 	if (PageAnon(page))
 		mss->anonymous += ptent_size;
 
@@ -564,6 +652,37 @@ static void smaps_pte_entry(pte_t ptent, unsigned long addr,
 	}
 }
 
+=======
+	if (page->index != pgoff)
+		mss->nonlinear += PAGE_SIZE;
+
+	smaps_account(mss, page, PAGE_SIZE, pte_young(*pte), pte_dirty(*pte));
+}
+
+#ifdef CONFIG_TRANSPARENT_HUGEPAGE
+static void smaps_pmd_entry(pmd_t *pmd, unsigned long addr,
+		struct mm_walk *walk)
+{
+	struct mem_size_stats *mss = walk->private;
+	struct vm_area_struct *vma = mss->vma;
+	struct page *page;
+
+	/* FOLL_DUMP will return -EFAULT on huge zero page */
+	page = follow_trans_huge_pmd(vma, addr, pmd, FOLL_DUMP);
+	if (IS_ERR_OR_NULL(page))
+		return;
+	mss->anonymous_thp += HPAGE_PMD_SIZE;
+	smaps_account(mss, page, HPAGE_PMD_SIZE,
+			pmd_young(*pmd), pmd_dirty(*pmd));
+}
+#else
+static void smaps_pmd_entry(pmd_t *pmd, unsigned long addr,
+		struct mm_walk *walk)
+{
+}
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 static int smaps_pte_range(pmd_t *pmd, unsigned long addr, unsigned long end,
 			   struct mm_walk *walk)
 {
@@ -573,9 +692,14 @@ static int smaps_pte_range(pmd_t *pmd, unsigned long addr, unsigned long end,
 	spinlock_t *ptl;
 
 	if (pmd_trans_huge_lock(pmd, vma, &ptl) == 1) {
+<<<<<<< HEAD
 		smaps_pte_entry(*(pte_t *)pmd, addr, HPAGE_PMD_SIZE, walk);
 		spin_unlock(ptl);
 		mss->anonymous_thp += HPAGE_PMD_SIZE;
+=======
+		smaps_pmd_entry(pmd, addr, walk);
+		spin_unlock(ptl);
+>>>>>>> common/deprecated/android-3.18
 		return 0;
 	}
 
@@ -588,7 +712,11 @@ static int smaps_pte_range(pmd_t *pmd, unsigned long addr, unsigned long end,
 	 */
 	pte = pte_offset_map_lock(vma->vm_mm, pmd, addr, &ptl);
 	for (; addr != end; pte++, addr += PAGE_SIZE)
+<<<<<<< HEAD
 		smaps_pte_entry(*pte, addr, PAGE_SIZE, walk);
+=======
+		smaps_pte_entry(pte, addr, walk);
+>>>>>>> common/deprecated/android-3.18
 	pte_unmap_unlock(pte - 1, ptl);
 	cond_resched();
 	return 0;
@@ -755,6 +883,7 @@ const struct file_operations proc_pid_smaps_operations = {
 	.release	= proc_map_release,
 };
 
+<<<<<<< HEAD
 static int proc_pid_smaps_simple_show(struct seq_file *m, void *v)
 {
 	struct pid *pid = (struct pid *)m->private;
@@ -825,6 +954,8 @@ const struct file_operations proc_pid_smaps_simple_operations = {
 	.release	= single_release,
 };
 
+=======
+>>>>>>> common/deprecated/android-3.18
 const struct file_operations proc_tid_smaps_operations = {
 	.open		= tid_smaps_open,
 	.read		= seq_read,
@@ -1532,6 +1663,35 @@ static struct page *can_gather_numa_stats(pte_t pte, struct vm_area_struct *vma,
 	return page;
 }
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_TRANSPARENT_HUGEPAGE
+static struct page *can_gather_numa_stats_pmd(pmd_t pmd,
+					      struct vm_area_struct *vma,
+					      unsigned long addr)
+{
+	struct page *page;
+	int nid;
+
+	if (!pmd_present(pmd))
+		return NULL;
+
+	page = vm_normal_page_pmd(vma, addr, pmd);
+	if (!page)
+		return NULL;
+
+	if (PageReserved(page))
+		return NULL;
+
+	nid = page_to_nid(page);
+	if (!node_isset(nid, node_states[N_MEMORY]))
+		return NULL;
+
+	return page;
+}
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 static int gather_pte_stats(pmd_t *pmd, unsigned long addr,
 		unsigned long end, struct mm_walk *walk)
 {
@@ -1542,6 +1702,7 @@ static int gather_pte_stats(pmd_t *pmd, unsigned long addr,
 
 	md = walk->private;
 
+<<<<<<< HEAD
 	if (pmd_trans_huge_lock(pmd, md->vma, &ptl) == 1) {
 		pte_t huge_pte = *(pte_t *)pmd;
 		struct page *page;
@@ -1549,6 +1710,15 @@ static int gather_pte_stats(pmd_t *pmd, unsigned long addr,
 		page = can_gather_numa_stats(huge_pte, md->vma, addr);
 		if (page)
 			gather_stats(page, md, pte_dirty(huge_pte),
+=======
+#ifdef CONFIG_TRANSPARENT_HUGEPAGE
+	if (pmd_trans_huge_lock(pmd, md->vma, &ptl) == 1) {
+		struct page *page;
+
+		page = can_gather_numa_stats_pmd(*pmd, md->vma, addr);
+		if (page)
+			gather_stats(page, md, pmd_dirty(*pmd),
+>>>>>>> common/deprecated/android-3.18
 				     HPAGE_PMD_SIZE/PAGE_SIZE);
 		spin_unlock(ptl);
 		return 0;
@@ -1556,6 +1726,10 @@ static int gather_pte_stats(pmd_t *pmd, unsigned long addr,
 
 	if (pmd_trans_unstable(pmd))
 		return 0;
+<<<<<<< HEAD
+=======
+#endif
+>>>>>>> common/deprecated/android-3.18
 	orig_pte = pte = pte_offset_map_lock(walk->mm, pmd, addr, &ptl);
 	do {
 		struct page *page = can_gather_numa_stats(*pte, md->vma, addr);
@@ -1571,6 +1745,7 @@ static int gather_pte_stats(pmd_t *pmd, unsigned long addr,
 static int gather_hugetbl_stats(pte_t *pte, unsigned long hmask,
 		unsigned long addr, unsigned long end, struct mm_walk *walk)
 {
+<<<<<<< HEAD
 	struct numa_maps *md;
 	struct page *page;
 
@@ -1578,11 +1753,25 @@ static int gather_hugetbl_stats(pte_t *pte, unsigned long hmask,
 		return 0;
 
 	page = pte_page(*pte);
+=======
+	pte_t huge_pte = huge_ptep_get(pte);
+	struct numa_maps *md;
+	struct page *page;
+
+	if (!pte_present(huge_pte))
+		return 0;
+
+	page = pte_page(huge_pte);
+>>>>>>> common/deprecated/android-3.18
 	if (!page)
 		return 0;
 
 	md = walk->private;
+<<<<<<< HEAD
 	gather_stats(page, md, pte_dirty(*pte), 1);
+=======
+	gather_stats(page, md, pte_dirty(huge_pte), 1);
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -1638,6 +1827,7 @@ static int show_numa_map(struct seq_file *m, void *v, int is_pid)
 		seq_path(m, &file->f_path, "\n\t= ");
 	} else if (vma->vm_start <= mm->brk && vma->vm_end >= mm->start_brk) {
 		seq_puts(m, " heap");
+<<<<<<< HEAD
 	} else {
 		pid_t tid = pid_of_stack(proc_priv, vma, is_pid);
 		if (tid != 0) {
@@ -1651,6 +1841,10 @@ static int show_numa_map(struct seq_file *m, void *v, int is_pid)
 			else
 				seq_printf(m, " stack:%d", tid);
 		}
+=======
+	} else if (is_stack(proc_priv, vma)) {
+		seq_puts(m, " stack");
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (is_vm_hugetlb_page(vma))

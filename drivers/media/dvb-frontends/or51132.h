@@ -34,7 +34,11 @@ struct or51132_config
 	int (*set_ts_params)(struct dvb_frontend* fe, int is_punctured);
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_OR51132)
+=======
+#if IS_REACHABLE(CONFIG_DVB_OR51132)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend* or51132_attach(const struct or51132_config* config,
 					   struct i2c_adapter* i2c);
 #else

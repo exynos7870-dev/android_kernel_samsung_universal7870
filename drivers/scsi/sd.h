@@ -65,7 +65,11 @@ struct scsi_disk {
 	struct device	dev;
 	struct gendisk	*disk;
 	atomic_t	openers;
+<<<<<<< HEAD
 	sector_t	capacity;	/* size in 512-byte sectors */
+=======
+	sector_t	capacity;	/* size in logical blocks */
+>>>>>>> common/deprecated/android-3.18
 	u32		max_xfer_blocks;
 	u32		max_ws_blocks;
 	u32		max_unmap_blocks;
@@ -93,6 +97,7 @@ struct scsi_disk {
 	unsigned	lbpvpd : 1;
 	unsigned	ws10 : 1;
 	unsigned	ws16 : 1;
+<<<<<<< HEAD
 #ifdef CONFIG_USB_STORAGE_DETECT
 	wait_queue_head_t	delay_wait;
 	struct completion	scanning_done;
@@ -101,6 +106,8 @@ struct scsi_disk {
 	int		async_end;
 	int		prv_media_present;
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 #define to_scsi_disk(obj) container_of(obj,struct scsi_disk,dev)
 
@@ -153,6 +160,14 @@ static inline int scsi_medium_access_command(struct scsi_cmnd *scmd)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+static inline sector_t logical_to_sectors(struct scsi_device *sdev, sector_t blocks)
+{
+	return blocks << (ilog2(sdev->sector_size) - 9);
+}
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * A DIF-capable target device can be formatted with different
  * protection schemes.  Currently 0 through 3 are defined:

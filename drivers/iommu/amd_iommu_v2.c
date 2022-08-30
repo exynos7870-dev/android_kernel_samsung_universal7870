@@ -701,9 +701,15 @@ out_clear_state:
 
 out_unregister:
 	mmu_notifier_unregister(&pasid_state->mn, mm);
+<<<<<<< HEAD
 
 out_free:
 	mmput(mm);
+=======
+	mmput(mm);
+
+out_free:
+>>>>>>> common/deprecated/android-3.18
 	free_pasid_state(pasid_state);
 
 out:

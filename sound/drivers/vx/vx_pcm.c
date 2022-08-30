@@ -1015,7 +1015,11 @@ static void vx_pcm_capture_update(struct vx_core *chip, struct snd_pcm_substream
 	int size, space, count;
 	struct snd_pcm_runtime *runtime = subs->runtime;
 
+<<<<<<< HEAD
 	if (! pipe->prepared || (chip->chip_status & VX_STAT_IS_STALE))
+=======
+	if (!pipe->running || (chip->chip_status & VX_STAT_IS_STALE))
+>>>>>>> common/deprecated/android-3.18
 		return;
 
 	size = runtime->buffer_size - snd_pcm_capture_avail(runtime);
@@ -1048,8 +1052,15 @@ static void vx_pcm_capture_update(struct vx_core *chip, struct snd_pcm_substream
 		/* ok, let's accelerate! */
 		int align = pipe->align * 3;
 		space = (count / align) * align;
+<<<<<<< HEAD
 		vx_pseudo_dma_read(chip, runtime, pipe, space);
 		count -= space;
+=======
+		if (space > 0) {
+			vx_pseudo_dma_read(chip, runtime, pipe, space);
+			count -= space;
+		}
+>>>>>>> common/deprecated/android-3.18
 	}
 	/* read the rest of bytes */
 	while (count > 0) {

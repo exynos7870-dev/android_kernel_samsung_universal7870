@@ -1095,7 +1095,11 @@ static int xd_copy_page(struct rtsx_chip *chip, u32 old_blk, u32 new_blk,
 			reg = 0;
 			rtsx_read_register(chip, XD_CTL, &reg);
 			if (reg & (XD_ECC1_ERROR | XD_ECC2_ERROR)) {
+<<<<<<< HEAD
 				wait_timeout(100);
+=======
+				mdelay(100);
+>>>>>>> common/deprecated/android-3.18
 
 				if (detect_card_cd(chip,
 					XD_CARD) != STATUS_SUCCESS) {

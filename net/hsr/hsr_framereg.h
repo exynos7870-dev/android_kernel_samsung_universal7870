@@ -16,6 +16,10 @@
 
 struct hsr_node;
 
+<<<<<<< HEAD
+=======
+void hsr_del_node(struct list_head *self_node_db);
+>>>>>>> common/deprecated/android-3.18
 struct hsr_node *hsr_add_node(struct list_head *node_db, unsigned char addr[],
 			      u16 seq_out);
 struct hsr_node *hsr_get_node(struct list_head *node_db, struct sk_buff *skb,

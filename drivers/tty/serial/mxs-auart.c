@@ -1040,6 +1040,14 @@ static int mxs_auart_probe(struct platform_device *pdev)
 		s->port.line = pdev->id < 0 ? 0 : pdev->id;
 	else if (ret < 0)
 		goto out_free;
+<<<<<<< HEAD
+=======
+	if (s->port.line >= ARRAY_SIZE(auart_port)) {
+		dev_err(&pdev->dev, "serial%d out of range\n", s->port.line);
+		ret = -EINVAL;
+		goto out_free;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	if (of_id) {
 		pdev->id_entry = of_id->data;

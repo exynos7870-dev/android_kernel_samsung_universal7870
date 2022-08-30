@@ -495,9 +495,16 @@ err_irq_alloc_descs:
 
 	chip = chip_save;
 err_gpiochip_add:
+<<<<<<< HEAD
 	while (--i >= 0) {
 		chip--;
 		gpiochip_remove(&chip->gpio);
+=======
+	chip = chip_save;
+	while (--i >= 0) {
+		gpiochip_remove(&chip->gpio);
+		chip++;
+>>>>>>> common/deprecated/android-3.18
 	}
 	kfree(chip_save);
 

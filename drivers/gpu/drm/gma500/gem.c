@@ -130,7 +130,11 @@ int psb_gem_create(struct drm_file *file, struct drm_device *dev, u64 size,
 		return ret;
 	}
 	/* We have the initial and handle reference but need only one now */
+<<<<<<< HEAD
 	drm_gem_object_unreference(&r->gem);
+=======
+	drm_gem_object_unreference_unlocked(&r->gem);
+>>>>>>> common/deprecated/android-3.18
 	*handlep = handle;
 	return 0;
 }

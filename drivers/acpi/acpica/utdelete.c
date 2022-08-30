@@ -587,11 +587,14 @@ acpi_ut_update_object_reference(union acpi_operand_object *object, u16 action)
 			next_object = object->buffer_field.buffer_obj;
 			break;
 
+<<<<<<< HEAD
 		case ACPI_TYPE_LOCAL_REGION_FIELD:
 
 			next_object = object->field.region_obj;
 			break;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		case ACPI_TYPE_LOCAL_BANK_FIELD:
 
 			next_object = object->bank_field.bank_obj;
@@ -632,6 +635,10 @@ acpi_ut_update_object_reference(union acpi_operand_object *object, u16 action)
 			}
 			break;
 
+<<<<<<< HEAD
+=======
+		case ACPI_TYPE_LOCAL_REGION_FIELD:
+>>>>>>> common/deprecated/android-3.18
 		case ACPI_TYPE_REGION:
 		default:
 

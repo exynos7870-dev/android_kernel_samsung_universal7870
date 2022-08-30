@@ -66,8 +66,11 @@ extern void *kmem_realloc(const void *, size_t, size_t, xfs_km_flags_t);
 extern void  kmem_free(const void *);
 
 
+<<<<<<< HEAD
 extern void *kmem_zalloc_greedy(size_t *, size_t, size_t);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static inline void *
 kmem_zalloc(size_t size, xfs_km_flags_t flags)
 {

@@ -75,7 +75,11 @@ static long madvise_behavior(struct vm_area_struct *vma,
 		new_flags |= VM_DONTDUMP;
 		break;
 	case MADV_DODUMP:
+<<<<<<< HEAD
 		if (new_flags & VM_SPECIAL) {
+=======
+		if (!is_vm_hugetlb_page(vma) && new_flags & VM_SPECIAL) {
+>>>>>>> common/deprecated/android-3.18
 			error = -EINVAL;
 			goto out;
 		}
@@ -222,9 +226,15 @@ static long madvise_willneed(struct vm_area_struct *vma,
 {
 	struct file *file = vma->vm_file;
 
+<<<<<<< HEAD
 #ifdef CONFIG_SWAP
 	if (!file || mapping_cap_swap_backed(file->f_mapping)) {
 		*prev = vma;
+=======
+	*prev = vma;
+#ifdef CONFIG_SWAP
+	if (!file || mapping_cap_swap_backed(file->f_mapping)) {
+>>>>>>> common/deprecated/android-3.18
 		if (!file)
 			force_swapin_readahead(vma, start, end);
 		else
@@ -242,7 +252,10 @@ static long madvise_willneed(struct vm_area_struct *vma,
 		return 0;
 	}
 
+<<<<<<< HEAD
 	*prev = vma;
+=======
+>>>>>>> common/deprecated/android-3.18
 	start = ((start - vma->vm_start) >> PAGE_SHIFT) + vma->vm_pgoff;
 	if (end > vma->vm_end)
 		end = vma->vm_end;

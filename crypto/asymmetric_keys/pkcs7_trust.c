@@ -174,6 +174,11 @@ int pkcs7_validate_trust(struct pkcs7_message *pkcs7,
 	int cached_ret = -ENOKEY;
 	int ret;
 
+<<<<<<< HEAD
+=======
+	*_trusted = false;
+
+>>>>>>> common/deprecated/android-3.18
 	for (p = pkcs7->certs; p; p = p->next)
 		p->seen = false;
 

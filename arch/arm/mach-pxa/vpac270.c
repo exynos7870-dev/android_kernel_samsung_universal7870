@@ -15,6 +15,10 @@
 #include <linux/irq.h>
 #include <linux/gpio_keys.h>
 #include <linux/input.h>
+<<<<<<< HEAD
+=======
+#include <linux/leds.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/gpio.h>
 #include <linux/usb/gpio_vbus.h>
 #include <linux/mtd/mtd.h>

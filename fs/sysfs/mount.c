@@ -31,9 +31,12 @@ static struct dentry *sysfs_mount(struct file_system_type *fs_type,
 	bool new_sb;
 
 	if (!(flags & MS_KERNMOUNT)) {
+<<<<<<< HEAD
 		if (!capable(CAP_SYS_ADMIN) && !fs_fully_visible(fs_type))
 			return ERR_PTR(-EPERM);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		if (!kobj_ns_current_may_mount(KOBJ_NS_TYPE_NET))
 			return ERR_PTR(-EPERM);
 	}
@@ -58,7 +61,11 @@ static struct file_system_type sysfs_fs_type = {
 	.name		= "sysfs",
 	.mount		= sysfs_mount,
 	.kill_sb	= sysfs_kill_sb,
+<<<<<<< HEAD
 	.fs_flags	= FS_USERNS_MOUNT,
+=======
+	.fs_flags	= FS_USERNS_VISIBLE | FS_USERNS_MOUNT,
+>>>>>>> common/deprecated/android-3.18
 };
 
 int __init sysfs_init(void)

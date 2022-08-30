@@ -8,6 +8,7 @@ config SRCARCH
 	string
 	option env="SRCARCH"
 
+<<<<<<< HEAD
 config ANDROID_VERSION
 	string
 	option env="ANDROID_VERSION"
@@ -16,4 +17,6 @@ config ANDROID_MAJOR_VERSION
 	string
 	option env="ANDROID_MAJOR_VERSION"
 
+=======
+>>>>>>> common/deprecated/android-3.18
 source "arch/$SRCARCH/Kconfig"

@@ -194,4 +194,8 @@ ENTRY(memmove)
 	tst	count, #0x3f
 	b.ne	.Ltail63
 	ret
+<<<<<<< HEAD
 ENDPROC(memmove)
+=======
+ENDPIPROC(memmove)
+>>>>>>> common/deprecated/android-3.18

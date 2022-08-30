@@ -1603,6 +1603,11 @@ bool usb_cmd_send_packet(struct ieee80211_hw *hw, struct sk_buff *skb)
    * This is maybe necessary:
    * rtlpriv->cfg->ops->fill_tx_cmddesc(hw, buffer, 1, 1, skb);
    */
+<<<<<<< HEAD
+=======
+	dev_kfree_skb(skb);
+
+>>>>>>> common/deprecated/android-3.18
 	return true;
 }
 

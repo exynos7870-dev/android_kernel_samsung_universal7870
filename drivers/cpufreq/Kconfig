@@ -45,12 +45,15 @@ config CPU_FREQ_STAT_DETAILS
 
 	  If in doubt, say N.
 
+<<<<<<< HEAD
 config LOAD_BASED_CORE_CURRENT_CAL
 	bool "CPU current accuracy improvement"
 	default n
 	help
 	  This option enable core current calculation to include core work load for Exynos7870
 
+=======
+>>>>>>> common/deprecated/android-3.18
 choice
 	prompt "Default CPUFreq governor"
 	default CPU_FREQ_DEFAULT_GOV_USERSPACE if ARM_SA1100_CPUFREQ || ARM_SA1110_CPUFREQ
@@ -118,6 +121,16 @@ config CPU_FREQ_DEFAULT_GOV_INTERACTIVE
 	  loading your cpufreq low-level hardware driver, using the
 	  'interactive' governor for latency-sensitive workloads.
 
+<<<<<<< HEAD
+=======
+config CPU_FREQ_DEFAULT_GOV_SCHED
+	bool "sched"
+	select CPU_FREQ_GOV_INTERACTIVE
+	help
+	  Use the CPUfreq governor 'sched' as default. This scales
+	  cpu frequency using CPU utilization estimates from the
+	  scheduler.
+>>>>>>> common/deprecated/android-3.18
 endchoice
 
 config CPU_FREQ_GOV_PERFORMANCE
@@ -216,6 +229,24 @@ config CPU_FREQ_GOV_CONSERVATIVE
 
 	  If in doubt, say N.
 
+<<<<<<< HEAD
+=======
+config CPU_FREQ_GOV_SCHED
+	bool "'sched' cpufreq governor"
+	depends on CPU_FREQ
+	depends on SMP
+	select CPU_FREQ_GOV_COMMON
+	help
+	  'sched' - this governor scales cpu frequency from the
+	  scheduler as a function of cpu capacity utilization. It does
+	  not evaluate utilization on a periodic basis (as ondemand
+	  does) but instead is event-driven by the scheduler.
+
+	  If in doubt, say N.
+
+comment "CPU frequency scaling drivers"
+
+>>>>>>> common/deprecated/android-3.18
 config CPUFREQ_DT
 	tristate "Generic DT based cpufreq driver"
 	depends on HAVE_CLK && OF

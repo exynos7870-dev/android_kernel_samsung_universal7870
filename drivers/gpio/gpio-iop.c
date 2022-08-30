@@ -130,3 +130,10 @@ static int __init iop3xx_gpio_init(void)
 	return platform_driver_register(&iop3xx_gpio_driver);
 }
 arch_initcall(iop3xx_gpio_init);
+<<<<<<< HEAD
+=======
+
+MODULE_DESCRIPTION("GPIO handling for Intel IOP3xx processors");
+MODULE_AUTHOR("Lennert Buytenhek <buytenh@wantstofly.org>");
+MODULE_LICENSE("GPL");
+>>>>>>> common/deprecated/android-3.18

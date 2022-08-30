@@ -56,6 +56,11 @@
 #include <linux/uidgid.h>
 #include <linux/cred.h>
 
+<<<<<<< HEAD
+=======
+#include <linux/nospec.h>
+
+>>>>>>> common/deprecated/android-3.18
 #include <linux/kmsg_dump.h>
 /* Move somewhere else to avoid recompiling? */
 #include <generated/utsrelease.h>
@@ -117,6 +122,7 @@ int fs_overflowgid = DEFAULT_FS_OVERFLOWUID;
 EXPORT_SYMBOL(fs_overflowuid);
 EXPORT_SYMBOL(fs_overflowgid);
 
+<<<<<<< HEAD
 #if defined CONFIG_SEC_RESTRICT_SETUID
 int sec_check_execpath(struct mm_struct *mm, char *denypath);
 #if defined CONFIG_SEC_RESTRICT_ROOTING_LOG
@@ -165,6 +171,8 @@ out:
 }
 #endif // End of CONFIG_SEC_RESTRICT_SETUID
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * Returns true if current's euid is same as p's uid or euid,
  * or has CAP_SYS_NICE to p's user_ns.
@@ -372,6 +380,7 @@ SYSCALL_DEFINE2(setregid, gid_t, rgid, gid_t, egid)
 	int retval;
 	kgid_t krgid, kegid;
 
+<<<<<<< HEAD
 #if defined CONFIG_SEC_RESTRICT_SETUID
 	if(rgid == 0 || egid == 0)
 	{
@@ -380,6 +389,8 @@ SYSCALL_DEFINE2(setregid, gid_t, rgid, gid_t, egid)
 	}
 #endif // End of CONFIG_SEC_RESTRICT_SETUID
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	krgid = make_kgid(ns, rgid);
 	kegid = make_kgid(ns, egid);
 
@@ -436,6 +447,7 @@ SYSCALL_DEFINE1(setgid, gid_t, gid)
 	struct cred *new;
 	int retval;
 	kgid_t kgid;
+<<<<<<< HEAD
 	
 #if defined CONFIG_SEC_RESTRICT_SETUID
 	if(gid == 0)
@@ -444,6 +456,8 @@ SYSCALL_DEFINE1(setgid, gid_t, gid)
 			return -EACCES;
 	}
 #endif // End of CONFIG_SEC_RESTRICT_SETUID
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	kgid = make_kgid(ns, gid);
 	if (!gid_valid(kgid))
@@ -521,6 +535,7 @@ SYSCALL_DEFINE2(setreuid, uid_t, ruid, uid_t, euid)
 	int retval;
 	kuid_t kruid, keuid;
 
+<<<<<<< HEAD
 #if defined CONFIG_SEC_RESTRICT_SETUID
 	if(ruid == 0 || euid == 0)
 	{
@@ -529,6 +544,8 @@ SYSCALL_DEFINE2(setreuid, uid_t, ruid, uid_t, euid)
 	}
 #endif // End of CONFIG_SEC_RESTRICT_SETUID
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	kruid = make_kuid(ns, ruid);
 	keuid = make_kuid(ns, euid);
 
@@ -600,6 +617,7 @@ SYSCALL_DEFINE1(setuid, uid_t, uid)
 	int retval;
 	kuid_t kuid;
 
+<<<<<<< HEAD
 #if defined CONFIG_SEC_RESTRICT_SETUID
 	if(uid == 0)
 	{
@@ -608,6 +626,8 @@ SYSCALL_DEFINE1(setuid, uid_t, uid)
 	}
 #endif // End of CONFIG_SEC_RESTRICT_SETUID
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	kuid = make_kuid(ns, uid);
 	if (!uid_valid(kuid))
 		return -EINVAL;
@@ -655,6 +675,7 @@ SYSCALL_DEFINE3(setresuid, uid_t, ruid, uid_t, euid, uid_t, suid)
 	int retval;
 	kuid_t kruid, keuid, ksuid;
 
+<<<<<<< HEAD
 #if defined CONFIG_SEC_RESTRICT_SETUID
 	if(ruid == 0 || euid == 0 || suid == 0)
 	{
@@ -663,6 +684,8 @@ SYSCALL_DEFINE3(setresuid, uid_t, ruid, uid_t, euid, uid_t, suid)
 	}
 #endif // End of CONFIG_SEC_RESTRICT_SETUID
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	kruid = make_kuid(ns, ruid);
 	keuid = make_kuid(ns, euid);
 	ksuid = make_kuid(ns, suid);
@@ -750,6 +773,7 @@ SYSCALL_DEFINE3(setresgid, gid_t, rgid, gid_t, egid, gid_t, sgid)
 	int retval;
 	kgid_t krgid, kegid, ksgid;
 
+<<<<<<< HEAD
 #if defined CONFIG_SEC_RESTRICT_SETUID
 	if(rgid == 0 || egid == 0 || sgid == 0)
 	{
@@ -758,6 +782,8 @@ SYSCALL_DEFINE3(setresgid, gid_t, rgid, gid_t, egid, gid_t, sgid)
 	}
 #endif // End of CONFIG_SEC_RESTRICT_SETUID
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	krgid = make_kgid(ns, rgid);
 	kegid = make_kgid(ns, egid);
 	ksgid = make_kgid(ns, sgid);
@@ -1224,6 +1250,7 @@ static int override_release(char __user *release, size_t len)
 
 SYSCALL_DEFINE1(newuname, struct new_utsname __user *, name)
 {
+<<<<<<< HEAD
 	int errno = 0;
 
 	down_read(&uts_sem);
@@ -1236,6 +1263,21 @@ SYSCALL_DEFINE1(newuname, struct new_utsname __user *, name)
 	if (!errno && override_architecture(name))
 		errno = -EFAULT;
 	return errno;
+=======
+	struct new_utsname tmp;
+
+	down_read(&uts_sem);
+	memcpy(&tmp, utsname(), sizeof(tmp));
+	up_read(&uts_sem);
+	if (copy_to_user(name, &tmp, sizeof(tmp)))
+		return -EFAULT;
+
+	if (override_release(name->release, sizeof(name->release)))
+		return -EFAULT;
+	if (override_architecture(name))
+		return -EFAULT;
+	return 0;
+>>>>>>> common/deprecated/android-3.18
 }
 
 #ifdef __ARCH_WANT_SYS_OLD_UNAME
@@ -1244,12 +1286,17 @@ SYSCALL_DEFINE1(newuname, struct new_utsname __user *, name)
  */
 SYSCALL_DEFINE1(uname, struct old_utsname __user *, name)
 {
+<<<<<<< HEAD
 	int error = 0;
+=======
+	struct old_utsname tmp;
+>>>>>>> common/deprecated/android-3.18
 
 	if (!name)
 		return -EFAULT;
 
 	down_read(&uts_sem);
+<<<<<<< HEAD
 	if (copy_to_user(name, utsname(), sizeof(*name)))
 		error = -EFAULT;
 	up_read(&uts_sem);
@@ -1259,10 +1306,23 @@ SYSCALL_DEFINE1(uname, struct old_utsname __user *, name)
 	if (!error && override_architecture(name))
 		error = -EFAULT;
 	return error;
+=======
+	memcpy(&tmp, utsname(), sizeof(tmp));
+	up_read(&uts_sem);
+	if (copy_to_user(name, &tmp, sizeof(tmp)))
+		return -EFAULT;
+
+	if (override_release(name->release, sizeof(name->release)))
+		return -EFAULT;
+	if (override_architecture(name))
+		return -EFAULT;
+	return 0;
+>>>>>>> common/deprecated/android-3.18
 }
 
 SYSCALL_DEFINE1(olduname, struct oldold_utsname __user *, name)
 {
+<<<<<<< HEAD
 	int error;
 
 	if (!name)
@@ -1293,6 +1353,30 @@ SYSCALL_DEFINE1(olduname, struct oldold_utsname __user *, name)
 	if (!error && override_release(name->release, sizeof(name->release)))
 		error = -EFAULT;
 	return error ? -EFAULT : 0;
+=======
+	struct oldold_utsname tmp;
+
+	if (!name)
+		return -EFAULT;
+
+	memset(&tmp, 0, sizeof(tmp));
+
+	down_read(&uts_sem);
+	memcpy(&tmp.sysname, &utsname()->sysname, __OLD_UTS_LEN);
+	memcpy(&tmp.nodename, &utsname()->nodename, __OLD_UTS_LEN);
+	memcpy(&tmp.release, &utsname()->release, __OLD_UTS_LEN);
+	memcpy(&tmp.version, &utsname()->version, __OLD_UTS_LEN);
+	memcpy(&tmp.machine, &utsname()->machine, __OLD_UTS_LEN);
+	up_read(&uts_sem);
+	if (copy_to_user(name, &tmp, sizeof(tmp)))
+		return -EFAULT;
+
+	if (override_architecture(name))
+		return -EFAULT;
+	if (override_release(name->release, sizeof(name->release)))
+		return -EFAULT;
+	return 0;
+>>>>>>> common/deprecated/android-3.18
 }
 #endif
 
@@ -1306,17 +1390,31 @@ SYSCALL_DEFINE2(sethostname, char __user *, name, int, len)
 
 	if (len < 0 || len > __NEW_UTS_LEN)
 		return -EINVAL;
+<<<<<<< HEAD
 	down_write(&uts_sem);
 	errno = -EFAULT;
 	if (!copy_from_user(tmp, name, len)) {
 		struct new_utsname *u = utsname();
 
+=======
+	errno = -EFAULT;
+	if (!copy_from_user(tmp, name, len)) {
+		struct new_utsname *u;
+
+		down_write(&uts_sem);
+		u = utsname();
+>>>>>>> common/deprecated/android-3.18
 		memcpy(u->nodename, tmp, len);
 		memset(u->nodename + len, 0, sizeof(u->nodename) - len);
 		errno = 0;
 		uts_proc_notify(UTS_PROC_HOSTNAME);
+<<<<<<< HEAD
 	}
 	up_write(&uts_sem);
+=======
+		up_write(&uts_sem);
+	}
+>>>>>>> common/deprecated/android-3.18
 	return errno;
 }
 
@@ -1324,8 +1422,14 @@ SYSCALL_DEFINE2(sethostname, char __user *, name, int, len)
 
 SYSCALL_DEFINE2(gethostname, char __user *, name, int, len)
 {
+<<<<<<< HEAD
 	int i, errno;
 	struct new_utsname *u;
+=======
+	int i;
+	struct new_utsname *u;
+	char tmp[__NEW_UTS_LEN + 1];
+>>>>>>> common/deprecated/android-3.18
 
 	if (len < 0)
 		return -EINVAL;
@@ -1334,11 +1438,19 @@ SYSCALL_DEFINE2(gethostname, char __user *, name, int, len)
 	i = 1 + strlen(u->nodename);
 	if (i > len)
 		i = len;
+<<<<<<< HEAD
 	errno = 0;
 	if (copy_to_user(name, u->nodename, i))
 		errno = -EFAULT;
 	up_read(&uts_sem);
 	return errno;
+=======
+	memcpy(tmp, u->nodename, i);
+	up_read(&uts_sem);
+	if (copy_to_user(name, tmp, i))
+		return -EFAULT;
+	return 0;
+>>>>>>> common/deprecated/android-3.18
 }
 
 #endif
@@ -1357,17 +1469,31 @@ SYSCALL_DEFINE2(setdomainname, char __user *, name, int, len)
 	if (len < 0 || len > __NEW_UTS_LEN)
 		return -EINVAL;
 
+<<<<<<< HEAD
 	down_write(&uts_sem);
 	errno = -EFAULT;
 	if (!copy_from_user(tmp, name, len)) {
 		struct new_utsname *u = utsname();
 
+=======
+	errno = -EFAULT;
+	if (!copy_from_user(tmp, name, len)) {
+		struct new_utsname *u;
+
+		down_write(&uts_sem);
+		u = utsname();
+>>>>>>> common/deprecated/android-3.18
 		memcpy(u->domainname, tmp, len);
 		memset(u->domainname + len, 0, sizeof(u->domainname) - len);
 		errno = 0;
 		uts_proc_notify(UTS_PROC_DOMAINNAME);
+<<<<<<< HEAD
 	}
 	up_write(&uts_sem);
+=======
+		up_write(&uts_sem);
+	}
+>>>>>>> common/deprecated/android-3.18
 	return errno;
 }
 
@@ -1395,6 +1521,10 @@ SYSCALL_DEFINE2(old_getrlimit, unsigned int, resource,
 	if (resource >= RLIM_NLIMITS)
 		return -EINVAL;
 
+<<<<<<< HEAD
+=======
+	resource = array_index_nospec(resource, RLIM_NLIMITS);
+>>>>>>> common/deprecated/android-3.18
 	task_lock(current->group_leader);
 	x = current->signal->rlim[resource];
 	task_unlock(current->group_leader);
@@ -1836,7 +1966,11 @@ static int validate_prctl_map(struct prctl_mm_map *prctl_map)
 	((unsigned long)prctl_map->__m1 __op				\
 	 (unsigned long)prctl_map->__m2) ? 0 : -EINVAL
 	error  = __prctl_check_order(start_code, <, end_code);
+<<<<<<< HEAD
 	error |= __prctl_check_order(start_data, <, end_data);
+=======
+	error |= __prctl_check_order(start_data,<=, end_data);
+>>>>>>> common/deprecated/android-3.18
 	error |= __prctl_check_order(start_brk, <=, brk);
 	error |= __prctl_check_order(arg_start, <=, arg_end);
 	error |= __prctl_check_order(env_start, <=, env_end);

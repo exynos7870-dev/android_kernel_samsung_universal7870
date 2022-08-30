@@ -464,7 +464,11 @@ static int clariion_prep_fn(struct scsi_device *sdev, struct request *req)
 static int clariion_std_inquiry(struct scsi_device *sdev,
 				struct clariion_dh_data *csdev)
 {
+<<<<<<< HEAD
 	int err;
+=======
+	int err = SCSI_DH_OK;
+>>>>>>> common/deprecated/android-3.18
 	char *sp_model;
 
 	err = send_inquiry_cmd(sdev, 0, csdev);

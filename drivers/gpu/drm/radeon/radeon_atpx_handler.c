@@ -10,6 +10,10 @@
 #include <linux/slab.h>
 #include <linux/acpi.h>
 #include <linux/pci.h>
+<<<<<<< HEAD
+=======
+#include <linux/delay.h>
+>>>>>>> common/deprecated/android-3.18
 
 #include "radeon_acpi.h"
 
@@ -255,6 +259,13 @@ static int radeon_atpx_set_discrete_state(struct radeon_atpx *atpx, u8 state)
 		if (!info)
 			return -EIO;
 		kfree(info);
+<<<<<<< HEAD
+=======
+
+		/* 200ms delay is required after off */
+		if (state == 0)
+			msleep(200);
+>>>>>>> common/deprecated/android-3.18
 	}
 	return 0;
 }

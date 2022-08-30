@@ -143,7 +143,10 @@ static int msg_insert(struct msg_msg *msg, struct mqueue_inode_info *info)
 		if (!leaf)
 			return -ENOMEM;
 		INIT_LIST_HEAD(&leaf->msg_list);
+<<<<<<< HEAD
 		info->qsize += sizeof(*leaf);
+=======
+>>>>>>> common/deprecated/android-3.18
 	}
 	leaf->priority = msg->m_type;
 	rb_link_node(&leaf->rb_node, parent, p);
@@ -188,7 +191,10 @@ try_again:
 			     "lazy leaf delete!\n");
 		rb_erase(&leaf->rb_node, &info->msg_tree);
 		if (info->node_cache) {
+<<<<<<< HEAD
 			info->qsize -= sizeof(*leaf);
+=======
+>>>>>>> common/deprecated/android-3.18
 			kfree(leaf);
 		} else {
 			info->node_cache = leaf;
@@ -201,7 +207,10 @@ try_again:
 		if (list_empty(&leaf->msg_list)) {
 			rb_erase(&leaf->rb_node, &info->msg_tree);
 			if (info->node_cache) {
+<<<<<<< HEAD
 				info->qsize -= sizeof(*leaf);
+=======
+>>>>>>> common/deprecated/android-3.18
 				kfree(leaf);
 			} else {
 				info->node_cache = leaf;
@@ -375,9 +384,15 @@ static void mqueue_evict_inode(struct inode *inode)
 {
 	struct mqueue_inode_info *info;
 	struct user_struct *user;
+<<<<<<< HEAD
 	unsigned long mq_bytes, mq_treesize;
 	struct ipc_namespace *ipc_ns;
 	struct msg_msg *msg;
+=======
+	struct ipc_namespace *ipc_ns;
+	struct msg_msg *msg, *nmsg;
+	LIST_HEAD(tmp_msg);
+>>>>>>> common/deprecated/android-3.18
 
 	clear_inode(inode);
 
@@ -388,6 +403,7 @@ static void mqueue_evict_inode(struct inode *inode)
 	info = MQUEUE_I(inode);
 	spin_lock(&info->lock);
 	while ((msg = msg_get(info)) != NULL)
+<<<<<<< HEAD
 		free_msg(msg);
 	kfree(info->node_cache);
 	spin_unlock(&info->lock);
@@ -402,6 +418,29 @@ static void mqueue_evict_inode(struct inode *inode)
 
 	user = info->user;
 	if (user) {
+=======
+		list_add_tail(&msg->m_list, &tmp_msg);
+	kfree(info->node_cache);
+	spin_unlock(&info->lock);
+
+	list_for_each_entry_safe(msg, nmsg, &tmp_msg, m_list) {
+		list_del(&msg->m_list);
+		free_msg(msg);
+	}
+
+	user = info->user;
+	if (user) {
+		unsigned long mq_bytes, mq_treesize;
+
+		/* Total amount of bytes accounted for the mqueue */
+		mq_treesize = info->attr.mq_maxmsg * sizeof(struct msg_msg) +
+			min_t(unsigned int, info->attr.mq_maxmsg, MQ_PRIO_MAX) *
+			sizeof(struct posix_msg_tree_node);
+
+		mq_bytes = mq_treesize + (info->attr.mq_maxmsg *
+					  info->attr.mq_msgsize);
+
+>>>>>>> common/deprecated/android-3.18
 		spin_lock(&mq_lock);
 		user->mq_bytes -= mq_bytes;
 		/*
@@ -1026,7 +1065,10 @@ SYSCALL_DEFINE5(mq_timedsend, mqd_t, mqdes, const char __user *, u_msg_ptr,
 		/* Save our speculative allocation into the cache */
 		INIT_LIST_HEAD(&new_leaf->msg_list);
 		info->node_cache = new_leaf;
+<<<<<<< HEAD
 		info->qsize += sizeof(*new_leaf);
+=======
+>>>>>>> common/deprecated/android-3.18
 		new_leaf = NULL;
 	} else {
 		kfree(new_leaf);
@@ -1133,7 +1175,10 @@ SYSCALL_DEFINE5(mq_timedreceive, mqd_t, mqdes, char __user *, u_msg_ptr,
 		/* Save our speculative allocation into the cache */
 		INIT_LIST_HEAD(&new_leaf->msg_list);
 		info->node_cache = new_leaf;
+<<<<<<< HEAD
 		info->qsize += sizeof(*new_leaf);
+=======
+>>>>>>> common/deprecated/android-3.18
 	} else {
 		kfree(new_leaf);
 	}

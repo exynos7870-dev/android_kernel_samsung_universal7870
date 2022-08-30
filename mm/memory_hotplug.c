@@ -32,6 +32,10 @@
 #include <linux/hugetlb.h>
 #include <linux/memblock.h>
 #include <linux/bootmem.h>
+<<<<<<< HEAD
+=======
+#include <linux/rmap.h>
+>>>>>>> common/deprecated/android-3.18
 
 #include <asm/tlbflush.h>
 
@@ -1321,7 +1325,12 @@ static struct page *next_active_pageblock(struct page *page)
 int is_mem_section_removable(unsigned long start_pfn, unsigned long nr_pages)
 {
 	struct page *page = pfn_to_page(start_pfn);
+<<<<<<< HEAD
 	struct page *end_page = page + nr_pages;
+=======
+	unsigned long end_pfn = min(start_pfn + nr_pages, zone_end_pfn(page_zone(page)));
+	struct page *end_page = pfn_to_page(end_pfn);
+>>>>>>> common/deprecated/android-3.18
 
 	/* Check the starting page of each pageblock within the range */
 	for (; page < end_page; page = next_active_pageblock(page)) {
@@ -1415,6 +1424,24 @@ do_migrate_range(unsigned long start_pfn, unsigned long end_pfn)
 			continue;
 		}
 
+<<<<<<< HEAD
+=======
+		/*
+		 * HWPoison pages have elevated reference counts so the migration would
+		 * fail on them. It also doesn't make any sense to migrate them in the
+		 * first place. Still try to unmap such a page in case it is still mapped
+		 * (e.g. current hwpoison implementation doesn't unmap KSM pages but keep
+		 * the unmap as the catch all safety net).
+		 */
+		if (PageHWPoison(page)) {
+			if (WARN_ON(PageLRU(page)))
+				isolate_lru_page(page);
+			if (page_mapped(page))
+				try_to_unmap(page, TTU_IGNORE_MLOCK | TTU_IGNORE_ACCESS);
+			continue;
+		}
+
+>>>>>>> common/deprecated/android-3.18
 		if (!get_page_unless_zero(page))
 			continue;
 		/*
@@ -1978,8 +2005,15 @@ void try_offline_node(int nid)
 		 * wait_table may be allocated from boot memory,
 		 * here only free if it's allocated by vmalloc.
 		 */
+<<<<<<< HEAD
 		if (is_vmalloc_addr(zone->wait_table))
 			vfree(zone->wait_table);
+=======
+		if (is_vmalloc_addr(zone->wait_table)) {
+			vfree(zone->wait_table);
+			zone->wait_table = NULL;
+		}
+>>>>>>> common/deprecated/android-3.18
 	}
 }
 EXPORT_SYMBOL(try_offline_node);

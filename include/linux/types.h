@@ -213,5 +213,11 @@ struct callback_head {
 };
 #define rcu_head callback_head
 
+<<<<<<< HEAD
+=======
+/* clocksource cycle base type */
+typedef u64 cycle_t;
+
+>>>>>>> common/deprecated/android-3.18
 #endif /*  __ASSEMBLY__ */
 #endif /* _LINUX_TYPES_H */

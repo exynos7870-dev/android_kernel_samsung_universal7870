@@ -800,9 +800,12 @@ static void start_queue(struct net2280_ep *ep, u32 dmactl, u32 td_dma)
 	(void) readl(&ep->dev->pci->pcimstctl);
 
 	writel(BIT(DMA_START), &dma->dmastat);
+<<<<<<< HEAD
 
 	if (!ep->is_in)
 		stop_out_naking(ep);
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void start_dma(struct net2280_ep *ep, struct net2280_request *req)
@@ -841,6 +844,10 @@ static void start_dma(struct net2280_ep *ep, struct net2280_request *req)
 			writel(BIT(DMA_START), &dma->dmastat);
 			return;
 		}
+<<<<<<< HEAD
+=======
+		stop_out_naking(ep);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	tmp = dmactl_default;
@@ -1284,7 +1291,13 @@ static int net2280_dequeue(struct usb_ep *_ep, struct usb_request *_req)
 			break;
 	}
 	if (&req->req != _req) {
+<<<<<<< HEAD
 		spin_unlock_irqrestore(&ep->dev->lock, flags);
+=======
+		ep->stopped = stopped;
+		spin_unlock_irqrestore(&ep->dev->lock, flags);
+		ep_dbg(ep->dev, "%s: Request mismatch\n", __func__);
+>>>>>>> common/deprecated/android-3.18
 		return -EINVAL;
 	}
 
@@ -2428,11 +2441,16 @@ static void stop_activity(struct net2280 *dev, struct usb_gadget_driver *driver)
 		nuke(&dev->ep[i]);
 
 	/* report disconnect; the driver is already quiesced */
+<<<<<<< HEAD
 	if (driver) {
 		spin_unlock(&dev->lock);
 		driver->disconnect(&dev->gadget);
 		spin_lock(&dev->lock);
 	}
+=======
+	if (driver)
+		driver->disconnect(&dev->gadget);
+>>>>>>> common/deprecated/android-3.18
 
 	usb_reinit(dev);
 }
@@ -3741,8 +3759,15 @@ static int net2280_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	return 0;
 
 done:
+<<<<<<< HEAD
 	if (dev)
 		net2280_remove(pdev);
+=======
+	if (dev) {
+		net2280_remove(pdev);
+		kfree(dev);
+	}
+>>>>>>> common/deprecated/android-3.18
 	return retval;
 }
 

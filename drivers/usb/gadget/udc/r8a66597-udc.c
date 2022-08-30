@@ -835,11 +835,19 @@ static void init_controller(struct r8a66597 *r8a66597)
 
 		r8a66597_bset(r8a66597, XCKE, SYSCFG0);
 
+<<<<<<< HEAD
 		msleep(3);
 
 		r8a66597_bset(r8a66597, PLLC, SYSCFG0);
 
 		msleep(1);
+=======
+		mdelay(3);
+
+		r8a66597_bset(r8a66597, PLLC, SYSCFG0);
+
+		mdelay(1);
+>>>>>>> common/deprecated/android-3.18
 
 		r8a66597_bset(r8a66597, SCKE, SYSCFG0);
 
@@ -1193,7 +1201,11 @@ __acquires(r8a66597->lock)
 	r8a66597->ep0_req->length = 2;
 	/* AV: what happens if we get called again before that gets through? */
 	spin_unlock(&r8a66597->lock);
+<<<<<<< HEAD
 	r8a66597_queue(r8a66597->gadget.ep0, r8a66597->ep0_req, GFP_KERNEL);
+=======
+	r8a66597_queue(r8a66597->gadget.ep0, r8a66597->ep0_req, GFP_ATOMIC);
+>>>>>>> common/deprecated/android-3.18
 	spin_lock(&r8a66597->lock);
 }
 
@@ -1870,6 +1882,11 @@ static int r8a66597_probe(struct platform_device *pdev)
 		return PTR_ERR(reg);
 
 	ires = platform_get_resource(pdev, IORESOURCE_IRQ, 0);
+<<<<<<< HEAD
+=======
+	if (!ires)
+		return -EINVAL;
+>>>>>>> common/deprecated/android-3.18
 	irq = ires->start;
 	irq_trigger = ires->flags & IRQF_TRIGGER_MASK;
 

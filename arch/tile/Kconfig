@@ -27,6 +27,11 @@ config TILE
 	select ARCH_HAS_ATOMIC64_DEC_IF_POSITIVE
 	select HAVE_DEBUG_STACKOVERFLOW
 	select ARCH_WANT_FRAME_POINTERS
+<<<<<<< HEAD
+=======
+	select GENERIC_STRNCPY_FROM_USER
+	select GENERIC_STRNLEN_USER
+>>>>>>> common/deprecated/android-3.18
 
 # FIXME: investigate whether we need/want these options.
 #	select HAVE_IOREMAP_PROT

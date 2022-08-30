@@ -98,6 +98,11 @@ nfnl_acct_new(struct sock *nfnl, struct sk_buff *skb,
 			return -EINVAL;
 		if (flags & NFACCT_F_OVERQUOTA)
 			return -EINVAL;
+<<<<<<< HEAD
+=======
+		if ((flags & NFACCT_F_QUOTA) && !tb[NFACCT_QUOTA])
+			return -EINVAL;
+>>>>>>> common/deprecated/android-3.18
 
 		size += sizeof(u64);
 	}
@@ -243,6 +248,12 @@ nfacct_filter_alloc(const struct nlattr * const attr)
 	if (err < 0)
 		return ERR_PTR(err);
 
+<<<<<<< HEAD
+=======
+	if (!tb[NFACCT_FILTER_MASK] || !tb[NFACCT_FILTER_VALUE])
+		return ERR_PTR(-EINVAL);
+
+>>>>>>> common/deprecated/android-3.18
 	filter = kzalloc(sizeof(struct nfacct_filter), GFP_KERNEL);
 	if (!filter)
 		return ERR_PTR(-ENOMEM);

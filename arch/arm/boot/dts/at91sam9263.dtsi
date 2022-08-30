@@ -913,6 +913,11 @@
 			interrupts = <26 IRQ_TYPE_LEVEL_HIGH 3>;
 			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_fb>;
+<<<<<<< HEAD
+=======
+			clocks = <&lcd_clk>, <&lcd_clk>;
+			clock-names = "lcdc_clk", "hclk";
+>>>>>>> common/deprecated/android-3.18
 			status = "disabled";
 		};
 

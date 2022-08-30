@@ -24,6 +24,10 @@
 #include <linux/mm.h>
 #include <linux/module.h>
 #include <linux/scatterlist.h>
+<<<<<<< HEAD
+=======
+#include <linux/spinlock.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/string.h>
 
 struct eseqiv_request_ctx {
@@ -33,6 +37,10 @@ struct eseqiv_request_ctx {
 };
 
 struct eseqiv_ctx {
+<<<<<<< HEAD
+=======
+	spinlock_t lock;
+>>>>>>> common/deprecated/android-3.18
 	unsigned int reqoff;
 	char salt[];
 };
@@ -144,6 +152,32 @@ out:
 	return err;
 }
 
+<<<<<<< HEAD
+=======
+static int eseqiv_givencrypt_first(struct skcipher_givcrypt_request *req)
+{
+	struct crypto_ablkcipher *geniv = skcipher_givcrypt_reqtfm(req);
+	struct eseqiv_ctx *ctx = crypto_ablkcipher_ctx(geniv);
+	int err = 0;
+
+	spin_lock_bh(&ctx->lock);
+	if (crypto_ablkcipher_crt(geniv)->givencrypt != eseqiv_givencrypt_first)
+		goto unlock;
+
+	crypto_ablkcipher_crt(geniv)->givencrypt = eseqiv_givencrypt;
+	err = crypto_rng_get_bytes(crypto_default_rng, ctx->salt,
+				   crypto_ablkcipher_ivsize(geniv));
+
+unlock:
+	spin_unlock_bh(&ctx->lock);
+
+	if (err)
+		return err;
+
+	return eseqiv_givencrypt(req);
+}
+
+>>>>>>> common/deprecated/android-3.18
 static int eseqiv_init(struct crypto_tfm *tfm)
 {
 	struct crypto_ablkcipher *geniv = __crypto_ablkcipher_cast(tfm);
@@ -151,6 +185,11 @@ static int eseqiv_init(struct crypto_tfm *tfm)
 	unsigned long alignmask;
 	unsigned int reqsize;
 
+<<<<<<< HEAD
+=======
+	spin_lock_init(&ctx->lock);
+
+>>>>>>> common/deprecated/android-3.18
 	alignmask = crypto_tfm_ctx_alignment() - 1;
 	reqsize = sizeof(struct eseqiv_request_ctx);
 
@@ -171,8 +210,11 @@ static int eseqiv_init(struct crypto_tfm *tfm)
 	tfm->crt_ablkcipher.reqsize = reqsize +
 				      sizeof(struct ablkcipher_request);
 
+<<<<<<< HEAD
 	crypto_rng_get_bytes(crypto_default_rng, ctx->salt,
 						crypto_ablkcipher_ivsize(geniv));
+=======
+>>>>>>> common/deprecated/android-3.18
 	return skcipher_geniv_init(tfm);
 }
 
@@ -195,7 +237,11 @@ static struct crypto_instance *eseqiv_alloc(struct rtattr **tb)
 	if (inst->alg.cra_ablkcipher.ivsize != inst->alg.cra_blocksize)
 		goto free_inst;
 
+<<<<<<< HEAD
 	inst->alg.cra_ablkcipher.givencrypt = eseqiv_givencrypt;
+=======
+	inst->alg.cra_ablkcipher.givencrypt = eseqiv_givencrypt_first;
+>>>>>>> common/deprecated/android-3.18
 
 	inst->alg.cra_init = eseqiv_init;
 	inst->alg.cra_exit = skcipher_geniv_exit;

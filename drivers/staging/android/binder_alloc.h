@@ -24,9 +24,12 @@
 #include <linux/list_lru.h>
 
 extern struct list_lru binder_alloc_lru;
+<<<<<<< HEAD
 
 #define BINDER_MIN_ALLOC (1 * PAGE_SIZE)
 
+=======
+>>>>>>> common/deprecated/android-3.18
 struct binder_transaction;
 
 /**
@@ -53,8 +56,12 @@ struct binder_buffer {
 	unsigned free:1;
 	unsigned allow_user_free:1;
 	unsigned async_transaction:1;
+<<<<<<< HEAD
 	unsigned free_in_progress:1;
 	unsigned debug_id:28;
+=======
+	unsigned debug_id:29;
+>>>>>>> common/deprecated/android-3.18
 
 	struct binder_transaction *transaction;
 
@@ -95,6 +102,10 @@ struct binder_lru_page {
  * @pages:              array of binder_lru_page
  * @buffer_size:        size of address space specified via mmap
  * @pid:                pid for associated binder_proc (invariant after init)
+<<<<<<< HEAD
+=======
+ * @pages_high:         high watermark of offset in @pages
+>>>>>>> common/deprecated/android-3.18
  *
  * Bookkeeping structure for per-proc address space management for binder
  * buffers. It is normally initialized during binder_init() and binder_mmap()
@@ -103,7 +114,10 @@ struct binder_lru_page {
  */
 struct binder_alloc {
 	struct mutex mutex;
+<<<<<<< HEAD
 	struct task_struct *tsk;
+=======
+>>>>>>> common/deprecated/android-3.18
 	struct vm_area_struct *vma;
 	struct mm_struct *vma_vm_mm;
 	void *buffer;
@@ -116,6 +130,10 @@ struct binder_alloc {
 	size_t buffer_size;
 	uint32_t buffer_free;
 	int pid;
+<<<<<<< HEAD
+=======
+	size_t pages_high;
+>>>>>>> common/deprecated/android-3.18
 };
 
 #ifdef CONFIG_ANDROID_BINDER_IPC_SELFTEST

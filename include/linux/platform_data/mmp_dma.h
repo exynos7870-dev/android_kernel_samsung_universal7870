@@ -14,6 +14,10 @@
 
 struct mmp_dma_platdata {
 	int dma_channels;
+<<<<<<< HEAD
+=======
+	int nb_requestors;
+>>>>>>> common/deprecated/android-3.18
 };
 
 #endif /* MMP_DMA_H */

@@ -209,10 +209,20 @@ static int of_thermal_set_mode(struct thermal_zone_device *tz,
 
 	mutex_lock(&tz->lock);
 
+<<<<<<< HEAD
 	if (mode == THERMAL_DEVICE_ENABLED)
 		tz->polling_delay = data->polling_delay;
 	else
 		tz->polling_delay = 0;
+=======
+	if (mode == THERMAL_DEVICE_ENABLED) {
+		tz->polling_delay = data->polling_delay;
+		tz->passive_delay = data->passive_delay;
+	} else {
+		tz->polling_delay = 0;
+		tz->passive_delay = 0;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	mutex_unlock(&tz->lock);
 

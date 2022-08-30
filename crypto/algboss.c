@@ -67,6 +67,7 @@ static int cryptomgr_probe(void *data)
 	int err;
 
 	tmpl = crypto_lookup_template(param->template);
+<<<<<<< HEAD
 
 #ifndef CONFIG_CRYPTO_FIPS
 	if (!tmpl)
@@ -81,6 +82,11 @@ static int cryptomgr_probe(void *data)
 	if (!tmpl || IS_ERR(tmpl))
 		goto out;
 #endif
+=======
+	if (!tmpl)
+		goto out;
+
+>>>>>>> common/deprecated/android-3.18
 	do {
 		if (tmpl->create) {
 			err = tmpl->create(tmpl, param->tb);
@@ -205,8 +211,11 @@ static int cryptomgr_schedule_probe(struct crypto_larval *larval)
 	if (IS_ERR(thread))
 		goto err_put_larval;
 
+<<<<<<< HEAD
 	wait_for_completion_interruptible(&larval->completion);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	return NOTIFY_STOP;
 
 err_put_larval:
@@ -225,10 +234,16 @@ static int cryptomgr_test(void *data)
 	u32 type = param->type;
 	int err = 0;
 
+<<<<<<< HEAD
 // skip test procedure if it's not from POST.
 //#ifdef CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
 	goto skiptest;
 //#endif
+=======
+#ifdef CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
+	goto skiptest;
+#endif
+>>>>>>> common/deprecated/android-3.18
 
 	if (type & CRYPTO_ALG_TESTED)
 		goto skiptest;

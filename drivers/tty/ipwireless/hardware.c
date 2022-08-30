@@ -1515,6 +1515,11 @@ static void ipw_send_setup_packet(struct ipw_hardware *hw)
 			sizeof(struct ipw_setup_get_version_query_packet),
 			ADDR_SETUP_PROT, TL_PROTOCOLID_SETUP,
 			TL_SETUP_SIGNO_GET_VERSION_QRY);
+<<<<<<< HEAD
+=======
+	if (!ver_packet)
+		return;
+>>>>>>> common/deprecated/android-3.18
 	ver_packet->header.length = sizeof(struct tl_setup_get_version_qry);
 
 	/*

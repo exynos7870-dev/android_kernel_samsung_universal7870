@@ -72,7 +72,10 @@ static struct pinctrl_desc foo_desc = {
 	.name = "foo",
 	.pins = foo_pins,
 	.npins = ARRAY_SIZE(foo_pins),
+<<<<<<< HEAD
 	.maxpin = 63,
+=======
+>>>>>>> common/deprecated/android-3.18
 	.owner = THIS_MODULE,
 };
 
@@ -164,8 +167,13 @@ static const char *foo_get_group_name(struct pinctrl_dev *pctldev,
 }
 
 static int foo_get_group_pins(struct pinctrl_dev *pctldev, unsigned selector,
+<<<<<<< HEAD
 			       unsigned ** const pins,
 			       unsigned * const num_pins)
+=======
+			       const unsigned **pins,
+			       unsigned *num_pins)
+>>>>>>> common/deprecated/android-3.18
 {
 	*pins = (unsigned *) foo_groups[selector].pins;
 	*num_pins = foo_groups[selector].num_pins;
@@ -570,9 +578,14 @@ is possible to perform the requested mux setting, poke the hardware so that
 this happens.
 
 Pinmux drivers are required to supply a few callback functions, some are
+<<<<<<< HEAD
 optional. Usually the enable() and disable() functions are implemented,
 writing values into some certain registers to activate a certain mux setting
 for a certain pin.
+=======
+optional. Usually the set_mux() function is implemented, writing values into
+some certain registers to activate a certain mux setting for a certain pin.
+>>>>>>> common/deprecated/android-3.18
 
 A simple driver for the above example will work by setting bits 0, 1, 2, 3 or 4
 into some register named MUX to select a certain function with a certain
@@ -1266,7 +1279,11 @@ The semantics of the pinctrl APIs are:
 
 Usually the pin control core handled the get/put pair and call out to the
 device drivers bookkeeping operations, like checking available functions and
+<<<<<<< HEAD
 the associated pins, whereas the enable/disable pass on to the pin controller
+=======
+the associated pins, whereas select_state pass on to the pin controller
+>>>>>>> common/deprecated/android-3.18
 driver which takes care of activating and/or deactivating the mux setting by
 quickly poking some registers.
 
@@ -1363,8 +1380,14 @@ function, but with different named in the mapping as described under
 "Advanced mapping" above. So that for an SPI device, we have two states named
 "pos-A" and "pos-B".
 
+<<<<<<< HEAD
 This snippet first muxes the function in the pins defined by group A, enables
 it, disables and releases it, and muxes it in on the pins defined by group B:
+=======
+This snippet first initializes a state object for both groups (in foo_probe()),
+then muxes the function in the pins defined by group A, and finally muxes it in
+on the pins defined by group B:
+>>>>>>> common/deprecated/android-3.18
 
 #include <linux/pinctrl/consumer.h>
 

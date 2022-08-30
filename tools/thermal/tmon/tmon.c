@@ -326,7 +326,10 @@ int main(int argc, char **argv)
 			show_data_w();
 			show_cooling_device();
 		}
+<<<<<<< HEAD
 		cur_thermal_record++;
+=======
+>>>>>>> common/deprecated/android-3.18
 		time_elapsed += ticktime;
 		controller_handler(trec[0].temp[target_tz_index] / 1000,
 				&yk);

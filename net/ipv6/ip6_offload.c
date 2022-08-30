@@ -118,6 +118,10 @@ static struct sk_buff *ipv6_gso_segment(struct sk_buff *skb,
 		ipv6h = (struct ipv6hdr *)(skb_mac_header(skb) + nhoff);
 		ipv6h->payload_len = htons(skb->len - nhoff - sizeof(*ipv6h));
 		skb->network_header = (u8 *)ipv6h - skb->head;
+<<<<<<< HEAD
+=======
+		skb_reset_mac_len(skb);
+>>>>>>> common/deprecated/android-3.18
 
 		if (udpfrag) {
 			int err = ip6_find_1stfragopt(skb, &prevhdr);
@@ -199,6 +203,10 @@ static struct sk_buff **ipv6_gro_receive(struct sk_buff **head,
 	ops = rcu_dereference(inet6_offloads[proto]);
 	if (!ops || !ops->callbacks.gro_receive) {
 		__pskb_pull(skb, skb_gro_offset(skb));
+<<<<<<< HEAD
+=======
+		skb_gro_frag0_invalidate(skb);
+>>>>>>> common/deprecated/android-3.18
 		proto = ipv6_gso_pull_exthdrs(skb, proto);
 		skb_gro_pull(skb, -skb_transport_offset(skb));
 		skb_reset_transport_header(skb);

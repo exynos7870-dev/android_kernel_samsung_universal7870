@@ -1633,8 +1633,13 @@ static int pxa168_eth_remove(struct platform_device *pdev)
 	pep->base = NULL;
 	mdiobus_unregister(pep->smi_bus);
 	mdiobus_free(pep->smi_bus);
+<<<<<<< HEAD
 	unregister_netdev(dev);
 	cancel_work_sync(&pep->tx_timeout_task);
+=======
+	cancel_work_sync(&pep->tx_timeout_task);
+	unregister_netdev(dev);
+>>>>>>> common/deprecated/android-3.18
 	free_netdev(dev);
 	return 0;
 }

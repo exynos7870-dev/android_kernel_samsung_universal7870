@@ -95,6 +95,7 @@ static int __try_to_free_cp_buf(struct journal_head *jh)
 	struct buffer_head *bh = jh2bh(jh);
 
 	if (jh->b_transaction == NULL && !buffer_locked(bh) &&
+<<<<<<< HEAD
 	    !buffer_dirty(bh)) {
 		if (likely(!buffer_write_io_error(bh))) {
 			JBUFFER_TRACE(jh, "remove from checkpoint list");
@@ -113,6 +114,11 @@ static int __try_to_free_cp_buf(struct journal_head *jh)
 					(long unsigned int) bh->b_blocknr);
 			jbd2_journal_abort(journal, -EIO);
 		}
+=======
+	    !buffer_dirty(bh) && !buffer_write_io_error(bh)) {
+		JBUFFER_TRACE(jh, "remove from checkpoint list");
+		ret = __jbd2_journal_remove_checkpoint(jh) + 1;
+>>>>>>> common/deprecated/android-3.18
 	}
 	return ret;
 }
@@ -183,7 +189,11 @@ void __jbd2_log_wait_for_space(journal_t *journal)
 				       "journal space in %s\n", __func__,
 				       journal->j_devname);
 				WARN_ON(1);
+<<<<<<< HEAD
 				jbd2_journal_abort(journal, 0);
+=======
+				jbd2_journal_abort(journal, -EIO);
+>>>>>>> common/deprecated/android-3.18
 			}
 			write_lock(&journal->j_state_lock);
 		} else {
@@ -269,8 +279,13 @@ restart:
 		bh = jh2bh(jh);
 
 		if (buffer_locked(bh)) {
+<<<<<<< HEAD
 			spin_unlock(&journal->j_list_lock);
 			get_bh(bh);
+=======
+			get_bh(bh);
+			spin_unlock(&journal->j_list_lock);
+>>>>>>> common/deprecated/android-3.18
 			wait_on_buffer(bh);
 			/* the journal_head may have gone by now */
 			BUFFER_TRACE(bh, "brelse");
@@ -351,8 +366,13 @@ restart2:
 		jh = transaction->t_checkpoint_io_list;
 		bh = jh2bh(jh);
 		if (buffer_locked(bh)) {
+<<<<<<< HEAD
 			spin_unlock(&journal->j_list_lock);
 			get_bh(bh);
+=======
+			get_bh(bh);
+			spin_unlock(&journal->j_list_lock);
+>>>>>>> common/deprecated/android-3.18
 			wait_on_buffer(bh);
 			/* the journal_head may have gone by now */
 			BUFFER_TRACE(bh, "brelse");
@@ -405,7 +425,11 @@ int jbd2_cleanup_journal_tail(journal_t *journal)
 	unsigned long	blocknr;
 
 	if (is_journal_aborted(journal))
+<<<<<<< HEAD
 		return 1;
+=======
+		return -EIO;
+>>>>>>> common/deprecated/android-3.18
 
 	if (!jbd2_journal_get_log_tail(journal, &first_tid, &blocknr))
 		return 1;
@@ -420,10 +444,16 @@ int jbd2_cleanup_journal_tail(journal_t *journal)
 	 * jbd2_cleanup_journal_tail() doesn't get called all that often.
 	 */
 	if (journal->j_flags & JBD2_BARRIER)
+<<<<<<< HEAD
 		blkdev_issue_flush(journal->j_fs_dev, GFP_KERNEL, NULL);
 
 	__jbd2_update_log_tail(journal, first_tid, blocknr);
 	return 0;
+=======
+		blkdev_issue_flush(journal->j_fs_dev, GFP_NOFS, NULL);
+
+	return __jbd2_update_log_tail(journal, first_tid, blocknr);
+>>>>>>> common/deprecated/android-3.18
 }
 
 
@@ -433,12 +463,20 @@ int jbd2_cleanup_journal_tail(journal_t *journal)
  * journal_clean_one_cp_list
  *
  * Find all the written-back checkpoint buffers in the given list and
+<<<<<<< HEAD
  * release them.
+=======
+ * release them. If 'destroy' is set, clean all buffers unconditionally.
+>>>>>>> common/deprecated/android-3.18
  *
  * Called with j_list_lock held.
  * Returns 1 if we freed the transaction, 0 otherwise.
  */
+<<<<<<< HEAD
 static int journal_clean_one_cp_list(struct journal_head *jh)
+=======
+static int journal_clean_one_cp_list(struct journal_head *jh, bool destroy)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct journal_head *last_jh;
 	struct journal_head *next_jh = jh;
@@ -452,7 +490,14 @@ static int journal_clean_one_cp_list(struct journal_head *jh)
 	do {
 		jh = next_jh;
 		next_jh = jh->b_cpnext;
+<<<<<<< HEAD
 		ret = __try_to_free_cp_buf(jh);
+=======
+		if (!destroy)
+			ret = __try_to_free_cp_buf(jh);
+		else
+			ret = __jbd2_journal_remove_checkpoint(jh) + 1;
+>>>>>>> common/deprecated/android-3.18
 		if (!ret)
 			return freed;
 		if (ret == 2)
@@ -475,10 +520,18 @@ static int journal_clean_one_cp_list(struct journal_head *jh)
  * journal_clean_checkpoint_list
  *
  * Find all the written-back checkpoint buffers in the journal and release them.
+<<<<<<< HEAD
  *
  * Called with j_list_lock held.
  */
 void __jbd2_journal_clean_checkpoint_list(journal_t *journal)
+=======
+ * If 'destroy' is set, release all buffers unconditionally.
+ *
+ * Called with j_list_lock held.
+ */
+void __jbd2_journal_clean_checkpoint_list(journal_t *journal, bool destroy)
+>>>>>>> common/deprecated/android-3.18
 {
 	transaction_t *transaction, *last_transaction, *next_transaction;
 	int ret;
@@ -492,7 +545,12 @@ void __jbd2_journal_clean_checkpoint_list(journal_t *journal)
 	do {
 		transaction = next_transaction;
 		next_transaction = transaction->t_cpnext;
+<<<<<<< HEAD
 		ret = journal_clean_one_cp_list(transaction->t_checkpoint_list);
+=======
+		ret = journal_clean_one_cp_list(transaction->t_checkpoint_list,
+						destroy);
+>>>>>>> common/deprecated/android-3.18
 		/*
 		 * This function only frees up some memory if possible so we
 		 * dont have an obligation to finish processing. Bail out if
@@ -508,7 +566,11 @@ void __jbd2_journal_clean_checkpoint_list(journal_t *journal)
 		 * we can possibly see not yet submitted buffers on io_list
 		 */
 		ret = journal_clean_one_cp_list(transaction->
+<<<<<<< HEAD
 				t_checkpoint_io_list);
+=======
+				t_checkpoint_io_list, destroy);
+>>>>>>> common/deprecated/android-3.18
 		if (need_resched())
 			return;
 		/*
@@ -522,6 +584,31 @@ void __jbd2_journal_clean_checkpoint_list(journal_t *journal)
 }
 
 /*
+<<<<<<< HEAD
+=======
+ * Remove buffers from all checkpoint lists as journal is aborted and we just
+ * need to free memory
+ */
+void jbd2_journal_destroy_checkpoint(journal_t *journal)
+{
+	/*
+	 * We loop because __jbd2_journal_clean_checkpoint_list() may abort
+	 * early due to a need of rescheduling.
+	 */
+	while (1) {
+		spin_lock(&journal->j_list_lock);
+		if (!journal->j_checkpoint_transactions) {
+			spin_unlock(&journal->j_list_lock);
+			break;
+		}
+		__jbd2_journal_clean_checkpoint_list(journal, true);
+		spin_unlock(&journal->j_list_lock);
+		cond_resched();
+	}
+}
+
+/*
+>>>>>>> common/deprecated/android-3.18
  * journal_remove_checkpoint: called after a buffer has been committed
  * to disk (either by being write-back flushed to disk, or being
  * committed to the log).

@@ -145,6 +145,12 @@ struct oob_data {
 
 #define HCI_MAX_SHORT_NAME_LENGTH	10
 
+<<<<<<< HEAD
+=======
+/* Min encryption key size to match with SMP */
+#define HCI_MIN_ENC_KEY_SIZE		7
+
+>>>>>>> common/deprecated/android-3.18
 /* Default LE RPA expiry time, 15 minutes */
 #define HCI_DEFAULT_RPA_TIMEOUT		(15 * 60)
 
@@ -443,6 +449,10 @@ struct hci_chan {
 	struct sk_buff_head data_q;
 	unsigned int	sent;
 	__u8		state;
+<<<<<<< HEAD
+=======
+	bool		amp;
+>>>>>>> common/deprecated/android-3.18
 };
 
 struct hci_conn_params {

@@ -411,8 +411,11 @@ int dquot_acquire(struct dquot *dquot)
 		ret = dqopt->ops[dquot->dq_id.type]->read_dqblk(dquot);
 	if (ret < 0)
 		goto out_iolock;
+<<<<<<< HEAD
 	/* Make sure flags update is visible after dquot has been filled */
 	smp_mb__before_atomic();
+=======
+>>>>>>> common/deprecated/android-3.18
 	set_bit(DQ_READ_B, &dquot->dq_flags);
 	/* Instantiate dquot if needed */
 	if (!test_bit(DQ_ACTIVE_B, &dquot->dq_flags) && !dquot->dq_off) {
@@ -429,11 +432,14 @@ int dquot_acquire(struct dquot *dquot)
 			goto out_iolock;
 		}
 	}
+<<<<<<< HEAD
 	/*
 	 * Make sure flags update is visible after on-disk struct has been
 	 * allocated. Paired with smp_rmb() in dqget().
 	 */
 	smp_mb__before_atomic();
+=======
+>>>>>>> common/deprecated/android-3.18
 	set_bit(DQ_ACTIVE_B, &dquot->dq_flags);
 out_iolock:
 	mutex_unlock(&dqopt->dqio_mutex);
@@ -479,7 +485,11 @@ int dquot_release(struct dquot *dquot)
 
 	mutex_lock(&dquot->dq_lock);
 	/* Check whether we are not racing with some other dqget() */
+<<<<<<< HEAD
 	if (atomic_read(&dquot->dq_count) > 1)
+=======
+	if (dquot_is_busy(dquot))
+>>>>>>> common/deprecated/android-3.18
 		goto out_dqlock;
 	mutex_lock(&dqopt->dqio_mutex);
 	if (dqopt->ops[dquot->dq_id.type]->release_dqblk) {
@@ -611,7 +621,11 @@ EXPORT_SYMBOL(dquot_scan_active);
 /* Write all dquot structures to quota files */
 int dquot_writeback_dquots(struct super_block *sb, int type)
 {
+<<<<<<< HEAD
 	struct list_head *dirty;
+=======
+	struct list_head dirty;
+>>>>>>> common/deprecated/android-3.18
 	struct dquot *dquot;
 	struct quota_info *dqopt = sb_dqopt(sb);
 	int cnt;
@@ -624,9 +638,16 @@ int dquot_writeback_dquots(struct super_block *sb, int type)
 		if (!sb_has_quota_active(sb, cnt))
 			continue;
 		spin_lock(&dq_list_lock);
+<<<<<<< HEAD
 		dirty = &dqopt->info[cnt].dqi_dirty_list;
 		while (!list_empty(dirty)) {
 			dquot = list_first_entry(dirty, struct dquot,
+=======
+		/* Move list away to avoid livelock. */
+		list_replace_init(&dqopt->info[cnt].dqi_dirty_list, &dirty);
+		while (!list_empty(&dirty)) {
+			dquot = list_first_entry(&dirty, struct dquot,
+>>>>>>> common/deprecated/android-3.18
 						 dq_dirty);
 			/* Dirty and inactive can be only bad dquot... */
 			if (!test_bit(DQ_ACTIVE_B, &dquot->dq_flags)) {
@@ -889,11 +910,14 @@ we_slept:
 		dquot = NULL;
 		goto out;
 	}
+<<<<<<< HEAD
 	/*
 	 * Make sure following reads see filled structure - paired with
 	 * smp_mb__before_atomic() in dquot_acquire().
 	 */
 	smp_rmb();
+=======
+>>>>>>> common/deprecated/android-3.18
 #ifdef CONFIG_QUOTA_DEBUG
 	BUG_ON(!dquot->dq_sb);	/* Has somebody invalidated entry under us? */
 #endif
@@ -1396,7 +1420,11 @@ static int dquot_active(const struct inode *inode)
 static void __dquot_initialize(struct inode *inode, int type)
 {
 	int cnt, init_needed = 0;
+<<<<<<< HEAD
 	struct dquot *got[MAXQUOTAS];
+=======
+	struct dquot *got[MAXQUOTAS] = {};
+>>>>>>> common/deprecated/android-3.18
 	struct super_block *sb = inode->i_sb;
 	qsize_t rsv;
 
@@ -1406,7 +1434,10 @@ static void __dquot_initialize(struct inode *inode, int type)
 	/* First get references to structures we might need. */
 	for (cnt = 0; cnt < MAXQUOTAS; cnt++) {
 		struct kqid qid;
+<<<<<<< HEAD
 		got[cnt] = NULL;
+=======
+>>>>>>> common/deprecated/android-3.18
 		if (type != -1 && cnt != type)
 			continue;
 		/*
@@ -1972,6 +2003,7 @@ int dquot_commit_info(struct super_block *sb, int type)
 }
 EXPORT_SYMBOL(dquot_commit_info);
 
+<<<<<<< HEAD
 int dquot_get_next_id(struct super_block *sb, struct kqid *qid)
 {
 	struct quota_info *dqopt = sb_dqopt(sb);
@@ -1996,6 +2028,8 @@ out:
 }
 EXPORT_SYMBOL(dquot_get_next_id);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * Definitions of diskquota operations.
  */
@@ -2007,7 +2041,10 @@ const struct dquot_operations dquot_operations = {
 	.write_info	= dquot_commit_info,
 	.alloc_dquot	= dquot_alloc,
 	.destroy_dquot	= dquot_destroy,
+<<<<<<< HEAD
 	.get_next_id	= dquot_get_next_id,
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 EXPORT_SYMBOL(dquot_operations);
 
@@ -2450,6 +2487,7 @@ int dquot_get_dqblk(struct super_block *sb, struct kqid qid,
 }
 EXPORT_SYMBOL(dquot_get_dqblk);
 
+<<<<<<< HEAD
 int dquot_get_next_dqblk(struct super_block *sb, struct kqid *qid,
 			 struct qc_dqblk *di)
 {
@@ -2471,6 +2509,8 @@ int dquot_get_next_dqblk(struct super_block *sb, struct kqid *qid,
 }
 EXPORT_SYMBOL(dquot_get_next_dqblk);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #define VFS_QC_MASK \
 	(QC_SPACE | QC_SPC_SOFT | QC_SPC_HARD | \
 	 QC_INO_COUNT | QC_INO_SOFT | QC_INO_HARD | \
@@ -2645,7 +2685,10 @@ const struct quotactl_ops dquot_quotactl_ops = {
 	.get_info	= dquot_get_dqinfo,
 	.set_info	= dquot_set_dqinfo,
 	.get_dqblk	= dquot_get_dqblk,
+<<<<<<< HEAD
 	.get_nextdqblk	= dquot_get_next_dqblk,
+=======
+>>>>>>> common/deprecated/android-3.18
 	.set_dqblk	= dquot_set_dqblk
 };
 EXPORT_SYMBOL(dquot_quotactl_ops);
@@ -2653,68 +2696,114 @@ EXPORT_SYMBOL(dquot_quotactl_ops);
 static int do_proc_dqstats(struct ctl_table *table, int write,
 		     void __user *buffer, size_t *lenp, loff_t *ppos)
 {
+<<<<<<< HEAD
 	unsigned int type = (int *)table->data - dqstats.stat;
 
 	/* Update global table */
 	dqstats.stat[type] =
 			percpu_counter_sum_positive(&dqstats.counter[type]);
 	return proc_dointvec(table, write, buffer, lenp, ppos);
+=======
+	unsigned int type = (unsigned long *)table->data - dqstats.stat;
+	s64 value = percpu_counter_sum(&dqstats.counter[type]);
+
+	/* Filter negative values for non-monotonic counters */
+	if (value < 0 && (type == DQST_ALLOC_DQUOTS ||
+			  type == DQST_FREE_DQUOTS))
+		value = 0;
+
+	/* Update global table */
+	dqstats.stat[type] = value;
+	return proc_doulongvec_minmax(table, write, buffer, lenp, ppos);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static struct ctl_table fs_dqstats_table[] = {
 	{
 		.procname	= "lookups",
 		.data		= &dqstats.stat[DQST_LOOKUPS],
+<<<<<<< HEAD
 		.maxlen		= sizeof(int),
+=======
+		.maxlen		= sizeof(unsigned long),
+>>>>>>> common/deprecated/android-3.18
 		.mode		= 0444,
 		.proc_handler	= do_proc_dqstats,
 	},
 	{
 		.procname	= "drops",
 		.data		= &dqstats.stat[DQST_DROPS],
+<<<<<<< HEAD
 		.maxlen		= sizeof(int),
+=======
+		.maxlen		= sizeof(unsigned long),
+>>>>>>> common/deprecated/android-3.18
 		.mode		= 0444,
 		.proc_handler	= do_proc_dqstats,
 	},
 	{
 		.procname	= "reads",
 		.data		= &dqstats.stat[DQST_READS],
+<<<<<<< HEAD
 		.maxlen		= sizeof(int),
+=======
+		.maxlen		= sizeof(unsigned long),
+>>>>>>> common/deprecated/android-3.18
 		.mode		= 0444,
 		.proc_handler	= do_proc_dqstats,
 	},
 	{
 		.procname	= "writes",
 		.data		= &dqstats.stat[DQST_WRITES],
+<<<<<<< HEAD
 		.maxlen		= sizeof(int),
+=======
+		.maxlen		= sizeof(unsigned long),
+>>>>>>> common/deprecated/android-3.18
 		.mode		= 0444,
 		.proc_handler	= do_proc_dqstats,
 	},
 	{
 		.procname	= "cache_hits",
 		.data		= &dqstats.stat[DQST_CACHE_HITS],
+<<<<<<< HEAD
 		.maxlen		= sizeof(int),
+=======
+		.maxlen		= sizeof(unsigned long),
+>>>>>>> common/deprecated/android-3.18
 		.mode		= 0444,
 		.proc_handler	= do_proc_dqstats,
 	},
 	{
 		.procname	= "allocated_dquots",
 		.data		= &dqstats.stat[DQST_ALLOC_DQUOTS],
+<<<<<<< HEAD
 		.maxlen		= sizeof(int),
+=======
+		.maxlen		= sizeof(unsigned long),
+>>>>>>> common/deprecated/android-3.18
 		.mode		= 0444,
 		.proc_handler	= do_proc_dqstats,
 	},
 	{
 		.procname	= "free_dquots",
 		.data		= &dqstats.stat[DQST_FREE_DQUOTS],
+<<<<<<< HEAD
 		.maxlen		= sizeof(int),
+=======
+		.maxlen		= sizeof(unsigned long),
+>>>>>>> common/deprecated/android-3.18
 		.mode		= 0444,
 		.proc_handler	= do_proc_dqstats,
 	},
 	{
 		.procname	= "syncs",
 		.data		= &dqstats.stat[DQST_SYNCS],
+<<<<<<< HEAD
 		.maxlen		= sizeof(int),
+=======
+		.maxlen		= sizeof(unsigned long),
+>>>>>>> common/deprecated/android-3.18
 		.mode		= 0444,
 		.proc_handler	= do_proc_dqstats,
 	},
@@ -2790,7 +2879,12 @@ static int __init dquot_init(void)
 	printk("Dquot-cache hash table entries: %ld (order %ld, %ld bytes)\n",
 			nr_hash, order, (PAGE_SIZE << order));
 
+<<<<<<< HEAD
 	register_shrinker(&dqcache_shrinker);
+=======
+	if (register_shrinker(&dqcache_shrinker))
+		panic("Cannot register dquot shrinker");
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }

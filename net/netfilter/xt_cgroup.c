@@ -39,7 +39,11 @@ cgroup_mt(const struct sk_buff *skb, struct xt_action_param *par)
 {
 	const struct xt_cgroup_info *info = par->matchinfo;
 
+<<<<<<< HEAD
 	if (skb->sk == NULL)
+=======
+	if (skb->sk == NULL || !sk_fullsock(skb->sk))
+>>>>>>> common/deprecated/android-3.18
 		return false;
 
 	return (info->id == skb->sk->sk_classid) ^ info->invert;

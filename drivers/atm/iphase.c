@@ -1175,7 +1175,11 @@ static int rx_pkt(struct atm_dev *dev)
         if (!(skb = atm_alloc_charge(vcc, len, GFP_ATOMIC))) {
            if (vcc->vci < 32)
               printk("Drop control packets\n");
+<<<<<<< HEAD
 	      goto out_free_desc;
+=======
+	   goto out_free_desc;
+>>>>>>> common/deprecated/android-3.18
         }
 	skb_put(skb,len);  
         // pwang_test

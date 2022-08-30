@@ -7,10 +7,17 @@
 
 static __always_inline int preempt_count(void)
 {
+<<<<<<< HEAD
 	return current_thread_info()->preempt_count;
 }
 
 static __always_inline int *preempt_count_ptr(void)
+=======
+	return READ_ONCE(current_thread_info()->preempt_count);
+}
+
+static __always_inline volatile int *preempt_count_ptr(void)
+>>>>>>> common/deprecated/android-3.18
 {
 	return &current_thread_info()->preempt_count;
 }

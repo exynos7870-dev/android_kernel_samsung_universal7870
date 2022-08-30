@@ -75,7 +75,11 @@ int __drm_modeset_lock_all(struct drm_device *dev,
 	int ret;
 
 	ctx = kzalloc(sizeof(*ctx),
+<<<<<<< HEAD
 		      trylock ? GFP_ATOMIC : GFP_KERNEL);
+=======
+		      trylock ? GFP_ATOMIC : GFP_KERNEL | __GFP_NOFAIL);
+>>>>>>> common/deprecated/android-3.18
 	if (!ctx)
 		return -ENOMEM;
 

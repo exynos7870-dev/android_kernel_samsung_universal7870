@@ -230,7 +230,11 @@ int wusb_dev_sec_add(struct wusbhc *wusbhc,
 
 	result = usb_get_descriptor(usb_dev, USB_DT_SECURITY,
 				    0, secd, sizeof(*secd));
+<<<<<<< HEAD
 	if (result < sizeof(*secd)) {
+=======
+	if (result < (int)sizeof(*secd)) {
+>>>>>>> common/deprecated/android-3.18
 		dev_err(dev, "Can't read security descriptor or "
 			"not enough data: %d\n", result);
 		goto out;

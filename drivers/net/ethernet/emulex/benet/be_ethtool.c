@@ -266,8 +266,13 @@ static int lancer_cmd_read_file(struct be_adapter *adapter, u8 *file_name,
 	int status = 0;
 
 	read_cmd.size = LANCER_READ_FILE_CHUNK;
+<<<<<<< HEAD
 	read_cmd.va = pci_alloc_consistent(adapter->pdev, read_cmd.size,
 					   &read_cmd.dma);
+=======
+	read_cmd.va = dma_zalloc_coherent(&adapter->pdev->dev, read_cmd.size,
+					  &read_cmd.dma, GFP_ATOMIC);
+>>>>>>> common/deprecated/android-3.18
 
 	if (!read_cmd.va) {
 		dev_err(&adapter->pdev->dev,
@@ -291,8 +296,13 @@ static int lancer_cmd_read_file(struct be_adapter *adapter, u8 *file_name,
 			break;
 		}
 	}
+<<<<<<< HEAD
 	pci_free_consistent(adapter->pdev, read_cmd.size, read_cmd.va,
 			    read_cmd.dma);
+=======
+	dma_free_coherent(&adapter->pdev->dev, read_cmd.size, read_cmd.va,
+			  read_cmd.dma);
+>>>>>>> common/deprecated/android-3.18
 
 	return status;
 }
@@ -818,8 +828,14 @@ static int be_test_ddr_dma(struct be_adapter *adapter)
 	};
 
 	ddrdma_cmd.size = sizeof(struct be_cmd_req_ddrdma_test);
+<<<<<<< HEAD
 	ddrdma_cmd.va = dma_alloc_coherent(&adapter->pdev->dev, ddrdma_cmd.size,
 					   &ddrdma_cmd.dma, GFP_KERNEL);
+=======
+	ddrdma_cmd.va = dma_zalloc_coherent(&adapter->pdev->dev,
+					    ddrdma_cmd.size, &ddrdma_cmd.dma,
+					    GFP_KERNEL);
+>>>>>>> common/deprecated/android-3.18
 	if (!ddrdma_cmd.va)
 		return -ENOMEM;
 
@@ -850,7 +866,11 @@ static void be_self_test(struct net_device *netdev, struct ethtool_test *test,
 			 u64 *data)
 {
 	struct be_adapter *adapter = netdev_priv(netdev);
+<<<<<<< HEAD
 	int status;
+=======
+	int status, cnt;
+>>>>>>> common/deprecated/android-3.18
 	u8 link_status = 0;
 
 	if (adapter->function_caps & BE_FUNCTION_CAPS_SUPER_NIC) {
@@ -861,6 +881,12 @@ static void be_self_test(struct net_device *netdev, struct ethtool_test *test,
 
 	memset(data, 0, sizeof(u64) * ETHTOOL_TESTS_NUM);
 
+<<<<<<< HEAD
+=======
+	/* check link status before offline tests */
+	link_status = netif_carrier_ok(netdev);
+
+>>>>>>> common/deprecated/android-3.18
 	if (test->flags & ETH_TEST_FL_OFFLINE) {
 		if (be_loopback_test(adapter, BE_MAC_LOOPBACK, &data[0]) != 0)
 			test->flags |= ETH_TEST_FL_FAILED;
@@ -881,6 +907,7 @@ static void be_self_test(struct net_device *netdev, struct ethtool_test *test,
 		test->flags |= ETH_TEST_FL_FAILED;
 	}
 
+<<<<<<< HEAD
 	status = be_cmd_link_status_query(adapter, NULL, &link_status, 0);
 	if (status) {
 		test->flags |= ETH_TEST_FL_FAILED;
@@ -888,6 +915,28 @@ static void be_self_test(struct net_device *netdev, struct ethtool_test *test,
 	} else if (!link_status) {
 		test->flags |= ETH_TEST_FL_FAILED;
 		data[4] = 1;
+=======
+	/* link status was down prior to test */
+	if (!link_status) {
+		test->flags |= ETH_TEST_FL_FAILED;
+		data[4] = 1;
+		return;
+	}
+
+	for (cnt = 10; cnt; cnt--) {
+		status = be_cmd_link_status_query(adapter, NULL, &link_status,
+						  0);
+		if (status) {
+			test->flags |= ETH_TEST_FL_FAILED;
+			data[4] = -1;
+			break;
+		}
+
+		if (link_status)
+			break;
+
+		msleep_interruptible(500);
+>>>>>>> common/deprecated/android-3.18
 	}
 }
 
@@ -941,8 +990,14 @@ static int be_read_eeprom(struct net_device *netdev,
 
 	memset(&eeprom_cmd, 0, sizeof(struct be_dma_mem));
 	eeprom_cmd.size = sizeof(struct be_cmd_req_seeprom_read);
+<<<<<<< HEAD
 	eeprom_cmd.va = dma_alloc_coherent(&adapter->pdev->dev, eeprom_cmd.size,
 					   &eeprom_cmd.dma, GFP_KERNEL);
+=======
+	eeprom_cmd.va = dma_zalloc_coherent(&adapter->pdev->dev,
+					    eeprom_cmd.size, &eeprom_cmd.dma,
+					    GFP_KERNEL);
+>>>>>>> common/deprecated/android-3.18
 
 	if (!eeprom_cmd.va)
 		return -ENOMEM;
@@ -1031,7 +1086,11 @@ static int be_get_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd,
 		cmd->data = be_get_rss_hash_opts(adapter, cmd->flow_type);
 		break;
 	case ETHTOOL_GRXRINGS:
+<<<<<<< HEAD
 		cmd->data = adapter->num_rx_qs - 1;
+=======
+		cmd->data = adapter->num_rx_qs;
+>>>>>>> common/deprecated/android-3.18
 		break;
 	default:
 		return -EINVAL;

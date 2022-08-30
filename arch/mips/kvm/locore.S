@@ -231,6 +231,10 @@ FEXPORT(__kvm_mips_load_k0k1)
 
 	/* Jump to guest */
 	eret
+<<<<<<< HEAD
+=======
+EXPORT(__kvm_mips_vcpu_run_end)
+>>>>>>> common/deprecated/android-3.18
 
 VECTOR(MIPSX(exception), unknown)
 /* Find out what mode we came from and jump to the proper handler. */

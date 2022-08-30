@@ -1039,7 +1039,10 @@ static int synaptics_rmi4_remove(struct i2c_client *client)
 	return 0;
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_PM
+=======
+>>>>>>> common/deprecated/android-3.18
 /**
  * synaptics_rmi4_suspend() - suspend the touch screen controller
  * @dev: pointer to device structure
@@ -1047,7 +1050,11 @@ static int synaptics_rmi4_remove(struct i2c_client *client)
  * This function is used to suspend the
  * touch panel controller and returns integer
  */
+<<<<<<< HEAD
 static int synaptics_rmi4_suspend(struct device *dev)
+=======
+static int __maybe_unused synaptics_rmi4_suspend(struct device *dev)
+>>>>>>> common/deprecated/android-3.18
 {
 	/* Touch sleep mode */
 	int retval;
@@ -1081,7 +1088,11 @@ static int synaptics_rmi4_suspend(struct device *dev)
  * This function is used to resume the touch panel
  * controller and returns integer.
  */
+<<<<<<< HEAD
 static int synaptics_rmi4_resume(struct device *dev)
+=======
+static int __maybe_unused synaptics_rmi4_resume(struct device *dev)
+>>>>>>> common/deprecated/android-3.18
 {
 	int retval;
 	unsigned char intr_status;
@@ -1116,7 +1127,10 @@ static const struct dev_pm_ops synaptics_rmi4_dev_pm_ops = {
 	.suspend = synaptics_rmi4_suspend,
 	.resume  = synaptics_rmi4_resume,
 };
+<<<<<<< HEAD
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 static const struct i2c_device_id synaptics_rmi4_id_table[] = {
 	{ DRIVER_NAME, 0 },

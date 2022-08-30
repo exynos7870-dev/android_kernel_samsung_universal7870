@@ -30,6 +30,10 @@ struct efi __read_mostly efi = {
 	.acpi       = EFI_INVALID_TABLE_ADDR,
 	.acpi20     = EFI_INVALID_TABLE_ADDR,
 	.smbios     = EFI_INVALID_TABLE_ADDR,
+<<<<<<< HEAD
+=======
+	.smbios3    = EFI_INVALID_TABLE_ADDR,
+>>>>>>> common/deprecated/android-3.18
 	.sal_systab = EFI_INVALID_TABLE_ADDR,
 	.boot_info  = EFI_INVALID_TABLE_ADDR,
 	.hcdp       = EFI_INVALID_TABLE_ADDR,
@@ -86,6 +90,11 @@ static ssize_t systab_show(struct kobject *kobj,
 		str += sprintf(str, "ACPI=0x%lx\n", efi.acpi);
 	if (efi.smbios != EFI_INVALID_TABLE_ADDR)
 		str += sprintf(str, "SMBIOS=0x%lx\n", efi.smbios);
+<<<<<<< HEAD
+=======
+	if (efi.smbios3 != EFI_INVALID_TABLE_ADDR)
+		str += sprintf(str, "SMBIOS3=0x%lx\n", efi.smbios3);
+>>>>>>> common/deprecated/android-3.18
 	if (efi.hcdp != EFI_INVALID_TABLE_ADDR)
 		str += sprintf(str, "HCDP=0x%lx\n", efi.hcdp);
 	if (efi.boot_info != EFI_INVALID_TABLE_ADDR)
@@ -96,8 +105,12 @@ static ssize_t systab_show(struct kobject *kobj,
 	return str - buf;
 }
 
+<<<<<<< HEAD
 static struct kobj_attribute efi_attr_systab =
 			__ATTR(systab, 0400, systab_show, NULL);
+=======
+static struct kobj_attribute efi_attr_systab = __ATTR_RO_MODE(systab, 0400);
+>>>>>>> common/deprecated/android-3.18
 
 #define EFI_FIELD(var) efi.var
 
@@ -154,6 +167,10 @@ static int generic_ops_register(void)
 {
 	generic_ops.get_variable = efi.get_variable;
 	generic_ops.set_variable = efi.set_variable;
+<<<<<<< HEAD
+=======
+	generic_ops.set_variable_nonblocking = efi.set_variable_nonblocking;
+>>>>>>> common/deprecated/android-3.18
 	generic_ops.get_next_variable = efi.get_next_variable;
 	generic_ops.query_variable_store = efi_query_variable_store;
 
@@ -221,6 +238,7 @@ err_put:
 subsys_initcall(efisubsys_init);
 
 
+<<<<<<< HEAD
 /*
  * We can't ioremap data in EFI boot services RAM, because we've already mapped
  * it as RAM.  So, look it up in the existing EFI memory map instead.  Only
@@ -253,6 +271,8 @@ void __iomem *efi_lookup_mapped_addr(u64 phys_addr)
 	return NULL;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static __initdata efi_config_table_type_t common_tables[] = {
 	{ACPI_20_TABLE_GUID, "ACPI 2.0", &efi.acpi20},
 	{ACPI_TABLE_GUID, "ACPI", &efi.acpi},
@@ -260,6 +280,10 @@ static __initdata efi_config_table_type_t common_tables[] = {
 	{MPS_TABLE_GUID, "MPS", &efi.mps},
 	{SAL_SYSTEM_TABLE_GUID, "SALsystab", &efi.sal_systab},
 	{SMBIOS_TABLE_GUID, "SMBIOS", &efi.smbios},
+<<<<<<< HEAD
+=======
+	{SMBIOS3_TABLE_GUID, "SMBIOS 3.0", &efi.smbios3},
+>>>>>>> common/deprecated/android-3.18
 	{UGA_IO_PROTOCOL_GUID, "UGA", &efi.uga},
 	{NULL_GUID, NULL, NULL},
 };
@@ -289,10 +313,56 @@ static __init int match_config_table(efi_guid_t *guid,
 	return 0;
 }
 
+<<<<<<< HEAD
 int __init efi_config_init(efi_config_table_type_t *arch_tables)
 {
 	void *config_tables, *tablep;
 	int i, sz;
+=======
+int __init efi_config_parse_tables(void *config_tables, int count, int sz,
+				   efi_config_table_type_t *arch_tables)
+{
+	void *tablep;
+	int i;
+
+	tablep = config_tables;
+	pr_info("");
+	for (i = 0; i < count; i++) {
+		efi_guid_t guid;
+		unsigned long table;
+
+		if (efi_enabled(EFI_64BIT)) {
+			u64 table64;
+			guid = ((efi_config_table_64_t *)tablep)->guid;
+			table64 = ((efi_config_table_64_t *)tablep)->table;
+			table = table64;
+#ifndef CONFIG_64BIT
+			if (table64 >> 32) {
+				pr_cont("\n");
+				pr_err("Table located above 4GB, disabling EFI.\n");
+				return -EINVAL;
+			}
+#endif
+		} else {
+			guid = ((efi_config_table_32_t *)tablep)->guid;
+			table = ((efi_config_table_32_t *)tablep)->table;
+		}
+
+		if (!match_config_table(&guid, table, common_tables))
+			match_config_table(&guid, table, arch_tables);
+
+		tablep += sz;
+	}
+	pr_cont("\n");
+	set_bit(EFI_CONFIG_TABLES, &efi.flags);
+	return 0;
+}
+
+int __init efi_config_init(efi_config_table_type_t *arch_tables)
+{
+	void *config_tables;
+	int sz, ret;
+>>>>>>> common/deprecated/android-3.18
 
 	if (efi_enabled(EFI_64BIT))
 		sz = sizeof(efi_config_table_64_t);
@@ -309,6 +379,7 @@ int __init efi_config_init(efi_config_table_type_t *arch_tables)
 		return -ENOMEM;
 	}
 
+<<<<<<< HEAD
 	tablep = config_tables;
 	pr_info("");
 	for (i = 0; i < efi.systab->nr_tables; i++) {
@@ -345,6 +416,13 @@ int __init efi_config_init(efi_config_table_type_t *arch_tables)
 	set_bit(EFI_CONFIG_TABLES, &efi.flags);
 
 	return 0;
+=======
+	ret = efi_config_parse_tables(config_tables, efi.systab->nr_tables, sz,
+				      arch_tables);
+
+	early_memunmap(config_tables, efi.systab->nr_tables * sz);
+	return ret;
+>>>>>>> common/deprecated/android-3.18
 }
 
 #ifdef CONFIG_EFI_VARS_MODULE

@@ -117,7 +117,11 @@
 			mmcsd_default_mux: mmcsd_mux {
 				mmcsd_default_mux {
 					ste,function = "mmcsd";
+<<<<<<< HEAD
 					ste,pins = "mmcsd_a_1";
+=======
+					ste,pins = "mmcsd_a_1", "mmcsd_b_1";
+>>>>>>> common/deprecated/android-3.18
 				};
 			};
 			mmcsd_default_mode: mmcsd_default {
@@ -127,9 +131,15 @@
 					ste,output = <0>;
 				};
 				mmcsd_default_cfg2 {
+<<<<<<< HEAD
 					/* MCCMDDIR, MCDAT0DIR, MCDAT31DIR */
 					ste,pins = "GPIO10_C11", "GPIO15_A12",
 					"GPIO16_C13";
+=======
+					/* MCCMDDIR, MCDAT0DIR, MCDAT31DIR, MCDATDIR2 */
+					ste,pins = "GPIO10_C11", "GPIO15_A12",
+					"GPIO16_C13", "GPIO23_D15";
+>>>>>>> common/deprecated/android-3.18
 					ste,output = <1>;
 				};
 				mmcsd_default_cfg3 {

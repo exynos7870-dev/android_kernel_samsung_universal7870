@@ -179,7 +179,11 @@ early_efi_write(struct console *con, const char *str, unsigned int num)
 			num--;
 		}
 
+<<<<<<< HEAD
 		if (efi_x >= si->lfb_width) {
+=======
+		if (efi_x + font->width > si->lfb_width) {
+>>>>>>> common/deprecated/android-3.18
 			efi_x = 0;
 			efi_y += font->height;
 		}

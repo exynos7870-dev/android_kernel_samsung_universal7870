@@ -455,7 +455,11 @@ static int fold_diff(int *diff)
  *
  * The function returns the number of global counters updated.
  */
+<<<<<<< HEAD
 static int refresh_cpu_vm_stats(void)
+=======
+static int refresh_cpu_vm_stats(bool do_pagesets)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct zone *zone;
 	int i;
@@ -479,6 +483,7 @@ static int refresh_cpu_vm_stats(void)
 #endif
 			}
 		}
+<<<<<<< HEAD
 		cond_resched();
 #ifdef CONFIG_NUMA
 		/*
@@ -506,6 +511,37 @@ static int refresh_cpu_vm_stats(void)
 		if (__this_cpu_read(p->pcp.count)) {
 			drain_zone_pages(zone, this_cpu_ptr(&p->pcp));
 			changes++;
+=======
+#ifdef CONFIG_NUMA
+		if (do_pagesets) {
+			cond_resched();
+			/*
+			 * Deal with draining the remote pageset of this
+			 * processor
+			 *
+			 * Check if there are pages remaining in this pageset
+			 * if not then there is nothing to expire.
+			 */
+			if (!__this_cpu_read(p->expire) ||
+			       !__this_cpu_read(p->pcp.count))
+				continue;
+
+			/*
+			 * We never drain zones local to this processor.
+			 */
+			if (zone_to_nid(zone) == numa_node_id()) {
+				__this_cpu_write(p->expire, 0);
+				continue;
+			}
+
+			if (__this_cpu_dec_return(p->expire))
+				continue;
+
+			if (__this_cpu_read(p->pcp.count)) {
+				drain_zone_pages(zone, this_cpu_ptr(&p->pcp));
+				changes++;
+			}
+>>>>>>> common/deprecated/android-3.18
 		}
 #endif
 	}
@@ -856,12 +892,15 @@ const char * const vmstat_text[] = {
 	"compact_stall",
 	"compact_fail",
 	"compact_success",
+<<<<<<< HEAD
 #ifdef CONFIG_SEC_PHCOMP	
 	"compact_defered",
 	"compact_call_defer",
 	"phcomp_defered",
 	"phcomp_call_defer",
 #endif	
+=======
+>>>>>>> common/deprecated/android-3.18
 #endif
 
 #ifdef CONFIG_HUGETLB_PAGE
@@ -893,10 +932,15 @@ const char * const vmstat_text[] = {
 #endif
 #endif /* CONFIG_MEMORY_BALLOON */
 #ifdef CONFIG_DEBUG_TLBFLUSH
+<<<<<<< HEAD
 #ifdef CONFIG_SMP
 	"nr_tlb_remote_flush",
 	"nr_tlb_remote_flush_received",
 #endif /* CONFIG_SMP */
+=======
+	"nr_tlb_remote_flush",
+	"nr_tlb_remote_flush_received",
+>>>>>>> common/deprecated/android-3.18
 	"nr_tlb_local_flush_all",
 	"nr_tlb_local_flush_one",
 #endif /* CONFIG_DEBUG_TLBFLUSH */
@@ -952,6 +996,12 @@ static void pagetypeinfo_showfree_print(struct seq_file *m,
 			list_for_each(curr, &area->free_list[mtype])
 				freecount++;
 			seq_printf(m, "%6lu ", freecount);
+<<<<<<< HEAD
+=======
+			spin_unlock_irq(&zone->lock);
+			cond_resched();
+			spin_lock_irq(&zone->lock);
+>>>>>>> common/deprecated/android-3.18
 		}
 		seq_putc(m, '\n');
 	}
@@ -1228,7 +1278,13 @@ static int vmstat_show(struct seq_file *m, void *arg)
 	unsigned long *l = arg;
 	unsigned long off = l - (unsigned long *)m->private;
 
+<<<<<<< HEAD
 	seq_printf(m, "%s %lu\n", vmstat_text[off], *l);
+=======
+	seq_puts(m, vmstat_text[off]);
+	seq_put_decimal_ull(m, ' ', *l);
+	seq_putc(m, '\n');
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -1265,7 +1321,11 @@ static cpumask_var_t cpu_stat_off;
 
 static void vmstat_update(struct work_struct *w)
 {
+<<<<<<< HEAD
 	if (refresh_cpu_vm_stats())
+=======
+	if (refresh_cpu_vm_stats(true)) {
+>>>>>>> common/deprecated/android-3.18
 		/*
 		 * Counters were updated so we expect more updates
 		 * to occur in the future. Keep on running the
@@ -1273,7 +1333,11 @@ static void vmstat_update(struct work_struct *w)
 		 */
 		schedule_delayed_work(this_cpu_ptr(&vmstat_work),
 			round_jiffies_relative(sysctl_stat_interval));
+<<<<<<< HEAD
 	else {
+=======
+	} else {
+>>>>>>> common/deprecated/android-3.18
 		/*
 		 * We did not update any counters so the app may be in
 		 * a mode where it does not cause counter updates.
@@ -1281,6 +1345,7 @@ static void vmstat_update(struct work_struct *w)
 		 * Defer the checking for differentials to the
 		 * shepherd thread on a different processor.
 		 */
+<<<<<<< HEAD
 		int r;
 		/*
 		 * Shepherd work thread does not race since it never
@@ -1292,10 +1357,33 @@ static void vmstat_update(struct work_struct *w)
 		r = cpumask_test_and_set_cpu(smp_processor_id(),
 			cpu_stat_off);
 		VM_BUG_ON(r);
+=======
+		cpumask_set_cpu(smp_processor_id(), cpu_stat_off);
+>>>>>>> common/deprecated/android-3.18
 	}
 }
 
 /*
+<<<<<<< HEAD
+=======
+ * Switch off vmstat processing and then fold all the remaining differentials
+ * until the diffs stay at zero. The function is used by NOHZ and can only be
+ * invoked when tick processing is not active.
+ */
+void quiet_vmstat(void)
+{
+	if (system_state != SYSTEM_RUNNING)
+		return;
+
+	do {
+		if (!cpumask_test_and_set_cpu(smp_processor_id(), cpu_stat_off))
+			cancel_delayed_work(this_cpu_ptr(&vmstat_work));
+
+	} while (refresh_cpu_vm_stats(false));
+}
+
+/*
+>>>>>>> common/deprecated/android-3.18
  * Check if the diffs for a certain cpu indicate that
  * an update is needed.
  */
@@ -1327,7 +1415,11 @@ static bool need_update(int cpu)
  */
 static void vmstat_shepherd(struct work_struct *w);
 
+<<<<<<< HEAD
 static DECLARE_DELAYED_WORK(shepherd, vmstat_shepherd);
+=======
+static DECLARE_DEFERRABLE_WORK(shepherd, vmstat_shepherd);
+>>>>>>> common/deprecated/android-3.18
 
 static void vmstat_shepherd(struct work_struct *w)
 {
@@ -1431,7 +1523,11 @@ static int __init setup_vmstat(void)
 #endif
 #ifdef CONFIG_PROC_FS
 	proc_create("buddyinfo", S_IRUGO, NULL, &fragmentation_file_operations);
+<<<<<<< HEAD
 	proc_create("pagetypeinfo", S_IRUGO, NULL, &pagetypeinfo_file_ops);
+=======
+	proc_create("pagetypeinfo", 0400, NULL, &pagetypeinfo_file_ops);
+>>>>>>> common/deprecated/android-3.18
 	proc_create("vmstat", S_IRUGO, NULL, &proc_vmstat_file_operations);
 	proc_create("zoneinfo", S_IRUGO, NULL, &proc_zoneinfo_file_operations);
 #endif

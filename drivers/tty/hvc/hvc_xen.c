@@ -289,7 +289,11 @@ static int xen_initial_domain_console_init(void)
 			return -ENOMEM;
 	}
 
+<<<<<<< HEAD
 	info->irq = bind_virq_to_irq(VIRQ_CONSOLE, 0);
+=======
+	info->irq = bind_virq_to_irq(VIRQ_CONSOLE, 0, false);
+>>>>>>> common/deprecated/android-3.18
 	info->vtermno = HVC_COOKIE;
 
 	spin_lock(&xencons_lock);
@@ -299,6 +303,7 @@ static int xen_initial_domain_console_init(void)
 	return 0;
 }
 
+<<<<<<< HEAD
 void xen_console_resume(void)
 {
 	struct xencons_info *info = vtermno_to_xencons(HVC_COOKIE);
@@ -306,6 +311,32 @@ void xen_console_resume(void)
 		rebind_evtchn_irq(info->evtchn, info->irq);
 }
 
+=======
+static void xen_console_update_evtchn(struct xencons_info *info)
+{
+	if (xen_hvm_domain()) {
+		uint64_t v;
+		int err;
+
+		err = hvm_get_parameter(HVM_PARAM_CONSOLE_EVTCHN, &v);
+		if (!err && v)
+			info->evtchn = v;
+	} else
+		info->evtchn = xen_start_info->console.domU.evtchn;
+}
+
+void xen_console_resume(void)
+{
+	struct xencons_info *info = vtermno_to_xencons(HVC_COOKIE);
+	if (info != NULL && info->irq) {
+		if (!xen_initial_domain())
+			xen_console_update_evtchn(info);
+		rebind_evtchn_irq(info->evtchn, info->irq);
+	}
+}
+
+#ifdef CONFIG_HVC_XEN_FRONTEND
+>>>>>>> common/deprecated/android-3.18
 static void xencons_disconnect_backend(struct xencons_info *info)
 {
 	if (info->irq > 0)
@@ -346,7 +377,10 @@ static int xen_console_remove(struct xencons_info *info)
 	return 0;
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_HVC_XEN_FRONTEND
+=======
+>>>>>>> common/deprecated/android-3.18
 static int xencons_remove(struct xenbus_device *dev)
 {
 	return xen_console_remove(dev_get_drvdata(&dev->dev));

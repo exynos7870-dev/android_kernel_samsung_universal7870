@@ -409,14 +409,22 @@ __arm946_setup:
 
 	.align
 
+<<<<<<< HEAD
 	.section ".proc.info.init", #alloc, #execinstr
+=======
+	.section ".proc.info.init", #alloc
+>>>>>>> common/deprecated/android-3.18
 	.type	__arm946_proc_info,#object
 __arm946_proc_info:
 	.long	0x41009460
 	.long	0xff00fff0
 	.long	0
 	.long	0
+<<<<<<< HEAD
 	b	__arm946_setup
+=======
+	initfn	__arm946_setup, __arm946_proc_info
+>>>>>>> common/deprecated/android-3.18
 	.long	cpu_arch_name
 	.long	cpu_elf_name
 	.long	HWCAP_SWP | HWCAP_HALF | HWCAP_THUMB

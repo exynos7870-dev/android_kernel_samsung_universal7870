@@ -159,12 +159,17 @@ int ip6_xmit(struct sock *sk, struct sk_buff *skb, struct flowi6 *fl6,
 	struct ipv6_pinfo *np = inet6_sk(sk);
 	struct in6_addr *first_hop = &fl6->daddr;
 	struct dst_entry *dst = skb_dst(skb);
+<<<<<<< HEAD
+=======
+	unsigned int head_room;
+>>>>>>> common/deprecated/android-3.18
 	struct ipv6hdr *hdr;
 	u8  proto = fl6->flowi6_proto;
 	int seg_len = skb->len;
 	int hlimit = -1;
 	u32 mtu;
 
+<<<<<<< HEAD
 	if (opt) {
 		unsigned int head_room;
 
@@ -189,6 +194,32 @@ int ip6_xmit(struct sock *sk, struct sk_buff *skb, struct flowi6 *fl6,
 		}
 		if (opt->opt_flen)
 			ipv6_push_frag_opts(skb, opt, &proto);
+=======
+	head_room = sizeof(struct ipv6hdr) + LL_RESERVED_SPACE(dst->dev);
+	if (opt)
+		head_room += opt->opt_nflen + opt->opt_flen;
+
+	if (unlikely(skb_headroom(skb) < head_room)) {
+		struct sk_buff *skb2 = skb_realloc_headroom(skb, head_room);
+		if (!skb2) {
+			IP6_INC_STATS(net, ip6_dst_idev(skb_dst(skb)),
+				      IPSTATS_MIB_OUTDISCARDS);
+			kfree_skb(skb);
+			return -ENOBUFS;
+		}
+		if (skb->sk)
+			skb_set_owner_w(skb2, skb->sk);
+		consume_skb(skb);
+		skb = skb2;
+	}
+
+	if (opt) {
+		seg_len += opt->opt_nflen + opt->opt_flen;
+
+		if (opt->opt_flen)
+			ipv6_push_frag_opts(skb, opt, &proto);
+
+>>>>>>> common/deprecated/android-3.18
 		if (opt->opt_nflen)
 			ipv6_push_nfrag_opts(skb, opt, &proto, &first_hop);
 	}
@@ -318,6 +349,15 @@ static int ip6_forward_proxy_check(struct sk_buff *skb)
 
 static inline int ip6_forward_finish(struct sk_buff *skb)
 {
+<<<<<<< HEAD
+=======
+	struct dst_entry *dst = skb_dst(skb);
+	struct net *net = dev_net(dst->dev);
+
+	IP6_INC_STATS_BH(net, ip6_dst_idev(dst), IPSTATS_MIB_OUTFORWDATAGRAMS);
+	IP6_ADD_STATS_BH(net, ip6_dst_idev(dst), IPSTATS_MIB_OUTOCTETS, skb->len);
+
+>>>>>>> common/deprecated/android-3.18
 	return dst_output(skb);
 }
 
@@ -374,6 +414,12 @@ int ip6_forward(struct sk_buff *skb)
 	if (skb->pkt_type != PACKET_HOST)
 		goto drop;
 
+<<<<<<< HEAD
+=======
+	if (unlikely(skb->sk))
+		goto drop;
+
+>>>>>>> common/deprecated/android-3.18
 	if (skb_warn_if_lro(skb))
 		goto drop;
 
@@ -457,7 +503,11 @@ int ip6_forward(struct sk_buff *skb)
 		else
 			target = &hdr->daddr;
 
+<<<<<<< HEAD
 		peer = inet_getpeer_v6(net->ipv6.peers, &rt->rt6i_dst.addr, 1);
+=======
+		peer = inet_getpeer_v6(net->ipv6.peers, &hdr->daddr, 1);
+>>>>>>> common/deprecated/android-3.18
 
 		/* Limit redirects both by destination (here)
 		   and by source (inside ndisc_send_redirect)
@@ -508,8 +558,11 @@ int ip6_forward(struct sk_buff *skb)
 
 	hdr->hop_limit--;
 
+<<<<<<< HEAD
 	IP6_INC_STATS_BH(net, ip6_dst_idev(dst), IPSTATS_MIB_OUTFORWDATAGRAMS);
 	IP6_ADD_STATS_BH(net, ip6_dst_idev(dst), IPSTATS_MIB_OUTOCTETS, skb->len);
+=======
+>>>>>>> common/deprecated/android-3.18
 	return NF_HOOK(NFPROTO_IPV6, NF_INET_FORWARD, skb, skb->dev, dst->dev,
 		       ip6_forward_finish);
 
@@ -530,6 +583,11 @@ static void ip6_copy_metadata(struct sk_buff *to, struct sk_buff *from)
 	to->dev = from->dev;
 	to->mark = from->mark;
 
+<<<<<<< HEAD
+=======
+	skb_copy_hash(to, from);
+
+>>>>>>> common/deprecated/android-3.18
 #ifdef CONFIG_NET_SCHED
 	to->tc_index = from->tc_index;
 #endif
@@ -537,6 +595,7 @@ static void ip6_copy_metadata(struct sk_buff *to, struct sk_buff *from)
 	skb_copy_secmark(to, from);
 }
 
+<<<<<<< HEAD
 static void ipv6_select_ident(struct frag_hdr *fhdr, struct rt6_info *rt)
 {
 	static u32 ip6_idents_hashrnd __read_mostly;
@@ -551,6 +610,8 @@ static void ipv6_select_ident(struct frag_hdr *fhdr, struct rt6_info *rt)
 	fhdr->identification = htonl(id);
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 int ip6_fragment(struct sk_buff *skb, int (*output)(struct sk_buff *))
 {
 	struct sk_buff *frag;
@@ -559,9 +620,15 @@ int ip6_fragment(struct sk_buff *skb, int (*output)(struct sk_buff *))
 				inet6_sk(skb->sk) : NULL;
 	struct ipv6hdr *tmp_hdr;
 	struct frag_hdr *fh;
+<<<<<<< HEAD
 	unsigned int mtu, hlen, left, len;
 	int hroom, troom;
 	__be32 frag_id = 0;
+=======
+	unsigned int mtu, hlen, left, len, nexthdr_offset;
+	int hroom, troom;
+	__be32 frag_id;
+>>>>>>> common/deprecated/android-3.18
 	int ptr, offset = 0, err = 0;
 	u8 *prevhdr, nexthdr = 0;
 	struct net *net = dev_net(skb_dst(skb)->dev);
@@ -571,6 +638,10 @@ int ip6_fragment(struct sk_buff *skb, int (*output)(struct sk_buff *))
 		goto fail;
 	hlen = err;
 	nexthdr = *prevhdr;
+<<<<<<< HEAD
+=======
+	nexthdr_offset = prevhdr - skb_network_header(skb);
+>>>>>>> common/deprecated/android-3.18
 
 	mtu = ip6_skb_dst_mtu(skb);
 
@@ -597,6 +668,13 @@ int ip6_fragment(struct sk_buff *skb, int (*output)(struct sk_buff *))
 	}
 	mtu -= hlen + sizeof(struct frag_hdr);
 
+<<<<<<< HEAD
+=======
+	frag_id = ipv6_select_ident(net, &ipv6_hdr(skb)->daddr,
+				    &ipv6_hdr(skb)->saddr);
+
+	prevhdr = skb_network_header(skb) + nexthdr_offset;
+>>>>>>> common/deprecated/android-3.18
 	if (skb_has_frag_list(skb)) {
 		int first_len = skb_pagelen(skb);
 		struct sk_buff *frag2;
@@ -634,8 +712,11 @@ int ip6_fragment(struct sk_buff *skb, int (*output)(struct sk_buff *))
 		*prevhdr = NEXTHDR_FRAGMENT;
 		tmp_hdr = kmemdup(skb_network_header(skb), hlen, GFP_ATOMIC);
 		if (!tmp_hdr) {
+<<<<<<< HEAD
 			IP6_INC_STATS(net, ip6_dst_idev(skb_dst(skb)),
 				      IPSTATS_MIB_FRAGFAILS);
+=======
+>>>>>>> common/deprecated/android-3.18
 			return -ENOMEM;
 		}
 
@@ -645,11 +726,18 @@ int ip6_fragment(struct sk_buff *skb, int (*output)(struct sk_buff *))
 		skb_reset_network_header(skb);
 		memcpy(skb_network_header(skb), tmp_hdr, hlen);
 
+<<<<<<< HEAD
 		ipv6_select_ident(fh, rt);
 		fh->nexthdr = nexthdr;
 		fh->reserved = 0;
 		fh->frag_off = htons(IP6_MF);
 		frag_id = fh->identification;
+=======
+		fh->nexthdr = nexthdr;
+		fh->reserved = 0;
+		fh->frag_off = htons(IP6_MF);
+		fh->identification = frag_id;
+>>>>>>> common/deprecated/android-3.18
 
 		first_len = skb_pagelen(skb);
 		skb->data_len = first_len - skb_headlen(skb);
@@ -734,7 +822,10 @@ slow_path:
 	 *	Fragment the datagram.
 	 */
 
+<<<<<<< HEAD
 	*prevhdr = NEXTHDR_FRAGMENT;
+=======
+>>>>>>> common/deprecated/android-3.18
 	hroom = LL_RESERVED_SPACE(rt->dst.dev);
 	troom = rt->dst.dev->needed_tailroom;
 
@@ -742,6 +833,11 @@ slow_path:
 	 *	Keep copying data until we run out.
 	 */
 	while (left > 0)	{
+<<<<<<< HEAD
+=======
+		u8 *fragnexthdr_offset;
+
+>>>>>>> common/deprecated/android-3.18
 		len = left;
 		/* IF: it doesn't fit, use 'mtu' - the data space left */
 		if (len > mtu)
@@ -758,8 +854,11 @@ slow_path:
 		if ((frag = alloc_skb(len + hlen + sizeof(struct frag_hdr) +
 				      hroom + troom, GFP_ATOMIC)) == NULL) {
 			NETDEBUG(KERN_INFO "IPv6: frag: no memory for new fragment!\n");
+<<<<<<< HEAD
 			IP6_INC_STATS(net, ip6_dst_idev(skb_dst(skb)),
 				      IPSTATS_MIB_FRAGFAILS);
+=======
+>>>>>>> common/deprecated/android-3.18
 			err = -ENOMEM;
 			goto fail;
 		}
@@ -788,16 +887,27 @@ slow_path:
 		 */
 		skb_copy_from_linear_data(skb, skb_network_header(frag), hlen);
 
+<<<<<<< HEAD
+=======
+		fragnexthdr_offset = skb_network_header(frag);
+		fragnexthdr_offset += prevhdr - skb_network_header(skb);
+		*fragnexthdr_offset = NEXTHDR_FRAGMENT;
+
+>>>>>>> common/deprecated/android-3.18
 		/*
 		 *	Build fragment header.
 		 */
 		fh->nexthdr = nexthdr;
 		fh->reserved = 0;
+<<<<<<< HEAD
 		if (!frag_id) {
 			ipv6_select_ident(fh, rt);
 			frag_id = fh->identification;
 		} else
 			fh->identification = frag_id;
+=======
+		fh->identification = frag_id;
+>>>>>>> common/deprecated/android-3.18
 
 		/*
 		 *	Copy a block of the IP datagram.
@@ -900,6 +1010,10 @@ static int ip6_dst_lookup_tail(struct sock *sk,
 	struct rt6_info *rt;
 #endif
 	int err;
+<<<<<<< HEAD
+=======
+	int flags = 0;
+>>>>>>> common/deprecated/android-3.18
 
 	if (*dst == NULL)
 		*dst = ip6_route_output(net, sk, fl6);
@@ -914,6 +1028,12 @@ static int ip6_dst_lookup_tail(struct sock *sk,
 					  &fl6->saddr);
 		if (err)
 			goto out_err_release;
+<<<<<<< HEAD
+=======
+
+		if (fl6->flowi6_oif)
+			flags |= RT6_LOOKUP_F_IFACE;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 #ifdef CONFIG_IPV6_OPTIMISTIC_DAD
@@ -957,6 +1077,14 @@ static int ip6_dst_lookup_tail(struct sock *sk,
 		}
 	}
 #endif
+<<<<<<< HEAD
+=======
+	if (ipv6_addr_v4mapped(&fl6->saddr) &&
+	    !(ipv6_addr_v4mapped(&fl6->daddr) || ipv6_addr_any(&fl6->daddr))) {
+		err = -EAFNOSUPPORT;
+		goto out_err_release;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 
@@ -996,7 +1124,11 @@ EXPORT_SYMBOL_GPL(ip6_dst_lookup);
  *	It returns a valid dst pointer on success, or a pointer encoded
  *	error code.
  */
+<<<<<<< HEAD
 struct dst_entry *ip6_dst_lookup_flow(struct sock *sk, struct flowi6 *fl6,
+=======
+struct dst_entry *ip6_dst_lookup_flow(struct net *net, struct sock *sk, struct flowi6 *fl6,
+>>>>>>> common/deprecated/android-3.18
 				      const struct in6_addr *final_dst)
 {
 	struct dst_entry *dst = NULL;
@@ -1008,7 +1140,11 @@ struct dst_entry *ip6_dst_lookup_flow(struct sock *sk, struct flowi6 *fl6,
 	if (final_dst)
 		fl6->daddr = *final_dst;
 
+<<<<<<< HEAD
 	return xfrm_lookup_route(sock_net(sk), dst, flowi6_to_flowi(fl6), sk, 0);
+=======
+	return xfrm_lookup_route(net, dst, flowi6_to_flowi(fl6), sk, 0);
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL_GPL(ip6_dst_lookup_flow);
 
@@ -1030,6 +1166,7 @@ struct dst_entry *ip6_sk_dst_lookup_flow(struct sock *sk, struct flowi6 *fl6,
 					 const struct in6_addr *final_dst)
 {
 	struct dst_entry *dst = sk_dst_check(sk, inet6_sk(sk)->dst_cookie);
+<<<<<<< HEAD
 	int err;
 
 	dst = ip6_sk_dst_check(sk, dst, fl6);
@@ -1041,6 +1178,14 @@ struct dst_entry *ip6_sk_dst_lookup_flow(struct sock *sk, struct flowi6 *fl6,
 		fl6->daddr = *final_dst;
 
 	return xfrm_lookup_route(sock_net(sk), dst, flowi6_to_flowi(fl6), sk, 0);
+=======
+
+	dst = ip6_sk_dst_check(sk, dst, fl6);
+	if (!dst)
+		dst = ip6_dst_lookup_flow(sock_net(sk), sk, fl6, final_dst);
+
+	return dst;
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL_GPL(ip6_sk_dst_lookup_flow);
 
@@ -1048,12 +1193,20 @@ static inline int ip6_ufo_append_data(struct sock *sk,
 			int getfrag(void *from, char *to, int offset, int len,
 			int odd, struct sk_buff *skb),
 			void *from, int length, int hh_len, int fragheaderlen,
+<<<<<<< HEAD
 			int transhdrlen, int mtu, unsigned int flags,
 			struct rt6_info *rt)
 
 {
 	struct sk_buff *skb;
 	struct frag_hdr fhdr;
+=======
+			int exthdrlen, int transhdrlen, int mtu,
+			unsigned int flags, const struct flowi6 *fl6)
+
+{
+	struct sk_buff *skb;
+>>>>>>> common/deprecated/android-3.18
 	int err;
 
 	/* There is support for UDP large send offload by network
@@ -1074,7 +1227,11 @@ static inline int ip6_ufo_append_data(struct sock *sk,
 		skb_put(skb, fragheaderlen + transhdrlen);
 
 		/* initialize network header pointer */
+<<<<<<< HEAD
 		skb_reset_network_header(skb);
+=======
+		skb_set_network_header(skb, exthdrlen);
+>>>>>>> common/deprecated/android-3.18
 
 		/* initialize protocol header pointer */
 		skb->transport_header = skb->network_header + fragheaderlen;
@@ -1094,8 +1251,14 @@ static inline int ip6_ufo_append_data(struct sock *sk,
 	skb_shinfo(skb)->gso_size = (mtu - fragheaderlen -
 				     sizeof(struct frag_hdr)) & ~7;
 	skb_shinfo(skb)->gso_type = SKB_GSO_UDP;
+<<<<<<< HEAD
 	ipv6_select_ident(&fhdr, rt);
 	skb_shinfo(skb)->ip6_frag_id = fhdr.identification;
+=======
+	skb_shinfo(skb)->ip6_frag_id = ipv6_select_ident(sock_net(sk),
+							 &fl6->daddr,
+							 &fl6->saddr);
+>>>>>>> common/deprecated/android-3.18
 
 append:
 	return skb_append_datato_frags(sk, skb, getfrag, from,
@@ -1148,7 +1311,11 @@ int ip6_append_data(struct sock *sk, int getfrag(void *from, char *to,
 	struct ipv6_pinfo *np = inet6_sk(sk);
 	struct inet_cork *cork;
 	struct sk_buff *skb, *skb_prev = NULL;
+<<<<<<< HEAD
 	unsigned int maxfraglen, fragheaderlen, mtu, orig_mtu;
+=======
+	unsigned int maxfraglen, fragheaderlen, mtu, orig_mtu, pmtu;
+>>>>>>> common/deprecated/android-3.18
 	int exthdrlen;
 	int dst_exthdrlen;
 	int hh_len;
@@ -1169,11 +1336,19 @@ int ip6_append_data(struct sock *sk, int getfrag(void *from, char *to,
 			if (WARN_ON(np->cork.opt))
 				return -EINVAL;
 
+<<<<<<< HEAD
 			np->cork.opt = kzalloc(opt->tot_len, sk->sk_allocation);
 			if (unlikely(np->cork.opt == NULL))
 				return -ENOBUFS;
 
 			np->cork.opt->tot_len = opt->tot_len;
+=======
+			np->cork.opt = kzalloc(sizeof(*opt), sk->sk_allocation);
+			if (unlikely(np->cork.opt == NULL))
+				return -ENOBUFS;
+
+			np->cork.opt->tot_len = sizeof(*opt);
+>>>>>>> common/deprecated/android-3.18
 			np->cork.opt->opt_flen = opt->opt_flen;
 			np->cork.opt->opt_nflen = opt->opt_nflen;
 
@@ -1206,10 +1381,17 @@ int ip6_append_data(struct sock *sk, int getfrag(void *from, char *to,
 		np->cork.tclass = tclass;
 		if (rt->dst.flags & DST_XFRM_TUNNEL)
 			mtu = np->pmtudisc >= IPV6_PMTUDISC_PROBE ?
+<<<<<<< HEAD
 			      ACCESS_ONCE(rt->dst.dev->mtu) : dst_mtu(&rt->dst);
 		else
 			mtu = np->pmtudisc >= IPV6_PMTUDISC_PROBE ?
 			      ACCESS_ONCE(rt->dst.dev->mtu) : dst_mtu(rt->dst.path);
+=======
+			      READ_ONCE(rt->dst.dev->mtu) : dst_mtu(&rt->dst);
+		else
+			mtu = np->pmtudisc >= IPV6_PMTUDISC_PROBE ?
+			      READ_ONCE(rt->dst.dev->mtu) : dst_mtu(rt->dst.path);
+>>>>>>> common/deprecated/android-3.18
 		if (np->frag_size < mtu) {
 			if (np->frag_size)
 				mtu = np->frag_size;
@@ -1256,6 +1438,15 @@ int ip6_append_data(struct sock *sk, int getfrag(void *from, char *to,
 		else
 			maxnonfragsize = mtu;
 
+<<<<<<< HEAD
+=======
+		/* as per RFC 7112 section 5, the entire IPv6 Header Chain must fit
+		 * the first fragment
+		 */
+		if (headersize + transhdrlen > mtu)
+			goto emsgsize;
+
+>>>>>>> common/deprecated/android-3.18
 		/* dontfrag active */
 		if ((cork->length + length > mtu - headersize) && dontfrag &&
 		    (sk->sk_protocol == IPPROTO_UDP ||
@@ -1267,9 +1458,14 @@ int ip6_append_data(struct sock *sk, int getfrag(void *from, char *to,
 
 		if (cork->length + length > maxnonfragsize - headersize) {
 emsgsize:
+<<<<<<< HEAD
 			ipv6_local_error(sk, EMSGSIZE, fl6,
 					 mtu - headersize +
 					 sizeof(struct ipv6hdr));
+=======
+			pmtu = max_t(int, mtu - headersize + sizeof(struct ipv6hdr), 0);
+			ipv6_local_error(sk, EMSGSIZE, fl6, pmtu);
+>>>>>>> common/deprecated/android-3.18
 			return -EMSGSIZE;
 		}
 	}
@@ -1304,10 +1500,17 @@ emsgsize:
 	    (skb_queue_len(&sk->sk_write_queue) <= 1) &&
 	    (sk->sk_protocol == IPPROTO_UDP) &&
 	    (rt->dst.dev->features & NETIF_F_UFO) &&
+<<<<<<< HEAD
 	    (sk->sk_type == SOCK_DGRAM))) {
 		err = ip6_ufo_append_data(sk, getfrag, from, length,
 					  hh_len, fragheaderlen,
 					  transhdrlen, mtu, flags, rt);
+=======
+	    (sk->sk_type == SOCK_DGRAM) && !udp_get_no_check6_tx(sk))) {
+		err = ip6_ufo_append_data(sk, getfrag, from, length,
+					  hh_len, fragheaderlen, exthdrlen,
+					  transhdrlen, mtu, flags, fl6);
+>>>>>>> common/deprecated/android-3.18
 		if (err)
 			goto error;
 		return 0;
@@ -1376,6 +1579,14 @@ alloc_new_skb:
 			 */
 			alloclen += sizeof(struct frag_hdr);
 
+<<<<<<< HEAD
+=======
+			copy = datalen - transhdrlen - fraggap;
+			if (copy < 0) {
+				err = -EINVAL;
+				goto error;
+			}
+>>>>>>> common/deprecated/android-3.18
 			if (transhdrlen) {
 				skb = sock_alloc_send_skb(sk,
 						alloclen + hh_len,
@@ -1425,6 +1636,7 @@ alloc_new_skb:
 				data += fraggap;
 				pskb_trim_unique(skb_prev, maxfraglen);
 			}
+<<<<<<< HEAD
 			copy = datalen - transhdrlen - fraggap;
 
 			if (copy < 0) {
@@ -1432,6 +1644,11 @@ alloc_new_skb:
 				kfree_skb(skb);
 				goto error;
 			} else if (copy > 0 && getfrag(from, data + transhdrlen, offset, copy, fraggap, skb) < 0) {
+=======
+			if (copy > 0 &&
+			    getfrag(from, data + transhdrlen, offset,
+				    copy, fraggap, skb) < 0) {
+>>>>>>> common/deprecated/android-3.18
 				err = -EFAULT;
 				kfree_skb(skb);
 				goto error;
@@ -1453,7 +1670,12 @@ alloc_new_skb:
 		if (copy > length)
 			copy = length;
 
+<<<<<<< HEAD
 		if (!(rt->dst.dev->features&NETIF_F_SG)) {
+=======
+		if (!(rt->dst.dev->features&NETIF_F_SG) &&
+		    skb_tailroom(skb) >= copy) {
+>>>>>>> common/deprecated/android-3.18
 			unsigned int off;
 
 			off = skb->len;

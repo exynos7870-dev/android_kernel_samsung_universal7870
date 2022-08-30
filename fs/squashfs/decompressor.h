@@ -46,6 +46,13 @@ static inline void *squashfs_comp_opts(struct squashfs_sb_info *msblk,
 extern const struct squashfs_decompressor squashfs_xz_comp_ops;
 #endif
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_SQUASHFS_LZ4
+extern const struct squashfs_decompressor squashfs_lz4_comp_ops;
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 #ifdef CONFIG_SQUASHFS_LZO
 extern const struct squashfs_decompressor squashfs_lzo_comp_ops;
 #endif

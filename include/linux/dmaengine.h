@@ -669,7 +669,11 @@ struct dma_device {
 	struct dma_async_tx_descriptor *(*device_prep_dma_cyclic)(
 		struct dma_chan *chan, dma_addr_t buf_addr, size_t buf_len,
 		size_t period_len, enum dma_transfer_direction direction,
+<<<<<<< HEAD
 		unsigned long flags, void *context);
+=======
+		unsigned long flags);
+>>>>>>> common/deprecated/android-3.18
 	struct dma_async_tx_descriptor *(*device_prep_interleaved_dma)(
 		struct dma_chan *chan, struct dma_interleaved_template *xt,
 		unsigned long flags);
@@ -714,6 +718,12 @@ static inline struct dma_async_tx_descriptor *dmaengine_prep_slave_single(
 	sg_dma_address(&sg) = buf;
 	sg_dma_len(&sg) = len;
 
+<<<<<<< HEAD
+=======
+	if (!chan || !chan->device || !chan->device->device_prep_slave_sg)
+		return NULL;
+
+>>>>>>> common/deprecated/android-3.18
 	return chan->device->device_prep_slave_sg(chan, &sg, 1,
 						  dir, flags, NULL);
 }
@@ -722,6 +732,12 @@ static inline struct dma_async_tx_descriptor *dmaengine_prep_slave_sg(
 	struct dma_chan *chan, struct scatterlist *sgl,	unsigned int sg_len,
 	enum dma_transfer_direction dir, unsigned long flags)
 {
+<<<<<<< HEAD
+=======
+	if (!chan || !chan->device || !chan->device->device_prep_slave_sg)
+		return NULL;
+
+>>>>>>> common/deprecated/android-3.18
 	return chan->device->device_prep_slave_sg(chan, sgl, sg_len,
 						  dir, flags, NULL);
 }
@@ -733,6 +749,12 @@ static inline struct dma_async_tx_descriptor *dmaengine_prep_rio_sg(
 	enum dma_transfer_direction dir, unsigned long flags,
 	struct rio_dma_ext *rio_ext)
 {
+<<<<<<< HEAD
+=======
+	if (!chan || !chan->device || !chan->device->device_prep_slave_sg)
+		return NULL;
+
+>>>>>>> common/deprecated/android-3.18
 	return chan->device->device_prep_slave_sg(chan, sgl, sg_len,
 						  dir, flags, rio_ext);
 }
@@ -743,14 +765,28 @@ static inline struct dma_async_tx_descriptor *dmaengine_prep_dma_cyclic(
 		size_t period_len, enum dma_transfer_direction dir,
 		unsigned long flags)
 {
+<<<<<<< HEAD
 	return chan->device->device_prep_dma_cyclic(chan, buf_addr, buf_len,
 						period_len, dir, flags, NULL);
+=======
+	if (!chan || !chan->device || !chan->device->device_prep_dma_cyclic)
+		return NULL;
+
+	return chan->device->device_prep_dma_cyclic(chan, buf_addr, buf_len,
+						period_len, dir, flags);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static inline struct dma_async_tx_descriptor *dmaengine_prep_interleaved_dma(
 		struct dma_chan *chan, struct dma_interleaved_template *xt,
 		unsigned long flags)
 {
+<<<<<<< HEAD
+=======
+	if (!chan || !chan->device || !chan->device->device_prep_interleaved_dma)
+		return NULL;
+
+>>>>>>> common/deprecated/android-3.18
 	return chan->device->device_prep_interleaved_dma(chan, xt, flags);
 }
 
@@ -760,6 +796,12 @@ static inline struct dma_async_tx_descriptor *dmaengine_prep_dma_sg(
 		struct scatterlist *src_sg, unsigned int src_nents,
 		unsigned long flags)
 {
+<<<<<<< HEAD
+=======
+	if (!chan || !chan->device || !chan->device->device_prep_dma_sg)
+		return NULL;
+
+>>>>>>> common/deprecated/android-3.18
 	return chan->device->device_prep_dma_sg(chan, dst_sg, dst_nents,
 			src_sg, src_nents, flags);
 }

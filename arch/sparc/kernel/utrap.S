@@ -11,8 +11,12 @@ utrap_trap:		/* %g3=handler,%g4=level */
 	mov		%l4, %o1
         call		bad_trap
 	 add		%sp, PTREGS_OFF, %o0
+<<<<<<< HEAD
 	ba,pt		%xcc, rtrap
 	 nop
+=======
+	ba,a,pt		%xcc, rtrap
+>>>>>>> common/deprecated/android-3.18
 
 invoke_utrap:
 	sllx		%g3, 3, %g3

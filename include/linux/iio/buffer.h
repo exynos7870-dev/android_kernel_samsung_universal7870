@@ -209,8 +209,11 @@ ssize_t iio_buffer_show_enable(struct device *dev,
 					   iio_buffer_show_enable,	\
 					   iio_buffer_store_enable)
 
+<<<<<<< HEAD
 int iio_sw_buffer_preenable(struct iio_dev *indio_dev);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 bool iio_validate_scan_mask_onehot(struct iio_dev *indio_dev,
 	const unsigned long *mask);
 

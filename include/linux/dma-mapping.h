@@ -141,8 +141,12 @@ static inline unsigned int dma_get_max_seg_size(struct device *dev)
 	return dev->dma_parms ? dev->dma_parms->max_segment_size : 65536;
 }
 
+<<<<<<< HEAD
 static inline unsigned int dma_set_max_seg_size(struct device *dev,
 						unsigned int size)
+=======
+static inline int dma_set_max_seg_size(struct device *dev, unsigned int size)
+>>>>>>> common/deprecated/android-3.18
 {
 	if (dev->dma_parms) {
 		dev->dma_parms->max_segment_size = size;

@@ -29,6 +29,10 @@ Supported adapters:
   * Intel Wildcat Point-LP (PCH)
   * Intel BayTrail (SOC)
   * Intel Sunrise Point-H (PCH)
+<<<<<<< HEAD
+=======
+  * Intel Sunrise Point-LP (PCH)
+>>>>>>> common/deprecated/android-3.18
    Datasheets: Publicly available at the Intel website
 
 On Intel Patsburg and later chipsets, both the normal host SMBus controller

@@ -53,7 +53,11 @@
 .popsection				;
 
 #define ELFNOTE(name, type, desc)		\
+<<<<<<< HEAD
 	ELFNOTE_START(name, type, "")		\
+=======
+	ELFNOTE_START(name, type, "a")		\
+>>>>>>> common/deprecated/android-3.18
 		desc			;	\
 	ELFNOTE_END
 

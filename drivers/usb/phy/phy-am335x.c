@@ -56,9 +56,12 @@ static int am335x_phy_probe(struct platform_device *pdev)
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
 	ret = usb_add_phy_dev(&am_phy->usb_phy_gen.phy);
 	if (ret)
 		return ret;
+=======
+>>>>>>> common/deprecated/android-3.18
 	am_phy->usb_phy_gen.phy.init = am335x_init;
 	am_phy->usb_phy_gen.phy.shutdown = am335x_shutdown;
 
@@ -77,7 +80,11 @@ static int am335x_phy_probe(struct platform_device *pdev)
 	device_set_wakeup_enable(dev, false);
 	phy_ctrl_power(am_phy->phy_ctrl, am_phy->id, false);
 
+<<<<<<< HEAD
 	return 0;
+=======
+	return usb_add_phy_dev(&am_phy->usb_phy_gen.phy);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int am335x_phy_remove(struct platform_device *pdev)

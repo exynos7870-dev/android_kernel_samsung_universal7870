@@ -191,6 +191,12 @@ int pm_wake_lock(const char *buf)
 	size_t len;
 	int ret = 0;
 
+<<<<<<< HEAD
+=======
+	if (!capable(CAP_BLOCK_SUSPEND))
+		return -EPERM;
+
+>>>>>>> common/deprecated/android-3.18
 	while (*str && !isspace(*str))
 		str++;
 
@@ -234,6 +240,12 @@ int pm_wake_unlock(const char *buf)
 	size_t len;
 	int ret = 0;
 
+<<<<<<< HEAD
+=======
+	if (!capable(CAP_BLOCK_SUSPEND))
+		return -EPERM;
+
+>>>>>>> common/deprecated/android-3.18
 	len = strlen(buf);
 	if (!len)
 		return -EINVAL;

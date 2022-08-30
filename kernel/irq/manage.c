@@ -211,7 +211,15 @@ int irq_set_affinity_locked(struct irq_data *data, const struct cpumask *mask,
 
 	if (desc->affinity_notify) {
 		kref_get(&desc->affinity_notify->kref);
+<<<<<<< HEAD
 		schedule_work(&desc->affinity_notify->work);
+=======
+		if (!schedule_work(&desc->affinity_notify->work)) {
+			/* Work was already scheduled, drop our extra ref */
+			kref_put(&desc->affinity_notify->kref,
+				 desc->affinity_notify->release);
+		}
+>>>>>>> common/deprecated/android-3.18
 	}
 	irqd_set(data, IRQD_AFFINITY_SET);
 
@@ -307,8 +315,18 @@ irq_set_affinity_notifier(unsigned int irq, struct irq_affinity_notify *notify)
 	desc->affinity_notify = notify;
 	raw_spin_unlock_irqrestore(&desc->lock, flags);
 
+<<<<<<< HEAD
 	if (old_notify)
 		kref_put(&old_notify->kref, old_notify->release);
+=======
+	if (old_notify) {
+		if (cancel_work_sync(&old_notify->work)) {
+			/* Pending work had a ref, put that one too */
+			kref_put(&old_notify->kref, old_notify->release);
+		}
+		kref_put(&old_notify->kref, old_notify->release);
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }
@@ -759,7 +777,11 @@ irq_thread_check_affinity(struct irq_desc *desc, struct irqaction *action)
 	 * This code is triggered unconditionally. Check the affinity
 	 * mask pointer. For CPU_MASK_OFFSTACK=n this is optimized out.
 	 */
+<<<<<<< HEAD
 	if (desc->irq_data.affinity)
+=======
+	if (cpumask_available(desc->irq_data.affinity))
+>>>>>>> common/deprecated/android-3.18
 		cpumask_copy(mask, desc->irq_data.affinity);
 	else
 		valid = false;
@@ -786,8 +808,20 @@ irq_forced_thread_fn(struct irq_desc *desc, struct irqaction *action)
 	irqreturn_t ret;
 
 	local_bh_disable();
+<<<<<<< HEAD
 	ret = action->thread_fn(action->irq, action->dev_id);
 	irq_finalize_oneshot(desc, action);
+=======
+	if (!IS_ENABLED(CONFIG_PREEMPT_RT_BASE))
+		local_irq_disable();
+	ret = action->thread_fn(action->irq, action->dev_id);
+	if (ret == IRQ_HANDLED)
+		atomic_inc(&desc->threads_handled);
+
+	irq_finalize_oneshot(desc, action);
+	if (!IS_ENABLED(CONFIG_PREEMPT_RT_BASE))
+		local_irq_enable();
+>>>>>>> common/deprecated/android-3.18
 	local_bh_enable();
 	return ret;
 }
@@ -803,6 +837,12 @@ static irqreturn_t irq_thread_fn(struct irq_desc *desc,
 	irqreturn_t ret;
 
 	ret = action->thread_fn(action->irq, action->dev_id);
+<<<<<<< HEAD
+=======
+	if (ret == IRQ_HANDLED)
+		atomic_inc(&desc->threads_handled);
+
+>>>>>>> common/deprecated/android-3.18
 	irq_finalize_oneshot(desc, action);
 	return ret;
 }
@@ -868,8 +908,11 @@ static int irq_thread(void *data)
 		irq_thread_check_affinity(desc, action);
 
 		action_ret = handler_fn(desc, action);
+<<<<<<< HEAD
 		if (action_ret == IRQ_HANDLED)
 			atomic_inc(&desc->threads_handled);
+=======
+>>>>>>> common/deprecated/android-3.18
 
 		wake_threads_waitq(desc);
 	}
@@ -1156,8 +1199,15 @@ __setup_irq(unsigned int irq, struct irq_desc *desc, struct irqaction *new)
 			ret = __irq_set_trigger(desc, irq,
 					new->flags & IRQF_TRIGGER_MASK);
 
+<<<<<<< HEAD
 			if (ret)
 				goto out_mask;
+=======
+			if (ret) {
+				irq_release_resources(desc);
+				goto out_mask;
+			}
+>>>>>>> common/deprecated/android-3.18
 		}
 
 		desc->istate &= ~(IRQS_AUTODETECT | IRQS_SPURIOUS_DISABLED | \
@@ -1184,9 +1234,12 @@ __setup_irq(unsigned int irq, struct irq_desc *desc, struct irqaction *new)
 			irqd_set(&desc->irq_data, IRQD_NO_BALANCING);
 		}
 
+<<<<<<< HEAD
 		if (new->flags & IRQF_GIC_MULTI_TARGET)
 			irqd_set(&desc->irq_data, IRQD_GIC_MULTI_TARGET);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		/* Set default affinity mask once everything is setup */
 		setup_affinity(irq, desc, mask);
 

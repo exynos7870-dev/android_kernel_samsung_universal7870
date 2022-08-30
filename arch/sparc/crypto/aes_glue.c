@@ -433,6 +433,10 @@ static struct crypto_alg algs[] = { {
 		.blkcipher = {
 			.min_keysize	= AES_MIN_KEY_SIZE,
 			.max_keysize	= AES_MAX_KEY_SIZE,
+<<<<<<< HEAD
+=======
+			.ivsize		= AES_BLOCK_SIZE,
+>>>>>>> common/deprecated/android-3.18
 			.setkey		= aes_set_key,
 			.encrypt	= cbc_encrypt,
 			.decrypt	= cbc_decrypt,
@@ -452,6 +456,10 @@ static struct crypto_alg algs[] = { {
 		.blkcipher = {
 			.min_keysize	= AES_MIN_KEY_SIZE,
 			.max_keysize	= AES_MAX_KEY_SIZE,
+<<<<<<< HEAD
+=======
+			.ivsize		= AES_BLOCK_SIZE,
+>>>>>>> common/deprecated/android-3.18
 			.setkey		= aes_set_key,
 			.encrypt	= ctr_crypt,
 			.decrypt	= ctr_crypt,

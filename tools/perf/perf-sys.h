@@ -6,7 +6,10 @@
 #include <sys/syscall.h>
 #include <linux/types.h>
 #include <linux/perf_event.h>
+<<<<<<< HEAD
 #include <asm/unistd.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #if defined(__i386__)
 #define mb()		asm volatile("lock; addl $0,0(%%esp)" ::: "memory")

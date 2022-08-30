@@ -99,7 +99,11 @@ void mdfldWaitForPipeEnable(struct drm_device *dev, int pipe)
 	/* Wait for for the pipe enable to take effect. */
 	for (count = 0; count < COUNT_MAX; count++) {
 		temp = REG_READ(map->conf);
+<<<<<<< HEAD
 		if ((temp & PIPEACONF_PIPE_STATE) == 1)
+=======
+		if (temp & PIPEACONF_PIPE_STATE)
+>>>>>>> common/deprecated/android-3.18
 			break;
 	}
 }

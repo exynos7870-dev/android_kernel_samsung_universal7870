@@ -15,6 +15,10 @@
  */
 #include <linux/debugfs.h>
 #include <linux/fs.h>
+<<<<<<< HEAD
+=======
+#include <linux/io.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/mm.h>
 #include <linux/sched.h>
 #include <linux/seq_file.h>

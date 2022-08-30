@@ -38,7 +38,11 @@ static void __init r8a7790_sysc_init(void)
 	void __iomem *base = rcar_sysc_init(0xe6180000);
 
 	/* enable all interrupt sources, but do not use interrupt handler */
+<<<<<<< HEAD
 	iowrite32(0x0131000e, base + SYSCIER);
+=======
+	iowrite32(0x013111ef, base + SYSCIER);
+>>>>>>> common/deprecated/android-3.18
 	iowrite32(0, base + SYSCIMR);
 }
 

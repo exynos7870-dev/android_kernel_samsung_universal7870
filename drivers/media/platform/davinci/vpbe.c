@@ -130,7 +130,11 @@ static int vpbe_enum_outputs(struct vpbe_device *vpbe_dev,
 			     struct v4l2_output *output)
 {
 	struct vpbe_config *cfg = vpbe_dev->cfg;
+<<<<<<< HEAD
 	int temp_index = output->index;
+=======
+	unsigned int temp_index = output->index;
+>>>>>>> common/deprecated/android-3.18
 
 	if (temp_index >= cfg->num_outputs)
 		return -EINVAL;
@@ -740,7 +744,11 @@ static int vpbe_initialize(struct device *dev, struct vpbe_device *vpbe_dev)
 	if (ret) {
 		v4l2_err(&vpbe_dev->v4l2_dev, "Failed to set default output %s",
 			 def_output);
+<<<<<<< HEAD
 		return ret;
+=======
+		goto fail_kfree_amp;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	printk(KERN_NOTICE "Setting default mode to %s\n", def_mode);
@@ -748,12 +756,22 @@ static int vpbe_initialize(struct device *dev, struct vpbe_device *vpbe_dev)
 	if (ret) {
 		v4l2_err(&vpbe_dev->v4l2_dev, "Failed to set default mode %s",
 			 def_mode);
+<<<<<<< HEAD
 		return ret;
+=======
+		goto fail_kfree_amp;
+>>>>>>> common/deprecated/android-3.18
 	}
 	vpbe_dev->initialized = 1;
 	/* TBD handling of bootargs for default output and mode */
 	return 0;
 
+<<<<<<< HEAD
+=======
+fail_kfree_amp:
+	mutex_lock(&vpbe_dev->lock);
+	kfree(vpbe_dev->amp);
+>>>>>>> common/deprecated/android-3.18
 fail_kfree_encoders:
 	kfree(vpbe_dev->encoders);
 fail_dev_unregister:

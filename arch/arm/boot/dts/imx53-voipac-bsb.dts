@@ -119,8 +119,13 @@
 &esdhc2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_esdhc2>;
+<<<<<<< HEAD
 	cd-gpios = <&gpio3 25 0>;
 	wp-gpios = <&gpio2 19 0>;
+=======
+	cd-gpios = <&gpio3 25 GPIO_ACTIVE_LOW>;
+	wp-gpios = <&gpio2 19 GPIO_ACTIVE_HIGH>;
+>>>>>>> common/deprecated/android-3.18
 	vmmc-supply = <&reg_3p3v>;
 	status = "okay";
 };

@@ -360,6 +360,15 @@ void br_vlan_flush(struct net_bridge *br)
 	struct net_port_vlans *pv;
 
 	ASSERT_RTNL();
+<<<<<<< HEAD
+=======
+
+	/* delete auto-added default pvid local fdb before flushing vlans
+	 * otherwise it will be leaked on bridge device init failure
+	 */
+	br_fdb_delete_by_port(br, NULL, 1);
+
+>>>>>>> common/deprecated/android-3.18
 	pv = rtnl_dereference(br->vlan_info);
 	if (!pv)
 		return;

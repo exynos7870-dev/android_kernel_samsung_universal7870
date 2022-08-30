@@ -56,6 +56,7 @@ obj-$(CONFIG_LEDS_BLINKM)		+= leds-blinkm.o
 obj-$(CONFIG_LEDS_SYSCON)		+= leds-syscon.o
 obj-$(CONFIG_LEDS_VERSATILE)		+= leds-versatile.o
 obj-$(CONFIG_LEDS_MENF21BMC)		+= leds-menf21bmc.o
+<<<<<<< HEAD
 obj-$(CONFIG_LEDS_S2MU003)		+= leds-s2mu003.o
 obj-$(CONFIG_LEDS_S2MPB02)		+= leds-s2mpb02.o
 obj-$(CONFIG_LEDS_S2MU005_FLASH)	+= leds-s2mu005.o
@@ -67,6 +68,8 @@ obj-$(CONFIG_LEDS_S2MU005_RGB)  += leds-s2mu005-rgb.o
 obj-$(CONFIG_LEDS_RT8547)		+= leds-rt8547.o
 obj-$(CONFIG_LEDS_IRIS_IRLED_KTD2692)	+= leds-ktd2692_ir.o
 obj-$(CONFIG_LEDS_KTD2692)	+= leds-ktd2692.o
+=======
+>>>>>>> common/deprecated/android-3.18
 
 # LED SPI Drivers
 obj-$(CONFIG_LEDS_DAC124S085)		+= leds-dac124s085.o

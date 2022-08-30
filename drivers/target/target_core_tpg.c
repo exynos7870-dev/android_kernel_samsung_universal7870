@@ -843,6 +843,11 @@ void core_tpg_remove_lun(
 	struct se_portal_group *tpg,
 	struct se_lun *lun)
 {
+<<<<<<< HEAD
+=======
+	lun->lun_shutdown = true;
+
+>>>>>>> common/deprecated/android-3.18
 	core_clear_lun_from_tpg(lun, tpg);
 	transport_clear_lun_ref(lun);
 
@@ -850,6 +855,10 @@ void core_tpg_remove_lun(
 
 	spin_lock(&tpg->tpg_lun_lock);
 	lun->lun_status = TRANSPORT_LUN_STATUS_FREE;
+<<<<<<< HEAD
+=======
+	lun->lun_shutdown = false;
+>>>>>>> common/deprecated/android-3.18
 	spin_unlock(&tpg->tpg_lun_lock);
 
 	percpu_ref_exit(&lun->lun_ref);

@@ -50,13 +50,21 @@
 
 struct receiver {
 	struct hlist_node list;
+<<<<<<< HEAD
 	struct rcu_head rcu;
+=======
+>>>>>>> common/deprecated/android-3.18
 	canid_t can_id;
 	canid_t mask;
 	unsigned long matches;
 	void (*func)(struct sk_buff *, void *);
 	void *data;
 	char *ident;
+<<<<<<< HEAD
+=======
+	struct sock *sk;
+	struct rcu_head rcu;
+>>>>>>> common/deprecated/android-3.18
 };
 
 #define CAN_SFF_RCV_ARRAY_SZ (1 << CAN_SFF_ID_BITS)

@@ -13,7 +13,11 @@ extern int iscsit_deaccess_np(struct iscsi_np *, struct iscsi_portal_group *,
 extern bool iscsit_check_np_match(struct __kernel_sockaddr_storage *,
 				struct iscsi_np *, int);
 extern struct iscsi_np *iscsit_add_np(struct __kernel_sockaddr_storage *,
+<<<<<<< HEAD
 				char *, int);
+=======
+				int);
+>>>>>>> common/deprecated/android-3.18
 extern int iscsit_reset_np_thread(struct iscsi_np *, struct iscsi_tpg_np *,
 				struct iscsi_portal_group *, bool);
 extern int iscsit_del_np(struct iscsi_np *);

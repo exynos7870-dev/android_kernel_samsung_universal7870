@@ -50,7 +50,11 @@ struct dm_io_client *dm_io_client_create(void)
 	struct dm_io_client *client;
 	unsigned min_ios = dm_get_reserved_bio_based_ios();
 
+<<<<<<< HEAD
 	client = kmalloc(sizeof(*client), GFP_KERNEL);
+=======
+	client = kzalloc(sizeof(*client), GFP_KERNEL);
+>>>>>>> common/deprecated/android-3.18
 	if (!client)
 		return ERR_PTR(-ENOMEM);
 
@@ -299,6 +303,10 @@ static void do_region(int rw, unsigned region, struct dm_io_region *where,
 	else if (rw & REQ_WRITE_SAME)
 		special_cmd_max_sectors = q->limits.max_write_same_sectors;
 	if ((rw & (REQ_DISCARD | REQ_WRITE_SAME)) && special_cmd_max_sectors == 0) {
+<<<<<<< HEAD
+=======
+		atomic_inc(&io->count);
+>>>>>>> common/deprecated/android-3.18
 		dec_count(io, region, -EOPNOTSUPP);
 		return;
 	}

@@ -90,7 +90,11 @@ struct gpio_desc *of_get_named_gpiod_flags(struct device_node *np,
 					 &gg_data.gpiospec);
 	if (ret) {
 		pr_debug("%s: can't parse '%s' property of node '%s[%d]'\n",
+<<<<<<< HEAD
 			__func__, propname, np->full_name, index);
+=======
+			__func__, propname, np ? np->full_name : NULL, index);
+>>>>>>> common/deprecated/android-3.18
 		return ERR_PTR(ret);
 	}
 

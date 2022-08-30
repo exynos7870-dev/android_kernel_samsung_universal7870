@@ -452,7 +452,11 @@ int opal_put_chars(uint32_t vtermno, const char *data, int total_len)
 		/* Closed or other error drop */
 		if (rc != OPAL_SUCCESS && rc != OPAL_BUSY &&
 		    rc != OPAL_BUSY_EVENT) {
+<<<<<<< HEAD
 			written = total_len;
+=======
+			written += total_len;
+>>>>>>> common/deprecated/android-3.18
 			break;
 		}
 		if (rc == OPAL_SUCCESS) {

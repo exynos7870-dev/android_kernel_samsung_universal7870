@@ -1229,6 +1229,13 @@ static int if_sdio_probe(struct sdio_func *func,
 
 	spin_lock_init(&card->lock);
 	card->workqueue = create_workqueue("libertas_sdio");
+<<<<<<< HEAD
+=======
+	if (unlikely(!card->workqueue)) {
+		ret = -ENOMEM;
+		goto err_queue;
+	}
+>>>>>>> common/deprecated/android-3.18
 	INIT_WORK(&card->packet_worker, if_sdio_host_to_card_worker);
 	init_waitqueue_head(&card->pwron_waitq);
 
@@ -1282,6 +1289,10 @@ err_activate_card:
 	lbs_remove_card(priv);
 free:
 	destroy_workqueue(card->workqueue);
+<<<<<<< HEAD
+=======
+err_queue:
+>>>>>>> common/deprecated/android-3.18
 	while (card->packets) {
 		packet = card->packets;
 		card->packets = card->packets->next;

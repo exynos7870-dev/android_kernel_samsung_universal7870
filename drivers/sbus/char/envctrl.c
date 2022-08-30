@@ -910,8 +910,15 @@ static void envctrl_init_i2c_child(struct device_node *dp,
 			for (len = 0; len < PCF8584_MAX_CHANNELS; ++len) {
 				pchild->mon_type[len] = ENVCTRL_NOMON;
 			}
+<<<<<<< HEAD
 			return;
 		}
+=======
+			of_node_put(root_node);
+			return;
+		}
+		of_node_put(root_node);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/* Get the monitor channels. */

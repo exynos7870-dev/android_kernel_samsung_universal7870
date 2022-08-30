@@ -33,7 +33,11 @@
 #define X86		new_cpu_data+CPUINFO_x86
 #define X86_VENDOR	new_cpu_data+CPUINFO_x86_vendor
 #define X86_MODEL	new_cpu_data+CPUINFO_x86_model
+<<<<<<< HEAD
 #define X86_MASK	new_cpu_data+CPUINFO_x86_mask
+=======
+#define X86_STEPPING	new_cpu_data+CPUINFO_x86_stepping
+>>>>>>> common/deprecated/android-3.18
 #define X86_HARD_MATH	new_cpu_data+CPUINFO_hard_math
 #define X86_CPUID	new_cpu_data+CPUINFO_cpuid_level
 #define X86_CAPABILITY	new_cpu_data+CPUINFO_x86_capability
@@ -61,9 +65,22 @@
 #define PAGE_TABLE_SIZE(pages) ((pages) / PTRS_PER_PGD)
 #endif
 
+<<<<<<< HEAD
 /* Number of possible pages in the lowmem region */
 LOWMEM_PAGES = (((1<<32) - __PAGE_OFFSET) >> PAGE_SHIFT)
 	
+=======
+/*
+ * Number of possible pages in the lowmem region.
+ *
+ * We shift 2 by 31 instead of 1 by 32 to the left in order to avoid a
+ * gas warning about overflowing shift count when gas has been compiled
+ * with only a host target support using a 32-bit type for internal
+ * representation.
+ */
+LOWMEM_PAGES = (((2<<31) - __PAGE_OFFSET) >> PAGE_SHIFT)
+
+>>>>>>> common/deprecated/android-3.18
 /* Enough space to fit pagetables for the low memory linear map */
 MAPPING_BEYOND_END = PAGE_TABLE_SIZE(LOWMEM_PAGES) << PAGE_SHIFT
 
@@ -433,7 +450,11 @@ enable_paging:
 	shrb $4,%al
 	movb %al,X86_MODEL
 	andb $0x0f,%cl		# mask mask revision
+<<<<<<< HEAD
 	movb %cl,X86_MASK
+=======
+	movb %cl,X86_STEPPING
+>>>>>>> common/deprecated/android-3.18
 	movl %edx,X86_CAPABILITY
 
 is486:
@@ -477,6 +498,7 @@ is486:
 __INIT
 setup_once:
 	/*
+<<<<<<< HEAD
 	 * Set up a idt with 256 entries pointing to ignore_int,
 	 * interrupt gates. It doesn't actually load idt - that needs
 	 * to be done on each CPU. Interrupts are enabled elsewhere,
@@ -485,13 +507,28 @@ setup_once:
 
 	movl $idt_table,%edi
 	movl $early_idt_handlers,%eax
+=======
+	 * Set up a idt with 256 interrupt gates that push zero if there
+	 * is no error code and then jump to early_idt_handler_common.
+	 * It doesn't actually load the idt - that needs to be done on
+	 * each CPU. Interrupts are enabled elsewhere, when we can be
+	 * relatively sure everything is ok.
+	 */
+
+	movl $idt_table,%edi
+	movl $early_idt_handler_array,%eax
+>>>>>>> common/deprecated/android-3.18
 	movl $NUM_EXCEPTION_VECTORS,%ecx
 1:
 	movl %eax,(%edi)
 	movl %eax,4(%edi)
 	/* interrupt gate, dpl=0, present */
 	movl $(0x8E000000 + __KERNEL_CS),2(%edi)
+<<<<<<< HEAD
 	addl $9,%eax
+=======
+	addl $EARLY_IDT_HANDLER_SIZE,%eax
+>>>>>>> common/deprecated/android-3.18
 	addl $8,%edi
 	loop 1b
 
@@ -523,13 +560,18 @@ setup_once:
 	andl $0,setup_once_ref	/* Once is enough, thanks */
 	ret
 
+<<<<<<< HEAD
 ENTRY(early_idt_handlers)
+=======
+ENTRY(early_idt_handler_array)
+>>>>>>> common/deprecated/android-3.18
 	# 36(%esp) %eflags
 	# 32(%esp) %cs
 	# 28(%esp) %eip
 	# 24(%rsp) error code
 	i = 0
 	.rept NUM_EXCEPTION_VECTORS
+<<<<<<< HEAD
 	.if (EXCEPTION_ERRCODE_MASK >> i) & 1
 	ASM_NOP2
 	.else
@@ -543,6 +585,23 @@ ENDPROC(early_idt_handlers)
 	
 	/* This is global to keep gas from relaxing the jumps */
 ENTRY(early_idt_handler)
+=======
+	.ifeq (EXCEPTION_ERRCODE_MASK >> i) & 1
+	pushl $0		# Dummy error code, to make stack frame uniform
+	.endif
+	pushl $i		# 20(%esp) Vector number
+	jmp early_idt_handler_common
+	i = i + 1
+	.fill early_idt_handler_array + i*EARLY_IDT_HANDLER_SIZE - ., 1, 0xcc
+	.endr
+ENDPROC(early_idt_handler_array)
+	
+early_idt_handler_common:
+	/*
+	 * The stack is the hardware frame, an error code or zero, and the
+	 * vector number.
+	 */
+>>>>>>> common/deprecated/android-3.18
 	cld
 
 	cmpl $2,(%esp)		# X86_TRAP_NMI
@@ -561,7 +620,11 @@ ENTRY(early_idt_handler)
 	movl %eax,%ds
 	movl %eax,%es
 
+<<<<<<< HEAD
 	cmpl $(__KERNEL_CS),32(%esp)
+=======
+	cmpw $(__KERNEL_CS),32(%esp)
+>>>>>>> common/deprecated/android-3.18
 	jne 10f
 
 	leal 28(%esp),%eax	# Pointer to %eip
@@ -602,7 +665,11 @@ ex_entry:
 is_nmi:
 	addl $8,%esp		/* drop vector number and error code */
 	iret
+<<<<<<< HEAD
 ENDPROC(early_idt_handler)
+=======
+ENDPROC(early_idt_handler_common)
+>>>>>>> common/deprecated/android-3.18
 
 /* This is the default interrupt "handler" :-) */
 	ALIGN
@@ -659,14 +726,27 @@ __PAGE_ALIGNED_BSS
 initial_pg_pmd:
 	.fill 1024*KPMDS,4,0
 #else
+<<<<<<< HEAD
 ENTRY(initial_page_table)
+=======
+.globl initial_page_table
+initial_page_table:
+>>>>>>> common/deprecated/android-3.18
 	.fill 1024,4,0
 #endif
 initial_pg_fixmap:
 	.fill 1024,4,0
+<<<<<<< HEAD
 ENTRY(empty_zero_page)
 	.fill 4096,1,0
 ENTRY(swapper_pg_dir)
+=======
+.globl empty_zero_page
+empty_zero_page:
+	.fill 4096,1,0
+.globl swapper_pg_dir
+swapper_pg_dir:
+>>>>>>> common/deprecated/android-3.18
 	.fill 1024,4,0
 
 /*

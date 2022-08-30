@@ -165,6 +165,10 @@ struct adis16400_state {
 	int				filt_int;
 
 	struct adis adis;
+<<<<<<< HEAD
+=======
+	unsigned long avail_scan_mask[2];
+>>>>>>> common/deprecated/android-3.18
 };
 
 /* At the moment triggers are only used for ring buffer

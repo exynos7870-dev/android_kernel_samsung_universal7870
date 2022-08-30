@@ -29,6 +29,12 @@ extern int usb_deauthorize_device(struct usb_device *);
 extern int usb_authorize_device(struct usb_device *);
 extern void usb_detect_quirks(struct usb_device *udev);
 extern void usb_detect_interface_quirks(struct usb_device *udev);
+<<<<<<< HEAD
+=======
+extern bool usb_endpoint_is_blacklisted(struct usb_device *udev,
+		struct usb_host_interface *intf,
+		struct usb_endpoint_descriptor *epd);
+>>>>>>> common/deprecated/android-3.18
 extern int usb_remove_device(struct usb_device *udev);
 
 extern int usb_get_device_descriptor(struct usb_device *dev,
@@ -43,7 +49,11 @@ static inline unsigned usb_get_max_power(struct usb_device *udev,
 		struct usb_host_config *c)
 {
 	/* SuperSpeed power is in 8 mA units; others are in 2 mA units */
+<<<<<<< HEAD
 	unsigned mul = (udev->speed == USB_SPEED_SUPER ? 8 : 2);
+=======
+	unsigned mul = (udev->speed >= USB_SPEED_SUPER ? 8 : 2);
+>>>>>>> common/deprecated/android-3.18
 
 	return c->desc.bMaxPower * mul;
 }

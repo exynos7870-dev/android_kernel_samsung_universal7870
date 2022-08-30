@@ -31,6 +31,14 @@
 #include <linux/hyperv.h>
 
 /*
+<<<<<<< HEAD
+=======
+ * Timeout for services such as KVP and fcopy.
+ */
+#define HV_UTIL_TIMEOUT 30
+
+/*
+>>>>>>> common/deprecated/android-3.18
  * The below CPUID leaves are present if VersionAndFeatures.HypervisorPresent
  * is set by CPUID(HVCPUID_VERSION_FEATURES).
  */
@@ -535,7 +543,11 @@ struct hv_ring_buffer_debug_info {
 
 extern int hv_init(void);
 
+<<<<<<< HEAD
 extern void hv_cleanup(void);
+=======
+extern void hv_cleanup(bool crash);
+>>>>>>> common/deprecated/android-3.18
 
 extern int hv_post_message(union hv_connection_id connection_id,
 			 enum hv_message_type message_type,
@@ -678,6 +690,17 @@ int vmbus_set_event(struct vmbus_channel *channel);
 
 void vmbus_on_event(unsigned long data);
 
+<<<<<<< HEAD
+=======
+int hv_kvp_init(struct hv_util_service *);
+void hv_kvp_deinit(void);
+void hv_kvp_onchannelcallback(void *);
+
+int hv_vss_init(struct hv_util_service *);
+void hv_vss_deinit(void);
+void hv_vss_onchannelcallback(void *);
+
+>>>>>>> common/deprecated/android-3.18
 int hv_fcopy_init(struct hv_util_service *);
 void hv_fcopy_deinit(void);
 void hv_fcopy_onchannelcallback(void *);

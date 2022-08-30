@@ -257,7 +257,11 @@ static int FNAME(update_accessed_dirty_bits)(struct kvm_vcpu *vcpu,
 			return ret;
 
 		mark_page_dirty(vcpu->kvm, table_gfn);
+<<<<<<< HEAD
 		walker->ptes[level] = pte;
+=======
+		walker->ptes[level - 1] = pte;
+>>>>>>> common/deprecated/android-3.18
 	}
 	return 0;
 }
@@ -718,6 +722,16 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gva_t addr, u32 error_code,
 					      mmu_is_nested(vcpu));
 		if (likely(r != RET_MMIO_PF_INVALID))
 			return r;
+<<<<<<< HEAD
+=======
+
+		/*
+		 * page fault with PFEC.RSVD  = 1 is caused by shadow
+		 * page fault, should not be used to walk guest page
+		 * table.
+		 */
+		error_code &= ~PFERR_RSVD_MASK;
+>>>>>>> common/deprecated/android-3.18
 	};
 
 	r = mmu_topup_memory_caches(vcpu);

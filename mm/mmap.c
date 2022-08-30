@@ -469,12 +469,25 @@ static void validate_mm(struct mm_struct *mm)
 	struct vm_area_struct *vma = mm->mmap;
 
 	while (vma) {
+<<<<<<< HEAD
 		struct anon_vma_chain *avc;
 
 		vma_lock_anon_vma(vma);
 		list_for_each_entry(avc, &vma->anon_vma_chain, same_vma)
 			anon_vma_interval_tree_verify(avc);
 		vma_unlock_anon_vma(vma);
+=======
+		struct anon_vma *anon_vma = vma->anon_vma;
+		struct anon_vma_chain *avc;
+
+		if (anon_vma) {
+			anon_vma_lock_read(anon_vma);
+			list_for_each_entry(avc, &vma->anon_vma_chain, same_vma)
+				anon_vma_interval_tree_verify(avc);
+			anon_vma_unlock_read(anon_vma);
+		}
+
+>>>>>>> common/deprecated/android-3.18
 		highest_address = vm_end_gap(vma);
 		vma = vma->vm_next;
 		i++;
@@ -1285,6 +1298,38 @@ static inline int mlock_future_check(struct mm_struct *mm,
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+static inline u64 file_mmap_size_max(struct file *file, struct inode *inode)
+{
+	if (S_ISREG(inode->i_mode))
+		return MAX_LFS_FILESIZE;
+
+	if (S_ISBLK(inode->i_mode))
+		return MAX_LFS_FILESIZE;
+
+	/* Special "we do even unsigned file positions" case */
+	if (file->f_mode & FMODE_UNSIGNED_OFFSET)
+		return 0;
+
+	/* Yes, random drivers might want more. But I'm tired of buggy drivers */
+	return ULONG_MAX;
+}
+
+static inline bool file_mmap_ok(struct file *file, struct inode *inode,
+				unsigned long pgoff, unsigned long len)
+{
+	u64 maxsize = file_mmap_size_max(file, inode);
+
+	if (maxsize && len > maxsize)
+		return false;
+	maxsize -= len;
+	if (pgoff > maxsize >> PAGE_SHIFT)
+		return false;
+	return true;
+}
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * The caller must hold down_write(&current->mm->mmap_sem).
  */
@@ -1299,9 +1344,12 @@ unsigned long do_mmap_pgoff(struct file *file, unsigned long addr,
 
 	*populate = 0;
 
+<<<<<<< HEAD
 	while (file && (file->f_mode & FMODE_NONMAPPABLE))
 		file = file->f_op->get_lower_file(file);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Does the application expect PROT_READ to imply PROT_EXEC?
 	 *
@@ -1355,6 +1403,12 @@ unsigned long do_mmap_pgoff(struct file *file, unsigned long addr,
 	if (file) {
 		struct inode *inode = file_inode(file);
 
+<<<<<<< HEAD
+=======
+		if (!file_mmap_ok(file, inode, pgoff, len))
+			return -EOVERFLOW;
+
+>>>>>>> common/deprecated/android-3.18
 		switch (flags & MAP_TYPE) {
 		case MAP_SHARED:
 			if ((prot&PROT_WRITE) && !(file->f_mode&FMODE_WRITE))
@@ -1789,7 +1843,11 @@ check_current:
 		if (gap_start > high_limit)
 			return -ENOMEM;
 		if (gap_end >= low_limit &&
+<<<<<<< HEAD
 			gap_end > gap_start && gap_end - gap_start >= length)
+=======
+		    gap_end > gap_start && gap_end - gap_start >= length)
+>>>>>>> common/deprecated/android-3.18
 			goto found;
 
 		/* Visit right subtree if it looks promising */
@@ -1893,7 +1951,11 @@ check_current:
 		if (gap_end < low_limit)
 			return -ENOMEM;
 		if (gap_start <= high_limit &&
+<<<<<<< HEAD
 			gap_end > gap_start && gap_end - gap_start >= length)
+=======
+		    gap_end > gap_start && gap_end - gap_start >= length)
+>>>>>>> common/deprecated/android-3.18
 			goto found;
 
 		/* Visit left subtree if it looks promising */
@@ -1977,6 +2039,10 @@ arch_get_unmapped_area(struct file *filp, unsigned long addr,
 	info.low_limit = mm->mmap_base;
 	info.high_limit = TASK_SIZE;
 	info.align_mask = 0;
+<<<<<<< HEAD
+=======
+	info.align_offset = 0;
+>>>>>>> common/deprecated/android-3.18
 	return vm_unmapped_area(&info);
 }
 #endif
@@ -2018,6 +2084,10 @@ arch_get_unmapped_area_topdown(struct file *filp, const unsigned long addr0,
 	info.low_limit = max(PAGE_SIZE, mmap_min_addr);
 	info.high_limit = mm->mmap_base;
 	info.align_mask = 0;
+<<<<<<< HEAD
+=======
+	info.align_offset = 0;
+>>>>>>> common/deprecated/android-3.18
 	addr = vm_unmapped_area(&info);
 
 	/*
@@ -2136,7 +2206,11 @@ find_vma_prev(struct mm_struct *mm, unsigned long addr,
  * grow-up and grow-down cases.
  */
 static int acct_stack_growth(struct vm_area_struct *vma,
+<<<<<<< HEAD
 			    unsigned long size, unsigned long grow)
+=======
+			     unsigned long size, unsigned long grow)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct mm_struct *mm = vma->vm_mm;
 	struct rlimit *rlim = current->signal->rlim;
@@ -2190,11 +2264,16 @@ int expand_upwards(struct vm_area_struct *vma, unsigned long address)
 {
 	struct vm_area_struct *next;
 	unsigned long gap_addr;
+<<<<<<< HEAD
         int error = 0;
+=======
+	int error = 0;
+>>>>>>> common/deprecated/android-3.18
 
 	if (!(vma->vm_flags & VM_GROWSUP))
 		return -EFAULT;
 
+<<<<<<< HEAD
 	/* Guard against wrapping around to address 0. */
 	address &= PAGE_MASK;
 	address += PAGE_SIZE;
@@ -2209,19 +2288,47 @@ int expand_upwards(struct vm_area_struct *vma, unsigned long address)
 	if (next && next->vm_start < gap_addr) {
 		if (!(next->vm_flags & VM_GROWSUP))
 		return -ENOMEM;
+=======
+	/* Guard against exceeding limits of the address space. */
+	address &= PAGE_MASK;
+	if (address >= (TASK_SIZE & PAGE_MASK))
+		return -ENOMEM;
+	address += PAGE_SIZE;
+
+	/* Enforce stack_guard_gap */
+	gap_addr = address + stack_guard_gap;
+
+	/* Guard against overflow */
+	if (gap_addr < address || gap_addr > TASK_SIZE)
+		gap_addr = TASK_SIZE;
+
+	next = vma->vm_next;
+	if (next && next->vm_start < gap_addr &&
+			(next->vm_flags & (VM_WRITE|VM_READ|VM_EXEC))) {
+		if (!(next->vm_flags & VM_GROWSUP))
+			return -ENOMEM;
+>>>>>>> common/deprecated/android-3.18
 		/* Check that both stack segments have the same anon_vma? */
 	}
 
 	/* We must make sure the anon_vma is allocated. */
 	if (unlikely(anon_vma_prepare(vma)))
 		return -ENOMEM;
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * vma->vm_start/vm_end cannot change under us because the caller
 	 * is required to hold the mmap_sem in read mode.  We need the
 	 * anon_vma lock to serialize against concurrent expand_stacks.
 	 */
+<<<<<<< HEAD
 	vma_lock_anon_vma(vma);
+=======
+	anon_vma_lock_write(vma->anon_vma);
+>>>>>>> common/deprecated/android-3.18
 
 	/* Somebody else might have raced and expanded it already */
 	if (address > vma->vm_end) {
@@ -2239,7 +2346,11 @@ int expand_upwards(struct vm_area_struct *vma, unsigned long address)
 				 * updates, but we only hold a shared mmap_sem
 				 * lock here, so we need to protect against
 				 * concurrent vma expansions.
+<<<<<<< HEAD
 				 * vma_lock_anon_vma() doesn't help here, as
+=======
+				 * anon_vma_lock_write() doesn't help here, as
+>>>>>>> common/deprecated/android-3.18
 				 * we don't guarantee that all growable vmas
 				 * in a mm share the same root anon vma.
 				 * So, we reuse mm->page_table_lock to guard
@@ -2259,7 +2370,11 @@ int expand_upwards(struct vm_area_struct *vma, unsigned long address)
 			}
 		}
 	}
+<<<<<<< HEAD
 	vma_unlock_anon_vma(vma);
+=======
+	anon_vma_unlock_write(vma->anon_vma);
+>>>>>>> common/deprecated/android-3.18
 	khugepaged_enter_vma_merge(vma, vma->vm_flags);
 	validate_mm(vma->vm_mm);
 	return error;
@@ -2273,6 +2388,7 @@ int expand_downwards(struct vm_area_struct *vma,
 				   unsigned long address)
 {
 	struct vm_area_struct *prev;
+<<<<<<< HEAD
 	unsigned long gap_addr;	
 	int error;
 
@@ -2280,13 +2396,26 @@ int expand_downwards(struct vm_area_struct *vma,
 	error = security_mmap_addr(address);
 	if (error)
 		return error;
+=======
+	unsigned long gap_addr;
+	int error = 0;
+
+	address &= PAGE_MASK;
+	if (address < mmap_min_addr)
+		return -EPERM;
+>>>>>>> common/deprecated/android-3.18
 
 	/* Enforce stack_guard_gap */
 	gap_addr = address - stack_guard_gap;
 	if (gap_addr > address)
 		return -ENOMEM;
 	prev = vma->vm_prev;
+<<<<<<< HEAD
 	if (prev && prev->vm_end > gap_addr) {
+=======
+	if (prev && prev->vm_end > gap_addr &&
+			(prev->vm_flags & (VM_WRITE|VM_READ|VM_EXEC))) {
+>>>>>>> common/deprecated/android-3.18
 		if (!(prev->vm_flags & VM_GROWSDOWN))
 			return -ENOMEM;
 		/* Check that both stack segments have the same anon_vma? */
@@ -2301,7 +2430,11 @@ int expand_downwards(struct vm_area_struct *vma,
 	 * is required to hold the mmap_sem in read mode.  We need the
 	 * anon_vma lock to serialize against concurrent expand_stacks.
 	 */
+<<<<<<< HEAD
 	vma_lock_anon_vma(vma);
+=======
+	anon_vma_lock_write(vma->anon_vma);
+>>>>>>> common/deprecated/android-3.18
 
 	/* Somebody else might have raced and expanded it already */
 	if (address < vma->vm_start) {
@@ -2319,7 +2452,11 @@ int expand_downwards(struct vm_area_struct *vma,
 				 * updates, but we only hold a shared mmap_sem
 				 * lock here, so we need to protect against
 				 * concurrent vma expansions.
+<<<<<<< HEAD
 				 * vma_lock_anon_vma() doesn't help here, as
+=======
+				 * anon_vma_lock_write() doesn't help here, as
+>>>>>>> common/deprecated/android-3.18
 				 * we don't guarantee that all growable vmas
 				 * in a mm share the same root anon vma.
 				 * So, we reuse mm->page_table_lock to guard
@@ -2337,7 +2474,11 @@ int expand_downwards(struct vm_area_struct *vma,
 			}
 		}
 	}
+<<<<<<< HEAD
 	vma_unlock_anon_vma(vma);
+=======
+	anon_vma_unlock_write(vma->anon_vma);
+>>>>>>> common/deprecated/android-3.18
 	khugepaged_enter_vma_merge(vma, vma->vm_flags);
 	validate_mm(vma->vm_mm);
 	return error;
@@ -2653,6 +2794,10 @@ int do_munmap(struct mm_struct *mm, unsigned long start, size_t len)
 
 	return 0;
 }
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL(do_munmap);
+>>>>>>> common/deprecated/android-3.18
 
 int vm_munmap(unsigned long start, size_t len)
 {
@@ -2696,10 +2841,13 @@ static unsigned long do_brk(unsigned long addr, unsigned long len)
 	pgoff_t pgoff = addr >> PAGE_SHIFT;
 	int error;
 
+<<<<<<< HEAD
 	len = PAGE_ALIGN(len);
 	if (!len)
 		return addr;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	flags = VM_DATA_DEFAULT_FLAGS | VM_ACCOUNT | mm->def_flags;
 
 	error = get_unmapped_area(NULL, addr, len, 0, MAP_FIXED);
@@ -2768,12 +2916,28 @@ out:
 	return addr;
 }
 
+<<<<<<< HEAD
 unsigned long vm_brk(unsigned long addr, unsigned long len)
 {
 	struct mm_struct *mm = current->mm;
 	unsigned long ret;
 	bool populate;
 
+=======
+unsigned long vm_brk(unsigned long addr, unsigned long request)
+{
+	struct mm_struct *mm = current->mm;
+	unsigned long len;
+	unsigned long ret;
+	bool populate;
+
+	len = PAGE_ALIGN(request);
+	if (len < request)
+		return -ENOMEM;
+	if (!len)
+		return addr;
+
+>>>>>>> common/deprecated/android-3.18
 	down_write(&mm->mmap_sem);
 	ret = do_brk(addr, len);
 	populate = ((mm->def_flags & VM_LOCKED) != 0);
@@ -2827,6 +2991,10 @@ void exit_mmap(struct mm_struct *mm)
 		if (vma->vm_flags & VM_ACCOUNT)
 			nr_accounted += vma_pages(vma);
 		vma = remove_vma(vma);
+<<<<<<< HEAD
+=======
+		cond_resched();
+>>>>>>> common/deprecated/android-3.18
 	}
 	vm_unacct_memory(nr_accounted);
 

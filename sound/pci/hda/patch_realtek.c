@@ -29,6 +29,10 @@
 #include <linux/pci.h>
 #include <linux/dmi.h>
 #include <linux/module.h>
+<<<<<<< HEAD
+=======
+#include <linux/input.h>
+>>>>>>> common/deprecated/android-3.18
 #include <sound/core.h>
 #include <sound/jack.h>
 #include "hda_codec.h"
@@ -96,6 +100,11 @@ struct alc_spec {
 	hda_nid_t cap_mute_led_nid;
 
 	unsigned int gpio_led; /* used for alc269_fixup_hp_gpio_led() */
+<<<<<<< HEAD
+=======
+	unsigned int gpio_mute_led_mask;
+	unsigned int gpio_mic_led_mask;
+>>>>>>> common/deprecated/android-3.18
 
 	hda_nid_t headset_mic_pin;
 	hda_nid_t headphone_mic_pin;
@@ -118,6 +127,12 @@ struct alc_spec {
 	hda_nid_t pll_nid;
 	unsigned int pll_coef_idx, pll_coef_bit;
 	unsigned int coef0;
+<<<<<<< HEAD
+=======
+#if IS_ENABLED(CONFIG_INPUT)
+	struct input_dev *kb_dev;
+#endif
+>>>>>>> common/deprecated/android-3.18
 };
 
 /*
@@ -317,20 +332,49 @@ static void alc_fill_eapd_coef(struct hda_codec *codec)
 	case 0x10ec0292:
 		alc_update_coef_idx(codec, 0x4, 1<<15, 0);
 		break;
+<<<<<<< HEAD
 	case 0x10ec0233:
 	case 0x10ec0255:
 	case 0x10ec0256:
+=======
+	case 0x10ec0225:
+	case 0x10ec0233:
+	case 0x10ec0235:
+	case 0x10ec0255:
+>>>>>>> common/deprecated/android-3.18
 	case 0x10ec0282:
 	case 0x10ec0283:
 	case 0x10ec0286:
 	case 0x10ec0288:
+<<<<<<< HEAD
 	case 0x10ec0298:
+=======
+	case 0x10ec0295:
+	case 0x10ec0298:
+	case 0x10ec0299:
+		alc_update_coef_idx(codec, 0x10, 1<<9, 0);
+		break;
+	case 0x10ec0236:
+	case 0x10ec0256:
+		alc_write_coef_idx(codec, 0x36, 0x5757);
+>>>>>>> common/deprecated/android-3.18
 		alc_update_coef_idx(codec, 0x10, 1<<9, 0);
 		break;
 	case 0x10ec0285:
 	case 0x10ec0293:
 		alc_update_coef_idx(codec, 0xa, 1<<13, 0);
 		break;
+<<<<<<< HEAD
+=======
+	case 0x10ec0234:
+	case 0x10ec0274:
+	case 0x10ec0294:
+	case 0x10ec0700:
+	case 0x10ec0701:
+	case 0x10ec0703:
+		alc_update_coef_idx(codec, 0x10, 1<<15, 0);
+		break;
+>>>>>>> common/deprecated/android-3.18
 	case 0x10ec0662:
 		if ((coef & 0x00f0) == 0x0030)
 			alc_update_coef_idx(codec, 0x4, 1<<10, 0); /* EAPD Ctrl */
@@ -355,6 +399,10 @@ static void alc_fill_eapd_coef(struct hda_codec *codec)
 			alc_update_coef_idx(codec, 0x7, 1<<5, 0);
 		break;
 	case 0x10ec0892:
+<<<<<<< HEAD
+=======
+	case 0x10ec0897:
+>>>>>>> common/deprecated/android-3.18
 		alc_update_coef_idx(codec, 0x7, 1<<5, 0);
 		break;
 	case 0x10ec0899:
@@ -749,10 +797,18 @@ static int alc_init(struct hda_codec *codec)
 	if (spec->init_hook)
 		spec->init_hook(codec);
 
+<<<<<<< HEAD
 	alc_fix_pll(codec);
 	alc_auto_init_amp(codec, spec->init_amp);
 
 	snd_hda_gen_init(codec);
+=======
+	spec->gen.skip_verbs = 1; /* applied in below */
+	snd_hda_gen_init(codec);
+	alc_fix_pll(codec);
+	alc_auto_init_amp(codec, spec->init_amp);
+	snd_hda_apply_verbs(codec); /* apply verbs here after own init */
+>>>>>>> common/deprecated/android-3.18
 
 	snd_hda_apply_fixup(codec, HDA_FIXUP_ACT_INIT);
 
@@ -880,6 +936,15 @@ static struct alc_codec_rename_pci_table rename_pci_tbl[] = {
 	{ 0x10ec0668, 0x1028, 0, "ALC3661" },
 	{ 0x10ec0275, 0x1028, 0, "ALC3260" },
 	{ 0x10ec0899, 0x1028, 0, "ALC3861" },
+<<<<<<< HEAD
+=======
+	{ 0x10ec0298, 0x1028, 0, "ALC3266" },
+	{ 0x10ec0236, 0x1028, 0, "ALC3204" },
+	{ 0x10ec0256, 0x1028, 0, "ALC3246" },
+	{ 0x10ec0225, 0x1028, 0, "ALC3253" },
+	{ 0x10ec0295, 0x1028, 0, "ALC3254" },
+	{ 0x10ec0299, 0x1028, 0, "ALC3271" },
+>>>>>>> common/deprecated/android-3.18
 	{ 0x10ec0670, 0x1025, 0, "ALC669X" },
 	{ 0x10ec0676, 0x1025, 0, "ALC679X" },
 	{ 0x10ec0282, 0x1043, 0, "ALC3229" },
@@ -1129,7 +1194,11 @@ static const struct hda_fixup alc880_fixups[] = {
 		/* override all pins as BIOS on old Amilo is broken */
 		.type = HDA_FIXUP_PINS,
 		.v.pins = (const struct hda_pintbl[]) {
+<<<<<<< HEAD
 			{ 0x14, 0x0121411f }, /* HP */
+=======
+			{ 0x14, 0x0121401f }, /* HP */
+>>>>>>> common/deprecated/android-3.18
 			{ 0x15, 0x99030120 }, /* speaker */
 			{ 0x16, 0x99030130 }, /* bass speaker */
 			{ 0x17, 0x411111f0 }, /* N/A */
@@ -1149,7 +1218,11 @@ static const struct hda_fixup alc880_fixups[] = {
 		/* almost compatible with FUJITSU, but no bass and SPDIF */
 		.type = HDA_FIXUP_PINS,
 		.v.pins = (const struct hda_pintbl[]) {
+<<<<<<< HEAD
 			{ 0x14, 0x0121411f }, /* HP */
+=======
+			{ 0x14, 0x0121401f }, /* HP */
+>>>>>>> common/deprecated/android-3.18
 			{ 0x15, 0x99030120 }, /* speaker */
 			{ 0x16, 0x411111f0 }, /* N/A */
 			{ 0x17, 0x411111f0 }, /* N/A */
@@ -1358,7 +1431,11 @@ static const struct snd_pci_quirk alc880_fixup_tbl[] = {
 	SND_PCI_QUIRK(0x161f, 0x203d, "W810", ALC880_FIXUP_W810),
 	SND_PCI_QUIRK(0x161f, 0x205d, "Medion Rim 2150", ALC880_FIXUP_MEDION_RIM),
 	SND_PCI_QUIRK(0x1631, 0xe011, "PB 13201056", ALC880_FIXUP_6ST_AUTOMUTE),
+<<<<<<< HEAD
 	SND_PCI_QUIRK(0x1734, 0x107c, "FSC F1734", ALC880_FIXUP_F1734),
+=======
+	SND_PCI_QUIRK(0x1734, 0x107c, "FSC Amilo M1437", ALC880_FIXUP_FUJITSU),
+>>>>>>> common/deprecated/android-3.18
 	SND_PCI_QUIRK(0x1734, 0x1094, "FSC Amilo M1451G", ALC880_FIXUP_FUJITSU),
 	SND_PCI_QUIRK(0x1734, 0x10ac, "FSC AMILO Xi 1526", ALC880_FIXUP_F1734),
 	SND_PCI_QUIRK(0x1734, 0x10b0, "FSC Amilo Pi1556", ALC880_FIXUP_FUJITSU),
@@ -2163,6 +2240,10 @@ static const struct hda_fixup alc882_fixups[] = {
 static const struct snd_pci_quirk alc882_fixup_tbl[] = {
 	SND_PCI_QUIRK(0x1025, 0x006c, "Acer Aspire 9810", ALC883_FIXUP_ACER_EAPD),
 	SND_PCI_QUIRK(0x1025, 0x0090, "Acer Aspire", ALC883_FIXUP_ACER_EAPD),
+<<<<<<< HEAD
+=======
+	SND_PCI_QUIRK(0x1025, 0x0107, "Acer Aspire", ALC883_FIXUP_ACER_EAPD),
+>>>>>>> common/deprecated/android-3.18
 	SND_PCI_QUIRK(0x1025, 0x010a, "Acer Ferrari 5000", ALC883_FIXUP_ACER_EAPD),
 	SND_PCI_QUIRK(0x1025, 0x0110, "Acer Aspire", ALC883_FIXUP_ACER_EAPD),
 	SND_PCI_QUIRK(0x1025, 0x0112, "Acer Aspire 9303", ALC883_FIXUP_ACER_EAPD),
@@ -2175,13 +2256,22 @@ static const struct snd_pci_quirk alc882_fixup_tbl[] = {
 		      ALC882_FIXUP_ACER_ASPIRE_8930G),
 	SND_PCI_QUIRK(0x1025, 0x0146, "Acer Aspire 6935G",
 		      ALC882_FIXUP_ACER_ASPIRE_8930G),
+<<<<<<< HEAD
+=======
+	SND_PCI_QUIRK(0x1025, 0x0142, "Acer Aspire 7730G",
+		      ALC882_FIXUP_ACER_ASPIRE_4930G),
+	SND_PCI_QUIRK(0x1025, 0x0155, "Packard-Bell M5120", ALC882_FIXUP_PB_M5210),
+>>>>>>> common/deprecated/android-3.18
 	SND_PCI_QUIRK(0x1025, 0x015e, "Acer Aspire 6930G",
 		      ALC882_FIXUP_ACER_ASPIRE_4930G),
 	SND_PCI_QUIRK(0x1025, 0x0166, "Acer Aspire 6530G",
 		      ALC882_FIXUP_ACER_ASPIRE_4930G),
+<<<<<<< HEAD
 	SND_PCI_QUIRK(0x1025, 0x0142, "Acer Aspire 7730G",
 		      ALC882_FIXUP_ACER_ASPIRE_4930G),
 	SND_PCI_QUIRK(0x1025, 0x0155, "Packard-Bell M5120", ALC882_FIXUP_PB_M5210),
+=======
+>>>>>>> common/deprecated/android-3.18
 	SND_PCI_QUIRK(0x1025, 0x021e, "Acer Aspire 5739G",
 		      ALC882_FIXUP_ACER_ASPIRE_4930G),
 	SND_PCI_QUIRK(0x1025, 0x0259, "Acer Aspire 5935", ALC889_FIXUP_DAC_ROUTE),
@@ -2192,9 +2282,18 @@ static const struct snd_pci_quirk alc882_fixup_tbl[] = {
 	SND_PCI_QUIRK(0x1043, 0x1971, "Asus W2JC", ALC882_FIXUP_ASUS_W2JC),
 	SND_PCI_QUIRK(0x1043, 0x835f, "Asus Eee 1601", ALC888_FIXUP_EEE1601),
 	SND_PCI_QUIRK(0x1043, 0x84bc, "ASUS ET2700", ALC887_FIXUP_ASUS_BASS),
+<<<<<<< HEAD
 	SND_PCI_QUIRK(0x104d, 0x9047, "Sony Vaio TT", ALC889_FIXUP_VAIO_TT),
 	SND_PCI_QUIRK(0x104d, 0x905a, "Sony Vaio Z", ALC882_FIXUP_NO_PRIMARY_HP),
 	SND_PCI_QUIRK(0x104d, 0x9043, "Sony Vaio VGC-LN51JGB", ALC882_FIXUP_NO_PRIMARY_HP),
+=======
+	SND_PCI_QUIRK(0x1043, 0x8691, "ASUS ROG Ranger VIII", ALC882_FIXUP_GPIO3),
+	SND_PCI_QUIRK(0x104d, 0x9043, "Sony Vaio VGC-LN51JGB", ALC882_FIXUP_NO_PRIMARY_HP),
+	SND_PCI_QUIRK(0x104d, 0x9044, "Sony VAIO AiO", ALC882_FIXUP_NO_PRIMARY_HP),
+	SND_PCI_QUIRK(0x104d, 0x9047, "Sony Vaio TT", ALC889_FIXUP_VAIO_TT),
+	SND_PCI_QUIRK(0x104d, 0x905a, "Sony Vaio Z", ALC882_FIXUP_NO_PRIMARY_HP),
+	SND_PCI_QUIRK(0x104d, 0x9060, "Sony Vaio VPCL14M1R", ALC882_FIXUP_NO_PRIMARY_HP),
+>>>>>>> common/deprecated/android-3.18
 
 	/* All Apple entries are in codec SSIDs */
 	SND_PCI_QUIRK(0x106b, 0x00a0, "MacBookPro 3,1", ALC889_FIXUP_MBP_VREF),
@@ -2218,7 +2317,11 @@ static const struct snd_pci_quirk alc882_fixup_tbl[] = {
 	SND_PCI_QUIRK(0x106b, 0x4300, "iMac 9,1", ALC889_FIXUP_IMAC91_VREF),
 	SND_PCI_QUIRK(0x106b, 0x4600, "MacbookPro 5,2", ALC889_FIXUP_IMAC91_VREF),
 	SND_PCI_QUIRK(0x106b, 0x4900, "iMac 9,1 Aluminum", ALC889_FIXUP_IMAC91_VREF),
+<<<<<<< HEAD
 	SND_PCI_QUIRK(0x106b, 0x4a00, "Macbook 5,2", ALC889_FIXUP_IMAC91_VREF),
+=======
+	SND_PCI_QUIRK(0x106b, 0x4a00, "Macbook 5,2", ALC889_FIXUP_MBA11_VREF),
+>>>>>>> common/deprecated/android-3.18
 
 	SND_PCI_QUIRK(0x1071, 0x8258, "Evesham Voyaeger", ALC882_FIXUP_EAPD),
 	SND_PCI_QUIRK(0x1462, 0x7350, "MSI-7350", ALC889_FIXUP_CD),
@@ -2403,6 +2506,10 @@ static const struct snd_pci_quirk alc262_fixup_tbl[] = {
 	SND_PCI_QUIRK(0x10cf, 0x1397, "Fujitsu Lifebook S7110", ALC262_FIXUP_FSC_S7110),
 	SND_PCI_QUIRK(0x10cf, 0x142d, "Fujitsu Lifebook E8410", ALC262_FIXUP_BENQ),
 	SND_PCI_QUIRK(0x10f1, 0x2915, "Tyan Thunder n6650W", ALC262_FIXUP_TYAN),
+<<<<<<< HEAD
+=======
+	SND_PCI_QUIRK(0x1734, 0x1141, "FSC ESPRIMO U9210", ALC262_FIXUP_FSC_H270),
+>>>>>>> common/deprecated/android-3.18
 	SND_PCI_QUIRK(0x1734, 0x1147, "FSC Celsius H270", ALC262_FIXUP_FSC_H270),
 	SND_PCI_QUIRK(0x17aa, 0x384e, "Lenovo 3000", ALC262_FIXUP_LENOVO_3000),
 	SND_PCI_QUIRK(0x17ff, 0x0560, "Benq ED8", ALC262_FIXUP_BENQ),
@@ -2662,6 +2769,12 @@ enum {
 	ALC269_TYPE_ALC298,
 	ALC269_TYPE_ALC255,
 	ALC269_TYPE_ALC256,
+<<<<<<< HEAD
+=======
+	ALC269_TYPE_ALC225,
+	ALC269_TYPE_ALC294,
+	ALC269_TYPE_ALC700,
+>>>>>>> common/deprecated/android-3.18
 };
 
 /*
@@ -2691,6 +2804,12 @@ static int alc269_parse_auto_config(struct hda_codec *codec)
 	case ALC269_TYPE_ALC298:
 	case ALC269_TYPE_ALC255:
 	case ALC269_TYPE_ALC256:
+<<<<<<< HEAD
+=======
+	case ALC269_TYPE_ALC225:
+	case ALC269_TYPE_ALC294:
+	case ALC269_TYPE_ALC700:
+>>>>>>> common/deprecated/android-3.18
 		ssids = alc269_ssids;
 		break;
 	default:
@@ -3125,6 +3244,22 @@ static void alc269_fixup_pincfg_no_hp_to_lineout(struct hda_codec *codec,
 		spec->parse_flags = HDA_PINCFG_NO_HP_FIXUP;
 }
 
+<<<<<<< HEAD
+=======
+static void alc269_fixup_pincfg_U7x7_headset_mic(struct hda_codec *codec,
+						 const struct hda_fixup *fix,
+						 int action)
+{
+	unsigned int cfg_headphone = snd_hda_codec_get_pincfg(codec, 0x21);
+	unsigned int cfg_headset_mic = snd_hda_codec_get_pincfg(codec, 0x19);
+
+	if (cfg_headphone && cfg_headset_mic == 0x411111f0)
+		snd_hda_codec_set_pincfg(codec, 0x19,
+			(cfg_headphone & ~AC_DEFCFG_DEVICE) |
+			(AC_JACK_MIC_IN << AC_DEFCFG_DEVICE_SHIFT));
+}
+
+>>>>>>> common/deprecated/android-3.18
 static void alc269_fixup_hweq(struct hda_codec *codec,
 			       const struct hda_fixup *fix, int action)
 {
@@ -3318,6 +3453,7 @@ static void alc269_fixup_hp_mute_led_mic2(struct hda_codec *codec,
 	}
 }
 
+<<<<<<< HEAD
 /* turn on/off mute LED per vmaster hook */
 static void alc269_fixup_hp_gpio_mute_hook(void *private_data, int enabled)
 {
@@ -3329,11 +3465,28 @@ static void alc269_fixup_hp_gpio_mute_hook(void *private_data, int enabled)
 		spec->gpio_led &= ~0x08;
 	else
 		spec->gpio_led |= 0x08;
+=======
+/* update LED status via GPIO */
+static void alc_update_gpio_led(struct hda_codec *codec, unsigned int mask,
+				bool enabled)
+{
+	struct alc_spec *spec = codec->spec;
+	unsigned int oldval = spec->gpio_led;
+
+	if (spec->mute_led_polarity)
+		enabled = !enabled;
+
+	if (enabled)
+		spec->gpio_led &= ~mask;
+	else
+		spec->gpio_led |= mask;
+>>>>>>> common/deprecated/android-3.18
 	if (spec->gpio_led != oldval)
 		snd_hda_codec_write(codec, 0x01, 0, AC_VERB_SET_GPIO_DATA,
 				    spec->gpio_led);
 }
 
+<<<<<<< HEAD
 /* turn on/off mic-mute LED per capture hook */
 static void alc269_fixup_hp_gpio_mic_mute_hook(struct hda_codec *codec,
 					       struct snd_kcontrol *kcontrol,
@@ -3353,6 +3506,28 @@ static void alc269_fixup_hp_gpio_mic_mute_hook(struct hda_codec *codec,
 	if (spec->gpio_led != oldval)
 		snd_hda_codec_write(codec, 0x01, 0, AC_VERB_SET_GPIO_DATA,
 				    spec->gpio_led);
+=======
+/* turn on/off mute LED via GPIO per vmaster hook */
+static void alc_fixup_gpio_mute_hook(void *private_data, int enabled)
+{
+	struct hda_codec *codec = private_data;
+	struct alc_spec *spec = codec->spec;
+
+	alc_update_gpio_led(codec, spec->gpio_mute_led_mask, enabled);
+}
+
+/* turn on/off mic-mute LED via GPIO per capture hook */
+static void alc_fixup_gpio_mic_mute_hook(struct hda_codec *codec,
+					 struct snd_kcontrol *kcontrol,
+					 struct snd_ctl_elem_value *ucontrol)
+{
+	struct alc_spec *spec = codec->spec;
+
+	if (ucontrol)
+		alc_update_gpio_led(codec, spec->gpio_mic_led_mask,
+				    ucontrol->value.integer.value[0] ||
+				    ucontrol->value.integer.value[1]);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void alc269_fixup_hp_gpio_led(struct hda_codec *codec,
@@ -3366,9 +3541,39 @@ static void alc269_fixup_hp_gpio_led(struct hda_codec *codec,
 	};
 
 	if (action == HDA_FIXUP_ACT_PRE_PROBE) {
+<<<<<<< HEAD
 		spec->gen.vmaster_mute.hook = alc269_fixup_hp_gpio_mute_hook;
 		spec->gen.cap_sync_hook = alc269_fixup_hp_gpio_mic_mute_hook;
 		spec->gpio_led = 0;
+=======
+		spec->gen.vmaster_mute.hook = alc_fixup_gpio_mute_hook;
+		spec->gen.cap_sync_hook = alc_fixup_gpio_mic_mute_hook;
+		spec->gpio_led = 0;
+		spec->mute_led_polarity = 0;
+		spec->gpio_mute_led_mask = 0x08;
+		spec->gpio_mic_led_mask = 0x10;
+		snd_hda_add_verbs(codec, gpio_init);
+	}
+}
+
+static void alc286_fixup_hp_gpio_led(struct hda_codec *codec,
+				const struct hda_fixup *fix, int action)
+{
+	struct alc_spec *spec = codec->spec;
+	static const struct hda_verb gpio_init[] = {
+		{ 0x01, AC_VERB_SET_GPIO_MASK, 0x22 },
+		{ 0x01, AC_VERB_SET_GPIO_DIRECTION, 0x22 },
+		{}
+	};
+
+	if (action == HDA_FIXUP_ACT_PRE_PROBE) {
+		spec->gen.vmaster_mute.hook = alc_fixup_gpio_mute_hook;
+		spec->gen.cap_sync_hook = alc_fixup_gpio_mic_mute_hook;
+		spec->gpio_led = 0;
+		spec->mute_led_polarity = 0;
+		spec->gpio_mute_led_mask = 0x02;
+		spec->gpio_mic_led_mask = 0x20;
+>>>>>>> common/deprecated/android-3.18
 		snd_hda_add_verbs(codec, gpio_init);
 	}
 }
@@ -3410,9 +3615,17 @@ static void alc269_fixup_hp_gpio_mic1_led(struct hda_codec *codec,
 	};
 
 	if (action == HDA_FIXUP_ACT_PRE_PROBE) {
+<<<<<<< HEAD
 		spec->gen.vmaster_mute.hook = alc269_fixup_hp_gpio_mute_hook;
 		spec->gen.cap_sync_hook = alc269_fixup_hp_cap_mic_mute_hook;
 		spec->gpio_led = 0;
+=======
+		spec->gen.vmaster_mute.hook = alc_fixup_gpio_mute_hook;
+		spec->gen.cap_sync_hook = alc269_fixup_hp_cap_mic_mute_hook;
+		spec->gpio_led = 0;
+		spec->mute_led_polarity = 0;
+		spec->gpio_mute_led_mask = 0x08;
+>>>>>>> common/deprecated/android-3.18
 		spec->cap_mute_led_nid = 0x18;
 		snd_hda_add_verbs(codec, gpio_init);
 		codec->power_filter = led_power_filter;
@@ -3431,15 +3644,156 @@ static void alc280_fixup_hp_gpio4(struct hda_codec *codec,
 	};
 
 	if (action == HDA_FIXUP_ACT_PRE_PROBE) {
+<<<<<<< HEAD
 		spec->gen.vmaster_mute.hook = alc269_fixup_hp_gpio_mute_hook;
 		spec->gen.cap_sync_hook = alc269_fixup_hp_cap_mic_mute_hook;
 		spec->gpio_led = 0;
+=======
+		spec->gen.vmaster_mute.hook = alc_fixup_gpio_mute_hook;
+		spec->gen.cap_sync_hook = alc269_fixup_hp_cap_mic_mute_hook;
+		spec->gpio_led = 0;
+		spec->mute_led_polarity = 0;
+		spec->gpio_mute_led_mask = 0x08;
+>>>>>>> common/deprecated/android-3.18
 		spec->cap_mute_led_nid = 0x18;
 		snd_hda_add_verbs(codec, gpio_init);
 		codec->power_filter = led_power_filter;
 	}
 }
 
+<<<<<<< HEAD
+=======
+#if IS_ENABLED(CONFIG_INPUT)
+static void gpio2_mic_hotkey_event(struct hda_codec *codec,
+				   struct hda_jack_callback *event)
+{
+	struct alc_spec *spec = codec->spec;
+
+	/* GPIO2 just toggles on a keypress/keyrelease cycle. Therefore
+	   send both key on and key off event for every interrupt. */
+	input_report_key(spec->kb_dev, KEY_MICMUTE, 1);
+	input_sync(spec->kb_dev);
+	input_report_key(spec->kb_dev, KEY_MICMUTE, 0);
+	input_sync(spec->kb_dev);
+}
+#endif
+
+static int alc_register_micmute_input_device(struct hda_codec *codec)
+{
+	struct alc_spec *spec = codec->spec;
+
+	spec->kb_dev = input_allocate_device();
+	if (!spec->kb_dev) {
+		codec_err(codec, "Out of memory (input_allocate_device)\n");
+		return -ENOMEM;
+	}
+	spec->kb_dev->name = "Microphone Mute Button";
+	spec->kb_dev->evbit[0] = BIT_MASK(EV_KEY);
+	spec->kb_dev->keybit[BIT_WORD(KEY_MICMUTE)] = BIT_MASK(KEY_MICMUTE);
+
+	if (input_register_device(spec->kb_dev)) {
+		codec_err(codec, "input_register_device failed\n");
+		input_free_device(spec->kb_dev);
+		spec->kb_dev = NULL;
+		return -ENOMEM;
+	}
+
+	return 0;
+}
+
+static void alc280_fixup_hp_gpio2_mic_hotkey(struct hda_codec *codec,
+					     const struct hda_fixup *fix, int action)
+{
+#if IS_ENABLED(CONFIG_INPUT)
+	/* GPIO1 = set according to SKU external amp
+	   GPIO2 = mic mute hotkey
+	   GPIO3 = mute LED
+	   GPIO4 = mic mute LED */
+	static const struct hda_verb gpio_init[] = {
+		{ 0x01, AC_VERB_SET_GPIO_MASK, 0x1e },
+		{ 0x01, AC_VERB_SET_GPIO_DIRECTION, 0x1a },
+		{ 0x01, AC_VERB_SET_GPIO_DATA, 0x02 },
+		{}
+	};
+
+	struct alc_spec *spec = codec->spec;
+
+	if (action == HDA_FIXUP_ACT_PRE_PROBE) {
+		if (alc_register_micmute_input_device(codec) != 0)
+			return;
+
+		snd_hda_add_verbs(codec, gpio_init);
+		snd_hda_codec_write_cache(codec, codec->afg, 0,
+					  AC_VERB_SET_GPIO_UNSOLICITED_RSP_MASK, 0x04);
+		snd_hda_jack_detect_enable_callback(codec, codec->afg,
+						    gpio2_mic_hotkey_event);
+
+		spec->gen.vmaster_mute.hook = alc_fixup_gpio_mute_hook;
+		spec->gen.cap_sync_hook = alc_fixup_gpio_mic_mute_hook;
+		spec->gpio_led = 0;
+		spec->mute_led_polarity = 0;
+		spec->gpio_mute_led_mask = 0x08;
+		spec->gpio_mic_led_mask = 0x10;
+		return;
+	}
+
+	if (!spec->kb_dev)
+		return;
+
+	switch (action) {
+	case HDA_FIXUP_ACT_PROBE:
+		spec->init_amp = ALC_INIT_DEFAULT;
+		break;
+	case HDA_FIXUP_ACT_FREE:
+		input_unregister_device(spec->kb_dev);
+		input_free_device(spec->kb_dev);
+		spec->kb_dev = NULL;
+	}
+#endif
+}
+
+static void alc233_fixup_lenovo_line2_mic_hotkey(struct hda_codec *codec,
+					     const struct hda_fixup *fix, int action)
+{
+	/* Line2 = mic mute hotkey
+	   GPIO2 = mic mute LED */
+	static const struct hda_verb gpio_init[] = {
+		{ 0x01, AC_VERB_SET_GPIO_MASK, 0x04 },
+		{ 0x01, AC_VERB_SET_GPIO_DIRECTION, 0x04 },
+		{}
+	};
+
+	struct alc_spec *spec = codec->spec;
+
+	if (action == HDA_FIXUP_ACT_PRE_PROBE) {
+		if (alc_register_micmute_input_device(codec) != 0)
+			return;
+
+		snd_hda_add_verbs(codec, gpio_init);
+		snd_hda_jack_detect_enable_callback(codec, 0x1b,
+						    gpio2_mic_hotkey_event);
+
+		spec->gen.cap_sync_hook = alc_fixup_gpio_mic_mute_hook;
+		spec->gpio_led = 0;
+		spec->mute_led_polarity = 0;
+		spec->gpio_mic_led_mask = 0x04;
+		return;
+	}
+
+	if (!spec->kb_dev)
+		return;
+
+	switch (action) {
+	case HDA_FIXUP_ACT_PROBE:
+		spec->init_amp = ALC_INIT_DEFAULT;
+		break;
+	case HDA_FIXUP_ACT_FREE:
+		input_unregister_device(spec->kb_dev);
+		spec->kb_dev = NULL;
+	}
+}
+
+>>>>>>> common/deprecated/android-3.18
 static void alc269_fixup_hp_line1_mic1_led(struct hda_codec *codec,
 				const struct hda_fixup *fix, int action)
 {
@@ -3459,13 +3813,27 @@ static void alc269_fixup_hp_line1_mic1_led(struct hda_codec *codec,
 static void alc_headset_mode_unplugged(struct hda_codec *codec)
 {
 	static struct coef_fw coef0255[] = {
+<<<<<<< HEAD
 		WRITE_COEF(0x1b, 0x0c0b), /* LDO and MISC control */
+=======
+>>>>>>> common/deprecated/android-3.18
 		WRITE_COEF(0x45, 0xd089), /* UAJ function set to menual mode */
 		UPDATE_COEFEX(0x57, 0x05, 1<<14, 0), /* Direct Drive HP Amp control(Set to verb control)*/
 		WRITE_COEF(0x06, 0x6104), /* Set MIC2 Vref gate with HP */
 		WRITE_COEFEX(0x57, 0x03, 0x8aa6), /* Direct Drive HP Amp control */
 		{}
 	};
+<<<<<<< HEAD
+=======
+	static struct coef_fw coef0255_1[] = {
+		WRITE_COEF(0x1b, 0x0c0b), /* LDO and MISC control */
+		{}
+	};
+	static struct coef_fw coef0256[] = {
+		WRITE_COEF(0x1b, 0x0c4b), /* LDO and MISC control */
+		{}
+	};
+>>>>>>> common/deprecated/android-3.18
 	static struct coef_fw coef0233[] = {
 		WRITE_COEF(0x1b, 0x0c0b),
 		WRITE_COEF(0x45, 0xc429),
@@ -3476,6 +3844,17 @@ static void alc_headset_mode_unplugged(struct hda_codec *codec)
 		WRITE_COEF(0x32, 0x42a3),
 		{}
 	};
+<<<<<<< HEAD
+=======
+	static struct coef_fw coef0288[] = {
+		UPDATE_COEF(0x4f, 0xfcc0, 0xc400),
+		UPDATE_COEF(0x50, 0x2000, 0x2000),
+		UPDATE_COEF(0x56, 0x0006, 0x0006),
+		UPDATE_COEF(0x66, 0x0008, 0),
+		UPDATE_COEF(0x67, 0x2000, 0),
+		{}
+	};
+>>>>>>> common/deprecated/android-3.18
 	static struct coef_fw coef0292[] = {
 		WRITE_COEF(0x76, 0x000e),
 		WRITE_COEF(0x6c, 0x2400),
@@ -3497,15 +3876,45 @@ static void alc_headset_mode_unplugged(struct hda_codec *codec)
 		WRITE_COEF(0xb7, 0x802b),
 		{}
 	};
+<<<<<<< HEAD
 
 	switch (codec->vendor_id) {
 	case 0x10ec0255:
+=======
+	static struct coef_fw coef0225[] = {
+		UPDATE_COEF(0x4a, 1<<8, 0),
+		UPDATE_COEFEX(0x57, 0x05, 1<<14, 0),
+		UPDATE_COEF(0x63, 3<<14, 3<<14),
+		UPDATE_COEF(0x4a, 3<<4, 2<<4),
+		UPDATE_COEF(0x4a, 3<<10, 3<<10),
+		UPDATE_COEF(0x45, 0x3f<<10, 0x34<<10),
+		UPDATE_COEF(0x4a, 3<<10, 0),
+		{}
+	};
+
+	switch (codec->vendor_id) {
+	case 0x10ec0255:
+		alc_process_coef_fw(codec, coef0255_1);
+		alc_process_coef_fw(codec, coef0255);
+		break;
+	case 0x10ec0236:
+	case 0x10ec0256:
+		alc_process_coef_fw(codec, coef0256);
+>>>>>>> common/deprecated/android-3.18
 		alc_process_coef_fw(codec, coef0255);
 		break;
 	case 0x10ec0233:
 	case 0x10ec0283:
 		alc_process_coef_fw(codec, coef0233);
 		break;
+<<<<<<< HEAD
+=======
+	case 0x10ec0286:
+	case 0x10ec0288:
+	case 0x10ec0298:
+		alc_process_coef_fw(codec, coef0288);
+		break;
+>>>>>>> common/deprecated/android-3.18
 	case 0x10ec0292:
 		alc_process_coef_fw(codec, coef0292);
 		break;
@@ -3515,6 +3924,14 @@ static void alc_headset_mode_unplugged(struct hda_codec *codec)
 	case 0x10ec0668:
 		alc_process_coef_fw(codec, coef0668);
 		break;
+<<<<<<< HEAD
+=======
+	case 0x10ec0225:
+	case 0x10ec0295:
+	case 0x10ec0299:
+		alc_process_coef_fw(codec, coef0225);
+		break;
+>>>>>>> common/deprecated/android-3.18
 	}
 	codec_dbg(codec, "Headset jack set to unplugged mode.\n");
 }
@@ -3535,6 +3952,17 @@ static void alc_headset_mode_mic_in(struct hda_codec *codec, hda_nid_t hp_pin,
 		WRITE_COEF(0x26, 0x008c),
 		{}
 	};
+<<<<<<< HEAD
+=======
+	static struct coef_fw coef0288[] = {
+		UPDATE_COEF(0x50, 0x2000, 0),
+		UPDATE_COEF(0x56, 0x0006, 0),
+		UPDATE_COEF(0x4f, 0xfcc0, 0xc400),
+		UPDATE_COEF(0x66, 0x0008, 0x0008),
+		UPDATE_COEF(0x67, 0x2000, 0x2000),
+		{}
+	};
+>>>>>>> common/deprecated/android-3.18
 	static struct coef_fw coef0292[] = {
 		WRITE_COEF(0x19, 0xa208),
 		WRITE_COEF(0x2e, 0xacf0),
@@ -3552,9 +3980,24 @@ static void alc_headset_mode_mic_in(struct hda_codec *codec, hda_nid_t hp_pin,
 		UPDATE_COEF(0xc3, 0, 1<<12),
 		{}
 	};
+<<<<<<< HEAD
 
 	switch (codec->vendor_id) {
 	case 0x10ec0255:
+=======
+	static struct coef_fw coef0225[] = {
+		UPDATE_COEFEX(0x57, 0x05, 1<<14, 1<<14),
+		UPDATE_COEF(0x4a, 3<<4, 2<<4),
+		UPDATE_COEF(0x63, 3<<14, 0),
+		{}
+	};
+
+
+	switch (codec->vendor_id) {
+	case 0x10ec0236:
+	case 0x10ec0255:
+	case 0x10ec0256:
+>>>>>>> common/deprecated/android-3.18
 		alc_write_coef_idx(codec, 0x45, 0xc489);
 		snd_hda_set_pin_ctl_cache(codec, hp_pin, 0);
 		alc_process_coef_fw(codec, coef0255);
@@ -3567,6 +4010,17 @@ static void alc_headset_mode_mic_in(struct hda_codec *codec, hda_nid_t hp_pin,
 		alc_process_coef_fw(codec, coef0233);
 		snd_hda_set_pin_ctl_cache(codec, mic_pin, PIN_VREF50);
 		break;
+<<<<<<< HEAD
+=======
+	case 0x10ec0286:
+	case 0x10ec0288:
+	case 0x10ec0298:
+		alc_update_coef_idx(codec, 0x4f, 0x000c, 0);
+		snd_hda_set_pin_ctl_cache(codec, hp_pin, 0);
+		alc_process_coef_fw(codec, coef0288);
+		snd_hda_set_pin_ctl_cache(codec, mic_pin, PIN_VREF50);
+		break;
+>>>>>>> common/deprecated/android-3.18
 	case 0x10ec0292:
 		snd_hda_set_pin_ctl_cache(codec, hp_pin, 0);
 		alc_process_coef_fw(codec, coef0292);
@@ -3578,18 +4032,43 @@ static void alc_headset_mode_mic_in(struct hda_codec *codec, hda_nid_t hp_pin,
 		alc_process_coef_fw(codec, coef0293);
 		snd_hda_set_pin_ctl_cache(codec, mic_pin, PIN_VREF50);
 		break;
+<<<<<<< HEAD
+=======
+	case 0x10ec0662:
+		snd_hda_set_pin_ctl_cache(codec, hp_pin, 0);
+		snd_hda_set_pin_ctl_cache(codec, mic_pin, PIN_VREF50);
+		break;
+>>>>>>> common/deprecated/android-3.18
 	case 0x10ec0668:
 		alc_write_coef_idx(codec, 0x11, 0x0001);
 		snd_hda_set_pin_ctl_cache(codec, hp_pin, 0);
 		alc_process_coef_fw(codec, coef0688);
 		snd_hda_set_pin_ctl_cache(codec, mic_pin, PIN_VREF50);
 		break;
+<<<<<<< HEAD
+=======
+	case 0x10ec0225:
+	case 0x10ec0295:
+	case 0x10ec0299:
+		alc_update_coef_idx(codec, 0x45, 0x3f<<10, 0x31<<10);
+		snd_hda_set_pin_ctl_cache(codec, hp_pin, 0);
+		alc_process_coef_fw(codec, coef0225);
+		snd_hda_set_pin_ctl_cache(codec, mic_pin, PIN_VREF50);
+		break;
+>>>>>>> common/deprecated/android-3.18
 	}
 	codec_dbg(codec, "Headset jack set to mic-in mode.\n");
 }
 
 static void alc_headset_mode_default(struct hda_codec *codec)
 {
+<<<<<<< HEAD
+=======
+	static struct coef_fw coef0225[] = {
+		UPDATE_COEF(0x45, 0x3f<<10, 0x34<<10),
+		{}
+	};
+>>>>>>> common/deprecated/android-3.18
 	static struct coef_fw coef0255[] = {
 		WRITE_COEF(0x45, 0xc089),
 		WRITE_COEF(0x45, 0xc489),
@@ -3602,6 +4081,17 @@ static void alc_headset_mode_default(struct hda_codec *codec)
 		WRITE_COEF(0x32, 0x4ea3),
 		{}
 	};
+<<<<<<< HEAD
+=======
+	static struct coef_fw coef0288[] = {
+		UPDATE_COEF(0x4f, 0xfcc0, 0xc400), /* Set to TRS type */
+		UPDATE_COEF(0x50, 0x2000, 0x2000),
+		UPDATE_COEF(0x56, 0x0006, 0x0006),
+		UPDATE_COEF(0x66, 0x0008, 0),
+		UPDATE_COEF(0x67, 0x2000, 0),
+		{}
+	};
+>>>>>>> common/deprecated/android-3.18
 	static struct coef_fw coef0292[] = {
 		WRITE_COEF(0x76, 0x000e),
 		WRITE_COEF(0x6c, 0x2400),
@@ -3623,13 +4113,32 @@ static void alc_headset_mode_default(struct hda_codec *codec)
 	};
 
 	switch (codec->vendor_id) {
+<<<<<<< HEAD
 	case 0x10ec0255:
+=======
+	case 0x10ec0225:
+	case 0x10ec0295:
+	case 0x10ec0299:
+		alc_process_coef_fw(codec, coef0225);
+		break;
+	case 0x10ec0236:
+	case 0x10ec0255:
+	case 0x10ec0256:
+>>>>>>> common/deprecated/android-3.18
 		alc_process_coef_fw(codec, coef0255);
 		break;
 	case 0x10ec0233:
 	case 0x10ec0283:
 		alc_process_coef_fw(codec, coef0233);
 		break;
+<<<<<<< HEAD
+=======
+	case 0x10ec0286:
+	case 0x10ec0288:
+	case 0x10ec0298:
+		alc_process_coef_fw(codec, coef0288);
+		break;
+>>>>>>> common/deprecated/android-3.18
 	case 0x10ec0292:
 		alc_process_coef_fw(codec, coef0292);
 		break;
@@ -3652,12 +4161,31 @@ static void alc_headset_mode_ctia(struct hda_codec *codec)
 		WRITE_COEFEX(0x57, 0x03, 0x8ea6),
 		{}
 	};
+<<<<<<< HEAD
+=======
+	static struct coef_fw coef0256[] = {
+		WRITE_COEF(0x45, 0xd489), /* Set to CTIA type */
+		WRITE_COEF(0x1b, 0x0c6b),
+		WRITE_COEFEX(0x57, 0x03, 0x8ea6),
+		{}
+	};
+>>>>>>> common/deprecated/android-3.18
 	static struct coef_fw coef0233[] = {
 		WRITE_COEF(0x45, 0xd429),
 		WRITE_COEF(0x1b, 0x0c2b),
 		WRITE_COEF(0x32, 0x4ea3),
 		{}
 	};
+<<<<<<< HEAD
+=======
+	static struct coef_fw coef0288[] = {
+		UPDATE_COEF(0x50, 0x2000, 0x2000),
+		UPDATE_COEF(0x56, 0x0006, 0x0006),
+		UPDATE_COEF(0x66, 0x0008, 0),
+		UPDATE_COEF(0x67, 0x2000, 0),
+		{}
+	};
+>>>>>>> common/deprecated/android-3.18
 	static struct coef_fw coef0292[] = {
 		WRITE_COEF(0x6b, 0xd429),
 		WRITE_COEF(0x76, 0x0008),
@@ -3675,15 +4203,44 @@ static void alc_headset_mode_ctia(struct hda_codec *codec)
 		WRITE_COEF(0xc3, 0x0000),
 		{}
 	};
+<<<<<<< HEAD
+=======
+	static struct coef_fw coef0225[] = {
+		UPDATE_COEF(0x45, 0x3f<<10, 0x35<<10),
+		UPDATE_COEF(0x49, 1<<8, 1<<8),
+		UPDATE_COEF(0x4a, 7<<6, 7<<6),
+		UPDATE_COEF(0x4a, 3<<4, 3<<4),
+		{}
+	};
+>>>>>>> common/deprecated/android-3.18
 
 	switch (codec->vendor_id) {
 	case 0x10ec0255:
 		alc_process_coef_fw(codec, coef0255);
 		break;
+<<<<<<< HEAD
+=======
+	case 0x10ec0236:
+	case 0x10ec0256:
+		alc_process_coef_fw(codec, coef0256);
+		break;
+>>>>>>> common/deprecated/android-3.18
 	case 0x10ec0233:
 	case 0x10ec0283:
 		alc_process_coef_fw(codec, coef0233);
 		break;
+<<<<<<< HEAD
+=======
+	case 0x10ec0298:
+		alc_update_coef_idx(codec, 0x8e, 0x0070, 0x0020);/* Headset output enable */
+		/* ALC298 jack type setting is the same with ALC286/ALC288 */
+	case 0x10ec0286:
+	case 0x10ec0288:
+		alc_update_coef_idx(codec, 0x4f, 0xfcc0, 0xd400);
+		msleep(300);
+		alc_process_coef_fw(codec, coef0288);
+		break;
+>>>>>>> common/deprecated/android-3.18
 	case 0x10ec0292:
 		alc_process_coef_fw(codec, coef0292);
 		break;
@@ -3693,6 +4250,14 @@ static void alc_headset_mode_ctia(struct hda_codec *codec)
 	case 0x10ec0668:
 		alc_process_coef_fw(codec, coef0688);
 		break;
+<<<<<<< HEAD
+=======
+	case 0x10ec0225:
+	case 0x10ec0295:
+	case 0x10ec0299:
+		alc_process_coef_fw(codec, coef0225);
+		break;
+>>>>>>> common/deprecated/android-3.18
 	}
 	codec_dbg(codec, "Headset jack set to iPhone-style headset mode.\n");
 }
@@ -3706,12 +4271,31 @@ static void alc_headset_mode_omtp(struct hda_codec *codec)
 		WRITE_COEFEX(0x57, 0x03, 0x8ea6),
 		{}
 	};
+<<<<<<< HEAD
+=======
+	static struct coef_fw coef0256[] = {
+		WRITE_COEF(0x45, 0xe489), /* Set to OMTP Type */
+		WRITE_COEF(0x1b, 0x0c6b),
+		WRITE_COEFEX(0x57, 0x03, 0x8ea6),
+		{}
+	};
+>>>>>>> common/deprecated/android-3.18
 	static struct coef_fw coef0233[] = {
 		WRITE_COEF(0x45, 0xe429),
 		WRITE_COEF(0x1b, 0x0c2b),
 		WRITE_COEF(0x32, 0x4ea3),
 		{}
 	};
+<<<<<<< HEAD
+=======
+	static struct coef_fw coef0288[] = {
+		UPDATE_COEF(0x50, 0x2000, 0x2000),
+		UPDATE_COEF(0x56, 0x0006, 0x0006),
+		UPDATE_COEF(0x66, 0x0008, 0),
+		UPDATE_COEF(0x67, 0x2000, 0),
+		{}
+	};
+>>>>>>> common/deprecated/android-3.18
 	static struct coef_fw coef0292[] = {
 		WRITE_COEF(0x6b, 0xe429),
 		WRITE_COEF(0x76, 0x0008),
@@ -3729,15 +4313,44 @@ static void alc_headset_mode_omtp(struct hda_codec *codec)
 		WRITE_COEF(0xc3, 0x0000),
 		{}
 	};
+<<<<<<< HEAD
+=======
+	static struct coef_fw coef0225[] = {
+		UPDATE_COEF(0x45, 0x3f<<10, 0x39<<10),
+		UPDATE_COEF(0x49, 1<<8, 1<<8),
+		UPDATE_COEF(0x4a, 7<<6, 7<<6),
+		UPDATE_COEF(0x4a, 3<<4, 3<<4),
+		{}
+	};
+>>>>>>> common/deprecated/android-3.18
 
 	switch (codec->vendor_id) {
 	case 0x10ec0255:
 		alc_process_coef_fw(codec, coef0255);
 		break;
+<<<<<<< HEAD
+=======
+	case 0x10ec0236:
+	case 0x10ec0256:
+		alc_process_coef_fw(codec, coef0256);
+		break;
+>>>>>>> common/deprecated/android-3.18
 	case 0x10ec0233:
 	case 0x10ec0283:
 		alc_process_coef_fw(codec, coef0233);
 		break;
+<<<<<<< HEAD
+=======
+	case 0x10ec0298:
+		alc_update_coef_idx(codec, 0x8e, 0x0070, 0x0010);/* Headset output enable */
+		/* ALC298 jack type setting is the same with ALC286/ALC288 */
+	case 0x10ec0286:
+	case 0x10ec0288:
+		alc_update_coef_idx(codec, 0x4f, 0xfcc0, 0xe400);
+		msleep(300);
+		alc_process_coef_fw(codec, coef0288);
+		break;
+>>>>>>> common/deprecated/android-3.18
 	case 0x10ec0292:
 		alc_process_coef_fw(codec, coef0292);
 		break;
@@ -3747,6 +4360,14 @@ static void alc_headset_mode_omtp(struct hda_codec *codec)
 	case 0x10ec0668:
 		alc_process_coef_fw(codec, coef0688);
 		break;
+<<<<<<< HEAD
+=======
+	case 0x10ec0225:
+	case 0x10ec0295:
+	case 0x10ec0299:
+		alc_process_coef_fw(codec, coef0225);
+		break;
+>>>>>>> common/deprecated/android-3.18
 	}
 	codec_dbg(codec, "Headset jack set to Nokia-style headset mode.\n");
 }
@@ -3762,6 +4383,13 @@ static void alc_determine_headset_type(struct hda_codec *codec)
  conteol) */
 		{}
 	};
+<<<<<<< HEAD
+=======
+	static struct coef_fw coef0288[] = {
+		UPDATE_COEF(0x4f, 0xfcc0, 0xd400), /* Check Type */
+		{}
+	};
+>>>>>>> common/deprecated/android-3.18
 	static struct coef_fw coef0293[] = {
 		UPDATE_COEF(0x4a, 0x000f, 0x0008), /* Combo Jack auto detect */
 		WRITE_COEF(0x45, 0xD429), /* Set to ctia type */
@@ -3774,9 +4402,22 @@ static void alc_determine_headset_type(struct hda_codec *codec)
 		WRITE_COEF(0xc3, 0x0c00),
 		{}
 	};
+<<<<<<< HEAD
 
 	switch (codec->vendor_id) {
 	case 0x10ec0255:
+=======
+	static struct coef_fw coef0225[] = {
+		UPDATE_COEF(0x45, 0x3f<<10, 0x34<<10),
+		UPDATE_COEF(0x49, 1<<8, 1<<8),
+		{}
+	};
+
+	switch (codec->vendor_id) {
+	case 0x10ec0236:
+	case 0x10ec0255:
+	case 0x10ec0256:
+>>>>>>> common/deprecated/android-3.18
 		alc_process_coef_fw(codec, coef0255);
 		msleep(300);
 		val = alc_read_coef_idx(codec, 0x46);
@@ -3789,6 +4430,19 @@ static void alc_determine_headset_type(struct hda_codec *codec)
 		val = alc_read_coef_idx(codec, 0x46);
 		is_ctia = (val & 0x0070) == 0x0070;
 		break;
+<<<<<<< HEAD
+=======
+	case 0x10ec0298:
+		alc_update_coef_idx(codec, 0x8e, 0x0070, 0x0020); /* Headset output enable */
+		/* ALC298 check jack type is the same with ALC286/ALC288 */
+	case 0x10ec0286:
+	case 0x10ec0288:
+		alc_process_coef_fw(codec, coef0288);
+		msleep(350);
+		val = alc_read_coef_idx(codec, 0x50);
+		is_ctia = (val & 0x0070) == 0x0070;
+		break;
+>>>>>>> common/deprecated/android-3.18
 	case 0x10ec0292:
 		alc_write_coef_idx(codec, 0x6b, 0xd429);
 		msleep(300);
@@ -3807,6 +4461,17 @@ static void alc_determine_headset_type(struct hda_codec *codec)
 		val = alc_read_coef_idx(codec, 0xbe);
 		is_ctia = (val & 0x1c02) == 0x1c02;
 		break;
+<<<<<<< HEAD
+=======
+	case 0x10ec0225:
+	case 0x10ec0295:
+	case 0x10ec0299:
+		alc_process_coef_fw(codec, coef0225);
+		msleep(800);
+		val = alc_read_coef_idx(codec, 0x46);
+		is_ctia = (val & 0x00f0) == 0x00f0;
+		break;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	codec_dbg(codec, "Headset jack detected iPhone-style headset: %s\n",
@@ -3863,7 +4528,11 @@ static void alc_update_headset_mode(struct hda_codec *codec)
 	if (new_headset_mode != ALC_HEADSET_MODE_MIC) {
 		snd_hda_set_pin_ctl_cache(codec, hp_pin,
 					  AC_PINCTL_OUT_EN | AC_PINCTL_HP_EN);
+<<<<<<< HEAD
 		if (spec->headphone_mic_pin)
+=======
+		if (spec->headphone_mic_pin && spec->headphone_mic_pin != hp_pin)
+>>>>>>> common/deprecated/android-3.18
 			snd_hda_set_pin_ctl_cache(codec, spec->headphone_mic_pin,
 						  PIN_VREFHIZ);
 	}
@@ -3885,6 +4554,10 @@ static void alc_update_headset_jack_cb(struct hda_codec *codec,
 	struct alc_spec *spec = codec->spec;
 	spec->current_headset_type = ALC_HEADSET_TYPE_UNKNOWN;
 	snd_hda_gen_hp_automute(codec, jack);
+<<<<<<< HEAD
+=======
+	alc_update_headset_mode(codec);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void alc_probe_headset_mode(struct hda_codec *codec)
@@ -3939,7 +4612,11 @@ static void alc_fixup_headset_mode_no_hp_mic(struct hda_codec *codec,
 static void alc255_set_default_jack_type(struct hda_codec *codec)
 {
 	/* Set to iphone type */
+<<<<<<< HEAD
 	static struct coef_fw fw[] = {
+=======
+	static struct coef_fw alc255fw[] = {
+>>>>>>> common/deprecated/android-3.18
 		WRITE_COEF(0x1b, 0x880b),
 		WRITE_COEF(0x45, 0xd089),
 		WRITE_COEF(0x1b, 0x080b),
@@ -3947,7 +4624,27 @@ static void alc255_set_default_jack_type(struct hda_codec *codec)
 		WRITE_COEF(0x1b, 0x0c0b),
 		{}
 	};
+<<<<<<< HEAD
 	alc_process_coef_fw(codec, fw);
+=======
+	static struct coef_fw alc256fw[] = {
+		WRITE_COEF(0x1b, 0x884b),
+		WRITE_COEF(0x45, 0xd089),
+		WRITE_COEF(0x1b, 0x084b),
+		WRITE_COEF(0x46, 0x0004),
+		WRITE_COEF(0x1b, 0x0c4b),
+		{}
+	};
+	switch (codec->vendor_id) {
+	case 0x10ec0255:
+		alc_process_coef_fw(codec, alc255fw);
+		break;
+	case 0x10ec0236:
+	case 0x10ec0256:
+		alc_process_coef_fw(codec, alc256fw);
+		break;
+	}
+>>>>>>> common/deprecated/android-3.18
 	msleep(30);
 }
 
@@ -3972,6 +4669,32 @@ static void alc_fixup_headset_mode_alc255_no_hp_mic(struct hda_codec *codec,
 		alc_fixup_headset_mode(codec, fix, action);
 }
 
+<<<<<<< HEAD
+=======
+static void alc288_update_headset_jack_cb(struct hda_codec *codec,
+				       struct hda_jack_callback *jack)
+{
+	struct alc_spec *spec = codec->spec;
+	int present;
+
+	alc_update_headset_jack_cb(codec, jack);
+	/* Headset Mic enable or disable, only for Dell Dino */
+	present = spec->gen.hp_jack_present ? 0x40 : 0;
+	snd_hda_codec_write(codec, 0x01, 0, AC_VERB_SET_GPIO_DATA,
+				present);
+}
+
+static void alc_fixup_headset_mode_dell_alc288(struct hda_codec *codec,
+				const struct hda_fixup *fix, int action)
+{
+	alc_fixup_headset_mode(codec, fix, action);
+	if (action == HDA_FIXUP_ACT_PROBE) {
+		struct alc_spec *spec = codec->spec;
+		spec->gen.hp_automute_hook = alc288_update_headset_jack_cb;
+	}
+}
+
+>>>>>>> common/deprecated/android-3.18
 static void alc_fixup_auto_mute_via_amp(struct hda_codec *codec,
 					const struct hda_fixup *fix, int action)
 {
@@ -3988,7 +4711,11 @@ static void alc_no_shutup(struct hda_codec *codec)
 static void alc_fixup_no_shutup(struct hda_codec *codec,
 				const struct hda_fixup *fix, int action)
 {
+<<<<<<< HEAD
 	if (action == HDA_FIXUP_ACT_PRE_PROBE) {
+=======
+	if (action == HDA_FIXUP_ACT_PROBE) {
+>>>>>>> common/deprecated/android-3.18
 		struct alc_spec *spec = codec->spec;
 		spec->shutup = alc_no_shutup;
 	}
@@ -4038,6 +4765,26 @@ static void alc_fixup_dell_xps13(struct hda_codec *codec,
 	}
 }
 
+<<<<<<< HEAD
+=======
+static void alc_fixup_headset_mode_alc662(struct hda_codec *codec,
+				const struct hda_fixup *fix, int action)
+{
+	struct alc_spec *spec = codec->spec;
+
+	if (action == HDA_FIXUP_ACT_PRE_PROBE) {
+		spec->parse_flags |= HDA_PINCFG_HEADSET_MIC;
+		spec->gen.hp_mic = 1; /* Mic-in is same pin as headphone */
+
+		/* Disable boost for mic-in permanently. (This code is only called
+		   from quirks that guarantee that the headphone is at NID 0x1b.) */
+		snd_hda_codec_write(codec, 0x1b, 0, AC_VERB_SET_AMP_GAIN_MUTE, 0x7000);
+		snd_hda_override_wcaps(codec, 0x1b, get_wcaps(codec, 0x1b) & ~AC_WCAP_IN_AMP);
+	} else
+		alc_fixup_headset_mode(codec, fix, action);
+}
+
+>>>>>>> common/deprecated/android-3.18
 static void alc_fixup_headset_mode_alc668(struct hda_codec *codec,
 				const struct hda_fixup *fix, int action)
 {
@@ -4235,6 +4982,91 @@ static void alc290_fixup_mono_speakers(struct hda_codec *codec,
 	}
 }
 
+<<<<<<< HEAD
+=======
+static void alc298_fixup_speaker_volume(struct hda_codec *codec,
+					const struct hda_fixup *fix, int action)
+{
+	if (action == HDA_FIXUP_ACT_PRE_PROBE) {
+		/* The speaker is routed to the Node 0x06 by a mistake, as a result
+		   we can't adjust the speaker's volume since this node does not has
+		   Amp-out capability. we change the speaker's route to:
+		   Node 0x02 (Audio Output) -> Node 0x0c (Audio Mixer) -> Node 0x17 (
+		   Pin Complex), since Node 0x02 has Amp-out caps, we can adjust
+		   speaker's volume now. */
+
+		hda_nid_t conn1[1] = { 0x0c };
+		snd_hda_override_conn_list(codec, 0x17, 1, conn1);
+	}
+}
+
+/* disable DAC3 (0x06) selection on NID 0x17 as it has no volume amp control */
+static void alc295_fixup_disable_dac3(struct hda_codec *codec,
+				      const struct hda_fixup *fix, int action)
+{
+	if (action == HDA_FIXUP_ACT_PRE_PROBE) {
+		hda_nid_t conn[2] = { 0x02, 0x03 };
+		snd_hda_override_conn_list(codec, 0x17, 2, conn);
+	}
+}
+
+/* Hook to update amp GPIO4 for automute */
+static void alc280_hp_gpio4_automute_hook(struct hda_codec *codec,
+					  struct hda_jack_callback *jack)
+{
+	struct alc_spec *spec = codec->spec;
+
+	snd_hda_gen_hp_automute(codec, jack);
+	/* mute_led_polarity is set to 0, so we pass inverted value here */
+	alc_update_gpio_led(codec, 0x10, !spec->gen.hp_jack_present);
+}
+
+/* Manage GPIOs for HP EliteBook Folio 9480m.
+ *
+ * GPIO4 is the headphone amplifier power control
+ * GPIO3 is the audio output mute indicator LED
+ */
+
+static void alc280_fixup_hp_9480m(struct hda_codec *codec,
+				  const struct hda_fixup *fix,
+				  int action)
+{
+	struct alc_spec *spec = codec->spec;
+	static const struct hda_verb gpio_init[] = {
+		{ 0x01, AC_VERB_SET_GPIO_MASK, 0x18 },
+		{ 0x01, AC_VERB_SET_GPIO_DIRECTION, 0x18 },
+		{}
+	};
+
+	if (action == HDA_FIXUP_ACT_PRE_PROBE) {
+		/* Set the hooks to turn the headphone amp on/off
+		 * as needed
+		 */
+		spec->gen.vmaster_mute.hook = alc_fixup_gpio_mute_hook;
+		spec->gen.hp_automute_hook = alc280_hp_gpio4_automute_hook;
+
+		/* The GPIOs are currently off */
+		spec->gpio_led = 0;
+
+		/* GPIO3 is connected to the output mute LED,
+		 * high is on, low is off
+		 */
+		spec->mute_led_polarity = 0;
+		spec->gpio_mute_led_mask = 0x08;
+
+		/* Initialize GPIO configuration */
+		snd_hda_add_verbs(codec, gpio_init);
+	}
+}
+
+static void alc_fixup_disable_mic_vref(struct hda_codec *codec,
+				  const struct hda_fixup *fix, int action)
+{
+	if (action == HDA_FIXUP_ACT_PRE_PROBE)
+		snd_hda_codec_set_pin_target(codec, 0x19, PIN_VREFHIZ);
+}
+
+>>>>>>> common/deprecated/android-3.18
 /* for hda_fixup_thinkpad_acpi() */
 #include "thinkpad_helper.c"
 
@@ -4258,6 +5090,11 @@ enum {
 	ALC269_FIXUP_LIFEBOOK,
 	ALC269_FIXUP_LIFEBOOK_EXTMIC,
 	ALC269_FIXUP_LIFEBOOK_HP_PIN,
+<<<<<<< HEAD
+=======
+	ALC269_FIXUP_LIFEBOOK_NO_HP_TO_LINEOUT,
+	ALC255_FIXUP_LIFEBOOK_U7x7_HEADSET_MIC,
+>>>>>>> common/deprecated/android-3.18
 	ALC269_FIXUP_AMIC,
 	ALC269_FIXUP_DMIC,
 	ALC269VB_FIXUP_AMIC,
@@ -4270,14 +5107,25 @@ enum {
 	ALC269_FIXUP_HP_LINE1_MIC1_LED,
 	ALC269_FIXUP_INV_DMIC,
 	ALC269_FIXUP_LENOVO_DOCK,
+<<<<<<< HEAD
+=======
+	ALC269_FIXUP_LENOVO_DOCK_LIMIT_BOOST,
+>>>>>>> common/deprecated/android-3.18
 	ALC269_FIXUP_NO_SHUTUP,
 	ALC286_FIXUP_SONY_MIC_NO_PRESENCE,
 	ALC269_FIXUP_PINCFG_NO_HP_TO_LINEOUT,
 	ALC269_FIXUP_DELL1_MIC_NO_PRESENCE,
 	ALC269_FIXUP_DELL2_MIC_NO_PRESENCE,
 	ALC269_FIXUP_DELL3_MIC_NO_PRESENCE,
+<<<<<<< HEAD
 	ALC269_FIXUP_HEADSET_MODE,
 	ALC269_FIXUP_HEADSET_MODE_NO_HP_MIC,
+=======
+	ALC269_FIXUP_DELL4_MIC_NO_PRESENCE,
+	ALC269_FIXUP_HEADSET_MODE,
+	ALC269_FIXUP_HEADSET_MODE_NO_HP_MIC,
+	ALC269_FIXUP_ASPIRE_HEADSET_MIC,
+>>>>>>> common/deprecated/android-3.18
 	ALC269_FIXUP_ASUS_X101_FUNC,
 	ALC269_FIXUP_ASUS_X101_VERB,
 	ALC269_FIXUP_ASUS_X101,
@@ -4299,16 +5147,50 @@ enum {
 	ALC290_FIXUP_SUBWOOFER,
 	ALC290_FIXUP_SUBWOOFER_HSJACK,
 	ALC269_FIXUP_THINKPAD_ACPI,
+<<<<<<< HEAD
+=======
+	ALC269_FIXUP_DMIC_THINKPAD_ACPI,
+>>>>>>> common/deprecated/android-3.18
 	ALC255_FIXUP_DELL1_MIC_NO_PRESENCE,
 	ALC255_FIXUP_DELL2_MIC_NO_PRESENCE,
 	ALC255_FIXUP_HEADSET_MODE,
 	ALC255_FIXUP_HEADSET_MODE_NO_HP_MIC,
 	ALC293_FIXUP_DELL1_MIC_NO_PRESENCE,
 	ALC292_FIXUP_TPT440_DOCK,
+<<<<<<< HEAD
+=======
+	ALC292_FIXUP_TPT440_DOCK2,
+>>>>>>> common/deprecated/android-3.18
 	ALC283_FIXUP_BXBT2807_MIC,
 	ALC255_FIXUP_DELL_WMI_MIC_MUTE_LED,
 	ALC282_FIXUP_ASPIRE_V5_PINS,
 	ALC280_FIXUP_HP_GPIO4,
+<<<<<<< HEAD
+=======
+	ALC286_FIXUP_HP_GPIO_LED,
+	ALC280_FIXUP_HP_GPIO2_MIC_HOTKEY,
+	ALC280_FIXUP_HP_DOCK_PINS,
+	ALC269_FIXUP_HP_DOCK_GPIO_MIC1_LED,
+	ALC280_FIXUP_HP_9480M,
+	ALC288_FIXUP_DELL_HEADSET_MODE,
+	ALC288_FIXUP_DELL1_MIC_NO_PRESENCE,
+	ALC288_FIXUP_DELL_XPS_13_GPIO6,
+	ALC298_FIXUP_DELL1_MIC_NO_PRESENCE,
+	ALC298_FIXUP_DELL_AIO_MIC_NO_PRESENCE,
+	ALC275_FIXUP_DELL_XPS,
+	ALC256_FIXUP_DELL_XPS_13_HEADPHONE_NOISE,
+	ALC293_FIXUP_LENOVO_SPK_NOISE,
+	ALC233_FIXUP_LENOVO_LINE2_MIC_HOTKEY,
+	ALC255_FIXUP_DELL_SPK_NOISE,
+	ALC225_FIXUP_DISABLE_MIC_VREF,
+	ALC225_FIXUP_DELL1_MIC_NO_PRESENCE,
+	ALC295_FIXUP_DISABLE_DAC3,
+	ALC280_FIXUP_HP_HEADSET_MIC,
+	ALC221_FIXUP_HP_FRONT_MIC,
+	ALC292_FIXUP_TPT460,
+	ALC298_FIXUP_SPK_VOLUME,
+	ALC256_FIXUP_DELL_INSPIRON_7559_SUBWOOFER,
+>>>>>>> common/deprecated/android-3.18
 };
 
 static const struct hda_fixup alc269_fixups[] = {
@@ -4415,6 +5297,17 @@ static const struct hda_fixup alc269_fixups[] = {
 			{ }
 		},
 	},
+<<<<<<< HEAD
+=======
+	[ALC269_FIXUP_LIFEBOOK_NO_HP_TO_LINEOUT] = {
+		.type = HDA_FIXUP_FUNC,
+		.v.func = alc269_fixup_pincfg_no_hp_to_lineout,
+	},
+	[ALC255_FIXUP_LIFEBOOK_U7x7_HEADSET_MIC] = {
+		.type = HDA_FIXUP_FUNC,
+		.v.func = alc269_fixup_pincfg_U7x7_headset_mic,
+	},
+>>>>>>> common/deprecated/android-3.18
 	[ALC269_FIXUP_AMIC] = {
 		.type = HDA_FIXUP_PINS,
 		.v.pins = (const struct hda_pintbl[]) {
@@ -4497,6 +5390,15 @@ static const struct hda_fixup alc269_fixups[] = {
 		.chained = true,
 		.chain_id = ALC269_FIXUP_PINCFG_NO_HP_TO_LINEOUT
 	},
+<<<<<<< HEAD
+=======
+	[ALC269_FIXUP_LENOVO_DOCK_LIMIT_BOOST] = {
+		.type = HDA_FIXUP_FUNC,
+		.v.func = alc269_fixup_limit_int_mic_boost,
+		.chained = true,
+		.chain_id = ALC269_FIXUP_LENOVO_DOCK,
+	},
+>>>>>>> common/deprecated/android-3.18
 	[ALC269_FIXUP_PINCFG_NO_HP_TO_LINEOUT] = {
 		.type = HDA_FIXUP_FUNC,
 		.v.func = alc269_fixup_pincfg_no_hp_to_lineout,
@@ -4533,6 +5435,19 @@ static const struct hda_fixup alc269_fixups[] = {
 		.chained = true,
 		.chain_id = ALC269_FIXUP_HEADSET_MODE_NO_HP_MIC
 	},
+<<<<<<< HEAD
+=======
+	[ALC269_FIXUP_DELL4_MIC_NO_PRESENCE] = {
+		.type = HDA_FIXUP_PINS,
+		.v.pins = (const struct hda_pintbl[]) {
+			{ 0x19, 0x01a1913c }, /* use as headset mic, without its own jack detect */
+			{ 0x1b, 0x01a1913d }, /* use as headphone mic, without its own jack detect */
+			{ }
+		},
+		.chained = true,
+		.chain_id = ALC269_FIXUP_HEADSET_MODE
+	},
+>>>>>>> common/deprecated/android-3.18
 	[ALC269_FIXUP_HEADSET_MODE] = {
 		.type = HDA_FIXUP_FUNC,
 		.v.func = alc_fixup_headset_mode,
@@ -4543,6 +5458,18 @@ static const struct hda_fixup alc269_fixups[] = {
 		.type = HDA_FIXUP_FUNC,
 		.v.func = alc_fixup_headset_mode_no_hp_mic,
 	},
+<<<<<<< HEAD
+=======
+	[ALC269_FIXUP_ASPIRE_HEADSET_MIC] = {
+		.type = HDA_FIXUP_PINS,
+		.v.pins = (const struct hda_pintbl[]) {
+			{ 0x19, 0x01a1913c }, /* headset mic w/o jack detect */
+			{ }
+		},
+		.chained = true,
+		.chain_id = ALC269_FIXUP_HEADSET_MODE,
+	},
+>>>>>>> common/deprecated/android-3.18
 	[ALC286_FIXUP_SONY_MIC_NO_PRESENCE] = {
 		.type = HDA_FIXUP_PINS,
 		.v.pins = (const struct hda_pintbl[]) {
@@ -4705,6 +5632,15 @@ static const struct hda_fixup alc269_fixups[] = {
 		.type = HDA_FIXUP_FUNC,
 		.v.func = hda_fixup_thinkpad_acpi,
 	},
+<<<<<<< HEAD
+=======
+	[ALC269_FIXUP_DMIC_THINKPAD_ACPI] = {
+		.type = HDA_FIXUP_FUNC,
+		.v.func = alc_fixup_inv_dmic,
+		.chained = true,
+		.chain_id = ALC269_FIXUP_THINKPAD_ACPI,
+	},
+>>>>>>> common/deprecated/android-3.18
 	[ALC255_FIXUP_DELL1_MIC_NO_PRESENCE] = {
 		.type = HDA_FIXUP_PINS,
 		.v.pins = (const struct hda_pintbl[]) {
@@ -4745,6 +5681,15 @@ static const struct hda_fixup alc269_fixups[] = {
 		.chain_id = ALC269_FIXUP_HEADSET_MODE
 	},
 	[ALC292_FIXUP_TPT440_DOCK] = {
+<<<<<<< HEAD
+=======
+		.type = HDA_FIXUP_FUNC,
+		.v.func = alc269_fixup_pincfg_no_hp_to_lineout,
+		.chained = true,
+		.chain_id = ALC292_FIXUP_TPT440_DOCK2
+	},
+	[ALC292_FIXUP_TPT440_DOCK2] = {
+>>>>>>> common/deprecated/android-3.18
 		.type = HDA_FIXUP_PINS,
 		.v.pins = (const struct hda_pintbl[]) {
 			{ 0x16, 0x21211010 }, /* dock headphone */
@@ -4772,7 +5717,11 @@ static const struct hda_fixup alc269_fixups[] = {
 			{ 0x14, 0x90170110 },
 			{ 0x17, 0x40000008 },
 			{ 0x18, 0x411111f0 },
+<<<<<<< HEAD
 			{ 0x19, 0x411111f0 },
+=======
+			{ 0x19, 0x01a1913c },
+>>>>>>> common/deprecated/android-3.18
 			{ 0x1a, 0x411111f0 },
 			{ 0x1b, 0x411111f0 },
 			{ 0x1d, 0x40f89b2d },
@@ -4785,6 +5734,175 @@ static const struct hda_fixup alc269_fixups[] = {
 		.type = HDA_FIXUP_FUNC,
 		.v.func = alc280_fixup_hp_gpio4,
 	},
+<<<<<<< HEAD
+=======
+	[ALC286_FIXUP_HP_GPIO_LED] = {
+		.type = HDA_FIXUP_FUNC,
+		.v.func = alc286_fixup_hp_gpio_led,
+	},
+	[ALC280_FIXUP_HP_GPIO2_MIC_HOTKEY] = {
+		.type = HDA_FIXUP_FUNC,
+		.v.func = alc280_fixup_hp_gpio2_mic_hotkey,
+	},
+	[ALC280_FIXUP_HP_DOCK_PINS] = {
+		.type = HDA_FIXUP_PINS,
+		.v.pins = (const struct hda_pintbl[]) {
+			{ 0x1b, 0x21011020 }, /* line-out */
+			{ 0x1a, 0x01a1903c }, /* headset mic */
+			{ 0x18, 0x2181103f }, /* line-in */
+			{ },
+		},
+		.chained = true,
+		.chain_id = ALC280_FIXUP_HP_GPIO4
+	},
+	[ALC269_FIXUP_HP_DOCK_GPIO_MIC1_LED] = {
+		.type = HDA_FIXUP_PINS,
+		.v.pins = (const struct hda_pintbl[]) {
+			{ 0x1b, 0x21011020 }, /* line-out */
+			{ 0x18, 0x2181103f }, /* line-in */
+			{ },
+		},
+		.chained = true,
+		.chain_id = ALC269_FIXUP_HP_GPIO_MIC1_LED
+	},
+	[ALC280_FIXUP_HP_9480M] = {
+		.type = HDA_FIXUP_FUNC,
+		.v.func = alc280_fixup_hp_9480m,
+	},
+	[ALC288_FIXUP_DELL_HEADSET_MODE] = {
+		.type = HDA_FIXUP_FUNC,
+		.v.func = alc_fixup_headset_mode_dell_alc288,
+		.chained = true,
+		.chain_id = ALC255_FIXUP_DELL_WMI_MIC_MUTE_LED
+	},
+	[ALC288_FIXUP_DELL1_MIC_NO_PRESENCE] = {
+		.type = HDA_FIXUP_PINS,
+		.v.pins = (const struct hda_pintbl[]) {
+			{ 0x18, 0x01a1913c }, /* use as headset mic, without its own jack detect */
+			{ 0x1a, 0x01a1913d }, /* use as headphone mic, without its own jack detect */
+			{ }
+		},
+		.chained = true,
+		.chain_id = ALC288_FIXUP_DELL_HEADSET_MODE
+	},
+	[ALC288_FIXUP_DELL_XPS_13_GPIO6] = {
+		.type = HDA_FIXUP_VERBS,
+		.v.verbs = (const struct hda_verb[]) {
+			{0x01, AC_VERB_SET_GPIO_MASK, 0x40},
+			{0x01, AC_VERB_SET_GPIO_DIRECTION, 0x40},
+			{0x01, AC_VERB_SET_GPIO_DATA, 0x00},
+			{ }
+		},
+		.chained = true,
+		.chain_id = ALC288_FIXUP_DELL1_MIC_NO_PRESENCE
+	},
+	[ALC298_FIXUP_DELL1_MIC_NO_PRESENCE] = {
+		.type = HDA_FIXUP_PINS,
+		.v.pins = (const struct hda_pintbl[]) {
+			{ 0x18, 0x01a1913c }, /* use as headset mic, without its own jack detect */
+			{ 0x1a, 0x01a1913d }, /* use as headphone mic, without its own jack detect */
+			{ }
+		},
+		.chained = true,
+		.chain_id = ALC269_FIXUP_HEADSET_MODE
+	},
+	[ALC298_FIXUP_DELL_AIO_MIC_NO_PRESENCE] = {
+		.type = HDA_FIXUP_PINS,
+		.v.pins = (const struct hda_pintbl[]) {
+			{ 0x18, 0x01a1913c }, /* use as headset mic, without its own jack detect */
+			{ }
+		},
+		.chained = true,
+		.chain_id = ALC269_FIXUP_HEADSET_MODE
+	},
+	[ALC275_FIXUP_DELL_XPS] = {
+		.type = HDA_FIXUP_VERBS,
+		.v.verbs = (const struct hda_verb[]) {
+			/* Enables internal speaker */
+			{0x20, AC_VERB_SET_COEF_INDEX, 0x1f},
+			{0x20, AC_VERB_SET_PROC_COEF, 0x00c0},
+			{0x20, AC_VERB_SET_COEF_INDEX, 0x30},
+			{0x20, AC_VERB_SET_PROC_COEF, 0x00b1},
+			{}
+		}
+	},
+	[ALC256_FIXUP_DELL_XPS_13_HEADPHONE_NOISE] = {
+		.type = HDA_FIXUP_VERBS,
+		.v.verbs = (const struct hda_verb[]) {
+			/* Disable pass-through path for FRONT 14h */
+			{0x20, AC_VERB_SET_COEF_INDEX, 0x36},
+			{0x20, AC_VERB_SET_PROC_COEF, 0x1737},
+			{}
+		},
+		.chained = true,
+		.chain_id = ALC255_FIXUP_DELL1_MIC_NO_PRESENCE
+	},
+	[ALC293_FIXUP_LENOVO_SPK_NOISE] = {
+		.type = HDA_FIXUP_FUNC,
+		.v.func = alc_fixup_disable_aamix,
+		.chained = true,
+		.chain_id = ALC269_FIXUP_THINKPAD_ACPI
+	},
+	[ALC233_FIXUP_LENOVO_LINE2_MIC_HOTKEY] = {
+		.type = HDA_FIXUP_FUNC,
+		.v.func = alc233_fixup_lenovo_line2_mic_hotkey,
+	},
+	[ALC255_FIXUP_DELL_SPK_NOISE] = {
+		.type = HDA_FIXUP_FUNC,
+		.v.func = alc_fixup_disable_aamix,
+		.chained = true,
+		.chain_id = ALC255_FIXUP_DELL1_MIC_NO_PRESENCE
+	},
+	[ALC225_FIXUP_DISABLE_MIC_VREF] = {
+		.type = HDA_FIXUP_FUNC,
+		.v.func = alc_fixup_disable_mic_vref,
+		.chained = true,
+		.chain_id = ALC269_FIXUP_DELL1_MIC_NO_PRESENCE
+	},
+	[ALC225_FIXUP_DELL1_MIC_NO_PRESENCE] = {
+		.type = HDA_FIXUP_VERBS,
+		.v.verbs = (const struct hda_verb[]) {
+			/* Disable pass-through path for FRONT 14h */
+			{ 0x20, AC_VERB_SET_COEF_INDEX, 0x36 },
+			{ 0x20, AC_VERB_SET_PROC_COEF, 0x57d7 },
+			{}
+		},
+		.chained = true,
+		.chain_id = ALC225_FIXUP_DISABLE_MIC_VREF
+	},
+	[ALC280_FIXUP_HP_HEADSET_MIC] = {
+		.type = HDA_FIXUP_FUNC,
+		.v.func = alc_fixup_disable_aamix,
+		.chained = true,
+		.chain_id = ALC269_FIXUP_HEADSET_MIC,
+	},
+	[ALC221_FIXUP_HP_FRONT_MIC] = {
+		.type = HDA_FIXUP_PINS,
+		.v.pins = (const struct hda_pintbl[]) {
+			{ 0x19, 0x02a19020 }, /* Front Mic */
+			{ }
+		},
+	},
+	[ALC298_FIXUP_SPK_VOLUME] = {
+		.type = HDA_FIXUP_FUNC,
+		.v.func = alc298_fixup_speaker_volume,
+		.chained = true,
+		.chain_id = ALC298_FIXUP_DELL_AIO_MIC_NO_PRESENCE,
+	},
+	[ALC295_FIXUP_DISABLE_DAC3] = {
+		.type = HDA_FIXUP_FUNC,
+		.v.func = alc295_fixup_disable_dac3,
+	},
+	[ALC256_FIXUP_DELL_INSPIRON_7559_SUBWOOFER] = {
+		.type = HDA_FIXUP_PINS,
+		.v.pins = (const struct hda_pintbl[]) {
+			{ 0x1b, 0x90170151 },
+			{ }
+		},
+		.chained = true,
+		.chain_id = ALC255_FIXUP_DELL1_MIC_NO_PRESENCE
+	},
+>>>>>>> common/deprecated/android-3.18
 };
 
 static const struct snd_pci_quirk alc269_fixup_tbl[] = {
@@ -4792,11 +5910,23 @@ static const struct snd_pci_quirk alc269_fixup_tbl[] = {
 	SND_PCI_QUIRK(0x1025, 0x029b, "Acer 1810TZ", ALC269_FIXUP_INV_DMIC),
 	SND_PCI_QUIRK(0x1025, 0x0349, "Acer AOD260", ALC269_FIXUP_INV_DMIC),
 	SND_PCI_QUIRK(0x1025, 0x047c, "Acer AC700", ALC269_FIXUP_ACER_AC700),
+<<<<<<< HEAD
 	SND_PCI_QUIRK(0x1025, 0x0740, "Acer AO725", ALC271_FIXUP_HP_GATE_MIC_JACK),
 	SND_PCI_QUIRK(0x1025, 0x0742, "Acer AO756", ALC271_FIXUP_HP_GATE_MIC_JACK),
 	SND_PCI_QUIRK(0x1025, 0x0775, "Acer Aspire E1-572", ALC271_FIXUP_HP_GATE_MIC_JACK_E1_572),
 	SND_PCI_QUIRK(0x1025, 0x079b, "Acer Aspire V5-573G", ALC282_FIXUP_ASPIRE_V5_PINS),
 	SND_PCI_QUIRK(0x1028, 0x0470, "Dell M101z", ALC269_FIXUP_DELL_M101Z),
+=======
+	SND_PCI_QUIRK(0x1025, 0x072d, "Acer Aspire V5-571G", ALC269_FIXUP_ASPIRE_HEADSET_MIC),
+	SND_PCI_QUIRK(0x1025, 0x080d, "Acer Aspire V5-122P", ALC269_FIXUP_ASPIRE_HEADSET_MIC),
+	SND_PCI_QUIRK(0x1025, 0x0740, "Acer AO725", ALC271_FIXUP_HP_GATE_MIC_JACK),
+	SND_PCI_QUIRK(0x1025, 0x0742, "Acer AO756", ALC271_FIXUP_HP_GATE_MIC_JACK),
+	SND_PCI_QUIRK(0x1025, 0x0762, "Acer Aspire E1-472", ALC271_FIXUP_HP_GATE_MIC_JACK_E1_572),
+	SND_PCI_QUIRK(0x1025, 0x0775, "Acer Aspire E1-572", ALC271_FIXUP_HP_GATE_MIC_JACK_E1_572),
+	SND_PCI_QUIRK(0x1025, 0x079b, "Acer Aspire V5-573G", ALC282_FIXUP_ASPIRE_V5_PINS),
+	SND_PCI_QUIRK(0x1028, 0x0470, "Dell M101z", ALC269_FIXUP_DELL_M101Z),
+	SND_PCI_QUIRK(0x1028, 0x054b, "Dell XPS one 2710", ALC275_FIXUP_DELL_XPS),
+>>>>>>> common/deprecated/android-3.18
 	SND_PCI_QUIRK(0x1028, 0x05da, "Dell Vostro 5460", ALC290_FIXUP_SUBWOOFER),
 	SND_PCI_QUIRK(0x1028, 0x05f4, "Dell", ALC269_FIXUP_DELL1_MIC_NO_PRESENCE),
 	SND_PCI_QUIRK(0x1028, 0x05f5, "Dell", ALC269_FIXUP_DELL1_MIC_NO_PRESENCE),
@@ -4806,14 +5936,34 @@ static const struct snd_pci_quirk alc269_fixup_tbl[] = {
 	SND_PCI_QUIRK(0x1028, 0x0638, "Dell Inspiron 5439", ALC290_FIXUP_MONO_SPEAKERS_HSJACK),
 	SND_PCI_QUIRK(0x1028, 0x064a, "Dell", ALC293_FIXUP_DELL1_MIC_NO_PRESENCE),
 	SND_PCI_QUIRK(0x1028, 0x064b, "Dell", ALC293_FIXUP_DELL1_MIC_NO_PRESENCE),
+<<<<<<< HEAD
 	SND_PCI_QUIRK(0x1028, 0x06c7, "Dell", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE),
 	SND_PCI_QUIRK(0x1028, 0x06d9, "Dell", ALC293_FIXUP_DELL1_MIC_NO_PRESENCE),
 	SND_PCI_QUIRK(0x1028, 0x06da, "Dell", ALC293_FIXUP_DELL1_MIC_NO_PRESENCE),
+=======
+	SND_PCI_QUIRK(0x1028, 0x0669, "Dell Optiplex 9020m", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE),
+	SND_PCI_QUIRK(0x1028, 0x06c7, "Dell", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE),
+	SND_PCI_QUIRK(0x1028, 0x06d9, "Dell", ALC293_FIXUP_DELL1_MIC_NO_PRESENCE),
+	SND_PCI_QUIRK(0x1028, 0x06da, "Dell", ALC293_FIXUP_DELL1_MIC_NO_PRESENCE),
+	SND_PCI_QUIRK(0x1028, 0x0704, "Dell XPS 13 9350", ALC256_FIXUP_DELL_XPS_13_HEADPHONE_NOISE),
+	SND_PCI_QUIRK(0x1028, 0x0706, "Dell Inspiron 7559", ALC256_FIXUP_DELL_INSPIRON_7559_SUBWOOFER),
+	SND_PCI_QUIRK(0x1028, 0x0725, "Dell Inspiron 3162", ALC255_FIXUP_DELL_SPK_NOISE),
+	SND_PCI_QUIRK(0x1028, 0x075b, "Dell XPS 13 9360", ALC256_FIXUP_DELL_XPS_13_HEADPHONE_NOISE),
+	SND_PCI_QUIRK(0x1028, 0x075c, "Dell XPS 27 7760", ALC298_FIXUP_SPK_VOLUME),
+	SND_PCI_QUIRK(0x1028, 0x075d, "Dell AIO", ALC298_FIXUP_SPK_VOLUME),
+	SND_PCI_QUIRK(0x1028, 0x07b0, "Dell Precision 7520", ALC295_FIXUP_DISABLE_DAC3),
+	SND_PCI_QUIRK(0x1028, 0x0798, "Dell Inspiron 17 7000 Gaming", ALC256_FIXUP_DELL_INSPIRON_7559_SUBWOOFER),
+	SND_PCI_QUIRK(0x1028, 0x082a, "Dell XPS 13 9360", ALC256_FIXUP_DELL_XPS_13_HEADPHONE_NOISE),
+>>>>>>> common/deprecated/android-3.18
 	SND_PCI_QUIRK(0x1028, 0x164a, "Dell", ALC293_FIXUP_DELL1_MIC_NO_PRESENCE),
 	SND_PCI_QUIRK(0x1028, 0x164b, "Dell", ALC293_FIXUP_DELL1_MIC_NO_PRESENCE),
 	SND_PCI_QUIRK(0x103c, 0x1586, "HP", ALC269_FIXUP_HP_MUTE_LED_MIC2),
 	SND_PCI_QUIRK(0x103c, 0x18e6, "HP", ALC269_FIXUP_HP_GPIO_LED),
 	SND_PCI_QUIRK(0x103c, 0x218b, "HP", ALC269_FIXUP_LIMIT_INT_MIC_BOOST_MUTE_LED),
+<<<<<<< HEAD
+=======
+	SND_PCI_QUIRK(0x103c, 0x225f, "HP", ALC280_FIXUP_HP_GPIO2_MIC_HOTKEY),
+>>>>>>> common/deprecated/android-3.18
 	/* ALC282 */
 	SND_PCI_QUIRK(0x103c, 0x21f9, "HP", ALC269_FIXUP_HP_MUTE_LED_MIC1),
 	SND_PCI_QUIRK(0x103c, 0x2210, "HP", ALC269_FIXUP_HP_MUTE_LED_MIC1),
@@ -4827,11 +5977,20 @@ static const struct snd_pci_quirk alc269_fixup_tbl[] = {
 	SND_PCI_QUIRK(0x103c, 0x226a, "HP", ALC269_FIXUP_HP_MUTE_LED_MIC1),
 	SND_PCI_QUIRK(0x103c, 0x226b, "HP", ALC269_FIXUP_HP_MUTE_LED_MIC1),
 	SND_PCI_QUIRK(0x103c, 0x226e, "HP", ALC269_FIXUP_HP_MUTE_LED_MIC1),
+<<<<<<< HEAD
+=======
+	SND_PCI_QUIRK(0x103c, 0x2271, "HP", ALC286_FIXUP_HP_GPIO_LED),
+	SND_PCI_QUIRK(0x103c, 0x2272, "HP", ALC280_FIXUP_HP_DOCK_PINS),
+>>>>>>> common/deprecated/android-3.18
 	SND_PCI_QUIRK(0x103c, 0x229e, "HP", ALC269_FIXUP_HP_MUTE_LED_MIC1),
 	SND_PCI_QUIRK(0x103c, 0x22b2, "HP", ALC269_FIXUP_HP_MUTE_LED_MIC1),
 	SND_PCI_QUIRK(0x103c, 0x22b7, "HP", ALC269_FIXUP_HP_MUTE_LED_MIC1),
 	SND_PCI_QUIRK(0x103c, 0x22bf, "HP", ALC269_FIXUP_HP_MUTE_LED_MIC1),
 	SND_PCI_QUIRK(0x103c, 0x22cf, "HP", ALC269_FIXUP_HP_MUTE_LED_MIC1),
+<<<<<<< HEAD
+=======
+	SND_PCI_QUIRK(0x103c, 0x22db, "HP", ALC280_FIXUP_HP_9480M),
+>>>>>>> common/deprecated/android-3.18
 	SND_PCI_QUIRK(0x103c, 0x22dc, "HP", ALC269_FIXUP_HP_GPIO_MIC1_LED),
 	SND_PCI_QUIRK(0x103c, 0x22fb, "HP", ALC269_FIXUP_HP_GPIO_MIC1_LED),
 	/* ALC290 */
@@ -4844,7 +6003,11 @@ static const struct snd_pci_quirk alc269_fixup_tbl[] = {
 	SND_PCI_QUIRK(0x103c, 0x2256, "HP", ALC269_FIXUP_HP_GPIO_MIC1_LED),
 	SND_PCI_QUIRK(0x103c, 0x2257, "HP", ALC269_FIXUP_HP_GPIO_MIC1_LED),
 	SND_PCI_QUIRK(0x103c, 0x2259, "HP", ALC269_FIXUP_HP_GPIO_MIC1_LED),
+<<<<<<< HEAD
 	SND_PCI_QUIRK(0x103c, 0x225a, "HP", ALC269_FIXUP_HP_GPIO_MIC1_LED),
+=======
+	SND_PCI_QUIRK(0x103c, 0x225a, "HP", ALC269_FIXUP_HP_DOCK_GPIO_MIC1_LED),
+>>>>>>> common/deprecated/android-3.18
 	SND_PCI_QUIRK(0x103c, 0x2260, "HP", ALC269_FIXUP_HP_MUTE_LED_MIC1),
 	SND_PCI_QUIRK(0x103c, 0x2263, "HP", ALC269_FIXUP_HP_MUTE_LED_MIC1),
 	SND_PCI_QUIRK(0x103c, 0x2264, "HP", ALC269_FIXUP_HP_MUTE_LED_MIC1),
@@ -4864,6 +6027,11 @@ static const struct snd_pci_quirk alc269_fixup_tbl[] = {
 	SND_PCI_QUIRK(0x103c, 0x2335, "HP", ALC269_FIXUP_HP_MUTE_LED_MIC1),
 	SND_PCI_QUIRK(0x103c, 0x2336, "HP", ALC269_FIXUP_HP_MUTE_LED_MIC1),
 	SND_PCI_QUIRK(0x103c, 0x2337, "HP", ALC269_FIXUP_HP_MUTE_LED_MIC1),
+<<<<<<< HEAD
+=======
+	SND_PCI_QUIRK(0x103c, 0x221c, "HP EliteBook 755 G2", ALC280_FIXUP_HP_HEADSET_MIC),
+	SND_PCI_QUIRK(0x103c, 0x8256, "HP", ALC221_FIXUP_HP_FRONT_MIC),
+>>>>>>> common/deprecated/android-3.18
 	SND_PCI_QUIRK(0x1043, 0x103f, "ASUS TX300", ALC282_FIXUP_ASUS_TX300),
 	SND_PCI_QUIRK(0x1043, 0x106d, "Asus K53BE", ALC269_FIXUP_LIMIT_INT_MIC_BOOST),
 	SND_PCI_QUIRK(0x1043, 0x115d, "Asus 1015E", ALC269_FIXUP_LIMIT_INT_MIC_BOOST),
@@ -4878,14 +6046,27 @@ static const struct snd_pci_quirk alc269_fixup_tbl[] = {
 	SND_PCI_QUIRK(0x1043, 0x8398, "ASUS P1005", ALC269_FIXUP_STEREO_DMIC),
 	SND_PCI_QUIRK(0x1043, 0x83ce, "ASUS P1005", ALC269_FIXUP_STEREO_DMIC),
 	SND_PCI_QUIRK(0x1043, 0x8516, "ASUS X101CH", ALC269_FIXUP_ASUS_X101),
+<<<<<<< HEAD
 	SND_PCI_QUIRK(0x104d, 0x90b5, "Sony VAIO Pro 11", ALC286_FIXUP_SONY_MIC_NO_PRESENCE),
 	SND_PCI_QUIRK(0x104d, 0x90b6, "Sony VAIO Pro 13", ALC286_FIXUP_SONY_MIC_NO_PRESENCE),
+=======
+>>>>>>> common/deprecated/android-3.18
 	SND_PCI_QUIRK(0x104d, 0x9073, "Sony VAIO", ALC275_FIXUP_SONY_VAIO_GPIO2),
 	SND_PCI_QUIRK(0x104d, 0x907b, "Sony VAIO", ALC275_FIXUP_SONY_HWEQ),
 	SND_PCI_QUIRK(0x104d, 0x9084, "Sony VAIO", ALC275_FIXUP_SONY_HWEQ),
 	SND_PCI_QUIRK(0x104d, 0x9099, "Sony VAIO S13", ALC275_FIXUP_SONY_DISABLE_AAMIX),
+<<<<<<< HEAD
 	SND_PCI_QUIRK(0x10cf, 0x1475, "Lifebook", ALC269_FIXUP_LIFEBOOK),
 	SND_PCI_QUIRK(0x10cf, 0x15dc, "Lifebook T731", ALC269_FIXUP_LIFEBOOK_HP_PIN),
+=======
+	SND_PCI_QUIRK(0x104d, 0x90b5, "Sony VAIO Pro 11", ALC286_FIXUP_SONY_MIC_NO_PRESENCE),
+	SND_PCI_QUIRK(0x104d, 0x90b6, "Sony VAIO Pro 13", ALC286_FIXUP_SONY_MIC_NO_PRESENCE),
+	SND_PCI_QUIRK(0x10cf, 0x1475, "Lifebook", ALC269_FIXUP_LIFEBOOK),
+	SND_PCI_QUIRK(0x10cf, 0x159f, "Lifebook E780", ALC269_FIXUP_LIFEBOOK_NO_HP_TO_LINEOUT),
+	SND_PCI_QUIRK(0x10cf, 0x15dc, "Lifebook T731", ALC269_FIXUP_LIFEBOOK_HP_PIN),
+	SND_PCI_QUIRK(0x10cf, 0x1757, "Lifebook E752", ALC269_FIXUP_LIFEBOOK_HP_PIN),
+	SND_PCI_QUIRK(0x10cf, 0x1629, "Lifebook U7x7", ALC255_FIXUP_LIFEBOOK_U7x7_HEADSET_MIC),
+>>>>>>> common/deprecated/android-3.18
 	SND_PCI_QUIRK(0x10cf, 0x1845, "Lifebook U904", ALC269_FIXUP_LIFEBOOK_EXTMIC),
 	SND_PCI_QUIRK(0x144d, 0xc109, "Samsung Ativ book 9 (NP900X3G)", ALC269_FIXUP_INV_DMIC),
 	SND_PCI_QUIRK(0x1458, 0xfa53, "Gigabyte BXBT-2807", ALC283_FIXUP_BXBT2807_MIC),
@@ -4894,7 +6075,11 @@ static const struct snd_pci_quirk alc269_fixup_tbl[] = {
 	SND_PCI_QUIRK(0x17aa, 0x21b8, "Thinkpad Edge 14", ALC269_FIXUP_SKU_IGNORE),
 	SND_PCI_QUIRK(0x17aa, 0x21ca, "Thinkpad L412", ALC269_FIXUP_SKU_IGNORE),
 	SND_PCI_QUIRK(0x17aa, 0x21e9, "Thinkpad Edge 15", ALC269_FIXUP_SKU_IGNORE),
+<<<<<<< HEAD
 	SND_PCI_QUIRK(0x17aa, 0x21f6, "Thinkpad T530", ALC269_FIXUP_LENOVO_DOCK),
+=======
+	SND_PCI_QUIRK(0x17aa, 0x21f6, "Thinkpad T530", ALC269_FIXUP_LENOVO_DOCK_LIMIT_BOOST),
+>>>>>>> common/deprecated/android-3.18
 	SND_PCI_QUIRK(0x17aa, 0x21fa, "Thinkpad X230", ALC269_FIXUP_LENOVO_DOCK),
 	SND_PCI_QUIRK(0x17aa, 0x21f3, "Thinkpad T430", ALC269_FIXUP_LENOVO_DOCK),
 	SND_PCI_QUIRK(0x17aa, 0x21fb, "Thinkpad T430s", ALC269_FIXUP_LENOVO_DOCK),
@@ -4906,15 +6091,36 @@ static const struct snd_pci_quirk alc269_fixup_tbl[] = {
 	SND_PCI_QUIRK(0x17aa, 0x2212, "Thinkpad T440", ALC292_FIXUP_TPT440_DOCK),
 	SND_PCI_QUIRK(0x17aa, 0x2214, "Thinkpad X240", ALC292_FIXUP_TPT440_DOCK),
 	SND_PCI_QUIRK(0x17aa, 0x2215, "Thinkpad", ALC269_FIXUP_LIMIT_INT_MIC_BOOST),
+<<<<<<< HEAD
 	SND_PCI_QUIRK(0x17aa, 0x2226, "ThinkPad X250", ALC292_FIXUP_TPT440_DOCK),
 	SND_PCI_QUIRK(0x17aa, 0x3977, "IdeaPad S210", ALC283_FIXUP_INT_MIC),
 	SND_PCI_QUIRK(0x17aa, 0x3978, "IdeaPad Y410P", ALC269_FIXUP_NO_SHUTUP),
+=======
+	SND_PCI_QUIRK(0x17aa, 0x2223, "ThinkPad T550", ALC292_FIXUP_TPT440_DOCK),
+	SND_PCI_QUIRK(0x17aa, 0x2226, "ThinkPad X250", ALC292_FIXUP_TPT440_DOCK),
+	SND_PCI_QUIRK(0x17aa, 0x2233, "Thinkpad", ALC293_FIXUP_LENOVO_SPK_NOISE),
+	SND_PCI_QUIRK(0x17aa, 0x30bb, "ThinkCentre AIO", ALC233_FIXUP_LENOVO_LINE2_MIC_HOTKEY),
+	SND_PCI_QUIRK(0x17aa, 0x30e2, "ThinkCentre AIO", ALC233_FIXUP_LENOVO_LINE2_MIC_HOTKEY),
+	SND_PCI_QUIRK(0x17aa, 0x3112, "ThinkCentre AIO", ALC233_FIXUP_LENOVO_LINE2_MIC_HOTKEY),
+	SND_PCI_QUIRK(0x17aa, 0x3902, "Lenovo E50-80", ALC269_FIXUP_DMIC_THINKPAD_ACPI),
+	SND_PCI_QUIRK(0x17aa, 0x3977, "IdeaPad S210", ALC283_FIXUP_INT_MIC),
+	SND_PCI_QUIRK(0x17aa, 0x3978, "Lenovo B50-70", ALC269_FIXUP_DMIC_THINKPAD_ACPI),
+>>>>>>> common/deprecated/android-3.18
 	SND_PCI_QUIRK(0x17aa, 0x5013, "Thinkpad", ALC269_FIXUP_LIMIT_INT_MIC_BOOST),
 	SND_PCI_QUIRK(0x17aa, 0x501a, "Thinkpad", ALC283_FIXUP_INT_MIC),
 	SND_PCI_QUIRK(0x17aa, 0x501e, "Thinkpad L440", ALC292_FIXUP_TPT440_DOCK),
 	SND_PCI_QUIRK(0x17aa, 0x5026, "Thinkpad", ALC269_FIXUP_LIMIT_INT_MIC_BOOST),
 	SND_PCI_QUIRK(0x17aa, 0x5034, "Thinkpad T450", ALC292_FIXUP_TPT440_DOCK),
 	SND_PCI_QUIRK(0x17aa, 0x5036, "Thinkpad T450s", ALC292_FIXUP_TPT440_DOCK),
+<<<<<<< HEAD
+=======
+	SND_PCI_QUIRK(0x17aa, 0x503c, "Thinkpad L450", ALC292_FIXUP_TPT440_DOCK),
+	SND_PCI_QUIRK(0x17aa, 0x504a, "ThinkPad X260", ALC292_FIXUP_TPT440_DOCK),
+	SND_PCI_QUIRK(0x17aa, 0x504b, "Thinkpad", ALC293_FIXUP_LENOVO_SPK_NOISE),
+	SND_PCI_QUIRK(0x17aa, 0x5050, "Thinkpad T560p", ALC292_FIXUP_TPT460),
+	SND_PCI_QUIRK(0x17aa, 0x5051, "Thinkpad L460", ALC292_FIXUP_TPT460),
+	SND_PCI_QUIRK(0x17aa, 0x5053, "Thinkpad T460", ALC292_FIXUP_TPT460),
+>>>>>>> common/deprecated/android-3.18
 	SND_PCI_QUIRK(0x17aa, 0x5109, "Thinkpad", ALC269_FIXUP_LIMIT_INT_MIC_BOOST),
 	SND_PCI_QUIRK(0x17aa, 0x3bf8, "Quanta FL1", ALC269_FIXUP_PCM_44K),
 	SND_PCI_QUIRK(0x17aa, 0x9e54, "LENOVO NB", ALC269_FIXUP_LENOVO_EAPD),
@@ -4987,7 +6193,13 @@ static const struct hda_model_fixup alc269_fixup_models[] = {
 	{.id = ALC269_FIXUP_INV_DMIC, .name = "inv-dmic"},
 	{.id = ALC269_FIXUP_HEADSET_MIC, .name = "headset-mic"},
 	{.id = ALC269_FIXUP_LENOVO_DOCK, .name = "lenovo-dock"},
+<<<<<<< HEAD
 	{.id = ALC269_FIXUP_HP_GPIO_LED, .name = "hp-gpio-led"},
+=======
+	{.id = ALC269_FIXUP_LENOVO_DOCK_LIMIT_BOOST, .name = "lenovo-dock-limit-boost"},
+	{.id = ALC269_FIXUP_HP_GPIO_LED, .name = "hp-gpio-led"},
+	{.id = ALC269_FIXUP_HP_DOCK_GPIO_MIC1_LED, .name = "hp-dock-gpio-mic1-led"},
+>>>>>>> common/deprecated/android-3.18
 	{.id = ALC269_FIXUP_DELL1_MIC_NO_PRESENCE, .name = "dell-headset-multi"},
 	{.id = ALC269_FIXUP_DELL2_MIC_NO_PRESENCE, .name = "dell-headset-dock"},
 	{.id = ALC283_FIXUP_CHROME_BOOK, .name = "alc283-dac-wcaps"},
@@ -4995,6 +6207,11 @@ static const struct hda_model_fixup alc269_fixup_models[] = {
 	{.id = ALC292_FIXUP_TPT440_DOCK, .name = "tpt440-dock"},
 	{}
 };
+<<<<<<< HEAD
+=======
+#define ALC225_STANDARD_PINS \
+	{0x21, 0x04211020}
+>>>>>>> common/deprecated/android-3.18
 
 #define ALC255_STANDARD_PINS \
 	{0x18, 0x411111f0}, \
@@ -5003,6 +6220,19 @@ static const struct hda_model_fixup alc269_fixup_models[] = {
 	{0x1b, 0x411111f0}, \
 	{0x1e, 0x411111f0}
 
+<<<<<<< HEAD
+=======
+#define ALC256_STANDARD_PINS \
+	{0x12, 0x90a60140}, \
+	{0x14, 0x90170110}, \
+	{0x19, 0x411111f0}, \
+	{0x1a, 0x411111f0}, \
+	{0x1b, 0x411111f0}, \
+	{0x1d, 0x40700001}, \
+	{0x1e, 0x411111f0}, \
+	{0x21, 0x02211020}
+
+>>>>>>> common/deprecated/android-3.18
 #define ALC282_STANDARD_PINS \
 	{0x14, 0x90170110}, \
 	{0x18, 0x411111f0}, \
@@ -5010,6 +6240,16 @@ static const struct hda_model_fixup alc269_fixup_models[] = {
 	{0x1b, 0x411111f0}, \
 	{0x1e, 0x411111f0}
 
+<<<<<<< HEAD
+=======
+#define ALC288_STANDARD_PINS \
+	{0x17, 0x411111f0}, \
+	{0x18, 0x411111f0}, \
+	{0x19, 0x411111f0}, \
+	{0x1a, 0x411111f0}, \
+	{0x1e, 0x411111f0}
+
+>>>>>>> common/deprecated/android-3.18
 #define ALC290_STANDARD_PINS \
 	{0x12, 0x99a30130}, \
 	{0x13, 0x40000000}, \
@@ -5024,10 +6264,62 @@ static const struct hda_model_fixup alc269_fixup_models[] = {
 	{0x15, 0x0221401f}, \
 	{0x1a, 0x411111f0}, \
 	{0x1b, 0x411111f0}, \
+<<<<<<< HEAD
 	{0x1d, 0x40700001}, \
 	{0x1e, 0x411111f0}
 
 static const struct snd_hda_pin_quirk alc269_pin_fixup_tbl[] = {
+=======
+	{0x1d, 0x40700001}
+
+#define ALC295_STANDARD_PINS \
+	{0x12, 0xb7a60130}, \
+	{0x14, 0x90170110}, \
+	{0x21, 0x04211020}
+
+#define ALC298_STANDARD_PINS \
+	{0x18, 0x411111f0}, \
+	{0x19, 0x411111f0}, \
+	{0x1a, 0x411111f0}, \
+	{0x1e, 0x411111f0}, \
+	{0x1f, 0x411111f0}
+
+static const struct snd_hda_pin_quirk alc269_pin_fixup_tbl[] = {
+	SND_HDA_PIN_QUIRK(0x10ec0225, 0x1028, "Dell", ALC269_FIXUP_DELL1_MIC_NO_PRESENCE,
+		ALC225_STANDARD_PINS,
+		{0x14, 0x901701a0}),
+	SND_HDA_PIN_QUIRK(0x10ec0225, 0x1028, "Dell", ALC269_FIXUP_DELL1_MIC_NO_PRESENCE,
+		ALC225_STANDARD_PINS,
+		{0x14, 0x901701b0}),
+	SND_HDA_PIN_QUIRK(0x10ec0225, 0x1028, "Dell", ALC225_FIXUP_DELL1_MIC_NO_PRESENCE,
+		ALC225_STANDARD_PINS,
+		{0x12, 0xb7a60130},
+		{0x14, 0x901701a0}),
+	SND_HDA_PIN_QUIRK(0x10ec0225, 0x1028, "Dell", ALC225_FIXUP_DELL1_MIC_NO_PRESENCE,
+		ALC225_STANDARD_PINS,
+		{0x12, 0xb7a60130},
+		{0x14, 0x901701b0}),
+	SND_HDA_PIN_QUIRK(0x10ec0225, 0x1028, "Dell", ALC225_FIXUP_DELL1_MIC_NO_PRESENCE,
+		ALC225_STANDARD_PINS,
+		{0x12, 0xb7a60150},
+		{0x14, 0x901701a0}),
+	SND_HDA_PIN_QUIRK(0x10ec0225, 0x1028, "Dell", ALC225_FIXUP_DELL1_MIC_NO_PRESENCE,
+		ALC225_STANDARD_PINS,
+		{0x12, 0xb7a60150},
+		{0x14, 0x901701b0}),
+	SND_HDA_PIN_QUIRK(0x10ec0225, 0x1028, "Dell", ALC225_FIXUP_DELL1_MIC_NO_PRESENCE,
+		ALC225_STANDARD_PINS,
+		{0x12, 0xb7a60130},
+		{0x1b, 0x90170110}),
+	SND_HDA_PIN_QUIRK(0x10ec0236, 0x1028, "Dell", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE,
+		{0x12, 0x90a60140},
+		{0x14, 0x90170110},
+		{0x21, 0x02211020}),
+	SND_HDA_PIN_QUIRK(0x10ec0236, 0x1028, "Dell", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE,
+		{0x12, 0x90a60140},
+		{0x14, 0x90170150},
+		{0x21, 0x02211020}),
+>>>>>>> common/deprecated/android-3.18
 	SND_HDA_PIN_QUIRK(0x10ec0255, 0x1028, "Dell", ALC255_FIXUP_DELL2_MIC_NO_PRESENCE,
 		ALC255_STANDARD_PINS,
 		{0x12, 0x40300000},
@@ -5036,6 +6328,12 @@ static const struct snd_hda_pin_quirk alc269_pin_fixup_tbl[] = {
 		{0x1d, 0x40538029},
 		{0x21, 0x02211020}),
 	SND_HDA_PIN_QUIRK(0x10ec0255, 0x1028, "Dell", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE,
+<<<<<<< HEAD
+=======
+		{0x14, 0x90170130},
+		{0x21, 0x02211040}),
+	SND_HDA_PIN_QUIRK(0x10ec0255, 0x1028, "Dell", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE,
+>>>>>>> common/deprecated/android-3.18
 		ALC255_STANDARD_PINS,
 		{0x12, 0x90a60140},
 		{0x14, 0x90170110},
@@ -5050,6 +6348,25 @@ static const struct snd_hda_pin_quirk alc269_pin_fixup_tbl[] = {
 		{0x1d, 0x40700001},
 		{0x21, 0x02211030}),
 	SND_HDA_PIN_QUIRK(0x10ec0255, 0x1028, "Dell", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE,
+<<<<<<< HEAD
+=======
+		{0x14, 0x90170110},
+		{0x1b, 0x02011020},
+		{0x21, 0x0221101f}),
+	SND_HDA_PIN_QUIRK(0x10ec0255, 0x1028, "Dell", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE,
+		{0x14, 0x90170110},
+		{0x1b, 0x01011020},
+		{0x21, 0x0221101f}),
+	SND_HDA_PIN_QUIRK(0x10ec0255, 0x1028, "Dell", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE,
+		{0x14, 0x90170130},
+		{0x1b, 0x02011020},
+		{0x21, 0x0221103f}),
+	SND_HDA_PIN_QUIRK(0x10ec0255, 0x1028, "Dell", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE,
+		{0x14, 0x90170130},
+		{0x1b, 0x01011020},
+		{0x21, 0x0221103f}),
+	SND_HDA_PIN_QUIRK(0x10ec0255, 0x1028, "Dell", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE,
+>>>>>>> common/deprecated/android-3.18
 		{0x12, 0x90a60160},
 		{0x14, 0x90170120},
 		{0x17, 0x90170140},
@@ -5091,10 +6408,59 @@ static const struct snd_hda_pin_quirk alc269_pin_fixup_tbl[] = {
 	SND_HDA_PIN_QUIRK(0x10ec0255, 0x1028, "Dell", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE,
 		ALC255_STANDARD_PINS,
 		{0x12, 0x90a60170},
+<<<<<<< HEAD
+=======
+		{0x14, 0x90171130},
+		{0x21, 0x02211040}),
+	SND_HDA_PIN_QUIRK(0x10ec0255, 0x1028, "Dell", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE,
+		{0x12, 0x90a60170},
+>>>>>>> common/deprecated/android-3.18
 		{0x14, 0x90170140},
 		{0x17, 0x40000000},
 		{0x1d, 0x40700001},
 		{0x21, 0x02211050}),
+<<<<<<< HEAD
+=======
+	SND_HDA_PIN_QUIRK(0x10ec0255, 0x1028, "Dell Inspiron 5548", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE,
+		ALC255_STANDARD_PINS,
+		{0x12, 0x90a60180},
+		{0x14, 0x90170130},
+		{0x17, 0x40000000},
+		{0x1d, 0x40700001},
+		{0x21, 0x02211040}),
+	SND_HDA_PIN_QUIRK(0x10ec0255, 0x1028, "Dell Inspiron 5565", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE,
+		{0x12, 0x90a60180},
+		{0x14, 0x90170120},
+		{0x21, 0x02211030}),
+	SND_HDA_PIN_QUIRK(0x10ec0255, 0x1028, "Dell", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE,
+		{0x1b, 0x01011020},
+		{0x21, 0x02211010}),
+	SND_HDA_PIN_QUIRK(0x10ec0256, 0x1028, "Dell", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE,
+		ALC256_STANDARD_PINS,
+		{0x13, 0x40000000}),
+	SND_HDA_PIN_QUIRK(0x10ec0256, 0x1028, "Dell", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE,
+		{0x12, 0x90a60160},
+		{0x14, 0x90170120},
+		{0x21, 0x02211030}),
+	SND_HDA_PIN_QUIRK(0x10ec0256, 0x1028, "Dell", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE,
+		ALC256_STANDARD_PINS,
+		{0x13, 0x411111f0}),
+	SND_HDA_PIN_QUIRK(0x10ec0256, 0x1028, "Dell Inspiron 5468", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE,
+		{0x12, 0x90a60180},
+		{0x14, 0x90170120},
+		{0x21, 0x02211030}),
+	SND_HDA_PIN_QUIRK(0x10ec0256, 0x1028, "Dell", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE,
+		{0x12, 0xb7a60130},
+		{0x14, 0x90170110},
+		{0x21, 0x02211020}),
+	SND_HDA_PIN_QUIRK(0x10ec0256, 0x1028, "Dell", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE,
+		{0x12, 0x90a60130},
+		{0x14, 0x90170110},
+		{0x14, 0x01011020},
+		{0x21, 0x0221101f}),
+	SND_HDA_PIN_QUIRK(0x10ec0256, 0x1028, "Dell", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE,
+		ALC256_STANDARD_PINS),
+>>>>>>> common/deprecated/android-3.18
 	SND_HDA_PIN_QUIRK(0x10ec0280, 0x103c, "HP", ALC280_FIXUP_HP_GPIO4,
 		{0x12, 0x90a60130},
 		{0x13, 0x40000000},
@@ -5195,6 +6561,20 @@ static const struct snd_hda_pin_quirk alc269_pin_fixup_tbl[] = {
 		{0x19, 0x03a11020},
 		{0x1d, 0x40e00001},
 		{0x21, 0x0321101f}),
+<<<<<<< HEAD
+=======
+	SND_HDA_PIN_QUIRK(0x10ec0288, 0x1028, "Dell", ALC288_FIXUP_DELL_XPS_13_GPIO6,
+		ALC288_STANDARD_PINS,
+		{0x12, 0x90a60120},
+		{0x13, 0x40000000},
+		{0x14, 0x90170110},
+		{0x1d, 0x4076832d},
+		{0x21, 0x0321101f}),
+	SND_HDA_PIN_QUIRK(0x10ec0289, 0x1028, "Dell", ALC269_FIXUP_DELL4_MIC_NO_PRESENCE,
+		{0x12, 0xb7a60130},
+		{0x14, 0x90170110},
+		{0x21, 0x04211020}),
+>>>>>>> common/deprecated/android-3.18
 	SND_HDA_PIN_QUIRK(0x10ec0290, 0x103c, "HP", ALC269_FIXUP_HP_MUTE_LED_MIC1,
 		ALC290_STANDARD_PINS,
 		{0x14, 0x411111f0},
@@ -5250,35 +6630,96 @@ static const struct snd_hda_pin_quirk alc269_pin_fixup_tbl[] = {
 		{0x13, 0x411111f0},
 		{0x16, 0x01014020},
 		{0x18, 0x411111f0},
+<<<<<<< HEAD
 		{0x19, 0x01a19030}),
+=======
+		{0x19, 0x01a19030},
+		{0x1e, 0x411111f0}),
+>>>>>>> common/deprecated/android-3.18
 	SND_HDA_PIN_QUIRK(0x10ec0292, 0x1028, "Dell", ALC269_FIXUP_DELL2_MIC_NO_PRESENCE,
 		ALC292_STANDARD_PINS,
 		{0x12, 0x90a60140},
 		{0x13, 0x411111f0},
 		{0x16, 0x01014020},
 		{0x18, 0x02a19031},
+<<<<<<< HEAD
 		{0x19, 0x01a1903e}),
+=======
+		{0x19, 0x01a1903e},
+		{0x1e, 0x411111f0}),
+>>>>>>> common/deprecated/android-3.18
 	SND_HDA_PIN_QUIRK(0x10ec0292, 0x1028, "Dell", ALC269_FIXUP_DELL3_MIC_NO_PRESENCE,
 		ALC292_STANDARD_PINS,
 		{0x12, 0x90a60140},
 		{0x13, 0x411111f0},
 		{0x16, 0x411111f0},
 		{0x18, 0x411111f0},
+<<<<<<< HEAD
 		{0x19, 0x411111f0}),
+=======
+		{0x19, 0x411111f0},
+		{0x1e, 0x411111f0}),
+>>>>>>> common/deprecated/android-3.18
 	SND_HDA_PIN_QUIRK(0x10ec0293, 0x1028, "Dell", ALC293_FIXUP_DELL1_MIC_NO_PRESENCE,
 		ALC292_STANDARD_PINS,
 		{0x12, 0x40000000},
 		{0x13, 0x90a60140},
 		{0x16, 0x21014020},
 		{0x18, 0x411111f0},
+<<<<<<< HEAD
 		{0x19, 0x21a19030}),
+=======
+		{0x19, 0x21a19030},
+		{0x1e, 0x411111f0}),
+>>>>>>> common/deprecated/android-3.18
 	SND_HDA_PIN_QUIRK(0x10ec0293, 0x1028, "Dell", ALC293_FIXUP_DELL1_MIC_NO_PRESENCE,
 		ALC292_STANDARD_PINS,
 		{0x12, 0x40000000},
 		{0x13, 0x90a60140},
 		{0x16, 0x411111f0},
 		{0x18, 0x411111f0},
+<<<<<<< HEAD
 		{0x19, 0x411111f0}),
+=======
+		{0x19, 0x411111f0},
+		{0x1e, 0x411111f0}),
+	SND_HDA_PIN_QUIRK(0x10ec0293, 0x1028, "Dell", ALC293_FIXUP_DELL1_MIC_NO_PRESENCE,
+		ALC292_STANDARD_PINS,
+		{0x12, 0x40000000},
+		{0x13, 0x90a60140},
+		{0x16, 0x21014020},
+		{0x18, 0x411111f0},
+		{0x19, 0x21a19030},
+		{0x1e, 0x411111ff}),
+	SND_HDA_PIN_QUIRK(0x10ec0295, 0x1028, "Dell", ALC269_FIXUP_DELL1_MIC_NO_PRESENCE,
+		ALC295_STANDARD_PINS,
+		{0x17, 0x21014020},
+		{0x18, 0x21a19030}),
+	SND_HDA_PIN_QUIRK(0x10ec0295, 0x1028, "Dell", ALC269_FIXUP_DELL1_MIC_NO_PRESENCE,
+		ALC295_STANDARD_PINS,
+		{0x17, 0x21014040},
+		{0x18, 0x21a19050}),
+	SND_HDA_PIN_QUIRK(0x10ec0295, 0x1028, "Dell", ALC269_FIXUP_DELL1_MIC_NO_PRESENCE,
+		ALC295_STANDARD_PINS),
+	SND_HDA_PIN_QUIRK(0x10ec0298, 0x1028, "Dell", ALC298_FIXUP_DELL1_MIC_NO_PRESENCE,
+		ALC298_STANDARD_PINS,
+		{0x12, 0x90a60130},
+		{0x13, 0x40000000},
+		{0x14, 0x411111f0},
+		{0x17, 0x90170140},
+		{0x1d, 0x4068a36d},
+		{0x21, 0x03211020}),
+	SND_HDA_PIN_QUIRK(0x10ec0298, 0x1028, "Dell", ALC298_FIXUP_SPK_VOLUME,
+		{0x12, 0xb7a60140},
+		{0x13, 0xb7a60150},
+		{0x17, 0x90170110},
+		{0x1a, 0x03011020},
+		{0x21, 0x03211030}),
+	SND_HDA_PIN_QUIRK(0x10ec0299, 0x1028, "Dell", ALC269_FIXUP_DELL4_MIC_NO_PRESENCE,
+		ALC225_STANDARD_PINS,
+		{0x12, 0xb7a60130},
+		{0x17, 0x90170110}),
+>>>>>>> common/deprecated/android-3.18
 	{}
 };
 
@@ -5409,14 +6850,43 @@ static int patch_alc269(struct hda_codec *codec)
 	case 0x10ec0298:
 		spec->codec_variant = ALC269_TYPE_ALC298;
 		break;
+<<<<<<< HEAD
 	case 0x10ec0255:
 		spec->codec_variant = ALC269_TYPE_ALC255;
 		break;
+=======
+	case 0x10ec0235:
+	case 0x10ec0255:
+		spec->codec_variant = ALC269_TYPE_ALC255;
+		break;
+	case 0x10ec0236:
+>>>>>>> common/deprecated/android-3.18
 	case 0x10ec0256:
 		spec->codec_variant = ALC269_TYPE_ALC256;
 		spec->gen.mixer_nid = 0; /* ALC256 does not have any loopback mixer path */
 		alc_update_coef_idx(codec, 0x36, 1 << 13, 1 << 5); /* Switch pcbeep path to Line in path*/
 		break;
+<<<<<<< HEAD
+=======
+	case 0x10ec0225:
+	case 0x10ec0295:
+	case 0x10ec0299:
+		spec->codec_variant = ALC269_TYPE_ALC225;
+		break;
+	case 0x10ec0234:
+	case 0x10ec0274:
+	case 0x10ec0294:
+		spec->codec_variant = ALC269_TYPE_ALC294;
+		break;
+	case 0x10ec0700:
+	case 0x10ec0701:
+	case 0x10ec0703:
+		spec->codec_variant = ALC269_TYPE_ALC700;
+		spec->gen.mixer_nid = 0; /* ALC700 does not have any loopback mixer path */
+		alc_update_coef_idx(codec, 0x4a, 1 << 15, 0); /* Combo jack auto trigger control */
+		break;
+
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (snd_hda_codec_read(codec, 0x51, 0, AC_VERB_PARAMETERS, 0) == 0x10ec5505) {
@@ -5535,8 +7005,12 @@ static const struct snd_pci_quirk alc861_fixup_tbl[] = {
 	SND_PCI_QUIRK(0x1043, 0x1393, "ASUS A6Rp", ALC861_FIXUP_ASUS_A6RP),
 	SND_PCI_QUIRK_VENDOR(0x1043, "ASUS laptop", ALC861_FIXUP_AMP_VREF_0F),
 	SND_PCI_QUIRK(0x1462, 0x7254, "HP DX2200", ALC861_FIXUP_NO_JACK_DETECT),
+<<<<<<< HEAD
 	SND_PCI_QUIRK(0x1584, 0x2b01, "Haier W18", ALC861_FIXUP_AMP_VREF_0F),
 	SND_PCI_QUIRK(0x1584, 0x0000, "Uniwill ECS M31EI", ALC861_FIXUP_AMP_VREF_0F),
+=======
+	SND_PCI_QUIRK_VENDOR(0x1584, "Haier/Uniwill", ALC861_FIXUP_AMP_VREF_0F),
+>>>>>>> common/deprecated/android-3.18
 	SND_PCI_QUIRK(0x1734, 0x10c7, "FSC Amilo Pi1505", ALC861_FIXUP_FSC_AMILO_PI1505),
 	{}
 };
@@ -5735,6 +7209,7 @@ static void alc_fixup_bass_chmap(struct hda_codec *codec,
 	}
 }
 
+<<<<<<< HEAD
 /* turn on/off mute LED per vmaster hook */
 static void alc662_led_gpio1_mute_hook(void *private_data, int enabled)
 {
@@ -5751,6 +7226,8 @@ static void alc662_led_gpio1_mute_hook(void *private_data, int enabled)
 				    spec->gpio_led);
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /* avoid D3 for keeping GPIO up */
 static unsigned int gpio_led_power_filter(struct hda_codec *codec,
 					  hda_nid_t nid,
@@ -5773,8 +7250,15 @@ static void alc662_fixup_led_gpio1(struct hda_codec *codec,
 	};
 
 	if (action == HDA_FIXUP_ACT_PRE_PROBE) {
+<<<<<<< HEAD
 		spec->gen.vmaster_mute.hook = alc662_led_gpio1_mute_hook;
 		spec->gpio_led = 0;
+=======
+		spec->gen.vmaster_mute.hook = alc_fixup_gpio_mute_hook;
+		spec->gpio_led = 0;
+		spec->mute_led_polarity = 1;
+		spec->gpio_mute_led_mask = 0x01;
+>>>>>>> common/deprecated/android-3.18
 		snd_hda_add_verbs(codec, gpio_init);
 		codec->power_filter = gpio_led_power_filter;
 	}
@@ -5828,7 +7312,13 @@ enum {
 	ALC662_FIXUP_NO_JACK_DETECT,
 	ALC662_FIXUP_ZOTAC_Z68,
 	ALC662_FIXUP_INV_DMIC,
+<<<<<<< HEAD
 	ALC668_FIXUP_DELL_MIC_NO_PRESENCE,
+=======
+	ALC662_FIXUP_DELL_MIC_NO_PRESENCE,
+	ALC668_FIXUP_DELL_MIC_NO_PRESENCE,
+	ALC662_FIXUP_HEADSET_MODE,
+>>>>>>> common/deprecated/android-3.18
 	ALC668_FIXUP_HEADSET_MODE,
 	ALC662_FIXUP_BASS_MODE4_CHMAP,
 	ALC662_FIXUP_BASS_16,
@@ -5837,6 +7327,12 @@ enum {
 	ALC668_FIXUP_AUTO_MUTE,
 	ALC668_FIXUP_DELL_DISABLE_AAMIX,
 	ALC668_FIXUP_DELL_XPS13,
+<<<<<<< HEAD
+=======
+	ALC662_FIXUP_ASUS_Nx50,
+	ALC668_FIXUP_ASUS_Nx51_HEADSET_MODE,
+	ALC668_FIXUP_ASUS_Nx51,
+>>>>>>> common/deprecated/android-3.18
 };
 
 static const struct hda_fixup alc662_fixups[] = {
@@ -6021,6 +7517,23 @@ static const struct hda_fixup alc662_fixups[] = {
 		.chained = true,
 		.chain_id = ALC668_FIXUP_DELL_MIC_NO_PRESENCE
 	},
+<<<<<<< HEAD
+=======
+	[ALC662_FIXUP_DELL_MIC_NO_PRESENCE] = {
+		.type = HDA_FIXUP_PINS,
+		.v.pins = (const struct hda_pintbl[]) {
+			{ 0x19, 0x03a1113c }, /* use as headset mic, without its own jack detect */
+			/* headphone mic by setting pin control of 0x1b (headphone out) to in + vref_50 */
+			{ }
+		},
+		.chained = true,
+		.chain_id = ALC662_FIXUP_HEADSET_MODE
+	},
+	[ALC662_FIXUP_HEADSET_MODE] = {
+		.type = HDA_FIXUP_FUNC,
+		.v.func = alc_fixup_headset_mode_alc662,
+	},
+>>>>>>> common/deprecated/android-3.18
 	[ALC668_FIXUP_DELL_MIC_NO_PRESENCE] = {
 		.type = HDA_FIXUP_PINS,
 		.v.pins = (const struct hda_pintbl[]) {
@@ -6063,6 +7576,31 @@ static const struct hda_fixup alc662_fixups[] = {
 		.type = HDA_FIXUP_FUNC,
 		.v.func = alc_fixup_bass_chmap,
 	},
+<<<<<<< HEAD
+=======
+	[ALC662_FIXUP_ASUS_Nx50] = {
+		.type = HDA_FIXUP_FUNC,
+		.v.func = alc_fixup_auto_mute_via_amp,
+		.chained = true,
+		.chain_id = ALC662_FIXUP_BASS_1A
+	},
+	[ALC668_FIXUP_ASUS_Nx51_HEADSET_MODE] = {
+		.type = HDA_FIXUP_FUNC,
+		.v.func = alc_fixup_headset_mode_alc668,
+		.chain_id = ALC662_FIXUP_BASS_CHMAP
+	},
+	[ALC668_FIXUP_ASUS_Nx51] = {
+		.type = HDA_FIXUP_PINS,
+		.v.pins = (const struct hda_pintbl[]) {
+			{ 0x19, 0x03a1913d }, /* use as headphone mic, without its own jack detect */
+			{ 0x1a, 0x90170151 }, /* bass speaker */
+			{ 0x1b, 0x03a1113c }, /* use as headset mic, without its own jack detect */
+			{}
+		},
+		.chained = true,
+		.chain_id = ALC668_FIXUP_ASUS_Nx51_HEADSET_MODE,
+	},
+>>>>>>> common/deprecated/android-3.18
 };
 
 static const struct snd_pci_quirk alc662_fixup_tbl[] = {
@@ -6083,9 +7621,21 @@ static const struct snd_pci_quirk alc662_fixup_tbl[] = {
 	SND_PCI_QUIRK(0x1028, 0x0698, "Dell", ALC668_FIXUP_DELL_MIC_NO_PRESENCE),
 	SND_PCI_QUIRK(0x1028, 0x069f, "Dell", ALC668_FIXUP_DELL_MIC_NO_PRESENCE),
 	SND_PCI_QUIRK(0x103c, 0x1632, "HP RP5800", ALC662_FIXUP_HP_RP5800),
+<<<<<<< HEAD
 	SND_PCI_QUIRK(0x1043, 0x11cd, "Asus N550", ALC662_FIXUP_BASS_1A),
 	SND_PCI_QUIRK(0x1043, 0x1477, "ASUS N56VZ", ALC662_FIXUP_BASS_MODE4_CHMAP),
 	SND_PCI_QUIRK(0x1043, 0x15a7, "ASUS UX51VZH", ALC662_FIXUP_BASS_16),
+=======
+	SND_PCI_QUIRK(0x1043, 0x1080, "Asus UX501VW", ALC668_FIXUP_HEADSET_MODE),
+	SND_PCI_QUIRK(0x1043, 0x11cd, "Asus N550", ALC662_FIXUP_ASUS_Nx50),
+	SND_PCI_QUIRK(0x1043, 0x13df, "Asus N550JX", ALC662_FIXUP_BASS_1A),
+	SND_PCI_QUIRK(0x1043, 0x129d, "Asus N750", ALC662_FIXUP_ASUS_Nx50),
+	SND_PCI_QUIRK(0x1043, 0x1477, "ASUS N56VZ", ALC662_FIXUP_BASS_MODE4_CHMAP),
+	SND_PCI_QUIRK(0x1043, 0x15a7, "ASUS UX51VZH", ALC662_FIXUP_BASS_16),
+	SND_PCI_QUIRK(0x1043, 0x177d, "ASUS N551", ALC668_FIXUP_ASUS_Nx51),
+	SND_PCI_QUIRK(0x1043, 0x17bd, "ASUS N751", ALC668_FIXUP_ASUS_Nx51),
+	SND_PCI_QUIRK(0x1043, 0x1963, "ASUS X71SL", ALC662_FIXUP_ASUS_MODE8),
+>>>>>>> common/deprecated/android-3.18
 	SND_PCI_QUIRK(0x1043, 0x1b73, "ASUS N55SF", ALC662_FIXUP_BASS_16),
 	SND_PCI_QUIRK(0x1043, 0x1bf3, "ASUS N76VZ", ALC662_FIXUP_BASS_MODE4_CHMAP),
 	SND_PCI_QUIRK(0x1043, 0x8469, "ASUS mobo", ALC662_FIXUP_NO_JACK_DETECT),
@@ -6172,6 +7722,21 @@ static const struct hda_model_fixup alc662_fixup_models[] = {
 };
 
 static const struct snd_hda_pin_quirk alc662_pin_fixup_tbl[] = {
+<<<<<<< HEAD
+=======
+	SND_HDA_PIN_QUIRK(0x10ec0662, 0x1028, "Dell", ALC662_FIXUP_DELL_MIC_NO_PRESENCE,
+		{0x12, 0x4004c000},
+		{0x14, 0x01014010},
+		{0x15, 0x411111f0},
+		{0x16, 0x411111f0},
+		{0x18, 0x01a19020},
+		{0x19, 0x411111f0},
+		{0x1a, 0x0181302f},
+		{0x1b, 0x0221401f},
+		{0x1c, 0x411111f0},
+		{0x1d, 0x4054c601},
+		{0x1e, 0x411111f0}),
+>>>>>>> common/deprecated/android-3.18
 	SND_HDA_PIN_QUIRK(0x10ec0668, 0x1028, "Dell", ALC668_FIXUP_AUTO_MUTE,
 		{0x12, 0x99a30130},
 		{0x14, 0x90170110},
@@ -6343,14 +7908,27 @@ static int patch_alc680(struct hda_codec *codec)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * patch entries
  */
 static const struct hda_codec_preset snd_hda_preset_realtek[] = {
 	{ .id = 0x10ec0221, .name = "ALC221", .patch = patch_alc269 },
+<<<<<<< HEAD
 	{ .id = 0x10ec0231, .name = "ALC231", .patch = patch_alc269 },
 	{ .id = 0x10ec0233, .name = "ALC233", .patch = patch_alc269 },
 	{ .id = 0x10ec0235, .name = "ALC233", .patch = patch_alc269 },
+=======
+	{ .id = 0x10ec0225, .name = "ALC225", .patch = patch_alc269 },
+	{ .id = 0x10ec0231, .name = "ALC231", .patch = patch_alc269 },
+	{ .id = 0x10ec0233, .name = "ALC233", .patch = patch_alc269 },
+	{ .id = 0x10ec0234, .name = "ALC234", .patch = patch_alc269 },
+	{ .id = 0x10ec0235, .name = "ALC233", .patch = patch_alc269 },
+	{ .id = 0x10ec0236, .name = "ALC236", .patch = patch_alc269 },
+>>>>>>> common/deprecated/android-3.18
 	{ .id = 0x10ec0255, .name = "ALC255", .patch = patch_alc269 },
 	{ .id = 0x10ec0256, .name = "ALC256", .patch = patch_alc269 },
 	{ .id = 0x10ec0260, .name = "ALC260", .patch = patch_alc260 },
@@ -6360,6 +7938,10 @@ static const struct hda_codec_preset snd_hda_preset_realtek[] = {
 	{ .id = 0x10ec0269, .name = "ALC269", .patch = patch_alc269 },
 	{ .id = 0x10ec0270, .name = "ALC270", .patch = patch_alc269 },
 	{ .id = 0x10ec0272, .name = "ALC272", .patch = patch_alc662 },
+<<<<<<< HEAD
+=======
+	{ .id = 0x10ec0274, .name = "ALC274", .patch = patch_alc269 },
+>>>>>>> common/deprecated/android-3.18
 	{ .id = 0x10ec0275, .name = "ALC275", .patch = patch_alc269 },
 	{ .id = 0x10ec0276, .name = "ALC276", .patch = patch_alc269 },
 	{ .id = 0x10ec0280, .name = "ALC280", .patch = patch_alc269 },
@@ -6372,7 +7954,14 @@ static const struct hda_codec_preset snd_hda_preset_realtek[] = {
 	{ .id = 0x10ec0290, .name = "ALC290", .patch = patch_alc269 },
 	{ .id = 0x10ec0292, .name = "ALC292", .patch = patch_alc269 },
 	{ .id = 0x10ec0293, .name = "ALC293", .patch = patch_alc269 },
+<<<<<<< HEAD
 	{ .id = 0x10ec0298, .name = "ALC298", .patch = patch_alc269 },
+=======
+	{ .id = 0x10ec0294, .name = "ALC294", .patch = patch_alc269 },
+	{ .id = 0x10ec0295, .name = "ALC295", .patch = patch_alc269 },
+	{ .id = 0x10ec0298, .name = "ALC298", .patch = patch_alc269 },
+	{ .id = 0x10ec0299, .name = "ALC299", .patch = patch_alc269 },
+>>>>>>> common/deprecated/android-3.18
 	{ .id = 0x10ec0861, .rev = 0x100340, .name = "ALC660",
 	  .patch = patch_alc861 },
 	{ .id = 0x10ec0660, .name = "ALC660-VD", .patch = patch_alc861vd },
@@ -6391,6 +7980,12 @@ static const struct hda_codec_preset snd_hda_preset_realtek[] = {
 	{ .id = 0x10ec0670, .name = "ALC670", .patch = patch_alc662 },
 	{ .id = 0x10ec0671, .name = "ALC671", .patch = patch_alc662 },
 	{ .id = 0x10ec0680, .name = "ALC680", .patch = patch_alc680 },
+<<<<<<< HEAD
+=======
+	{ .id = 0x10ec0700, .name = "ALC700", .patch = patch_alc269 },
+	{ .id = 0x10ec0701, .name = "ALC701", .patch = patch_alc269 },
+	{ .id = 0x10ec0703, .name = "ALC703", .patch = patch_alc269 },
+>>>>>>> common/deprecated/android-3.18
 	{ .id = 0x10ec0867, .name = "ALC891", .patch = patch_alc882 },
 	{ .id = 0x10ec0880, .name = "ALC880", .patch = patch_alc880 },
 	{ .id = 0x10ec0882, .name = "ALC882", .patch = patch_alc882 },
@@ -6406,6 +8001,10 @@ static const struct hda_codec_preset snd_hda_preset_realtek[] = {
 	{ .id = 0x10ec0888, .name = "ALC888", .patch = patch_alc882 },
 	{ .id = 0x10ec0889, .name = "ALC889", .patch = patch_alc882 },
 	{ .id = 0x10ec0892, .name = "ALC892", .patch = patch_alc662 },
+<<<<<<< HEAD
+=======
+	{ .id = 0x10ec0897, .name = "ALC897", .patch = patch_alc662 },
+>>>>>>> common/deprecated/android-3.18
 	{ .id = 0x10ec0899, .name = "ALC898", .patch = patch_alc882 },
 	{ .id = 0x10ec0900, .name = "ALC1150", .patch = patch_alc882 },
 	{} /* terminator */

@@ -156,6 +156,10 @@ out:
 					 */
 			case 0x2C:	/* Westmere EP - Gulftown */
 				cpu_info->caps |= CPUPOWER_CAP_HAS_TURBO_RATIO;
+<<<<<<< HEAD
+=======
+				break;
+>>>>>>> common/deprecated/android-3.18
 			case 0x2A:	/* SNB */
 			case 0x2D:	/* SNB Xeon */
 			case 0x3A:	/* IVB */

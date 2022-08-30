@@ -22,7 +22,10 @@
  */
 
 #include <linux/slab.h>
+<<<<<<< HEAD
 #include <linux/wl12xx.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 #include <linux/export.h>
 
 #include "debug.h"

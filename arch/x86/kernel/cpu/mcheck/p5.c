@@ -8,6 +8,10 @@
 #include <linux/smp.h>
 
 #include <asm/processor.h>
+<<<<<<< HEAD
+=======
+#include <asm/tlbflush.h>
+>>>>>>> common/deprecated/android-3.18
 #include <asm/mce.h>
 #include <asm/msr.h>
 
@@ -59,7 +63,11 @@ void intel_p5_mcheck_init(struct cpuinfo_x86 *c)
 	       "Intel old style machine check architecture supported.\n");
 
 	/* Enable MCE: */
+<<<<<<< HEAD
 	set_in_cr4(X86_CR4_MCE);
+=======
+	cr4_set_bits(X86_CR4_MCE);
+>>>>>>> common/deprecated/android-3.18
 	printk(KERN_INFO
 	       "Intel old style machine check reporting enabled on CPU#%d.\n",
 	       smp_processor_id());

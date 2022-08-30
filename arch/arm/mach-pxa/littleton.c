@@ -183,7 +183,11 @@ static struct pxafb_mach_info littleton_lcd_info = {
 	.lcd_conn		= LCD_COLOR_TFT_16BPP,
 };
 
+<<<<<<< HEAD
 static void littleton_init_lcd(void)
+=======
+static void __init littleton_init_lcd(void)
+>>>>>>> common/deprecated/android-3.18
 {
 	pxa_set_fb_info(NULL, &littleton_lcd_info);
 }

@@ -467,6 +467,12 @@ int i2400mu_probe(struct usb_interface *iface,
 	struct i2400mu *i2400mu;
 	struct usb_device *usb_dev = interface_to_usbdev(iface);
 
+<<<<<<< HEAD
+=======
+	if (iface->cur_altsetting->desc.bNumEndpoints < 4)
+		return -ENODEV;
+
+>>>>>>> common/deprecated/android-3.18
 	if (usb_dev->speed != USB_SPEED_HIGH)
 		dev_err(dev, "device not connected as high speed\n");
 

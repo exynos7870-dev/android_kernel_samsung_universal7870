@@ -16,10 +16,17 @@
 #include <linux/kthread.h>
 #include <linux/scatterlist.h>
 #include <linux/dma-mapping.h>
+<<<<<<< HEAD
 #include <linux/version.h>
 
 #include <linux/mmc/card.h>
 #include <linux/mmc/host.h>
+=======
+
+#include <linux/mmc/card.h>
+#include <linux/mmc/host.h>
+#include <linux/sched/rt.h>
+>>>>>>> common/deprecated/android-3.18
 #include "queue.h"
 
 #define MMC_QUEUE_BOUNCESZ	65536
@@ -39,7 +46,11 @@ static int mmc_prep_request(struct request_queue *q, struct request *req)
 		return BLKPREP_KILL;
 	}
 
+<<<<<<< HEAD
 	if (mq && mmc_card_removed(mq->card))
+=======
+	if (mq && (mmc_card_removed(mq->card) || mmc_access_rpmb(mq)))
+>>>>>>> common/deprecated/android-3.18
 		return BLKPREP_KILL;
 
 	req->cmd_flags |= REQ_DONTPREP;
@@ -51,6 +62,14 @@ static int mmc_queue_thread(void *d)
 {
 	struct mmc_queue *mq = d;
 	struct request_queue *q = mq->queue;
+<<<<<<< HEAD
+=======
+	struct sched_param scheduler_params = {0};
+
+	scheduler_params.sched_priority = 1;
+
+	sched_setscheduler(current, SCHED_FIFO, &scheduler_params);
+>>>>>>> common/deprecated/android-3.18
 
 	current->flags |= PF_MEMALLOC;
 
@@ -62,12 +81,16 @@ static int mmc_queue_thread(void *d)
 
 		spin_lock_irq(q->queue_lock);
 		set_current_state(TASK_INTERRUPTIBLE);
+<<<<<<< HEAD
 		if (mq->mqrq_prev->req &&
 				(mq->card && (mq->card->type == MMC_TYPE_SD) &&
 				mq->card->host->pm_progress))
 			req = NULL;
 		else
 			req = blk_fetch_request(q);
+=======
+		req = blk_fetch_request(q);
+>>>>>>> common/deprecated/android-3.18
 		mq->mqrq_cur->req = req;
 		spin_unlock_irq(q->queue_lock);
 
@@ -416,12 +439,19 @@ void mmc_packed_clean(struct mmc_queue *mq)
  * complete any outstanding requests.  This ensures that we
  * won't suspend while a request is being processed.
  */
+<<<<<<< HEAD
 int mmc_queue_suspend(struct mmc_queue *mq, int wait)
 {
 	struct request_queue *q = mq->queue;
 	struct request *req;
 	unsigned long flags;
 	int rc = 0;
+=======
+void mmc_queue_suspend(struct mmc_queue *mq)
+{
+	struct request_queue *q = mq->queue;
+	unsigned long flags;
+>>>>>>> common/deprecated/android-3.18
 
 	if (!(mq->flags & MMC_QUEUE_SUSPENDED)) {
 		mq->flags |= MMC_QUEUE_SUSPENDED;
@@ -429,6 +459,7 @@ int mmc_queue_suspend(struct mmc_queue *mq, int wait)
 		spin_lock_irqsave(q->queue_lock, flags);
 		blk_stop_queue(q);
 		spin_unlock_irqrestore(q->queue_lock, flags);
+<<<<<<< HEAD
 		rc = down_trylock(&mq->thread_sem);
 		if (rc && !wait) {
 			mq->flags &= ~MMC_QUEUE_SUSPENDED;
@@ -467,6 +498,11 @@ int mmc_queue_suspend(struct mmc_queue *mq, int wait)
 
 	}
 	return rc;
+=======
+
+		down(&mq->thread_sem);
+	}
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**

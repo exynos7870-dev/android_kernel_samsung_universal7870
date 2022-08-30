@@ -248,6 +248,10 @@ struct fnic {
 	struct completion *remove_wait; /* device remove thread blocks */
 
 	atomic_t in_flight;		/* io counter */
+<<<<<<< HEAD
+=======
+	bool internal_reset_inprogress;
+>>>>>>> common/deprecated/android-3.18
 	u32 _reserved;			/* fill hole */
 	unsigned long state_flags;	/* protected by host lock */
 	enum fnic_state state;

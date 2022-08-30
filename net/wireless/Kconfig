@@ -1,5 +1,9 @@
 config WIRELESS_EXT
+<<<<<<< HEAD
 	def_bool y
+=======
+	bool
+>>>>>>> common/deprecated/android-3.18
 
 config WEXT_CORE
 	def_bool y
@@ -14,7 +18,11 @@ config WEXT_SPY
 	bool
 
 config WEXT_PRIV
+<<<<<<< HEAD
 	def_bool y
+=======
+	bool
+>>>>>>> common/deprecated/android-3.18
 
 config CFG80211
 	tristate "cfg80211 - wireless configuration API"
@@ -178,11 +186,15 @@ config CFG80211_WEXT
 	bool "cfg80211 wireless extensions compatibility"
 	depends on CFG80211
 	select WEXT_CORE
+<<<<<<< HEAD
 	default y
+=======
+>>>>>>> common/deprecated/android-3.18
 	help
 	  Enable this option if you need old userspace for wireless
 	  extensions with cfg80211-based drivers.
 
+<<<<<<< HEAD
 config CONFIG_WLAN_SEC_REGULATORY_POLICY
 	bool "whether to use the db.txt_old or not"
     	default n 
@@ -209,6 +221,8 @@ config CFG80211_REG_NOT_UPDATED
 	  Access Point Beacon once since device should find around other
 	  Access Points.
 
+=======
+>>>>>>> common/deprecated/android-3.18
 config LIB80211
 	tristate
 	default n
@@ -236,6 +250,7 @@ config LIB80211_DEBUG
 	  from lib80211.
 
 	  If unsure, say N.
+<<<<<<< HEAD
 
 config CFG80211_ALLOW_RECONNECT
 	bool "Allow reconnect while already connected"
@@ -248,3 +263,5 @@ config CFG80211_ALLOW_RECONNECT
 	  Select this option ONLY for wlan drivers that are specifically
 	  built for such purposes.
 
+=======
+>>>>>>> common/deprecated/android-3.18

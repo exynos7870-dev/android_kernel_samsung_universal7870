@@ -563,6 +563,10 @@ struct brcms_c_info {
 
 	struct wiphy *wiphy;
 	struct scb pri_scb;
+<<<<<<< HEAD
+=======
+	struct ieee80211_vif *vif;
+>>>>>>> common/deprecated/android-3.18
 
 	struct sk_buff *beacon;
 	u16 beacon_tim_offset;

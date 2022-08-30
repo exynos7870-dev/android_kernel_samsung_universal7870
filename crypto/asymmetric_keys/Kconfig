@@ -14,6 +14,10 @@ config ASYMMETRIC_PUBLIC_KEY_SUBTYPE
 	select MPILIB
 	select PUBLIC_KEY_ALGO_RSA
 	select CRYPTO_HASH_INFO
+<<<<<<< HEAD
+=======
+	select CRYPTO_AKCIPHER
+>>>>>>> common/deprecated/android-3.18
 	help
 	  This option provides support for asymmetric public key type handling.
 	  If signature generation and/or verification are to be used,

@@ -49,7 +49,10 @@
 #include <linux/sched/deadline.h>
 #include <linux/timer.h>
 #include <linux/freezer.h>
+<<<<<<< HEAD
 #include <linux/exynos-ss.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #include <asm/uaccess.h>
 
@@ -99,6 +102,12 @@ DEFINE_PER_CPU(struct hrtimer_cpu_base, hrtimer_bases) =
 };
 
 static const int hrtimer_clock_to_base_table[MAX_CLOCKS] = {
+<<<<<<< HEAD
+=======
+	/* Make sure we catch unsupported clockids */
+	[0 ... MAX_CLOCKS - 1]	= HRTIMER_MAX_CLOCK_BASES,
+
+>>>>>>> common/deprecated/android-3.18
 	[CLOCK_REALTIME]	= HRTIMER_BASE_REALTIME,
 	[CLOCK_MONOTONIC]	= HRTIMER_BASE_MONOTONIC,
 	[CLOCK_BOOTTIME]	= HRTIMER_BASE_BOOTTIME,
@@ -107,7 +116,13 @@ static const int hrtimer_clock_to_base_table[MAX_CLOCKS] = {
 
 static inline int hrtimer_clockid_to_base(clockid_t clock_id)
 {
+<<<<<<< HEAD
 	return hrtimer_clock_to_base_table[clock_id];
+=======
+	int base = hrtimer_clock_to_base_table[clock_id];
+	BUG_ON(base == HRTIMER_MAX_CLOCK_BASES);
+	return base;
+>>>>>>> common/deprecated/android-3.18
 }
 
 
@@ -267,23 +282,43 @@ lock_hrtimer_base(const struct hrtimer *timer, unsigned long *flags)
 /*
  * Divide a ktime value by a nanosecond value
  */
+<<<<<<< HEAD
 u64 ktime_divns(const ktime_t kt, s64 div)
 {
 	u64 dclc;
 	int sft = 0;
 
 	dclc = ktime_to_ns(kt);
+=======
+s64 __ktime_divns(const ktime_t kt, s64 div)
+{
+	int sft = 0;
+	s64 dclc;
+	u64 tmp;
+
+	dclc = ktime_to_ns(kt);
+	tmp = dclc < 0 ? -dclc : dclc;
+
+>>>>>>> common/deprecated/android-3.18
 	/* Make sure the divisor is less than 2^32: */
 	while (div >> 32) {
 		sft++;
 		div >>= 1;
 	}
+<<<<<<< HEAD
 	dclc >>= sft;
 	do_div(dclc, (unsigned long) div);
 
 	return dclc;
 }
 EXPORT_SYMBOL_GPL(ktime_divns);
+=======
+	tmp >>= sft;
+	do_div(tmp, (unsigned long) div);
+	return dclc < 0 ? -tmp : tmp;
+}
+EXPORT_SYMBOL_GPL(__ktime_divns);
+>>>>>>> common/deprecated/android-3.18
 #endif /* BITS_PER_LONG >= 64 */
 
 /*
@@ -291,7 +326,11 @@ EXPORT_SYMBOL_GPL(ktime_divns);
  */
 ktime_t ktime_add_safe(const ktime_t lhs, const ktime_t rhs)
 {
+<<<<<<< HEAD
 	ktime_t res = ktime_add(lhs, rhs);
+=======
+	ktime_t res = ktime_add_unsafe(lhs, rhs);
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * We use KTIME_SEC_MAX here, the maximum timeout which we can
@@ -414,6 +453,10 @@ void destroy_hrtimer_on_stack(struct hrtimer *timer)
 {
 	debug_object_free(timer, &hrtimer_debug_descr);
 }
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL_GPL(destroy_hrtimer_on_stack);
+>>>>>>> common/deprecated/android-3.18
 
 #else
 static inline void debug_hrtimer_init(struct hrtimer *timer) { }
@@ -611,6 +654,10 @@ static int hrtimer_reprogram(struct hrtimer *timer,
 static inline void hrtimer_init_hres(struct hrtimer_cpu_base *base)
 {
 	base->expires_next.tv64 = KTIME_MAX;
+<<<<<<< HEAD
+=======
+	base->hang_detected = 0;
+>>>>>>> common/deprecated/android-3.18
 	base->hres_active = 0;
 }
 
@@ -1147,7 +1194,16 @@ static void __hrtimer_init(struct hrtimer *timer, clockid_t clock_id,
 
 	cpu_base = raw_cpu_ptr(&hrtimer_bases);
 
+<<<<<<< HEAD
 	if (clock_id == CLOCK_REALTIME && mode != HRTIMER_MODE_ABS)
+=======
+	/*
+	 * POSIX magic: Relative CLOCK_REALTIME timers are not affected by
+	 * clock modifications, so they needs to become CLOCK_MONOTONIC to
+	 * ensure POSIX compliance.
+	 */
+	if (clock_id == CLOCK_REALTIME && mode & HRTIMER_MODE_REL)
+>>>>>>> common/deprecated/android-3.18
 		clock_id = CLOCK_MONOTONIC;
 
 	base = hrtimer_clockid_to_base(clock_id);
@@ -1216,9 +1272,13 @@ static void __run_hrtimer(struct hrtimer *timer, ktime_t *now)
 	 */
 	raw_spin_unlock(&cpu_base->lock);
 	trace_hrtimer_expire_entry(timer, now);
+<<<<<<< HEAD
 	exynos_ss_hrtimer(timer, &now->tv64, fn, ESS_FLAG_IN);
 	restart = fn(timer);
 	exynos_ss_hrtimer(timer, &now->tv64, fn, ESS_FLAG_OUT);
+=======
+	restart = fn(timer);
+>>>>>>> common/deprecated/android-3.18
 	trace_hrtimer_expire_exit(timer);
 	raw_spin_lock(&cpu_base->lock);
 
@@ -1594,7 +1654,11 @@ long hrtimer_nanosleep(struct timespec *rqtp, struct timespec __user *rmtp,
 			goto out;
 	}
 
+<<<<<<< HEAD
 	restart = &current_thread_info()->restart_block;
+=======
+	restart = &current->restart_block;
+>>>>>>> common/deprecated/android-3.18
 	restart->fn = hrtimer_nanosleep_restart;
 	restart->nanosleep.clockid = t.timer.base->clockid;
 	restart->nanosleep.rmtp = rmtp;
@@ -1633,6 +1697,10 @@ static void init_hrtimers_cpu(int cpu)
 		timerqueue_init_head(&cpu_base->clock_base[i].active);
 	}
 
+<<<<<<< HEAD
+=======
+	cpu_base->active_bases = 0;
+>>>>>>> common/deprecated/android-3.18
 	cpu_base->cpu = cpu;
 	hrtimer_init_hres(cpu_base);
 }

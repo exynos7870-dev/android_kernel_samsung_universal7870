@@ -57,6 +57,11 @@ static ssize_t pubek_show(struct device *dev, struct device_attribute *attr,
 
 	struct tpm_chip *chip = dev_get_drvdata(dev);
 
+<<<<<<< HEAD
+=======
+	memset(&tpm_cmd, 0, sizeof(tpm_cmd));
+
+>>>>>>> common/deprecated/android-3.18
 	tpm_cmd.header.in = tpm_readpubek_header;
 	err = transmit_cmd(chip, &tpm_cmd, READ_PUBEK_RESULT_SIZE,
 			   "attempting to read the PUBEK");

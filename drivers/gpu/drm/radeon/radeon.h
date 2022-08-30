@@ -1628,6 +1628,10 @@ struct radeon_pm {
 	struct device	        *int_hwmon_dev;
 	/* dpm */
 	bool                    dpm_enabled;
+<<<<<<< HEAD
+=======
+	bool                    sysfs_initialized;
+>>>>>>> common/deprecated/android-3.18
 	struct radeon_dpm       dpm;
 };
 

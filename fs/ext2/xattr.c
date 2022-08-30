@@ -55,6 +55,10 @@
 
 #include <linux/buffer_head.h>
 #include <linux/init.h>
+<<<<<<< HEAD
+=======
+#include <linux/printk.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/slab.h>
 #include <linux/mbcache.h>
 #include <linux/quotaops.h>
@@ -85,8 +89,13 @@
 		printk("\n"); \
 	} while (0)
 #else
+<<<<<<< HEAD
 # define ea_idebug(f...)
 # define ea_bdebug(f...)
+=======
+# define ea_idebug(inode, f...)	no_printk(f)
+# define ea_bdebug(bh, f...)	no_printk(f)
+>>>>>>> common/deprecated/android-3.18
 #endif
 
 static int ext2_xattr_set2(struct inode *, struct buffer_head *,
@@ -606,9 +615,15 @@ skip_replace:
 	}
 
 cleanup:
+<<<<<<< HEAD
 	brelse(bh);
 	if (!(bh && header == HDR(bh)))
 		kfree(header);
+=======
+	if (!(bh && header == HDR(bh)))
+		kfree(header);
+	brelse(bh);
+>>>>>>> common/deprecated/android-3.18
 	up_write(&EXT2_I(inode)->xattr_sem);
 
 	return error;
@@ -837,8 +852,12 @@ ext2_xattr_cache_insert(struct buffer_head *bh)
 	if (error) {
 		mb_cache_entry_free(ce);
 		if (error == -EBUSY) {
+<<<<<<< HEAD
 			ea_bdebug(bh, "already in cache (%d cache entries)",
 				atomic_read(&ext2_xattr_cache->c_entry_count));
+=======
+			ea_bdebug(bh, "already in cache");
+>>>>>>> common/deprecated/android-3.18
 			error = 0;
 		}
 	} else {

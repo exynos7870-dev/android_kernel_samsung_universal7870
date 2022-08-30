@@ -181,7 +181,22 @@ static void kvm_on_user_return(struct user_return_notifier *urn)
 	struct kvm_shared_msrs *locals
 		= container_of(urn, struct kvm_shared_msrs, urn);
 	struct kvm_shared_msr_values *values;
+<<<<<<< HEAD
 
+=======
+	unsigned long flags;
+
+	/*
+	 * Disabling irqs at this point since the following code could be
+	 * interrupted and executed through kvm_arch_hardware_disable()
+	 */
+	local_irq_save(flags);
+	if (locals->registered) {
+		locals->registered = false;
+		user_return_notifier_unregister(urn);
+	}
+	local_irq_restore(flags);
+>>>>>>> common/deprecated/android-3.18
 	for (slot = 0; slot < shared_msrs_global.nr; ++slot) {
 		values = &locals->values[slot];
 		if (values->host != values->curr) {
@@ -189,8 +204,11 @@ static void kvm_on_user_return(struct user_return_notifier *urn)
 			values->curr = values->host;
 		}
 	}
+<<<<<<< HEAD
 	locals->registered = false;
 	user_return_notifier_unregister(urn);
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void shared_msr_update(unsigned slot, u32 msr)
@@ -235,13 +253,23 @@ int kvm_set_shared_msr(unsigned slot, u64 value, u64 mask)
 	struct kvm_shared_msrs *smsr = per_cpu_ptr(shared_msrs, cpu);
 	int err;
 
+<<<<<<< HEAD
 	if (((value ^ smsr->values[slot].curr) & mask) == 0)
 		return 0;
 	smsr->values[slot].curr = value;
+=======
+	value = (value & mask) | (smsr->values[slot].host & ~mask);
+	if (value == smsr->values[slot].curr)
+		return 0;
+>>>>>>> common/deprecated/android-3.18
 	err = wrmsrl_safe(shared_msrs_global.msrs[slot], value);
 	if (err)
 		return 1;
 
+<<<<<<< HEAD
+=======
+	smsr->values[slot].curr = value;
+>>>>>>> common/deprecated/android-3.18
 	if (!smsr->registered) {
 		smsr->urn.on_user_return = kvm_on_user_return;
 		user_return_notifier_register(&smsr->urn);
@@ -486,8 +514,19 @@ int kvm_read_nested_guest_page(struct kvm_vcpu *vcpu, gfn_t gfn,
 				       data, offset, len, access);
 }
 
+<<<<<<< HEAD
 /*
  * Load the pae pdptrs.  Return true is they are all valid.
+=======
+static inline u64 pdptr_rsvd_bits(struct kvm_vcpu *vcpu)
+{
+	return rsvd_bits(cpuid_maxphyaddr(vcpu), 63) | rsvd_bits(5, 8) |
+	       rsvd_bits(1, 2);
+}
+
+/*
+ * Load the pae pdptrs.  Return 1 if they are all valid, 0 otherwise.
+>>>>>>> common/deprecated/android-3.18
  */
 int load_pdptrs(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu, unsigned long cr3)
 {
@@ -506,7 +545,11 @@ int load_pdptrs(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu, unsigned long cr3)
 	}
 	for (i = 0; i < ARRAY_SIZE(pdpte); ++i) {
 		if (is_present_gpte(pdpte[i]) &&
+<<<<<<< HEAD
 		    (pdpte[i] & vcpu->arch.mmu.rsvd_bits_mask[0][2])) {
+=======
+		    (pdpte[i] & pdptr_rsvd_bits(vcpu))) {
+>>>>>>> common/deprecated/android-3.18
 			ret = 0;
 			goto out;
 		}
@@ -532,7 +575,11 @@ static bool pdptrs_changed(struct kvm_vcpu *vcpu)
 	gfn_t gfn;
 	int r;
 
+<<<<<<< HEAD
 	if (is_long_mode(vcpu) || !is_pae(vcpu))
+=======
+	if (is_long_mode(vcpu) || !is_pae(vcpu) || !is_paging(vcpu))
+>>>>>>> common/deprecated/android-3.18
 		return false;
 
 	if (!test_bit(VCPU_EXREG_PDPTR,
@@ -656,7 +703,10 @@ int __kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
 	if ((!(xcr0 & XSTATE_BNDREGS)) != (!(xcr0 & XSTATE_BNDCSR)))
 		return 1;
 
+<<<<<<< HEAD
 	kvm_put_guest_xcr0(vcpu);
+=======
+>>>>>>> common/deprecated/android-3.18
 	vcpu->arch.xcr0 = xcr0;
 
 	if ((xcr0 ^ old_xcr0) & XSTATE_EXTEND_MASK)
@@ -678,8 +728,14 @@ EXPORT_SYMBOL_GPL(kvm_set_xcr);
 int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
 {
 	unsigned long old_cr4 = kvm_read_cr4(vcpu);
+<<<<<<< HEAD
 	unsigned long pdptr_bits = X86_CR4_PGE | X86_CR4_PSE |
 				   X86_CR4_PAE | X86_CR4_SMEP;
+=======
+	unsigned long pdptr_bits = X86_CR4_PGE | X86_CR4_PSE | X86_CR4_PAE |
+				   X86_CR4_SMEP | X86_CR4_SMAP;
+
+>>>>>>> common/deprecated/android-3.18
 	if (cr4 & CR4_RESERVED_BITS)
 		return 1;
 
@@ -720,9 +776,12 @@ int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
 	    (!(cr4 & X86_CR4_PCIDE) && (old_cr4 & X86_CR4_PCIDE)))
 		kvm_mmu_reset_context(vcpu);
 
+<<<<<<< HEAD
 	if ((cr4 ^ old_cr4) & X86_CR4_SMAP)
 		update_permission_bitmask(vcpu, vcpu->arch.walk_mmu, false);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if ((cr4 ^ old_cr4) & X86_CR4_OSXSAVE)
 		kvm_update_cpuid(vcpu);
 
@@ -925,7 +984,11 @@ static u32 msrs_to_save[] = {
 	MSR_CSTAR, MSR_KERNEL_GS_BASE, MSR_SYSCALL_MASK, MSR_LSTAR,
 #endif
 	MSR_IA32_TSC, MSR_IA32_CR_PAT, MSR_VM_HSAVE_PA,
+<<<<<<< HEAD
 	MSR_IA32_FEATURE_CONTROL, MSR_IA32_BNDCFGS
+=======
+	MSR_IA32_FEATURE_CONTROL, MSR_IA32_BNDCFGS, MSR_TSC_AUX,
+>>>>>>> common/deprecated/android-3.18
 };
 
 static unsigned num_msrs_to_save;
@@ -938,11 +1001,16 @@ static const u32 emulated_msrs[] = {
 	MSR_IA32_MCG_CTL,
 };
 
+<<<<<<< HEAD
 bool kvm_valid_efer(struct kvm_vcpu *vcpu, u64 efer)
 {
 	if (efer & efer_reserved_bits)
 		return false;
 
+=======
+static bool __kvm_valid_efer(struct kvm_vcpu *vcpu, u64 efer)
+{
+>>>>>>> common/deprecated/android-3.18
 	if (efer & EFER_FFXSR) {
 		struct kvm_cpuid_entry2 *feat;
 
@@ -960,6 +1028,7 @@ bool kvm_valid_efer(struct kvm_vcpu *vcpu, u64 efer)
 	}
 
 	return true;
+<<<<<<< HEAD
 }
 EXPORT_SYMBOL_GPL(kvm_valid_efer);
 
@@ -973,6 +1042,35 @@ static int set_efer(struct kvm_vcpu *vcpu, u64 efer)
 	if (is_paging(vcpu)
 	    && (vcpu->arch.efer & EFER_LME) != (efer & EFER_LME))
 		return 1;
+=======
+
+}
+bool kvm_valid_efer(struct kvm_vcpu *vcpu, u64 efer)
+{
+	if (efer & efer_reserved_bits)
+		return false;
+
+	return __kvm_valid_efer(vcpu, efer);
+}
+EXPORT_SYMBOL_GPL(kvm_valid_efer);
+
+static int set_efer(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+{
+	u64 old_efer = vcpu->arch.efer;
+	u64 efer = msr_info->data;
+
+	if (efer & efer_reserved_bits)
+		return 1;
+
+	if (!msr_info->host_initiated) {
+		if (!__kvm_valid_efer(vcpu, efer))
+			return 1;
+
+		if (is_paging(vcpu) &&
+		    (vcpu->arch.efer & EFER_LME) != (efer & EFER_LME))
+			return 1;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	efer &= ~EFER_LMA;
 	efer |= vcpu->arch.efer & EFER_LMA;
@@ -1064,11 +1162,16 @@ static void update_pvclock_gtod(struct timekeeper *tk)
 	struct pvclock_gtod_data *vdata = &pvclock_gtod_data;
 	u64 boot_ns;
 
+<<<<<<< HEAD
 	boot_ns = ktime_to_ns(ktime_add(tk->tkr.base_mono, tk->offs_boot));
+=======
+	boot_ns = ktime_to_ns(ktime_add(tk->tkr_mono.base, tk->offs_boot));
+>>>>>>> common/deprecated/android-3.18
 
 	write_seqcount_begin(&vdata->seq);
 
 	/* copy pvclock gtod data */
+<<<<<<< HEAD
 	vdata->clock.vclock_mode	= tk->tkr.clock->archdata.vclock_mode;
 	vdata->clock.cycle_last		= tk->tkr.cycle_last;
 	vdata->clock.mask		= tk->tkr.mask;
@@ -1077,6 +1180,16 @@ static void update_pvclock_gtod(struct timekeeper *tk)
 
 	vdata->boot_ns			= boot_ns;
 	vdata->nsec_base		= tk->tkr.xtime_nsec;
+=======
+	vdata->clock.vclock_mode	= tk->tkr_mono.clock->archdata.vclock_mode;
+	vdata->clock.cycle_last		= tk->tkr_mono.cycle_last;
+	vdata->clock.mask		= tk->tkr_mono.mask;
+	vdata->clock.mult		= tk->tkr_mono.mult;
+	vdata->clock.shift		= tk->tkr_mono.shift;
+
+	vdata->boot_ns			= boot_ns;
+	vdata->nsec_base		= tk->tkr_mono.xtime_nsec;
+>>>>>>> common/deprecated/android-3.18
 
 	write_seqcount_end(&vdata->seq);
 }
@@ -1649,6 +1762,12 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
 		&guest_hv_clock, sizeof(guest_hv_clock))))
 		return 0;
 
+<<<<<<< HEAD
+=======
+	if (guest_hv_clock.version & 1)
+		++guest_hv_clock.version;  /* first time write, random junk */
+
+>>>>>>> common/deprecated/android-3.18
 	/* retain PVCLOCK_GUEST_STOPPED if set in guest copy */
 	pvclock_flags = (guest_hv_clock.flags & PVCLOCK_GUEST_STOPPED);
 
@@ -2067,6 +2186,11 @@ static void accumulate_steal_time(struct kvm_vcpu *vcpu)
 
 static void record_steal_time(struct kvm_vcpu *vcpu)
 {
+<<<<<<< HEAD
+=======
+	accumulate_steal_time(vcpu);
+
+>>>>>>> common/deprecated/android-3.18
 	if (!(vcpu->arch.st.msr_val & KVM_MSR_ENABLED))
 		return;
 
@@ -2098,7 +2222,11 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 		break;
 
 	case MSR_EFER:
+<<<<<<< HEAD
 		return set_efer(vcpu, data);
+=======
+		return set_efer(vcpu, msr_info);
+>>>>>>> common/deprecated/android-3.18
 	case MSR_K7_HWCR:
 		data &= ~(u64)0x40;	/* ignore flush filter disable */
 		data &= ~(u64)0x100;	/* ignore ignne emulation enable */
@@ -2133,7 +2261,11 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 		return set_msr_mtrr(vcpu, msr, data);
 	case MSR_IA32_APICBASE:
 		return kvm_set_apic_base(vcpu, msr_info);
+<<<<<<< HEAD
 	case APIC_BASE_MSR ... APIC_BASE_MSR + 0x3ff:
+=======
+	case APIC_BASE_MSR ... APIC_BASE_MSR + 0xff:
+>>>>>>> common/deprecated/android-3.18
 		return kvm_x2apic_msr_write(vcpu, msr, data);
 	case MSR_IA32_TSCDEADLINE:
 		kvm_set_lapic_tscdeadline_msr(vcpu, data);
@@ -2200,12 +2332,15 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 		if (!(data & KVM_MSR_ENABLED))
 			break;
 
+<<<<<<< HEAD
 		vcpu->arch.st.last_steal = current->sched_info.run_delay;
 
 		preempt_disable();
 		accumulate_steal_time(vcpu);
 		preempt_enable();
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
 
 		break;
@@ -2520,7 +2655,11 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, u32 msr, u64 *pdata)
 	case MSR_IA32_APICBASE:
 		data = kvm_get_apic_base(vcpu);
 		break;
+<<<<<<< HEAD
 	case APIC_BASE_MSR ... APIC_BASE_MSR + 0x3ff:
+=======
+	case APIC_BASE_MSR ... APIC_BASE_MSR + 0xff:
+>>>>>>> common/deprecated/android-3.18
 		return kvm_x2apic_msr_read(vcpu, msr, pdata);
 		break;
 	case MSR_IA32_TSCDEADLINE:
@@ -2905,7 +3044,10 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
 		vcpu->cpu = cpu;
 	}
 
+<<<<<<< HEAD
 	accumulate_steal_time(vcpu);
+=======
+>>>>>>> common/deprecated/android-3.18
 	kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
 }
 
@@ -2914,6 +3056,15 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
 	kvm_x86_ops->vcpu_put(vcpu);
 	kvm_put_guest_fpu(vcpu);
 	vcpu->arch.last_host_tsc = native_read_tsc();
+<<<<<<< HEAD
+=======
+	/*
+	 * If userspace has set any breakpoints or watchpoints, dr6 is restored
+	 * on every vmexit, but if not, we might have a stale dr6 from the
+	 * guest. do_debug expects dr6 to be cleared after it runs, do the same.
+	 */
+	set_debugreg(0, 6);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int kvm_vcpu_ioctl_get_lapic(struct kvm_vcpu *vcpu,
@@ -2971,7 +3122,11 @@ static int kvm_vcpu_ioctl_x86_setup_mce(struct kvm_vcpu *vcpu,
 	unsigned bank_num = mcg_cap & 0xff, bank;
 
 	r = -EINVAL;
+<<<<<<< HEAD
 	if (!bank_num || bank_num >= KVM_MAX_MCE_BANKS)
+=======
+	if (!bank_num || bank_num > KVM_MAX_MCE_BANKS)
+>>>>>>> common/deprecated/android-3.18
 		goto out;
 	if (mcg_cap & ~(KVM_MCE_CAP_SUPPORTED | 0xff | 0xff0000))
 		goto out;
@@ -3073,6 +3228,13 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
 			      | KVM_VCPUEVENT_VALID_SHADOW))
 		return -EINVAL;
 
+<<<<<<< HEAD
+=======
+	if (events->exception.injected &&
+	    (events->exception.nr > 31 || events->exception.nr == NMI_VECTOR))
+		return -EINVAL;
+
+>>>>>>> common/deprecated/android-3.18
 	process_nmi(vcpu);
 	vcpu->arch.exception.pending = events->exception.injected;
 	vcpu->arch.exception.nr = events->exception.nr;
@@ -3119,6 +3281,14 @@ static int kvm_vcpu_ioctl_x86_set_debugregs(struct kvm_vcpu *vcpu,
 	if (dbgregs->flags)
 		return -EINVAL;
 
+<<<<<<< HEAD
+=======
+	if (dbgregs->dr6 & ~0xffffffffull)
+		return -EINVAL;
+	if (dbgregs->dr7 & ~0xffffffffull)
+		return -EINVAL;
+
+>>>>>>> common/deprecated/android-3.18
 	memcpy(vcpu->arch.db, dbgregs->db, sizeof(vcpu->arch.db));
 	vcpu->arch.dr6 = dbgregs->dr6;
 	kvm_update_dr6(vcpu);
@@ -3414,6 +3584,10 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
 	};
 	case KVM_SET_VAPIC_ADDR: {
 		struct kvm_vapic_addr va;
+<<<<<<< HEAD
+=======
+		int idx;
+>>>>>>> common/deprecated/android-3.18
 
 		r = -EINVAL;
 		if (!irqchip_in_kernel(vcpu->kvm))
@@ -3421,7 +3595,13 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
 		r = -EFAULT;
 		if (copy_from_user(&va, argp, sizeof va))
 			goto out;
+<<<<<<< HEAD
 		r = kvm_lapic_set_vapic_addr(vcpu, va.vapic_addr);
+=======
+		idx = srcu_read_lock(&vcpu->kvm->srcu);
+		r = kvm_lapic_set_vapic_addr(vcpu, va.vapic_addr);
+		srcu_read_unlock(&vcpu->kvm->srcu, idx);
+>>>>>>> common/deprecated/android-3.18
 		break;
 	}
 	case KVM_X86_SETUP_MCE: {
@@ -3675,6 +3855,7 @@ static int kvm_vm_ioctl_get_pit(struct kvm *kvm, struct kvm_pit_state *ps)
 
 static int kvm_vm_ioctl_set_pit(struct kvm *kvm, struct kvm_pit_state *ps)
 {
+<<<<<<< HEAD
 	int r = 0;
 
 	mutex_lock(&kvm->arch.vpit->pit_state.lock);
@@ -3682,6 +3863,15 @@ static int kvm_vm_ioctl_set_pit(struct kvm *kvm, struct kvm_pit_state *ps)
 	kvm_pit_load_count(kvm, 0, ps->channels[0].count, 0);
 	mutex_unlock(&kvm->arch.vpit->pit_state.lock);
 	return r;
+=======
+	int i;
+	mutex_lock(&kvm->arch.vpit->pit_state.lock);
+	memcpy(&kvm->arch.vpit->pit_state, ps, sizeof(struct kvm_pit_state));
+	for (i = 0; i < 3; i++)
+		kvm_pit_load_count(kvm, i, ps->channels[i].count, 0);
+	mutex_unlock(&kvm->arch.vpit->pit_state.lock);
+	return 0;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int kvm_vm_ioctl_get_pit2(struct kvm *kvm, struct kvm_pit_state2 *ps)
@@ -3700,6 +3890,10 @@ static int kvm_vm_ioctl_get_pit2(struct kvm *kvm, struct kvm_pit_state2 *ps)
 static int kvm_vm_ioctl_set_pit2(struct kvm *kvm, struct kvm_pit_state2 *ps)
 {
 	int r = 0, start = 0;
+<<<<<<< HEAD
+=======
+	int i;
+>>>>>>> common/deprecated/android-3.18
 	u32 prev_legacy, cur_legacy;
 	mutex_lock(&kvm->arch.vpit->pit_state.lock);
 	prev_legacy = kvm->arch.vpit->pit_state.flags & KVM_PIT_FLAGS_HPET_LEGACY;
@@ -3709,7 +3903,12 @@ static int kvm_vm_ioctl_set_pit2(struct kvm *kvm, struct kvm_pit_state2 *ps)
 	memcpy(&kvm->arch.vpit->pit_state.channels, &ps->channels,
 	       sizeof(kvm->arch.vpit->pit_state.channels));
 	kvm->arch.vpit->pit_state.flags = ps->flags;
+<<<<<<< HEAD
 	kvm_pit_load_count(kvm, 0, kvm->arch.vpit->pit_state.channels[0].count, start);
+=======
+	for (i = 0; i < 3; i++)
+		kvm_pit_load_count(kvm, i, kvm->arch.vpit->pit_state.channels[i].count, start);
+>>>>>>> common/deprecated/android-3.18
 	mutex_unlock(&kvm->arch.vpit->pit_state.lock);
 	return r;
 }
@@ -3912,7 +4111,11 @@ long kvm_arch_vm_ioctl(struct file *filp,
 				   sizeof(struct kvm_pit_config)))
 			goto out;
 	create_pit:
+<<<<<<< HEAD
 		mutex_lock(&kvm->slots_lock);
+=======
+		mutex_lock(&kvm->lock);
+>>>>>>> common/deprecated/android-3.18
 		r = -EEXIST;
 		if (kvm->arch.vpit)
 			goto create_pit_unlock;
@@ -3921,7 +4124,11 @@ long kvm_arch_vm_ioctl(struct file *filp,
 		if (kvm->arch.vpit)
 			r = 0;
 	create_pit_unlock:
+<<<<<<< HEAD
 		mutex_unlock(&kvm->slots_lock);
+=======
+		mutex_unlock(&kvm->lock);
+>>>>>>> common/deprecated/android-3.18
 		break;
 	case KVM_GET_IRQCHIP: {
 		/* 0: PIC master, 1: PIC slave, 2: IOAPIC */
@@ -3988,10 +4195,20 @@ long kvm_arch_vm_ioctl(struct file *filp,
 		r = -EFAULT;
 		if (copy_from_user(&u.ps, argp, sizeof u.ps))
 			goto out;
+<<<<<<< HEAD
 		r = -ENXIO;
 		if (!kvm->arch.vpit)
 			goto out;
 		r = kvm_vm_ioctl_set_pit(kvm, &u.ps);
+=======
+		mutex_lock(&kvm->lock);
+		r = -ENXIO;
+		if (!kvm->arch.vpit)
+			goto set_pit_out;
+		r = kvm_vm_ioctl_set_pit(kvm, &u.ps);
+set_pit_out:
+		mutex_unlock(&kvm->lock);
+>>>>>>> common/deprecated/android-3.18
 		break;
 	}
 	case KVM_GET_PIT2: {
@@ -4011,10 +4228,20 @@ long kvm_arch_vm_ioctl(struct file *filp,
 		r = -EFAULT;
 		if (copy_from_user(&u.ps2, argp, sizeof(u.ps2)))
 			goto out;
+<<<<<<< HEAD
 		r = -ENXIO;
 		if (!kvm->arch.vpit)
 			goto out;
 		r = kvm_vm_ioctl_set_pit2(kvm, &u.ps2);
+=======
+		mutex_lock(&kvm->lock);
+		r = -ENXIO;
+		if (!kvm->arch.vpit)
+			goto set_pit2_out;
+		r = kvm_vm_ioctl_set_pit2(kvm, &u.ps2);
+set_pit2_out:
+		mutex_unlock(&kvm->lock);
+>>>>>>> common/deprecated/android-3.18
 		break;
 	}
 	case KVM_REINJECT_CONTROL: {
@@ -4026,6 +4253,7 @@ long kvm_arch_vm_ioctl(struct file *filp,
 		break;
 	}
 	case KVM_XEN_HVM_CONFIG: {
+<<<<<<< HEAD
 		r = -EFAULT;
 		if (copy_from_user(&kvm->arch.xen_hvm_config, argp,
 				   sizeof(struct kvm_xen_hvm_config)))
@@ -4033,6 +4261,16 @@ long kvm_arch_vm_ioctl(struct file *filp,
 		r = -EINVAL;
 		if (kvm->arch.xen_hvm_config.flags)
 			goto out;
+=======
+		struct kvm_xen_hvm_config xhc;
+		r = -EFAULT;
+		if (copy_from_user(&xhc, argp, sizeof(xhc)))
+			goto out;
+		r = -EINVAL;
+		if (xhc.flags)
+			goto out;
+		memcpy(&kvm->arch.xen_hvm_config, &xhc, sizeof(xhc));
+>>>>>>> common/deprecated/android-3.18
 		r = 0;
 		break;
 	}
@@ -4095,16 +4333,27 @@ static void kvm_init_msr_list(void)
 
 		/*
 		 * Even MSRs that are valid in the host may not be exposed
+<<<<<<< HEAD
 		 * to the guests in some cases.  We could work around this
 		 * in VMX with the generic MSR save/load machinery, but it
 		 * is not really worthwhile since it will really only
 		 * happen with nested virtualization.
+=======
+		 * to the guests in some cases.
+>>>>>>> common/deprecated/android-3.18
 		 */
 		switch (msrs_to_save[i]) {
 		case MSR_IA32_BNDCFGS:
 			if (!kvm_x86_ops->mpx_supported())
 				continue;
 			break;
+<<<<<<< HEAD
+=======
+		case MSR_TSC_AUX:
+			if (!kvm_x86_ops->rdtscp_supported())
+				continue;
+			break;
+>>>>>>> common/deprecated/android-3.18
 		default:
 			break;
 		}
@@ -4148,7 +4397,11 @@ static int vcpu_mmio_read(struct kvm_vcpu *vcpu, gpa_t addr, int len, void *v)
 		      !kvm_iodevice_read(&vcpu->arch.apic->dev, addr, n, v))
 		    && kvm_io_bus_read(vcpu->kvm, KVM_MMIO_BUS, addr, n, v))
 			break;
+<<<<<<< HEAD
 		trace_kvm_mmio(KVM_TRACE_MMIO_READ, n, addr, *(u64 *)v);
+=======
+		trace_kvm_mmio(KVM_TRACE_MMIO_READ, n, addr, v);
+>>>>>>> common/deprecated/android-3.18
 		handled += n;
 		addr += n;
 		len -= n;
@@ -4279,6 +4532,16 @@ int kvm_read_guest_virt(struct x86_emulate_ctxt *ctxt,
 	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
 	u32 access = (kvm_x86_ops->get_cpl(vcpu) == 3) ? PFERR_USER_MASK : 0;
 
+<<<<<<< HEAD
+=======
+	/*
+	 * FIXME: this should call handle_emulation_failure if X86EMUL_IO_NEEDED
+	 * is returned, but our callers are not ready for that and they blindly
+	 * call kvm_inject_page_fault.  Ensure that they at least do not leak
+	 * uninitialized kernel stack memory into cr2 and error code.
+	 */
+	memset(exception, 0, sizeof(*exception));
+>>>>>>> common/deprecated/android-3.18
 	return kvm_read_guest_virt_helper(addr, val, bytes, vcpu, access,
 					  exception);
 }
@@ -4387,7 +4650,11 @@ static int read_prepare(struct kvm_vcpu *vcpu, void *val, int bytes)
 {
 	if (vcpu->mmio_read_completed) {
 		trace_kvm_mmio(KVM_TRACE_MMIO_READ, bytes,
+<<<<<<< HEAD
 			       vcpu->mmio_fragments[0].gpa, *(u64 *)val);
+=======
+			       vcpu->mmio_fragments[0].gpa, val);
+>>>>>>> common/deprecated/android-3.18
 		vcpu->mmio_read_completed = 0;
 		return 1;
 	}
@@ -4409,14 +4676,22 @@ static int write_emulate(struct kvm_vcpu *vcpu, gpa_t gpa,
 
 static int write_mmio(struct kvm_vcpu *vcpu, gpa_t gpa, int bytes, void *val)
 {
+<<<<<<< HEAD
 	trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, bytes, gpa, *(u64 *)val);
+=======
+	trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, bytes, gpa, val);
+>>>>>>> common/deprecated/android-3.18
 	return vcpu_mmio_write(vcpu, gpa, bytes, val);
 }
 
 static int read_exit_mmio(struct kvm_vcpu *vcpu, gpa_t gpa,
 			  void *val, int bytes)
 {
+<<<<<<< HEAD
 	trace_kvm_mmio(KVM_TRACE_MMIO_READ_UNSATISFIED, bytes, gpa, 0);
+=======
+	trace_kvm_mmio(KVM_TRACE_MMIO_READ_UNSATISFIED, bytes, gpa, NULL);
+>>>>>>> common/deprecated/android-3.18
 	return X86EMUL_IO_NEEDED;
 }
 
@@ -4634,6 +4909,7 @@ emul_write:
 
 static int kernel_pio(struct kvm_vcpu *vcpu, void *pd)
 {
+<<<<<<< HEAD
 	/* TODO: String I/O for in kernel device */
 	int r;
 
@@ -4644,6 +4920,22 @@ static int kernel_pio(struct kvm_vcpu *vcpu, void *pd)
 		r = kvm_io_bus_write(vcpu->kvm, KVM_PIO_BUS,
 				     vcpu->arch.pio.port, vcpu->arch.pio.size,
 				     pd);
+=======
+	int r = 0, i;
+
+	for (i = 0; i < vcpu->arch.pio.count; i++) {
+		if (vcpu->arch.pio.in)
+			r = kvm_io_bus_read(vcpu->kvm, KVM_PIO_BUS, vcpu->arch.pio.port,
+					    vcpu->arch.pio.size, pd);
+		else
+			r = kvm_io_bus_write(vcpu->kvm, KVM_PIO_BUS,
+					     vcpu->arch.pio.port, vcpu->arch.pio.size,
+					     pd);
+		if (r)
+			break;
+		pd += vcpu->arch.pio.size;
+	}
+>>>>>>> common/deprecated/android-3.18
 	return r;
 }
 
@@ -4681,6 +4973,11 @@ static int emulator_pio_in_emulated(struct x86_emulate_ctxt *ctxt,
 	if (vcpu->arch.pio.count)
 		goto data_avail;
 
+<<<<<<< HEAD
+=======
+	memset(vcpu->arch.pio_data, 0, size * count);
+
+>>>>>>> common/deprecated/android-3.18
 	ret = emulator_pio_in_out(vcpu, size, port, val, count, true);
 	if (ret) {
 data_avail:
@@ -4854,6 +5151,11 @@ static bool emulator_get_segment(struct x86_emulate_ctxt *ctxt, u16 *selector,
 
 	if (var.unusable) {
 		memset(desc, 0, sizeof(*desc));
+<<<<<<< HEAD
+=======
+		if (base3)
+			*base3 = 0;
+>>>>>>> common/deprecated/android-3.18
 		return false;
 	}
 
@@ -5058,6 +5360,11 @@ static void init_emulate_ctxt(struct kvm_vcpu *vcpu)
 	kvm_x86_ops->get_cs_db_l_bits(vcpu, &cs_db, &cs_l);
 
 	ctxt->eflags = kvm_get_rflags(vcpu);
+<<<<<<< HEAD
+=======
+	ctxt->tf = (ctxt->eflags & X86_EFLAGS_TF) != 0;
+
+>>>>>>> common/deprecated/android-3.18
 	ctxt->eip = kvm_rip_read(vcpu);
 	ctxt->mode = (!is_protmode(vcpu))		? X86EMUL_MODE_REAL :
 		     (ctxt->eflags & X86_EFLAGS_VM)	? X86EMUL_MODE_VM86 :
@@ -5108,7 +5415,11 @@ static int handle_emulation_failure(struct kvm_vcpu *vcpu)
 		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
 		vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
 		vcpu->run->internal.ndata = 0;
+<<<<<<< HEAD
 		r = EMULATE_FAIL;
+=======
+		r = EMULATE_USER_EXIT;
+>>>>>>> common/deprecated/android-3.18
 	}
 	kvm_queue_exception(vcpu, UD_VECTOR);
 
@@ -5248,6 +5559,7 @@ static int kvm_vcpu_check_hw_bp(unsigned long addr, u32 type, u32 dr7,
 	return dr6;
 }
 
+<<<<<<< HEAD
 static void kvm_vcpu_check_singlestep(struct kvm_vcpu *vcpu, unsigned long rflags, int *r)
 {
 	struct kvm_run *kvm_run = vcpu->run;
@@ -5279,6 +5591,28 @@ static void kvm_vcpu_check_singlestep(struct kvm_vcpu *vcpu, unsigned long rflag
 			vcpu->arch.dr6 |= DR6_BS | DR6_RTM;
 			kvm_queue_exception(vcpu, DB_VECTOR);
 		}
+=======
+static void kvm_vcpu_do_singlestep(struct kvm_vcpu *vcpu, int *r)
+{
+	struct kvm_run *kvm_run = vcpu->run;
+
+	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
+		kvm_run->debug.arch.dr6 = DR6_BS | DR6_FIXED_1 | DR6_RTM;
+		kvm_run->debug.arch.pc = vcpu->arch.singlestep_rip;
+		kvm_run->debug.arch.exception = DB_VECTOR;
+		kvm_run->exit_reason = KVM_EXIT_DEBUG;
+		*r = EMULATE_USER_EXIT;
+	} else {
+		vcpu->arch.emulate_ctxt.eflags &= ~X86_EFLAGS_TF;
+		/*
+		 * "Certain debug exceptions may clear bit 0-3.  The
+		 * remaining contents of the DR6 register are never
+		 * cleared by the processor".
+		 */
+		vcpu->arch.dr6 &= ~15;
+		vcpu->arch.dr6 |= DR6_BS | DR6_RTM;
+		kvm_queue_exception(vcpu, DB_VECTOR);
+>>>>>>> common/deprecated/android-3.18
 	}
 }
 
@@ -5351,7 +5685,12 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu,
 		 * handle watchpoints yet, those would be handled in
 		 * the emulate_ops.
 		 */
+<<<<<<< HEAD
 		if (kvm_vcpu_check_breakpoint(vcpu, &r))
+=======
+		if (!(emulation_type & EMULTYPE_SKIP) &&
+		    kvm_vcpu_check_breakpoint(vcpu, &r))
+>>>>>>> common/deprecated/android-3.18
 			return r;
 
 		ctxt->interruptibility = 0;
@@ -5371,6 +5710,19 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu,
 			if (reexecute_instruction(vcpu, cr2, write_fault_to_spt,
 						emulation_type))
 				return EMULATE_DONE;
+<<<<<<< HEAD
+=======
+			if (ctxt->have_exception) {
+				/*
+				 * #UD should result in just EMULATION_FAILED, and trap-like
+				 * exception should not be encountered during decode.
+				 */
+				WARN_ON_ONCE(ctxt->exception.vector == UD_VECTOR ||
+					     exception_type(ctxt->exception.vector) == EXCPT_TRAP);
+				inject_emulated_exception(vcpu);
+				return EMULATE_DONE;
+			}
+>>>>>>> common/deprecated/android-3.18
 			if (emulation_type & EMULTYPE_SKIP)
 				return EMULATE_FAIL;
 			return handle_emulation_failure(vcpu);
@@ -5436,8 +5788,13 @@ restart:
 		toggle_interruptibility(vcpu, ctxt->interruptibility);
 		vcpu->arch.emulate_regs_need_sync_to_vcpu = false;
 		kvm_rip_write(vcpu, ctxt->eip);
+<<<<<<< HEAD
 		if (r == EMULATE_DONE)
 			kvm_vcpu_check_singlestep(vcpu, rflags, &r);
+=======
+		if (r == EMULATE_DONE && ctxt->tf)
+			kvm_vcpu_do_singlestep(vcpu, &r);
+>>>>>>> common/deprecated/android-3.18
 		__kvm_set_rflags(vcpu, ctxt->eflags);
 
 		/*
@@ -5687,14 +6044,20 @@ static void kvm_set_mmio_spte_mask(void)
 	/* Set the present bit. */
 	mask |= 1ull;
 
+<<<<<<< HEAD
 #ifdef CONFIG_X86_64
+=======
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * If reserved bit is not supported, clear the present bit to disable
 	 * mmio page fault.
 	 */
 	if (maxphyaddr == 52)
 		mask &= ~1ull;
+<<<<<<< HEAD
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	kvm_mmu_set_mmio_spte_mask(mask);
 }
@@ -5805,6 +6168,10 @@ out:
 
 void kvm_arch_exit(void)
 {
+<<<<<<< HEAD
+=======
+	kvm_lapic_exit();
+>>>>>>> common/deprecated/android-3.18
 	perf_unregister_guest_info_callbacks(&kvm_guest_cbs);
 
 	if (!boot_cpu_has(X86_FEATURE_CONSTANT_TSC))
@@ -5813,6 +6180,10 @@ void kvm_arch_exit(void)
 	unregister_hotcpu_notifier(&kvmclock_cpu_notifier_block);
 #ifdef CONFIG_X86_64
 	pvclock_gtod_unregister_notifier(&pvclock_gtod_notifier);
+<<<<<<< HEAD
+=======
+	cancel_work_sync(&pvclock_gtod_work);
+>>>>>>> common/deprecated/android-3.18
 #endif
 	kvm_x86_ops = NULL;
 	kvm_mmu_module_exit();
@@ -5968,7 +6339,12 @@ static int emulator_fix_hypercall(struct x86_emulate_ctxt *ctxt)
 
 	kvm_x86_ops->patch_hypercall(vcpu, instruction);
 
+<<<<<<< HEAD
 	return emulator_write_emulated(ctxt, rip, instruction, 3, NULL);
+=======
+	return emulator_write_emulated(ctxt, rip, instruction, 3,
+		&ctxt->exception);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
@@ -6061,12 +6437,19 @@ static int inject_pending_event(struct kvm_vcpu *vcpu, bool req_int_win)
 	}
 
 	/* try to inject new event if pending */
+<<<<<<< HEAD
 	if (vcpu->arch.nmi_pending) {
 		if (kvm_x86_ops->nmi_allowed(vcpu)) {
 			--vcpu->arch.nmi_pending;
 			vcpu->arch.nmi_injected = true;
 			kvm_x86_ops->set_nmi(vcpu);
 		}
+=======
+	if (vcpu->arch.nmi_pending && kvm_x86_ops->nmi_allowed(vcpu)) {
+		--vcpu->arch.nmi_pending;
+		vcpu->arch.nmi_injected = true;
+		kvm_x86_ops->set_nmi(vcpu);
+>>>>>>> common/deprecated/android-3.18
 	} else if (kvm_cpu_has_injectable_intr(vcpu)) {
 		/*
 		 * Because interrupts can be injected asynchronously, we are
@@ -6139,6 +6522,11 @@ void kvm_vcpu_reload_apic_access_page(struct kvm_vcpu *vcpu)
 		return;
 
 	page = gfn_to_page(vcpu->kvm, APIC_DEFAULT_PHYS_BASE >> PAGE_SHIFT);
+<<<<<<< HEAD
+=======
+	if (is_error_page(page))
+		return;
+>>>>>>> common/deprecated/android-3.18
 	kvm_x86_ops->set_apic_access_page_addr(vcpu, page_to_phys(page));
 
 	/*
@@ -6197,6 +6585,10 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
 		}
 		if (kvm_check_request(KVM_REQ_TRIPLE_FAULT, vcpu)) {
 			vcpu->run->exit_reason = KVM_EXIT_SHUTDOWN;
+<<<<<<< HEAD
+=======
+			vcpu->mmio_needed = 0;
+>>>>>>> common/deprecated/android-3.18
 			r = 0;
 			goto out;
 		}
@@ -6234,10 +6626,19 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
 		if (inject_pending_event(vcpu, req_int_win) != 0)
 			req_immediate_exit = true;
 		/* enable NMI/IRQ window open exits if needed */
+<<<<<<< HEAD
 		else if (vcpu->arch.nmi_pending)
 			kvm_x86_ops->enable_nmi_window(vcpu);
 		else if (kvm_cpu_has_injectable_intr(vcpu) || req_int_win)
 			kvm_x86_ops->enable_irq_window(vcpu);
+=======
+		else {
+			if (vcpu->arch.nmi_pending)
+				kvm_x86_ops->enable_nmi_window(vcpu);
+			if (kvm_cpu_has_injectable_intr(vcpu) || req_int_win)
+				kvm_x86_ops->enable_irq_window(vcpu);
+		}
+>>>>>>> common/deprecated/android-3.18
 
 		if (kvm_lapic_enabled(vcpu)) {
 			/*
@@ -6262,8 +6663,11 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
 	kvm_x86_ops->prepare_guest_switch(vcpu);
 	if (vcpu->fpu_active)
 		kvm_load_guest_fpu(vcpu);
+<<<<<<< HEAD
 	kvm_load_guest_xcr0(vcpu);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	vcpu->mode = IN_GUEST_MODE;
 
 	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
@@ -6286,6 +6690,11 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
 		goto cancel_injection;
 	}
 
+<<<<<<< HEAD
+=======
+	kvm_load_guest_xcr0(vcpu);
+
+>>>>>>> common/deprecated/android-3.18
 	if (req_immediate_exit)
 		smp_send_reschedule(vcpu->cpu);
 
@@ -6334,6 +6743,11 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
 	vcpu->mode = OUTSIDE_GUEST_MODE;
 	smp_wmb();
 
+<<<<<<< HEAD
+=======
+	kvm_put_guest_xcr0(vcpu);
+
+>>>>>>> common/deprecated/android-3.18
 	/* Interrupt is enabled by handle_external_intr() */
 	kvm_x86_ops->handle_external_intr(vcpu);
 
@@ -6637,7 +7051,11 @@ int kvm_arch_vcpu_ioctl_set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
 #endif
 
 	kvm_rip_write(vcpu, regs->rip);
+<<<<<<< HEAD
 	kvm_set_rflags(vcpu, regs->rflags);
+=======
+	kvm_set_rflags(vcpu, regs->rflags | X86_EFLAGS_FIXED);
+>>>>>>> common/deprecated/android-3.18
 
 	vcpu->arch.exception.pending = false;
 
@@ -6786,7 +7204,11 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
 		kvm_update_cpuid(vcpu);
 
 	idx = srcu_read_lock(&vcpu->kvm->srcu);
+<<<<<<< HEAD
 	if (!is_long_mode(vcpu) && is_pae(vcpu)) {
+=======
+	if (!is_long_mode(vcpu) && is_pae(vcpu) && is_paging(vcpu)) {
+>>>>>>> common/deprecated/android-3.18
 		load_pdptrs(vcpu, vcpu->arch.walk_mmu, kvm_read_cr3(vcpu));
 		mmu_reset_needed = 1;
 	}
@@ -6975,7 +7397,10 @@ void kvm_load_guest_fpu(struct kvm_vcpu *vcpu)
 	 * and assume host would use all available bits.
 	 * Guest xcr0 would be loaded later.
 	 */
+<<<<<<< HEAD
 	kvm_put_guest_xcr0(vcpu);
+=======
+>>>>>>> common/deprecated/android-3.18
 	vcpu->guest_fpu_loaded = 1;
 	__kernel_fpu_begin();
 	fpu_restore_checking(&vcpu->arch.guest_fpu);
@@ -6984,8 +7409,11 @@ void kvm_load_guest_fpu(struct kvm_vcpu *vcpu)
 
 void kvm_put_guest_fpu(struct kvm_vcpu *vcpu)
 {
+<<<<<<< HEAD
 	kvm_put_guest_xcr0(vcpu);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (!vcpu->guest_fpu_loaded)
 		return;
 
@@ -6993,27 +7421,60 @@ void kvm_put_guest_fpu(struct kvm_vcpu *vcpu)
 	fpu_save_init(&vcpu->arch.guest_fpu);
 	__kernel_fpu_end();
 	++vcpu->stat.fpu_reload;
+<<<<<<< HEAD
 	kvm_make_request(KVM_REQ_DEACTIVATE_FPU, vcpu);
+=======
+	if (!vcpu->arch.eager_fpu)
+		kvm_make_request(KVM_REQ_DEACTIVATE_FPU, vcpu);
+
+>>>>>>> common/deprecated/android-3.18
 	trace_kvm_fpu(0);
 }
 
 void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
 {
+<<<<<<< HEAD
 	kvmclock_reset(vcpu);
 
 	free_cpumask_var(vcpu->arch.wbinvd_dirty_mask);
 	fx_free(vcpu);
 	kvm_x86_ops->vcpu_free(vcpu);
+=======
+	void *wbinvd_dirty_mask = vcpu->arch.wbinvd_dirty_mask;
+
+	kvmclock_reset(vcpu);
+
+	fx_free(vcpu);
+	kvm_x86_ops->vcpu_free(vcpu);
+	free_cpumask_var(wbinvd_dirty_mask);
+>>>>>>> common/deprecated/android-3.18
 }
 
 struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm,
 						unsigned int id)
 {
+<<<<<<< HEAD
+=======
+	struct kvm_vcpu *vcpu;
+
+>>>>>>> common/deprecated/android-3.18
 	if (check_tsc_unstable() && atomic_read(&kvm->online_vcpus) != 0)
 		printk_once(KERN_WARNING
 		"kvm: SMP vm created on host with unstable TSC; "
 		"guest TSC will not be reliable\n");
+<<<<<<< HEAD
 	return kvm_x86_ops->vcpu_create(kvm, id);
+=======
+
+	vcpu = kvm_x86_ops->vcpu_create(kvm, id);
+
+	/*
+	 * Activate fpu unconditionally in case the guest needs eager FPU.  It will be
+	 * deactivated soon if it doesn't.
+	 */
+	kvm_x86_ops->fpu_activate(vcpu);
+	return vcpu;
+>>>>>>> common/deprecated/android-3.18
 }
 
 int kvm_arch_vcpu_setup(struct kvm_vcpu *vcpu)
@@ -7063,7 +7524,11 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
 	vcpu_put(vcpu);
 
 	fx_free(vcpu);
+<<<<<<< HEAD
 	kvm_x86_ops->vcpu_free(vcpu);
+=======
+	kvm_arch_vcpu_free(vcpu);
+>>>>>>> common/deprecated/android-3.18
 }
 
 void kvm_vcpu_reset(struct kvm_vcpu *vcpu)
@@ -7453,6 +7918,16 @@ int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
 {
 	int i;
 
+<<<<<<< HEAD
+=======
+	/*
+	 * Clear out the previous array pointers for the KVM_MR_MOVE case.  The
+	 * old arrays will be freed by __kvm_set_memory_region() if installing
+	 * the new memslot is successful.
+	 */
+	memset(&slot->arch, 0, sizeof(slot->arch));
+
+>>>>>>> common/deprecated/android-3.18
 	for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
 		unsigned long ugfn;
 		int lpages;
@@ -7542,6 +8017,13 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
 		memslot->userspace_addr = userspace_addr;
 	}
 
+<<<<<<< HEAD
+=======
+	if (change == KVM_MR_MOVE)
+		return kvm_arch_create_memslot(kvm, memslot,
+					       mem->memory_size >> PAGE_SHIFT);
+
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -7740,6 +8222,16 @@ static int apf_put_user(struct kvm_vcpu *vcpu, u32 val)
 				      sizeof(val));
 }
 
+<<<<<<< HEAD
+=======
+static int apf_get_user(struct kvm_vcpu *vcpu, u32 *val)
+{
+
+	return kvm_read_guest_cached(vcpu->kvm, &vcpu->arch.apf.data, val,
+				      sizeof(u32));
+}
+
+>>>>>>> common/deprecated/android-3.18
 void kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
 				     struct kvm_async_pf *work)
 {
@@ -7766,12 +8258,18 @@ void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
 				 struct kvm_async_pf *work)
 {
 	struct x86_exception fault;
+<<<<<<< HEAD
 
 	trace_kvm_async_pf_ready(work->arch.token, work->gva);
+=======
+	u32 val;
+
+>>>>>>> common/deprecated/android-3.18
 	if (work->wakeup_all)
 		work->arch.token = ~0; /* broadcast wakeup */
 	else
 		kvm_del_async_pf_gfn(vcpu, work->arch.gfn);
+<<<<<<< HEAD
 
 	if ((vcpu->arch.apf.msr_val & KVM_ASYNC_PF_ENABLED) &&
 	    !apf_put_user(vcpu, KVM_PV_REASON_PAGE_READY)) {
@@ -7781,6 +8279,28 @@ void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
 		fault.nested_page_fault = false;
 		fault.address = work->arch.token;
 		kvm_inject_page_fault(vcpu, &fault);
+=======
+	trace_kvm_async_pf_ready(work->arch.token, work->gva);
+
+	if (vcpu->arch.apf.msr_val & KVM_ASYNC_PF_ENABLED &&
+	    !apf_get_user(vcpu, &val)) {
+		if (val == KVM_PV_REASON_PAGE_NOT_PRESENT &&
+		    vcpu->arch.exception.pending &&
+		    vcpu->arch.exception.nr == PF_VECTOR &&
+		    !apf_put_user(vcpu, 0)) {
+			vcpu->arch.exception.pending = false;
+			vcpu->arch.exception.nr = 0;
+			vcpu->arch.exception.has_error_code = false;
+			vcpu->arch.exception.error_code = 0;
+		} else if (!apf_put_user(vcpu, KVM_PV_REASON_PAGE_READY)) {
+			fault.vector = PF_VECTOR;
+			fault.error_code_valid = true;
+			fault.error_code = 0;
+			fault.nested_page_fault = false;
+			fault.address = work->arch.token;
+			kvm_inject_page_fault(vcpu, &fault);
+		}
+>>>>>>> common/deprecated/android-3.18
 	}
 	vcpu->arch.apf.halted = false;
 	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
@@ -7791,8 +8311,12 @@ bool kvm_arch_can_inject_async_page_present(struct kvm_vcpu *vcpu)
 	if (!(vcpu->arch.apf.msr_val & KVM_ASYNC_PF_ENABLED))
 		return true;
 	else
+<<<<<<< HEAD
 		return !kvm_event_needs_reinjection(vcpu) &&
 			kvm_x86_ops->interrupt_allowed(vcpu);
+=======
+		return kvm_can_do_async_pf(vcpu);
+>>>>>>> common/deprecated/android-3.18
 }
 
 void kvm_arch_register_noncoherent_dma(struct kvm *kvm)

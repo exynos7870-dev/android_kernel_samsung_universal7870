@@ -191,7 +191,11 @@ static int pxa_cpufreq_change_voltage(pxa_freqs_t *pxa_freq)
 	return ret;
 }
 
+<<<<<<< HEAD
 static void __init pxa_cpufreq_init_voltages(void)
+=======
+static void pxa_cpufreq_init_voltages(void)
+>>>>>>> common/deprecated/android-3.18
 {
 	vcc_core = regulator_get(NULL, "vcc_core");
 	if (IS_ERR(vcc_core)) {
@@ -207,7 +211,11 @@ static int pxa_cpufreq_change_voltage(pxa_freqs_t *pxa_freq)
 	return 0;
 }
 
+<<<<<<< HEAD
 static void __init pxa_cpufreq_init_voltages(void) { }
+=======
+static void pxa_cpufreq_init_voltages(void) { }
+>>>>>>> common/deprecated/android-3.18
 #endif
 
 static void find_freq_tables(struct cpufreq_frequency_table **freq_table,

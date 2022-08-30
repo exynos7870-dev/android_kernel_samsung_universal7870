@@ -117,12 +117,15 @@ static netdev_tx_t veth_xmit(struct sk_buff *skb, struct net_device *dev)
 		kfree_skb(skb);
 		goto drop;
 	}
+<<<<<<< HEAD
 	/* don't change ip_summed == CHECKSUM_PARTIAL, as that
 	 * will cause bad checksum on forwarded packets
 	 */
 	if (skb->ip_summed == CHECKSUM_NONE &&
 	    rcv->features & NETIF_F_RXCSUM)
 		skb->ip_summed = CHECKSUM_UNNECESSARY;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	if (likely(dev_forward_skb(rcv, skb) == NET_RX_SUCCESS)) {
 		struct pcpu_vstats *stats = this_cpu_ptr(dev->vstats);
@@ -388,6 +391,12 @@ static int veth_newlink(struct net *src_net, struct net_device *dev,
 	if (ifmp && (dev->ifindex != 0))
 		peer->ifindex = ifmp->ifi_index;
 
+<<<<<<< HEAD
+=======
+	peer->gso_max_size = dev->gso_max_size;
+	peer->gso_max_segs = dev->gso_max_segs;
+
+>>>>>>> common/deprecated/android-3.18
 	err = register_netdevice(peer);
 	put_net(net);
 	net = NULL;

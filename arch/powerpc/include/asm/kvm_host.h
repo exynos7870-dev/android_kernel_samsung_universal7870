@@ -537,6 +537,10 @@ struct kvm_vcpu_arch {
 	u64 tfiar;
 
 	u32 cr_tm;
+<<<<<<< HEAD
+=======
+	u64 xer_tm;
+>>>>>>> common/deprecated/android-3.18
 	u64 lr_tm;
 	u64 ctr_tm;
 	u64 amr_tm;

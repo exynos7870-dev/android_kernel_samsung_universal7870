@@ -65,7 +65,11 @@ struct RR_PL_s {
 };
 
 struct stamp {
+<<<<<<< HEAD
 	char time[7];
+=======
+	__u8 time[7];		/* actually 6 unsigned, 1 signed */
+>>>>>>> common/deprecated/android-3.18
 } __attribute__ ((packed));
 
 struct RR_TF_s {

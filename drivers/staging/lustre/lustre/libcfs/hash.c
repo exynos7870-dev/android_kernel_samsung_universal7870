@@ -1049,8 +1049,12 @@ cfs_hash_create(char *name, unsigned cur_bits, unsigned max_bits,
 	if (hs == NULL)
 		return NULL;
 
+<<<<<<< HEAD
 	strncpy(hs->hs_name, name, len);
 	hs->hs_name[len - 1] = '\0';
+=======
+	strlcpy(hs->hs_name, name, len);
+>>>>>>> common/deprecated/android-3.18
 	hs->hs_flags = flags;
 
 	atomic_set(&hs->hs_refcount, 1);

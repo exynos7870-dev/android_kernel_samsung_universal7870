@@ -249,6 +249,11 @@ static struct class uio_class = {
 	.dev_groups = uio_groups,
 };
 
+<<<<<<< HEAD
+=======
+bool uio_class_registered;
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * device functions
  */
@@ -771,6 +776,12 @@ static int init_uio_class(void)
 		printk(KERN_ERR "class_register failed for uio\n");
 		goto err_class_register;
 	}
+<<<<<<< HEAD
+=======
+
+	uio_class_registered = true;
+
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 
 err_class_register:
@@ -781,6 +792,10 @@ exit:
 
 static void release_uio_class(void)
 {
+<<<<<<< HEAD
+=======
+	uio_class_registered = false;
+>>>>>>> common/deprecated/android-3.18
 	class_unregister(&uio_class);
 	uio_major_cleanup();
 }
@@ -800,6 +815,12 @@ int __uio_register_device(struct module *owner,
 	struct uio_device *idev;
 	int ret = 0;
 
+<<<<<<< HEAD
+=======
+	if (!uio_class_registered)
+		return -EPROBE_DEFER;
+
+>>>>>>> common/deprecated/android-3.18
 	if (!parent || !info || !info->name || !info->version)
 		return -EINVAL;
 
@@ -837,8 +858,15 @@ int __uio_register_device(struct module *owner,
 	if (info->irq && (info->irq != UIO_IRQ_CUSTOM)) {
 		ret = devm_request_irq(idev->dev, info->irq, uio_interrupt,
 				  info->irq_flags, info->name, idev);
+<<<<<<< HEAD
 		if (ret)
 			goto err_request_irq;
+=======
+		if (ret) {
+			info->uio_dev = NULL;
+			goto err_request_irq;
+		}
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	return 0;

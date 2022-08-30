@@ -161,7 +161,11 @@ static int gpio_setup_irq(struct gpio_desc *desc, struct device *dev,
 	desc->flags &= ~GPIO_TRIGGER_MASK;
 
 	if (!gpio_flags) {
+<<<<<<< HEAD
 		gpio_unlock_as_irq(desc->chip, gpio_chip_hwgpio(desc));
+=======
+		gpiochip_unlock_as_irq(desc->chip, gpio_chip_hwgpio(desc));
+>>>>>>> common/deprecated/android-3.18
 		ret = 0;
 		goto free_id;
 	}
@@ -200,7 +204,11 @@ static int gpio_setup_irq(struct gpio_desc *desc, struct device *dev,
 	if (ret < 0)
 		goto free_id;
 
+<<<<<<< HEAD
 	ret = gpio_lock_as_irq(desc->chip, gpio_chip_hwgpio(desc));
+=======
+	ret = gpiochip_lock_as_irq(desc->chip, gpio_chip_hwgpio(desc));
+>>>>>>> common/deprecated/android-3.18
 	if (ret < 0) {
 		gpiod_warn(desc, "failed to flag the GPIO for IRQ\n");
 		goto free_id;
@@ -519,6 +527,10 @@ static struct class gpio_class = {
  */
 int gpiod_export(struct gpio_desc *desc, bool direction_may_change)
 {
+<<<<<<< HEAD
+=======
+	struct gpio_chip	*chip;
+>>>>>>> common/deprecated/android-3.18
 	unsigned long		flags;
 	int			status;
 	const char		*ioname = NULL;
@@ -536,8 +548,21 @@ int gpiod_export(struct gpio_desc *desc, bool direction_may_change)
 		return -EINVAL;
 	}
 
+<<<<<<< HEAD
 	mutex_lock(&sysfs_lock);
 
+=======
+	chip = desc->chip;
+
+	mutex_lock(&sysfs_lock);
+
+	/* check if chip is being removed */
+	if (!chip || !chip->exported) {
+		status = -ENODEV;
+		goto fail_unlock;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	spin_lock_irqsave(&gpio_lock, flags);
 	if (!test_bit(FLAG_REQUESTED, &desc->flags) ||
 	     test_bit(FLAG_EXPORT, &desc->flags)) {
@@ -766,12 +791,21 @@ void gpiochip_unexport(struct gpio_chip *chip)
 {
 	int			status;
 	struct device		*dev;
+<<<<<<< HEAD
+=======
+	struct gpio_desc *desc;
+	unsigned int i;
+>>>>>>> common/deprecated/android-3.18
 
 	mutex_lock(&sysfs_lock);
 	dev = class_find_device(&gpio_class, NULL, chip, match_export);
 	if (dev) {
 		put_device(dev);
 		device_unregister(dev);
+<<<<<<< HEAD
+=======
+		/* prevent further gpiod exports */
+>>>>>>> common/deprecated/android-3.18
 		chip->exported = false;
 		status = 0;
 	} else
@@ -780,6 +814,16 @@ void gpiochip_unexport(struct gpio_chip *chip)
 
 	if (status)
 		chip_dbg(chip, "%s: status %d\n", __func__, status);
+<<<<<<< HEAD
+=======
+
+	/* unregister gpiod class devices owned by sysfs */
+	for (i = 0; i < chip->ngpio; i++) {
+		desc = &chip->desc[i];
+		if (test_and_clear_bit(FLAG_SYSFS, &desc->flags))
+			gpiod_free(desc);
+	}
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int __init gpiolib_sysfs_init(void)

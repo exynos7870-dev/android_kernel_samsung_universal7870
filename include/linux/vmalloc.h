@@ -88,8 +88,14 @@ extern int remap_vmalloc_range_partial(struct vm_area_struct *vma,
 
 extern int remap_vmalloc_range(struct vm_area_struct *vma, void *addr,
 							unsigned long pgoff);
+<<<<<<< HEAD
 void vmalloc_sync_all(void);
  
+=======
+void vmalloc_sync_mappings(void);
+void vmalloc_sync_unmappings(void);
+
+>>>>>>> common/deprecated/android-3.18
 /*
  *	Lowlevel-APIs (not for driver use!)
  */

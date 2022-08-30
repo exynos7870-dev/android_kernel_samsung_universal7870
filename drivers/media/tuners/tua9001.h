@@ -51,7 +51,11 @@ struct tua9001_config {
 #define TUA9001_CMD_RESETN  1
 #define TUA9001_CMD_RXEN    2
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_MEDIA_TUNER_TUA9001)
+=======
+#if IS_REACHABLE(CONFIG_MEDIA_TUNER_TUA9001)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend *tua9001_attach(struct dvb_frontend *fe,
 		struct i2c_adapter *i2c, struct tua9001_config *cfg);
 #else

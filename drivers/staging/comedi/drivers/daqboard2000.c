@@ -637,7 +637,11 @@ static const void *daqboard2000_find_boardinfo(struct comedi_device *dev,
 	const struct daq200_boardtype *board;
 	int i;
 
+<<<<<<< HEAD
 	if (pcidev->subsystem_device != PCI_VENDOR_ID_IOTECH)
+=======
+	if (pcidev->subsystem_vendor != PCI_VENDOR_ID_IOTECH)
+>>>>>>> common/deprecated/android-3.18
 		return NULL;
 
 	for (i = 0; i < ARRAY_SIZE(boardtypes); i++) {

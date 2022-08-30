@@ -72,6 +72,7 @@ static char *check[] = {
 	"lzo", "cts", "zlib", NULL
 };
 
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 #ifdef CONFIG_CRYPTO_DRBG
 static char *drbg_cores[] = {
@@ -96,6 +97,8 @@ static char *drbg_cores[] = {
 #endif /* CONFIG_CRYPTO_DRBG */
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static int test_cipher_jiffies(struct blkcipher_desc *desc, int enc,
 			       struct scatterlist *sg, int blen, int secs)
 {
@@ -276,12 +279,18 @@ static void sg_init_aead(struct scatterlist *sg, char *xbuf[XBUFSIZE],
 
 	np = (np > XBUFSIZE) ? XBUFSIZE : np;
 	rem = buflen % PAGE_SIZE;
+<<<<<<< HEAD
 #if 0 // Prevent 60109 : Logically dead code
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (np > XBUFSIZE) {
 		rem = PAGE_SIZE;
 		np = XBUFSIZE;
 	}
+<<<<<<< HEAD
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	sg_init_table(sg, np);
 	for (k = 0; k < np; ++k) {
 		if (k == (np-1))
@@ -397,12 +406,22 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
 			}
 
 			sg_init_aead(&sg[0], xbuf,
+<<<<<<< HEAD
 				    *b_size + (enc ? authsize : 0));
+=======
+				    *b_size + (enc ? 0 : authsize));
+>>>>>>> common/deprecated/android-3.18
 
 			sg_init_aead(&sgout[0], xoutbuf,
 				    *b_size + (enc ? authsize : 0));
 
+<<<<<<< HEAD
 			aead_request_set_crypt(req, sg, sgout, *b_size, iv);
+=======
+			aead_request_set_crypt(req, sg, sgout,
+					       *b_size + (enc ? 0 : authsize),
+					       iv);
+>>>>>>> common/deprecated/android-3.18
 			aead_request_set_assoc(req, asg, aad_size);
 
 			if (secs)
@@ -1228,6 +1247,7 @@ out:
 	crypto_free_ablkcipher(tfm);
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_DRBG
 static inline int test_drbg(const char *drbg_core, int pr)
 {
@@ -1249,6 +1269,8 @@ static inline int test_drbg(const char *drbg_core, int pr)
 }
 #endif /* CONFIG_CRYPTO_DRBG */
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static void test_available(void)
 {
 	char **name = check;
@@ -2169,6 +2191,7 @@ static int do_test(int m)
 	case 1000:
 		test_available();
 		break;
+<<<<<<< HEAD
 
 #ifdef CONFIG_CRYPTO_FIPS
 	case 1402 : //For FIPS 140-2
@@ -2256,6 +2279,8 @@ static int do_test(int m)
 		printk(KERN_ERR "FIPS : Tcrypt Tests End\n");
 		break;
 #endif //CONFIG_CRYPTO_FIPS
+=======
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	return ret;
@@ -2278,16 +2303,20 @@ static int __init tcrypt_mod_init(void)
 			goto err_free_tv;
 	}
 
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 	testmgr_crypto_proc_init();
 	mode = 1402; //For FIPS 140-2
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (alg)
 		err = do_alg_test(alg, type, mask);
 	else
 		err = do_test(mode);
 
+<<<<<<< HEAD
 #if FIPS_FUNC_TEST == 1
 	printk(KERN_ERR "FIPS FUNC TEST: Do test again\n");
 	do_test(mode);
@@ -2315,6 +2344,13 @@ static int __init tcrypt_mod_init(void)
 	}
     #endif
 #endif /* FIPS_FUNC_TEST */
+=======
+	if (err) {
+		printk(KERN_ERR "tcrypt: one or more tests failed!\n");
+		goto err_free_tv;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	/* We intentionaly return -EAGAIN to prevent keeping the module,
 	 * unless we're running in fips mode. It does all its work from
 	 * init() and doesn't offer any runtime functionality, but in
@@ -2338,6 +2374,7 @@ err_free_tv:
  */
 static void __exit tcrypt_mod_fini(void) { }
 
+<<<<<<< HEAD
 #if defined(CONFIG_CRYPTO_POST_DEFERRED_INIT)
 deferred_module_init(tcrypt_mod_init);
 #elif defined(CONFIG_CRYPTO_POST_LATE_INIT_SYNC)
@@ -2347,6 +2384,9 @@ late_initcall(tcrypt_mod_init);
 #else
 module_init(tcrypt_mod_init);
 #endif
+=======
+module_init(tcrypt_mod_init);
+>>>>>>> common/deprecated/android-3.18
 module_exit(tcrypt_mod_fini);
 
 module_param(alg, charp, 0);

@@ -1339,5 +1339,9 @@ irqreturn_t pcxhr_threaded_irq(int irq, void *dev_id)
 	}
 
 	pcxhr_msg_thread(mgr);
+<<<<<<< HEAD
+=======
+	mutex_unlock(&mgr->lock);
+>>>>>>> common/deprecated/android-3.18
 	return IRQ_HANDLED;
 }

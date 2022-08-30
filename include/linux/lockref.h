@@ -28,12 +28,20 @@ struct lockref {
 #endif
 		struct {
 			spinlock_t lock;
+<<<<<<< HEAD
 			unsigned int count;
+=======
+			int count;
+>>>>>>> common/deprecated/android-3.18
 		};
 	};
 };
 
 extern void lockref_get(struct lockref *);
+<<<<<<< HEAD
+=======
+extern int lockref_put_return(struct lockref *);
+>>>>>>> common/deprecated/android-3.18
 extern int lockref_get_not_zero(struct lockref *);
 extern int lockref_get_or_lock(struct lockref *);
 extern int lockref_put_or_lock(struct lockref *);

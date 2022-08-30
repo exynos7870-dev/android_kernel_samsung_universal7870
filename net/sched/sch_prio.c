@@ -18,7 +18,10 @@
 #include <linux/string.h>
 #include <linux/errno.h>
 #include <linux/skbuff.h>
+<<<<<<< HEAD
 #include <linux/netdevice.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 #include <net/netlink.h>
 #include <net/pkt_sched.h>
 
@@ -28,7 +31,10 @@ struct prio_sched_data {
 	struct tcf_proto __rcu *filter_list;
 	u8  prio2band[TC_PRIO_MAX+1];
 	struct Qdisc *queues[TCQ_PRIO_BANDS];
+<<<<<<< HEAD
 	u8 enable_flow;
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 
@@ -87,6 +93,10 @@ prio_enqueue(struct sk_buff *skb, struct Qdisc *sch)
 
 	ret = qdisc_enqueue(skb, qdisc);
 	if (ret == NET_XMIT_SUCCESS) {
+<<<<<<< HEAD
+=======
+		qdisc_qstats_backlog_inc(sch, skb);
+>>>>>>> common/deprecated/android-3.18
 		sch->q.qlen++;
 		return NET_XMIT_SUCCESS;
 	}
@@ -99,8 +109,12 @@ static struct sk_buff *prio_peek(struct Qdisc *sch)
 {
 	struct prio_sched_data *q = qdisc_priv(sch);
 	int prio;
+<<<<<<< HEAD
 	if (!q->enable_flow)
 		return NULL;
+=======
+
+>>>>>>> common/deprecated/android-3.18
 	for (prio = 0; prio < q->bands; prio++) {
 		struct Qdisc *qdisc = q->queues[prio];
 		struct sk_buff *skb = qdisc->ops->peek(qdisc);
@@ -114,14 +128,21 @@ static struct sk_buff *prio_dequeue(struct Qdisc *sch)
 {
 	struct prio_sched_data *q = qdisc_priv(sch);
 	int prio;
+<<<<<<< HEAD
 	if (!q->enable_flow)
 		return NULL;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	for (prio = 0; prio < q->bands; prio++) {
 		struct Qdisc *qdisc = q->queues[prio];
 		struct sk_buff *skb = qdisc_dequeue_peeked(qdisc);
 		if (skb) {
 			qdisc_bstats_update(sch, skb);
+<<<<<<< HEAD
+=======
+			qdisc_qstats_backlog_dec(sch, skb);
+>>>>>>> common/deprecated/android-3.18
 			sch->q.qlen--;
 			return skb;
 		}
@@ -140,6 +161,10 @@ static unsigned int prio_drop(struct Qdisc *sch)
 	for (prio = q->bands-1; prio >= 0; prio--) {
 		qdisc = q->queues[prio];
 		if (qdisc->ops->drop && (len = qdisc->ops->drop(qdisc)) != 0) {
+<<<<<<< HEAD
+=======
+			sch->qstats.backlog -= len;
+>>>>>>> common/deprecated/android-3.18
 			sch->q.qlen--;
 			return len;
 		}
@@ -156,8 +181,13 @@ prio_reset(struct Qdisc *sch)
 
 	for (prio = 0; prio < q->bands; prio++)
 		qdisc_reset(q->queues[prio]);
+<<<<<<< HEAD
 	sch->q.qlen = 0;
 	q->enable_flow = 1;
+=======
+	sch->qstats.backlog = 0;
+	sch->q.qlen = 0;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void
@@ -176,7 +206,10 @@ static int prio_tune(struct Qdisc *sch, struct nlattr *opt)
 	struct prio_sched_data *q = qdisc_priv(sch);
 	struct tc_prio_qopt *qopt;
 	int i;
+<<<<<<< HEAD
 	int flow_change = 0;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	if (nla_len(opt) < sizeof(*qopt))
 		return -EINVAL;
@@ -191,10 +224,13 @@ static int prio_tune(struct Qdisc *sch, struct nlattr *opt)
 	}
 
 	sch_tree_lock(sch);
+<<<<<<< HEAD
 	if (q->enable_flow != qopt->enable_flow) {
 		q->enable_flow = qopt->enable_flow;
 		flow_change = 1;
 	}
+=======
+>>>>>>> common/deprecated/android-3.18
 	q->bands = qopt->bands;
 	memcpy(q->prio2band, qopt->priomap, TC_PRIO_MAX+1);
 
@@ -202,7 +238,11 @@ static int prio_tune(struct Qdisc *sch, struct nlattr *opt)
 		struct Qdisc *child = q->queues[i];
 		q->queues[i] = &noop_qdisc;
 		if (child != &noop_qdisc) {
+<<<<<<< HEAD
 			qdisc_tree_decrease_qlen(child, child->q.qlen);
+=======
+			qdisc_tree_reduce_backlog(child, child->q.qlen, child->qstats.backlog);
+>>>>>>> common/deprecated/android-3.18
 			qdisc_destroy(child);
 		}
 	}
@@ -221,20 +261,29 @@ static int prio_tune(struct Qdisc *sch, struct nlattr *opt)
 				q->queues[i] = child;
 
 				if (old != &noop_qdisc) {
+<<<<<<< HEAD
 					qdisc_tree_decrease_qlen(old,
 								 old->q.qlen);
+=======
+					qdisc_tree_reduce_backlog(old,
+								  old->q.qlen,
+								  old->qstats.backlog);
+>>>>>>> common/deprecated/android-3.18
 					qdisc_destroy(old);
 				}
 				sch_tree_unlock(sch);
 			}
 		}
 	}
+<<<<<<< HEAD
 	/* Schedule qdisc when flow re-enabled */
 	if (flow_change && q->enable_flow) {
 		if (!test_bit(__QDISC_STATE_DEACTIVATED,
 			      &sch->state))
 			__netif_schedule(qdisc_root(sch));
 	}
+=======
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -264,7 +313,10 @@ static int prio_dump(struct Qdisc *sch, struct sk_buff *skb)
 	struct tc_prio_qopt opt;
 
 	opt.bands = q->bands;
+<<<<<<< HEAD
 	opt.enable_flow = q->enable_flow;
+=======
+>>>>>>> common/deprecated/android-3.18
 	memcpy(&opt.priomap, q->prio2band, TC_PRIO_MAX + 1);
 
 	if (nla_put(skb, TCA_OPTIONS, sizeof(opt), &opt))
@@ -286,6 +338,7 @@ static int prio_graft(struct Qdisc *sch, unsigned long arg, struct Qdisc *new,
 	if (new == NULL)
 		new = &noop_qdisc;
 
+<<<<<<< HEAD
 	sch_tree_lock(sch);
 	*old = q->queues[band];
 	q->queues[band] = new;
@@ -293,6 +346,9 @@ static int prio_graft(struct Qdisc *sch, unsigned long arg, struct Qdisc *new,
 	qdisc_reset(*old);
 	sch_tree_unlock(sch);
 
+=======
+	*old = qdisc_replace(sch, new, &q->queues[band]);
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -342,7 +398,11 @@ static int prio_dump_class_stats(struct Qdisc *sch, unsigned long cl,
 	struct Qdisc *cl_q;
 
 	cl_q = q->queues[cl - 1];
+<<<<<<< HEAD
 	if (gnet_stats_copy_basic(d, NULL, &cl_q->bstats) < 0 ||
+=======
+	if (gnet_stats_copy_basic(d, cl_q->cpu_bstats, &cl_q->bstats) < 0 ||
+>>>>>>> common/deprecated/android-3.18
 	    gnet_stats_copy_queue(d, NULL, &cl_q->qstats, cl_q->q.qlen) < 0)
 		return -1;
 

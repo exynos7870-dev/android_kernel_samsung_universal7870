@@ -1593,6 +1593,11 @@ static int idecd_open(struct block_device *bdev, fmode_t mode)
 	struct cdrom_info *info;
 	int rc = -ENXIO;
 
+<<<<<<< HEAD
+=======
+	check_disk_change(bdev);
+
+>>>>>>> common/deprecated/android-3.18
 	mutex_lock(&ide_cd_mutex);
 	info = ide_cd_get(bdev->bd_disk);
 	if (!info)

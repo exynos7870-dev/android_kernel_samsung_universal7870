@@ -27,6 +27,7 @@
 #define F_SETPIPE_SZ	(F_LINUX_SPECIFIC_BASE + 7)
 #define F_GETPIPE_SZ	(F_LINUX_SPECIFIC_BASE + 8)
 
+<<<<<<< HEAD
 #ifdef CONFIG_FIVE
 #define F_FIVE_SIGN	(F_LINUX_SPECIFIC_BASE + 100)
 #define F_FIVE_VERIFY_ASYNC	(F_LINUX_SPECIFIC_BASE + 101)
@@ -36,6 +37,8 @@
 #endif
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * Set/Get seals
  */

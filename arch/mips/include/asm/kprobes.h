@@ -40,7 +40,12 @@ typedef union mips_instruction kprobe_opcode_t;
 
 #define flush_insn_slot(p)						\
 do {									\
+<<<<<<< HEAD
 	flush_icache_range((unsigned long)p->addr,			\
+=======
+	if (p->addr)							\
+		flush_icache_range((unsigned long)p->addr,		\
+>>>>>>> common/deprecated/android-3.18
 			   (unsigned long)p->addr +			\
 			   (MAX_INSN_SIZE * sizeof(kprobe_opcode_t)));	\
 } while (0)

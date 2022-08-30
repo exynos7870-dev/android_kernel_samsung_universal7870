@@ -314,7 +314,11 @@ static int __parse_flow_nlattrs(const struct nlattr *attr,
 			return -EINVAL;
 		}
 
+<<<<<<< HEAD
 		if (!nz || !is_all_zero(nla_data(nla), expected_len)) {
+=======
+		if (!nz || !is_all_zero(nla_data(nla), nla_len(nla))) {
+>>>>>>> common/deprecated/android-3.18
 			attrs |= 1 << type;
 			a[type] = nla;
 		}
@@ -1261,14 +1265,22 @@ static struct nlattr *reserve_sfa_size(struct sw_flow_actions **sfa,
 
 	struct sw_flow_actions *acts;
 	int new_acts_size;
+<<<<<<< HEAD
 	int req_size = NLA_ALIGN(attr_len);
+=======
+	size_t req_size = NLA_ALIGN(attr_len);
+>>>>>>> common/deprecated/android-3.18
 	int next_offset = offsetof(struct sw_flow_actions, actions) +
 					(*sfa)->actions_len;
 
 	if (req_size <= (ksize(*sfa) - next_offset))
 		goto out;
 
+<<<<<<< HEAD
 	new_acts_size = ksize(*sfa) * 2;
+=======
+	new_acts_size = max(next_offset + req_size, ksize(*sfa) * 2);
+>>>>>>> common/deprecated/android-3.18
 
 	if (new_acts_size > MAX_ACTIONS_BUFSIZE) {
 		if ((MAX_ACTIONS_BUFSIZE - next_offset) < req_size)

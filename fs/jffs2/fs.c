@@ -363,7 +363,10 @@ error_io:
 	ret = -EIO;
 error:
 	mutex_unlock(&f->sem);
+<<<<<<< HEAD
 	jffs2_do_clear_inode(c, f);
+=======
+>>>>>>> common/deprecated/android-3.18
 	iget_failed(inode);
 	return ERR_PTR(ret);
 }

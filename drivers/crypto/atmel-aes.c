@@ -1380,9 +1380,15 @@ static int atmel_aes_probe(struct platform_device *pdev)
 	}
 
 	aes_dd->io_base = ioremap(aes_dd->phys_base, aes_phys_size);
+<<<<<<< HEAD
 	if (!aes_dd->io_base) {
 		dev_err(dev, "can't ioremap\n");
 		err = -ENOMEM;
+=======
+	if (IS_ERR(aes_dd->io_base)) {
+		dev_err(dev, "can't ioremap\n");
+		err = PTR_ERR(aes_dd->io_base);
+>>>>>>> common/deprecated/android-3.18
 		goto aes_io_err;
 	}
 

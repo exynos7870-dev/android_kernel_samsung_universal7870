@@ -804,6 +804,7 @@ static void iscsi_check_proposer_for_optional_reply(struct iscsi_param *param)
 		if (!strcmp(param->name, MAXRECVDATASEGMENTLENGTH))
 			SET_PSTATE_REPLY_OPTIONAL(param);
 		/*
+<<<<<<< HEAD
 		 * The GlobalSAN iSCSI Initiator for MacOSX does
 		 * not respond to MaxBurstLength, FirstBurstLength,
 		 * DefaultTime2Wait or DefaultTime2Retain parameter keys.
@@ -820,6 +821,8 @@ static void iscsi_check_proposer_for_optional_reply(struct iscsi_param *param)
 		if (!strcmp(param->name, DEFAULTTIME2RETAIN))
 			SET_PSTATE_REPLY_OPTIONAL(param);
 		/*
+=======
+>>>>>>> common/deprecated/android-3.18
 		 * Required for gPXE iSCSI boot client
 		 */
 		if (!strcmp(param->name, MAXCONNECTIONS))

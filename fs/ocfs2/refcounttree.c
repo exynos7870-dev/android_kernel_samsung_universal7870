@@ -4268,12 +4268,16 @@ static int ocfs2_reflink(struct dentry *old_dentry, struct inode *dir,
 	struct inode *inode = old_dentry->d_inode;
 	struct buffer_head *old_bh = NULL;
 	struct inode *new_orphan_inode = NULL;
+<<<<<<< HEAD
 	struct posix_acl *default_acl, *acl;
 	umode_t mode;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	if (!ocfs2_refcount_tree(OCFS2_SB(inode->i_sb)))
 		return -EOPNOTSUPP;
 
+<<<<<<< HEAD
 	mode = inode->i_mode;
 	error = posix_acl_create(dir, &mode, &default_acl, &acl);
 	if (error) {
@@ -4282,6 +4286,10 @@ static int ocfs2_reflink(struct dentry *old_dentry, struct inode *dir,
 	}
 
 	error = ocfs2_create_inode_in_orphan(dir, mode,
+=======
+
+	error = ocfs2_create_inode_in_orphan(dir, inode->i_mode,
+>>>>>>> common/deprecated/android-3.18
 					     &new_orphan_inode);
 	if (error) {
 		mlog_errno(error);
@@ -4320,16 +4328,23 @@ static int ocfs2_reflink(struct dentry *old_dentry, struct inode *dir,
 	/* If the security isn't preserved, we need to re-initialize them. */
 	if (!preserve) {
 		error = ocfs2_init_security_and_acl(dir, new_orphan_inode,
+<<<<<<< HEAD
 						    &new_dentry->d_name,
 						    default_acl, acl);
+=======
+						    &new_dentry->d_name);
+>>>>>>> common/deprecated/android-3.18
 		if (error)
 			mlog_errno(error);
 	}
 out:
+<<<<<<< HEAD
 	if (default_acl)
 		posix_acl_release(default_acl);
 	if (acl)
 		posix_acl_release(acl);
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (!error) {
 		error = ocfs2_mv_orphaned_inode_to_new(dir, new_orphan_inode,
 						       new_dentry);

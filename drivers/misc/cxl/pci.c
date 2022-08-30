@@ -117,6 +117,10 @@ static DEFINE_PCI_DEVICE_TABLE(cxl_pci_tbl) = {
 	{ PCI_DEVICE(PCI_VENDOR_ID_IBM, 0x0477), },
 	{ PCI_DEVICE(PCI_VENDOR_ID_IBM, 0x044b), },
 	{ PCI_DEVICE(PCI_VENDOR_ID_IBM, 0x04cf), },
+<<<<<<< HEAD
+=======
+	{ PCI_DEVICE(PCI_VENDOR_ID_IBM, 0x0601), },
+>>>>>>> common/deprecated/android-3.18
 	{ PCI_DEVICE_CLASS(0x120000, ~0), },
 
 	{ }
@@ -987,8 +991,11 @@ static int cxl_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	int slice;
 	int rc;
 
+<<<<<<< HEAD
 	pci_dev_get(dev);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (cxl_verbose)
 		dump_cxl_config_space(dev);
 

@@ -92,7 +92,10 @@ do { \
                __LINE__, __FILE__, #x, jiffies); \
     {do} \
     printk("\n"); \
+<<<<<<< HEAD
     BUG(); \
+=======
+>>>>>>> common/deprecated/android-3.18
     panic("DLM:  Record message above and reboot.\n"); \
   } \
 }

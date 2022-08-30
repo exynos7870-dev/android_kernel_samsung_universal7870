@@ -183,6 +183,10 @@ struct arm_ccn {
 	struct arm_ccn_component *xp;
 
 	struct arm_ccn_dt dt;
+<<<<<<< HEAD
+=======
+	int mn_id;
+>>>>>>> common/deprecated/android-3.18
 };
 
 
@@ -212,7 +216,11 @@ static int arm_ccn_node_to_xp_port(int node)
 
 static void arm_ccn_pmu_config_set(u64 *config, u32 node_xp, u32 type, u32 port)
 {
+<<<<<<< HEAD
 	*config &= ~((0xff << 0) | (0xff << 8) | (0xff << 24));
+=======
+	*config &= ~((0xff << 0) | (0xff << 8) | (0x3 << 24));
+>>>>>>> common/deprecated/android-3.18
 	*config |= (node_xp << 0) | (type << 8) | (port << 24);
 }
 
@@ -322,6 +330,10 @@ struct arm_ccn_pmu_event {
 static ssize_t arm_ccn_pmu_event_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
+<<<<<<< HEAD
+=======
+	struct arm_ccn *ccn = pmu_to_arm_ccn(dev_get_drvdata(dev));
+>>>>>>> common/deprecated/android-3.18
 	struct arm_ccn_pmu_event *event = container_of(attr,
 			struct arm_ccn_pmu_event, attr);
 	ssize_t res;
@@ -336,6 +348,29 @@ static ssize_t arm_ccn_pmu_event_show(struct device *dev,
 	if (event->mask)
 		res += snprintf(buf + res, PAGE_SIZE - res, ",mask=0x%x",
 				event->mask);
+<<<<<<< HEAD
+=======
+
+	/* Arguments required by an event */
+	switch (event->type) {
+	case CCN_TYPE_CYCLES:
+		break;
+	case CCN_TYPE_XP:
+		res += snprintf(buf + res, PAGE_SIZE - res,
+				",xp=?,port=?,vc=?,dir=?");
+		if (event->event == CCN_EVENT_WATCHPOINT)
+			res += snprintf(buf + res, PAGE_SIZE - res,
+					",cmp_l=?,cmp_h=?,mask=?");
+		break;
+	case CCN_TYPE_MN:
+		res += snprintf(buf + res, PAGE_SIZE - res, ",node=%d", ccn->mn_id);
+		break;
+	default:
+		res += snprintf(buf + res, PAGE_SIZE - res, ",node=?");
+		break;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	res += snprintf(buf + res, PAGE_SIZE - res, "\n");
 
 	return res;
@@ -360,9 +395,15 @@ static umode_t arm_ccn_pmu_events_is_visible(struct kobject *kobj,
 }
 
 static struct arm_ccn_pmu_event arm_ccn_pmu_events[] = {
+<<<<<<< HEAD
 	CCN_EVENT_MN(eobarrier, "dir=0,vc=0,cmp_h=0x1c00", CCN_IDX_MASK_OPCODE),
 	CCN_EVENT_MN(ecbarrier, "dir=0,vc=0,cmp_h=0x1e00", CCN_IDX_MASK_OPCODE),
 	CCN_EVENT_MN(dvmop, "dir=0,vc=0,cmp_h=0x2800", CCN_IDX_MASK_OPCODE),
+=======
+	CCN_EVENT_MN(eobarrier, "dir=1,vc=0,cmp_h=0x1c00", CCN_IDX_MASK_OPCODE),
+	CCN_EVENT_MN(ecbarrier, "dir=1,vc=0,cmp_h=0x1e00", CCN_IDX_MASK_OPCODE),
+	CCN_EVENT_MN(dvmop, "dir=1,vc=0,cmp_h=0x2800", CCN_IDX_MASK_OPCODE),
+>>>>>>> common/deprecated/android-3.18
 	CCN_EVENT_HNI(txdatflits, "dir=1,vc=3", CCN_IDX_MASK_ANY),
 	CCN_EVENT_HNI(rxdatflits, "dir=0,vc=3", CCN_IDX_MASK_ANY),
 	CCN_EVENT_HNI(txreqflits, "dir=1,vc=0", CCN_IDX_MASK_ANY),
@@ -649,6 +690,15 @@ static int arm_ccn_pmu_event_init(struct perf_event *event)
 
 	/* Validate node/xp vs topology */
 	switch (type) {
+<<<<<<< HEAD
+=======
+	case CCN_TYPE_MN:
+		if (node_xp != ccn->mn_id) {
+			dev_warn(ccn->dev, "Invalid MN ID %d!\n", node_xp);
+			return -EINVAL;
+		}
+		break;
+>>>>>>> common/deprecated/android-3.18
 	case CCN_TYPE_XP:
 		if (node_xp >= ccn->num_xps) {
 			dev_warn(ccn->dev, "Invalid XP ID %d!\n", node_xp);
@@ -804,6 +854,13 @@ static void arm_ccn_pmu_xp_dt_config(struct perf_event *event, int enable)
 	struct arm_ccn_component *xp;
 	u32 val, dt_cfg;
 
+<<<<<<< HEAD
+=======
+	/* Nothing to do for cycle counter */
+	if (hw->idx == CCN_IDX_PMU_CYCLE_COUNTER)
+		return;
+
+>>>>>>> common/deprecated/android-3.18
 	if (CCN_CONFIG_TYPE(event->attr.config) == CCN_TYPE_XP)
 		xp = &ccn->xp[CCN_CONFIG_XP(event->attr.config)];
 	else
@@ -901,7 +958,11 @@ static void arm_ccn_pmu_xp_watchpoint_config(struct perf_event *event)
 
 	/* Comparison values */
 	writel(cmp_l & 0xffffffff, source->base + CCN_XP_DT_CMP_VAL_L(wp));
+<<<<<<< HEAD
 	writel((cmp_l >> 32) & 0xefffffff,
+=======
+	writel((cmp_l >> 32) & 0x7fffffff,
+>>>>>>> common/deprecated/android-3.18
 			source->base + CCN_XP_DT_CMP_VAL_L(wp) + 4);
 	writel(cmp_h & 0xffffffff, source->base + CCN_XP_DT_CMP_VAL_H(wp));
 	writel((cmp_h >> 32) & 0x0fffffff,
@@ -909,7 +970,11 @@ static void arm_ccn_pmu_xp_watchpoint_config(struct perf_event *event)
 
 	/* Mask */
 	writel(mask_l & 0xffffffff, source->base + CCN_XP_DT_CMP_MASK_L(wp));
+<<<<<<< HEAD
 	writel((mask_l >> 32) & 0xefffffff,
+=======
+	writel((mask_l >> 32) & 0x7fffffff,
+>>>>>>> common/deprecated/android-3.18
 			source->base + CCN_XP_DT_CMP_MASK_L(wp) + 4);
 	writel(mask_h & 0xffffffff, source->base + CCN_XP_DT_CMP_MASK_H(wp));
 	writel((mask_h >> 32) & 0x0fffffff,
@@ -1125,6 +1190,10 @@ static int arm_ccn_pmu_init(struct arm_ccn *ccn)
 
 	/* Perf driver registration */
 	ccn->dt.pmu = (struct pmu) {
+<<<<<<< HEAD
+=======
+		.module = THIS_MODULE,
+>>>>>>> common/deprecated/android-3.18
 		.attr_groups = arm_ccn_pmu_attr_groups,
 		.task_ctx_nr = perf_invalid_context,
 		.event_init = arm_ccn_pmu_event_init,
@@ -1210,6 +1279,11 @@ static int arm_ccn_init_nodes(struct arm_ccn *ccn, int region,
 
 	switch (type) {
 	case CCN_TYPE_MN:
+<<<<<<< HEAD
+=======
+		ccn->mn_id = id;
+		return 0;
+>>>>>>> common/deprecated/android-3.18
 	case CCN_TYPE_DT:
 		return 0;
 	case CCN_TYPE_XP:

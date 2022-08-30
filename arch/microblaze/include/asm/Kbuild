@@ -11,3 +11,7 @@ generic-y += preempt.h
 generic-y += scatterlist.h
 generic-y += syscalls.h
 generic-y += trace_clock.h
+<<<<<<< HEAD
+=======
+generic-y += word-at-a-time.h
+>>>>>>> common/deprecated/android-3.18

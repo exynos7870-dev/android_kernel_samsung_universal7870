@@ -444,7 +444,11 @@ static int tmio_probe(struct platform_device *dev)
 	if (!retval)
 		return retval;
 
+<<<<<<< HEAD
 	nand_release(mtd);
+=======
+	nand_cleanup(nand_chip);
+>>>>>>> common/deprecated/android-3.18
 
 err_irq:
 	tmio_hw_stop(dev, tmio);

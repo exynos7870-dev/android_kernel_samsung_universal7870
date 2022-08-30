@@ -98,7 +98,11 @@ temp_crit_show(struct device *dev, struct device_attribute *attr, char *buf)
 	long temperature;
 	int ret;
 
+<<<<<<< HEAD
 	ret = tz->ops->get_trip_temp(tz, 0, &temperature);
+=======
+	ret = tz->ops->get_crit_temp(tz, &temperature);
+>>>>>>> common/deprecated/android-3.18
 	if (ret)
 		return ret;
 

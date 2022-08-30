@@ -13,6 +13,10 @@
 
 #include <linux/cpufreq.h>
 #include <linux/interrupt.h>
+<<<<<<< HEAD
+=======
+#include <linux/leds.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/irq.h>
 #include <linux/pm.h>
 #include <linux/gpio.h>
@@ -556,7 +560,11 @@ static struct pxaohci_platform_data zeus_ohci_platform_data = {
 	.flags		= ENABLE_PORT_ALL | POWER_SENSE_LOW,
 };
 
+<<<<<<< HEAD
 static void zeus_register_ohci(void)
+=======
+static void __init zeus_register_ohci(void)
+>>>>>>> common/deprecated/android-3.18
 {
 	/* Port 2 is shared between host and client interface. */
 	UP2OCR = UP2OCR_HXOE | UP2OCR_HXS | UP2OCR_DMPDE | UP2OCR_DPPDE;

@@ -463,7 +463,11 @@ static int max77686_rtc_probe(struct platform_device *pdev)
 
 	info->virq = regmap_irq_get_virq(max77686->rtc_irq_data,
 					 MAX77686_RTCIRQ_RTCA1);
+<<<<<<< HEAD
 	if (!info->virq) {
+=======
+	if (info->virq <= 0) {
+>>>>>>> common/deprecated/android-3.18
 		ret = -ENXIO;
 		goto err_rtc;
 	}

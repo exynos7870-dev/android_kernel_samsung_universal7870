@@ -46,7 +46,11 @@ struct efx_loopback_payload {
 	struct iphdr ip;
 	struct udphdr udp;
 	__be16 iteration;
+<<<<<<< HEAD
 	const char msg[64];
+=======
+	char msg[64];
+>>>>>>> common/deprecated/android-3.18
 } __packed;
 
 /* Loopback test source MAC address */

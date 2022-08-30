@@ -184,22 +184,38 @@ do {									\
 	typeof(var) pfo_ret__;				\
 	switch (sizeof(var)) {				\
 	case 1:						\
+<<<<<<< HEAD
 		asm(op "b "__percpu_arg(1)",%0"		\
+=======
+		asm volatile(op "b "__percpu_arg(1)",%0"\
+>>>>>>> common/deprecated/android-3.18
 		    : "=q" (pfo_ret__)			\
 		    : constraint);			\
 		break;					\
 	case 2:						\
+<<<<<<< HEAD
 		asm(op "w "__percpu_arg(1)",%0"		\
+=======
+		asm volatile(op "w "__percpu_arg(1)",%0"\
+>>>>>>> common/deprecated/android-3.18
 		    : "=r" (pfo_ret__)			\
 		    : constraint);			\
 		break;					\
 	case 4:						\
+<<<<<<< HEAD
 		asm(op "l "__percpu_arg(1)",%0"		\
+=======
+		asm volatile(op "l "__percpu_arg(1)",%0"\
+>>>>>>> common/deprecated/android-3.18
 		    : "=r" (pfo_ret__)			\
 		    : constraint);			\
 		break;					\
 	case 8:						\
+<<<<<<< HEAD
 		asm(op "q "__percpu_arg(1)",%0"		\
+=======
+		asm volatile(op "q "__percpu_arg(1)",%0"\
+>>>>>>> common/deprecated/android-3.18
 		    : "=r" (pfo_ret__)			\
 		    : constraint);			\
 		break;					\
@@ -505,7 +521,11 @@ static inline int x86_this_cpu_variable_test_bit(int nr,
 {
 	int oldbit;
 
+<<<<<<< HEAD
 	asm volatile("bt "__percpu_arg(2)",%1\n\t"
+=======
+	asm volatile("btl "__percpu_arg(2)",%1\n\t"
+>>>>>>> common/deprecated/android-3.18
 			"sbb %0,%0"
 			: "=r" (oldbit)
 			: "m" (*(unsigned long *)addr), "Ir" (nr));

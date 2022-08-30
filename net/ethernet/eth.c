@@ -163,9 +163,15 @@ u32 eth_get_headlen(void *data, unsigned int len)
 		return len;
 
 	/* parse any remaining L2/L3 headers, check for L4 */
+<<<<<<< HEAD
 	if (!__skb_flow_dissect(NULL, &keys, data,
 				eth->h_proto, sizeof(*eth), len))
 		return max_t(u32, keys.thoff, sizeof(*eth));
+=======
+	if (!skb_flow_dissect_flow_keys_buf(&keys, data, eth->h_proto,
+					    sizeof(*eth), len))
+		return max_t(u32, keys.control.thoff, sizeof(*eth));
+>>>>>>> common/deprecated/android-3.18
 
 	/* parse for any L4 headers */
 	return min_t(u32, __skb_get_poff(NULL, data, &keys, len), len);
@@ -385,6 +391,10 @@ void ether_setup(struct net_device *dev)
 	dev->header_ops		= &eth_header_ops;
 	dev->type		= ARPHRD_ETHER;
 	dev->hard_header_len 	= ETH_HLEN;
+<<<<<<< HEAD
+=======
+	dev->min_header_len	= ETH_HLEN;
+>>>>>>> common/deprecated/android-3.18
 	dev->mtu		= ETH_DATA_LEN;
 	dev->addr_len		= ETH_ALEN;
 	dev->tx_queue_len	= 1000;	/* Ethernet wants good queues */

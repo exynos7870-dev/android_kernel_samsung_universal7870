@@ -38,6 +38,7 @@
  */
 
 #include <linux/async.h>
+<<<<<<< HEAD
 #if defined(CONFIG_PM_DEVFREQ)
 #include <linux/devfreq.h>
 #endif
@@ -50,6 +51,13 @@
 #include "unipro.h"
 #include "ufs-exynos.h"
 #include "ufs_quirks.h"
+=======
+#include <linux/devfreq.h>
+#include <linux/blkdev.h>
+
+#include "ufshcd.h"
+#include "unipro.h"
+>>>>>>> common/deprecated/android-3.18
 
 #define UFSHCD_ENABLE_INTRS	(UTP_TRANSFER_REQ_COMPL |\
 				 UTP_TASK_REQ_COMPL |\
@@ -61,13 +69,20 @@
 #define NOP_OUT_RETRIES    10
 /* Timeout after 30 msecs if NOP OUT hangs without response */
 #define NOP_OUT_TIMEOUT    30 /* msecs */
+<<<<<<< HEAD
 /* Device initialization completion timeout, unit: ms */
 #define DEV_INIT_COMPL_TIMEOUT  500
+=======
+>>>>>>> common/deprecated/android-3.18
 
 /* Query request retries */
 #define QUERY_REQ_RETRIES 10
 /* Query request timeout */
+<<<<<<< HEAD
 #define QUERY_REQ_TIMEOUT 1000 /* msec */
+=======
+#define QUERY_REQ_TIMEOUT 30 /* msec */
+>>>>>>> common/deprecated/android-3.18
 
 /* Task management command timeout */
 #define TM_CMD_TIMEOUT	100 /* msecs */
@@ -82,6 +97,7 @@
 #define MASK_QUERY_UPIU_FLAG_LOC 0xFF
 
 /* Interrupt aggregation default timeout, unit: 40us */
+<<<<<<< HEAD
 #define INT_AGGR_DEF_TO	0x01
 
 /* Link Hibernation delay, msecs */
@@ -89,6 +105,9 @@
 
 /* UFS link setup retries */
 #define UFS_LINK_SETUP_RETRIES 5
+=======
+#define INT_AGGR_DEF_TO	0x02
+>>>>>>> common/deprecated/android-3.18
 
 #define ufshcd_toggle_vreg(_dev, _vreg, _on)				\
 	({                                                              \
@@ -110,7 +129,10 @@ static u32 ufs_query_desc_max_size[] = {
 	QUERY_DESC_RFU_MAX_SIZE,
 	QUERY_DESC_GEOMETRY_MAZ_SIZE,
 	QUERY_DESC_POWER_MAX_SIZE,
+<<<<<<< HEAD
 	QUERY_DESC_HEALTH_MAX_SIZE,
+=======
+>>>>>>> common/deprecated/android-3.18
 	QUERY_DESC_RFU_MAX_SIZE,
 };
 
@@ -135,11 +157,18 @@ enum {
 
 /* UFSHCD UIC layer error flags */
 enum {
+<<<<<<< HEAD
 	UFSHCD_UIC_DL_PA_INIT_ERROR = (1 << 0), /* Data link layer error, PA_INIT_ERROR */
 	UFSHCD_UIC_NL_ERROR = (1 << 1), /* Network layer error */
 	UFSHCD_UIC_TL_ERROR = (1 << 2), /* Transport Layer error */
 	UFSHCD_UIC_DME_ERROR = (1 << 3), /* DME error */
 	UFSHCD_UIC_DL_ERROR = (1 << 4), /* Data link layer error */
+=======
+	UFSHCD_UIC_DL_PA_INIT_ERROR = (1 << 0), /* Data link layer error */
+	UFSHCD_UIC_NL_ERROR = (1 << 1), /* Network layer error */
+	UFSHCD_UIC_TL_ERROR = (1 << 2), /* Transport Layer error */
+	UFSHCD_UIC_DME_ERROR = (1 << 3), /* DME error */
+>>>>>>> common/deprecated/android-3.18
 };
 
 /* Interrupt configuration options */
@@ -190,6 +219,7 @@ ufs_get_pm_lvl_to_link_pwr_state(enum ufs_pm_level lvl)
 	return ufs_pm_lvl_states[lvl].link_state;
 }
 
+<<<<<<< HEAD
 /* replace non-printable or non-ASCII characters with spaces */
 static inline void ufshcd_remove_non_printable(char *val)
 {
@@ -200,6 +230,8 @@ static inline void ufshcd_remove_non_printable(char *val)
 		*val = ' ';
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static void ufshcd_tmc_handler(struct ufs_hba *hba);
 static void ufshcd_async_scan(void *data, async_cookie_t cookie);
 static int ufshcd_reset_and_restore(struct ufs_hba *hba);
@@ -211,6 +243,7 @@ static int __ufshcd_setup_clocks(struct ufs_hba *hba, bool on,
 static int ufshcd_setup_clocks(struct ufs_hba *hba, bool on);
 static int ufshcd_uic_hibern8_exit(struct ufs_hba *hba);
 static int ufshcd_uic_hibern8_enter(struct ufs_hba *hba);
+<<<<<<< HEAD
 static int ufshcd_link_hibern8_ctrl(struct ufs_hba *hba, bool en);
 static int ufshcd_host_reset_and_restore(struct ufs_hba *hba);
 static irqreturn_t ufshcd_intr(int irq, void *__hba);
@@ -262,6 +295,12 @@ static void ufshcd_init_debug(struct ufs_hba *hba)
 	if (device_create_file(hba->dev, &hba->debug.attrs))
 		dev_err(hba->dev, "Failed to create sysfs for debug\n");
 }
+=======
+static int ufshcd_host_reset_and_restore(struct ufs_hba *hba);
+static irqreturn_t ufshcd_intr(int irq, void *__hba);
+static int ufshcd_config_pwr_mode(struct ufs_hba *hba,
+		struct ufs_pa_layer_attr *desired_pwr_mode);
+>>>>>>> common/deprecated/android-3.18
 
 static inline int ufshcd_enable_irq(struct ufs_hba *hba)
 {
@@ -425,6 +464,7 @@ static inline void ufshcd_put_tm_slot(struct ufs_hba *hba, int slot)
  */
 static inline void ufshcd_utrl_clear(struct ufs_hba *hba, u32 pos)
 {
+<<<<<<< HEAD
 	u32 clear;
 
 	if (hba->quirks & UFSHCI_QUIRK_BROKEN_REQ_LIST_CLR)
@@ -450,6 +490,9 @@ static inline void ufshcd_utmrl_clear(struct ufs_hba *hba, u32 pos)
 		clear = ~(1 << pos);
 
 	ufshcd_writel(hba, clear, REG_UTP_TASK_REQ_LIST_CLEAR);
+=======
+	ufshcd_writel(hba, ~(1 << pos), REG_UTP_TRANSFER_REQ_LIST_CLEAR);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -618,17 +661,25 @@ static void ufshcd_ungate_work(struct work_struct *work)
 	unsigned long flags;
 	struct ufs_hba *hba = container_of(work, struct ufs_hba,
 			clk_gating.ungate_work);
+<<<<<<< HEAD
 	bool gating_allowed = !ufshcd_can_fake_clkgating(hba);
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	cancel_delayed_work_sync(&hba->clk_gating.gate_work);
 
 	spin_lock_irqsave(hba->host->host_lock, flags);
+<<<<<<< HEAD
 	if (hba->clk_gating.state == CLKS_ON && gating_allowed) {
+=======
+	if (hba->clk_gating.state == CLKS_ON) {
+>>>>>>> common/deprecated/android-3.18
 		spin_unlock_irqrestore(hba->host->host_lock, flags);
 		goto unblock_reqs;
 	}
 
 	spin_unlock_irqrestore(hba->host->host_lock, flags);
+<<<<<<< HEAD
 	if (gating_allowed) {
 		ufshcd_setup_clocks(hba, true);
 	} else {
@@ -636,12 +687,16 @@ static void ufshcd_ungate_work(struct work_struct *work)
 		hba->clk_gating.state = CLKS_ON;
 		spin_unlock_irqrestore(hba->host->host_lock, flags);
 	}
+=======
+	ufshcd_setup_clocks(hba, true);
+>>>>>>> common/deprecated/android-3.18
 
 	/* Exit from hibern8 */
 	if (ufshcd_can_hibern8_during_gating(hba)) {
 		/* Prevent gating in this path */
 		hba->clk_gating.is_suspended = true;
 		if (ufshcd_is_link_hibern8(hba)) {
+<<<<<<< HEAD
 			ufshcd_set_link_trans_active(hba);
 			ret = ufshcd_link_hibern8_ctrl(hba, false);
 			if (ret) {
@@ -651,14 +706,27 @@ static void ufshcd_ungate_work(struct work_struct *work)
 			} else {
 				ufshcd_set_link_active(hba);
 			}
+=======
+			ret = ufshcd_uic_hibern8_exit(hba);
+			if (ret)
+				dev_err(hba->dev, "%s: hibern8 exit failed %d\n",
+					__func__, ret);
+			else
+				ufshcd_set_link_active(hba);
+>>>>>>> common/deprecated/android-3.18
 		}
 		hba->clk_gating.is_suspended = false;
 	}
 unblock_reqs:
+<<<<<<< HEAD
 #if defined(CONFIG_PM_DEVFREQ)
 	if (ufshcd_is_clkscaling_enabled(hba))
 		devfreq_resume_device(hba->devfreq);
 #endif
+=======
+	if (ufshcd_is_clkscaling_enabled(hba))
+		devfreq_resume_device(hba->devfreq);
+>>>>>>> common/deprecated/android-3.18
 	scsi_unblock_requests(hba->host);
 }
 
@@ -671,6 +739,10 @@ unblock_reqs:
 int ufshcd_hold(struct ufs_hba *hba, bool async)
 {
 	int rc = 0;
+<<<<<<< HEAD
+=======
+	bool flush_result;
+>>>>>>> common/deprecated/android-3.18
 	unsigned long flags;
 
 	if (!ufshcd_is_clkgating_allowed(hba))
@@ -680,11 +752,37 @@ int ufshcd_hold(struct ufs_hba *hba, bool async)
 
 start:
 	switch (hba->clk_gating.state) {
+<<<<<<< HEAD
 	case __CLKS_ON:
 		rc = -EAGAIN;
 		if (async)
 			hba->clk_gating.active_reqs--;
 	case CLKS_ON:
+=======
+	case CLKS_ON:
+		/*
+		 * Wait for the ungate work to complete if in progress.
+		 * Though the clocks may be in ON state, the link could
+		 * still be in hibner8 state if hibern8 is allowed
+		 * during clock gating.
+		 * Make sure we exit hibern8 state also in addition to
+		 * clocks being ON.
+		 */
+		if (ufshcd_can_hibern8_during_gating(hba) &&
+		    ufshcd_is_link_hibern8(hba)) {
+			if (async) {
+				rc = -EAGAIN;
+				hba->clk_gating.active_reqs--;
+				break;
+			}
+			spin_unlock_irqrestore(hba->host->host_lock, flags);
+			flush_result = flush_work(&hba->clk_gating.ungate_work);
+			if (hba->clk_gating.is_suspended && !flush_result)
+				goto out;
+			spin_lock_irqsave(hba->host->host_lock, flags);
+			goto start;
+		}
+>>>>>>> common/deprecated/android-3.18
 		break;
 	case REQ_CLKS_OFF:
 		if (cancel_delayed_work(&hba->clk_gating.gate_work)) {
@@ -699,7 +797,11 @@ start:
 	case CLKS_OFF:
 		scsi_block_requests(hba->host);
 		hba->clk_gating.state = REQ_CLKS_ON;
+<<<<<<< HEAD
 		queue_work(hba->ufshcd_workq, &hba->clk_gating.ungate_work);
+=======
+		schedule_work(&hba->clk_gating.ungate_work);
+>>>>>>> common/deprecated/android-3.18
 		/*
 		 * fall through to check if we should wait for this
 		 * work to be done or not.
@@ -730,7 +832,10 @@ static void ufshcd_gate_work(struct work_struct *work)
 {
 	struct ufs_hba *hba = container_of(work, struct ufs_hba,
 			clk_gating.gate_work.work);
+<<<<<<< HEAD
 	bool gating_allowed = !ufshcd_can_fake_clkgating(hba);
+=======
+>>>>>>> common/deprecated/android-3.18
 	unsigned long flags;
 
 	spin_lock_irqsave(hba->host->host_lock, flags);
@@ -742,14 +847,19 @@ static void ufshcd_gate_work(struct work_struct *work)
 	if (hba->clk_gating.active_reqs
 		|| hba->ufshcd_state != UFSHCD_STATE_OPERATIONAL
 		|| hba->lrb_in_use || hba->outstanding_tasks
+<<<<<<< HEAD
 		|| hba->active_uic_cmd || hba->uic_async_done
 		|| scsi_host_in_recovery(hba->host))
+=======
+		|| hba->active_uic_cmd || hba->uic_async_done)
+>>>>>>> common/deprecated/android-3.18
 		goto rel_lock;
 
 	spin_unlock_irqrestore(hba->host->host_lock, flags);
 
 	/* put the link into hibern8 mode before turning off clocks */
 	if (ufshcd_can_hibern8_during_gating(hba)) {
+<<<<<<< HEAD
 		ufshcd_set_link_trans_hibern8(hba);
 		if (ufshcd_link_hibern8_ctrl(hba, true)) {
 			spin_lock_irqsave(hba->host->host_lock, flags);
@@ -762,16 +872,24 @@ static void ufshcd_gate_work(struct work_struct *work)
 			spin_unlock_irqrestore(hba->host->host_lock, flags);
 			hba->clk_gating.is_suspended = false;
 			scsi_unblock_requests(hba->host);
+=======
+		if (ufshcd_uic_hibern8_enter(hba)) {
+			hba->clk_gating.state = CLKS_ON;
+>>>>>>> common/deprecated/android-3.18
 			goto out;
 		}
 		ufshcd_set_link_hibern8(hba);
 	}
 
+<<<<<<< HEAD
 #if defined(CONFIG_PM_DEVFREQ)
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (ufshcd_is_clkscaling_enabled(hba)) {
 		devfreq_suspend_device(hba->devfreq);
 		hba->clk_scaling.window_start_t = 0;
 	}
+<<<<<<< HEAD
 #endif
 
 	if (gating_allowed) {
@@ -781,6 +899,14 @@ static void ufshcd_gate_work(struct work_struct *work)
 			/* If link is active, device ref_clk can't be switched off */
 			__ufshcd_setup_clocks(hba, false, true);
 	}
+=======
+
+	if (!ufshcd_is_link_active(hba))
+		ufshcd_setup_clocks(hba, false);
+	else
+		/* If link is active, device ref_clk can't be switched off */
+		__ufshcd_setup_clocks(hba, false, true);
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * In case you are here to cancel this work the gating state
@@ -812,12 +938,20 @@ static void __ufshcd_release(struct ufs_hba *hba)
 	if (hba->clk_gating.active_reqs || hba->clk_gating.is_suspended
 		|| hba->ufshcd_state != UFSHCD_STATE_OPERATIONAL
 		|| hba->lrb_in_use || hba->outstanding_tasks
+<<<<<<< HEAD
 		|| hba->active_uic_cmd || hba->uic_async_done
 		|| scsi_host_in_recovery(hba->host))
 		return;
 
 	hba->clk_gating.state = REQ_CLKS_OFF;
 	queue_delayed_work(hba->ufshcd_workq, &hba->clk_gating.gate_work,
+=======
+		|| hba->active_uic_cmd || hba->uic_async_done)
+		return;
+
+	hba->clk_gating.state = REQ_CLKS_OFF;
+	schedule_delayed_work(&hba->clk_gating.gate_work,
+>>>>>>> common/deprecated/android-3.18
 			msecs_to_jiffies(hba->clk_gating.delay_ms));
 }
 
@@ -853,6 +987,7 @@ static ssize_t ufshcd_clkgate_delay_store(struct device *dev,
 	return count;
 }
 
+<<<<<<< HEAD
 static int ufshcd_init_clk_gating(struct ufs_hba *hba)
 {
 	int ret = 0;
@@ -867,6 +1002,14 @@ static int ufshcd_init_clk_gating(struct ufs_hba *hba)
 	}
 
 	hba->clk_gating.delay_ms = LINK_H8_DELAY;
+=======
+static void ufshcd_init_clk_gating(struct ufs_hba *hba)
+{
+	if (!ufshcd_is_clkgating_allowed(hba))
+		return;
+
+	hba->clk_gating.delay_ms = 150;
+>>>>>>> common/deprecated/android-3.18
 	INIT_DELAYED_WORK(&hba->clk_gating.gate_work, ufshcd_gate_work);
 	INIT_WORK(&hba->clk_gating.ungate_work, ufshcd_ungate_work);
 
@@ -877,20 +1020,31 @@ static int ufshcd_init_clk_gating(struct ufs_hba *hba)
 	hba->clk_gating.delay_attr.attr.mode = S_IRUGO | S_IWUSR;
 	if (device_create_file(hba->dev, &hba->clk_gating.delay_attr))
 		dev_err(hba->dev, "Failed to create sysfs for clkgate_delay\n");
+<<<<<<< HEAD
 
 out:
 	return ret;
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void ufshcd_exit_clk_gating(struct ufs_hba *hba)
 {
 	if (!ufshcd_is_clkgating_allowed(hba))
 		return;
+<<<<<<< HEAD
 	destroy_workqueue(hba->ufshcd_workq);
 	device_remove_file(hba->dev, &hba->clk_gating.delay_attr);
 }
 
 #if defined(CONFIG_PM_DEVFREQ)
+=======
+	device_remove_file(hba->dev, &hba->clk_gating.delay_attr);
+	cancel_work_sync(&hba->clk_gating.ungate_work);
+	cancel_delayed_work_sync(&hba->clk_gating.gate_work);
+}
+
+>>>>>>> common/deprecated/android-3.18
 /* Must be called with host lock acquired */
 static void ufshcd_clk_scaling_start_busy(struct ufs_hba *hba)
 {
@@ -917,7 +1071,10 @@ static void ufshcd_clk_scaling_update_busy(struct ufs_hba *hba)
 		scaling->is_busy_started = false;
 	}
 }
+<<<<<<< HEAD
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 /**
  * ufshcd_send_command - Send SCSI or device management commands
  * @hba: per adapter instance
@@ -926,9 +1083,13 @@ static void ufshcd_clk_scaling_update_busy(struct ufs_hba *hba)
 static inline
 void ufshcd_send_command(struct ufs_hba *hba, unsigned int task_tag)
 {
+<<<<<<< HEAD
 #if defined(CONFIG_PM_DEVFREQ)
 	ufshcd_clk_scaling_start_busy(hba);
 #endif
+=======
+	ufshcd_clk_scaling_start_busy(hba);
+>>>>>>> common/deprecated/android-3.18
 	__set_bit(task_tag, &hba->outstanding_reqs);
 	ufshcd_writel(hba, 1 << task_tag, REG_UTP_TRANSFER_REQ_DOOR_BELL);
 }
@@ -942,10 +1103,21 @@ static inline void ufshcd_copy_sense_data(struct ufshcd_lrb *lrbp)
 	int len;
 	if (lrbp->sense_buffer &&
 	    ufshcd_get_rsp_upiu_data_seg_len(lrbp->ucd_rsp_ptr)) {
+<<<<<<< HEAD
 		len = be16_to_cpu(lrbp->ucd_rsp_ptr->sr.sense_data_len);
 		memcpy(lrbp->sense_buffer,
 			lrbp->ucd_rsp_ptr->sr.sense_data,
 			min_t(int, len, SCSI_SENSE_BUFFERSIZE));
+=======
+		int len_to_copy;
+
+		len = be16_to_cpu(lrbp->ucd_rsp_ptr->sr.sense_data_len);
+		len_to_copy = min_t(int, RESPONSE_UPIU_SENSE_DATA_LENGTH, len);
+
+		memcpy(lrbp->sense_buffer,
+			lrbp->ucd_rsp_ptr->sr.sense_data,
+			min_t(int, len_to_copy, SCSI_SENSE_BUFFERSIZE));
+>>>>>>> common/deprecated/android-3.18
 	}
 }
 
@@ -963,7 +1135,12 @@ int ufshcd_copy_query_response(struct ufs_hba *hba, struct ufshcd_lrb *lrbp)
 	memcpy(&query_res->upiu_res, &lrbp->ucd_rsp_ptr->qr, QUERY_OSF_SIZE);
 
 	/* Get the descriptor */
+<<<<<<< HEAD
 	if (lrbp->ucd_rsp_ptr->qr.opcode == UPIU_QUERY_OPCODE_READ_DESC) {
+=======
+	if (hba->dev_cmd.query.descriptor &&
+	    lrbp->ucd_rsp_ptr->qr.opcode == UPIU_QUERY_OPCODE_READ_DESC) {
+>>>>>>> common/deprecated/android-3.18
 		u8 *descp = (u8 *)lrbp->ucd_rsp_ptr +
 				GENERAL_UPIU_REQUEST_SIZE;
 		u16 resp_len;
@@ -1136,13 +1313,18 @@ ufshcd_send_uic_cmd(struct ufs_hba *hba, struct uic_command *uic_cmd)
  *
  * Returns 0 in case of success, non-zero value in case of failure
  */
+<<<<<<< HEAD
 static int ufshcd_map_sg(struct ufs_hba *hba, struct ufshcd_lrb *lrbp)
+=======
+static int ufshcd_map_sg(struct ufshcd_lrb *lrbp)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct ufshcd_sg_entry *prd_table;
 	struct scatterlist *sg;
 	struct scsi_cmnd *cmd;
 	int sg_segments;
 	int i;
+<<<<<<< HEAD
 	int ret;
 	unsigned int sector_key = UFS_BYPASS_SECTOR_BEGIN;
 	unsigned int sector = 0;
@@ -1154,11 +1336,16 @@ static int ufshcd_map_sg(struct ufs_hba *hba, struct ufshcd_lrb *lrbp)
 		sector = cmd->request->bio->bi_iter.bi_sector;
 	}
 #endif
+=======
+
+	cmd = lrbp->cmd;
+>>>>>>> common/deprecated/android-3.18
 	sg_segments = scsi_dma_map(cmd);
 	if (sg_segments < 0)
 		return sg_segments;
 
 	if (sg_segments) {
+<<<<<<< HEAD
 		if (hba->quirks & UFSHCI_QUIRK_BROKEN_DWORD_UTRD)
 			lrbp->utr_descriptor_ptr->prd_table_length =
 				cpu_to_le16((u16)(sg_segments *
@@ -1259,6 +1446,10 @@ static int ufshcd_map_sg_st(struct ufs_hba *hba, struct ufshcd_lrb *lrbp)
 		else
 			lrbp->utr_descriptor_ptr->prd_table_length =
 				cpu_to_le16((u16) (sg_segments));
+=======
+		lrbp->utr_descriptor_ptr->prd_table_length =
+					cpu_to_le16((u16) (sg_segments));
+>>>>>>> common/deprecated/android-3.18
 
 		prd_table = (struct ufshcd_sg_entry *)lrbp->ucd_prdt_ptr;
 
@@ -1269,6 +1460,7 @@ static int ufshcd_map_sg_st(struct ufs_hba *hba, struct ufshcd_lrb *lrbp)
 				cpu_to_le32(lower_32_bits(sg->dma_address));
 			prd_table[i].upper_addr =
 				cpu_to_le32(upper_32_bits(sg->dma_address));
+<<<<<<< HEAD
 			hba->transferred_sector += prd_table[i].size;
 
 			ret = fmp_map_sg_st(hba, prd_table, sg, sector_key, i, sector);
@@ -1278,6 +1470,8 @@ static int ufshcd_map_sg_st(struct ufs_hba *hba, struct ufshcd_lrb *lrbp)
 			}
 
 			sector += UFSHCI_SECTOR_SIZE / MIN_SECTOR_SIZE;
+=======
+>>>>>>> common/deprecated/android-3.18
 		}
 	} else {
 		lrbp->utr_descriptor_ptr->prd_table_length = 0;
@@ -1285,7 +1479,10 @@ static int ufshcd_map_sg_st(struct ufs_hba *hba, struct ufshcd_lrb *lrbp)
 
 	return 0;
 }
+<<<<<<< HEAD
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 /**
  * ufshcd_enable_intr - enable interrupts
@@ -1421,9 +1618,12 @@ static void ufshcd_prepare_utp_query_req_upiu(struct ufs_hba *hba,
 	ucd_req_ptr->header.dword_1 = UPIU_HEADER_DWORD(
 			0, query->request.query_func, 0, 0);
 
+<<<<<<< HEAD
 	if (query->request.upiu_req.opcode == UPIU_QUERY_OPCODE_READ_DESC)
 		len = 0;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* Data segment length */
 	ucd_req_ptr->header.dword_2 = UPIU_HEADER_DWORD(
 			0, 0, len >> 8, (u8)len);
@@ -1511,6 +1711,7 @@ static inline u8 ufshcd_scsi_to_upiu_lun(unsigned int scsi_lun)
 		return scsi_lun & UFS_UPIU_MAX_UNIT_NUM_ID;
 }
 
+<<<<<<< HEAD
 static inline unsigned int ufshcd_get_scsi_lun(struct scsi_cmnd *cmd)
 {
 	if (cmd->cmnd[0] == SECURITY_PROTOCOL_IN ||
@@ -1521,6 +1722,8 @@ static inline unsigned int ufshcd_get_scsi_lun(struct scsi_cmnd *cmd)
 		return cmd->device->lun;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /**
  * ufshcd_upiu_wlun_to_scsi_wlun - maps UPIU W-LUN id to SCSI W-LUN ID
  * @scsi_lun: UPIU W-LUN id
@@ -1546,10 +1749,13 @@ static int ufshcd_queuecommand(struct Scsi_Host *host, struct scsi_cmnd *cmd)
 	unsigned long flags;
 	int tag;
 	int err = 0;
+<<<<<<< HEAD
 #if defined(CONFIG_FIPS_FMP)
 	uint64_t self_test_bh;
 #endif
 	unsigned int scsi_lun;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	hba = shost_priv(host);
 
@@ -1593,6 +1799,19 @@ static int ufshcd_queuecommand(struct Scsi_Host *host, struct scsi_cmnd *cmd)
 		clear_bit_unlock(tag, &hba->lrb_in_use);
 		goto out;
 	}
+<<<<<<< HEAD
+=======
+	/* IO svc time latency histogram */
+	if (hba != NULL && cmd->request != NULL) {
+		if (hba->latency_hist_enabled &&
+		    (cmd->request->cmd_type == REQ_TYPE_FS)) {
+			cmd->request->lat_hist_io_start = ktime_get();
+			cmd->request->lat_hist_enabled = 1;
+		} else
+			cmd->request->lat_hist_enabled = 0;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	WARN_ON(hba->clk_gating.state != CLKS_ON);
 
 	lrbp = &hba->lrb[tag];
@@ -1602,14 +1821,19 @@ static int ufshcd_queuecommand(struct Scsi_Host *host, struct scsi_cmnd *cmd)
 	lrbp->sense_bufflen = SCSI_SENSE_BUFFERSIZE;
 	lrbp->sense_buffer = cmd->sense_buffer;
 	lrbp->task_tag = tag;
+<<<<<<< HEAD
 
 	scsi_lun = ufshcd_get_scsi_lun(cmd);
 	lrbp->lun = ufshcd_scsi_to_upiu_lun(scsi_lun);
+=======
+	lrbp->lun = ufshcd_scsi_to_upiu_lun(cmd->device->lun);
+>>>>>>> common/deprecated/android-3.18
 	lrbp->intr_cmd = false;
 	lrbp->command_type = UTP_CMD_TYPE_SCSI;
 
 	/* form UPIU before issuing the command */
 	ufshcd_compose_upiu(hba, lrbp);
+<<<<<<< HEAD
 #if defined(CONFIG_FIPS_FMP)
 	if (cmd->request->bio) {
 		self_test_bh = (uint64_t)cmd->request->bio->bi_private;
@@ -1624,6 +1848,11 @@ static int ufshcd_queuecommand(struct Scsi_Host *host, struct scsi_cmnd *cmd)
 	err = ufshcd_map_sg(hba, lrbp);
 #endif
 	if (err) {
+=======
+	err = ufshcd_map_sg(lrbp);
+	if (err) {
+		ufshcd_release(hba);
+>>>>>>> common/deprecated/android-3.18
 		lrbp->cmd = NULL;
 		clear_bit_unlock(tag, &hba->lrb_in_use);
 		goto out;
@@ -1631,6 +1860,7 @@ static int ufshcd_queuecommand(struct Scsi_Host *host, struct scsi_cmnd *cmd)
 
 	/* issue command to the controller */
 	spin_lock_irqsave(hba->host->host_lock, flags);
+<<<<<<< HEAD
 	if (hba->vops && hba->vops->set_nexus_t_xfer_req)
 		hba->vops->set_nexus_t_xfer_req(hba, tag, lrbp->cmd);
 
@@ -1638,6 +1868,9 @@ static int ufshcd_queuecommand(struct Scsi_Host *host, struct scsi_cmnd *cmd)
 
 	if (hba->debug.flag & UFSHCD_DEBUG_LEVEL1)
 		dev_info(hba->dev, "IO issued(%d)\n", tag);
+=======
+	ufshcd_send_command(hba, tag);
+>>>>>>> common/deprecated/android-3.18
 out_unlock:
 	spin_unlock_irqrestore(hba->host->host_lock, flags);
 out:
@@ -1756,6 +1989,7 @@ static int ufshcd_wait_for_dev_cmd(struct ufs_hba *hba,
 
 	if (!time_left) {
 		err = -ETIMEDOUT;
+<<<<<<< HEAD
 		if (!ufshcd_clear_cmd(hba, lrbp->task_tag)) {
 			spin_lock_irqsave(hba->host->host_lock, flags);
 			__clear_bit(lrbp->task_tag, &hba->outstanding_reqs);
@@ -1764,6 +1998,11 @@ static int ufshcd_wait_for_dev_cmd(struct ufs_hba *hba,
 			/* sucessfully cleared the command, retry if needed */
 			err = -EAGAIN;
 		}
+=======
+		if (!ufshcd_clear_cmd(hba, lrbp->task_tag))
+			/* sucessfully cleared the command, retry if needed */
+			err = -EAGAIN;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	return err;
@@ -1825,12 +2064,15 @@ static int ufshcd_exec_dev_cmd(struct ufs_hba *hba,
 	struct completion wait;
 	unsigned long flags;
 
+<<<<<<< HEAD
 	if (!ufshcd_is_link_active(hba)) {
 		flush_work(&hba->clk_gating.ungate_work);
 		if (!ufshcd_is_link_active(hba))
 			return -EPERM;
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Get free slot, sleep if slots are unavailable.
 	 * Even though we use wait_event() which sleeps indefinitely,
@@ -1848,8 +2090,11 @@ static int ufshcd_exec_dev_cmd(struct ufs_hba *hba,
 	hba->dev_cmd.complete = &wait;
 
 	spin_lock_irqsave(hba->host->host_lock, flags);
+<<<<<<< HEAD
 	if (hba->vops && hba->vops->set_nexus_t_xfer_req)
 		hba->vops->set_nexus_t_xfer_req(hba, tag, lrbp->cmd);
+=======
+>>>>>>> common/deprecated/android-3.18
 	ufshcd_send_command(hba, tag);
 	spin_unlock_irqrestore(hba->host->host_lock, flags);
 
@@ -1861,6 +2106,7 @@ out_put_tag:
 	return err;
 }
 
+<<<<<<< HEAD
 int ufshcd_prep_query(struct ufs_hba *hba, enum query_opcode op,
 		u8 idn, u8 idx, u8 sel, u32 *qry_val)
 {
@@ -1906,6 +2152,30 @@ int ufshcd_prep_query(struct ufs_hba *hba, enum query_opcode op,
 	request->upiu_req.selector = sel;
 
 	return 0;
+=======
+/**
+ * ufshcd_init_query() - init the query response and request parameters
+ * @hba: per-adapter instance
+ * @request: address of the request pointer to be initialized
+ * @response: address of the response pointer to be initialized
+ * @opcode: operation to perform
+ * @idn: flag idn to access
+ * @index: LU number to access
+ * @selector: query/flag/descriptor further identification
+ */
+static inline void ufshcd_init_query(struct ufs_hba *hba,
+		struct ufs_query_req **request, struct ufs_query_res **response,
+		enum query_opcode opcode, u8 idn, u8 index, u8 selector)
+{
+	*request = &hba->dev_cmd.query.request;
+	*response = &hba->dev_cmd.query.response;
+	memset(*request, 0, sizeof(struct ufs_query_req));
+	memset(*response, 0, sizeof(struct ufs_query_res));
+	(*request)->upiu_req.opcode = opcode;
+	(*request)->upiu_req.idn = idn;
+	(*request)->upiu_req.index = index;
+	(*request)->upiu_req.selector = selector;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -1917,17 +2187,27 @@ int ufshcd_prep_query(struct ufs_hba *hba, enum query_opcode op,
  *
  * Returns 0 for success, non-zero in case of failure
  */
+<<<<<<< HEAD
 
 static int ufshcd_query_flag(struct ufs_hba *hba, enum query_opcode opcode,
 			enum flag_idn idn, bool *flag_res)
 {
 	struct ufs_query_res *response = &hba->dev_cmd.query.response;
 	int err;
+=======
+static int ufshcd_query_flag(struct ufs_hba *hba, enum query_opcode opcode,
+			enum flag_idn idn, bool *flag_res)
+{
+	struct ufs_query_req *request = NULL;
+	struct ufs_query_res *response = NULL;
+	int err, index = 0, selector = 0;
+>>>>>>> common/deprecated/android-3.18
 
 	BUG_ON(!hba);
 
 	ufshcd_hold(hba, false);
 	mutex_lock(&hba->dev_cmd.lock);
+<<<<<<< HEAD
 
 	err = ufshcd_prep_query(hba, opcode, idn, 0, 0, NULL);
 	if (err)
@@ -1936,6 +2216,37 @@ static int ufshcd_query_flag(struct ufs_hba *hba, enum query_opcode opcode,
 	/* Send query request */
 	err = ufshcd_exec_dev_cmd(hba, DEV_CMD_TYPE_QUERY,
 			QUERY_REQ_TIMEOUT);
+=======
+	ufshcd_init_query(hba, &request, &response, opcode, idn, index,
+			selector);
+
+	switch (opcode) {
+	case UPIU_QUERY_OPCODE_SET_FLAG:
+	case UPIU_QUERY_OPCODE_CLEAR_FLAG:
+	case UPIU_QUERY_OPCODE_TOGGLE_FLAG:
+		request->query_func = UPIU_QUERY_FUNC_STANDARD_WRITE_REQUEST;
+		break;
+	case UPIU_QUERY_OPCODE_READ_FLAG:
+		request->query_func = UPIU_QUERY_FUNC_STANDARD_READ_REQUEST;
+		if (!flag_res) {
+			/* No dummy reads */
+			dev_err(hba->dev, "%s: Invalid argument for read request\n",
+					__func__);
+			err = -EINVAL;
+			goto out_unlock;
+		}
+		break;
+	default:
+		dev_err(hba->dev,
+			"%s: Expected query flag opcode but got = %d\n",
+			__func__, opcode);
+		err = -EINVAL;
+		goto out_unlock;
+	}
+
+	err = ufshcd_exec_dev_cmd(hba, DEV_CMD_TYPE_QUERY, QUERY_REQ_TIMEOUT);
+
+>>>>>>> common/deprecated/android-3.18
 	if (err) {
 		dev_err(hba->dev,
 			"%s: Sending flag query for idn %d failed, err = %d\n",
@@ -1965,9 +2276,16 @@ out_unlock:
  * Returns 0 for success, non-zero in case of failure
 */
 static int ufshcd_query_attr(struct ufs_hba *hba, enum query_opcode opcode,
+<<<<<<< HEAD
 			u8 idn, u8 index, u8 selector, u32 *attr_val)
 {
 	struct ufs_query_res *response = &hba->dev_cmd.query.response;
+=======
+			enum attr_idn idn, u8 index, u8 selector, u32 *attr_val)
+{
+	struct ufs_query_req *request = NULL;
+	struct ufs_query_res *response = NULL;
+>>>>>>> common/deprecated/android-3.18
 	int err;
 
 	BUG_ON(!hba);
@@ -1981,12 +2299,33 @@ static int ufshcd_query_attr(struct ufs_hba *hba, enum query_opcode opcode,
 	}
 
 	mutex_lock(&hba->dev_cmd.lock);
+<<<<<<< HEAD
 
 	err = ufshcd_prep_query(hba, opcode, idn, index, selector, attr_val);
 	if (err)
 		goto out_unlock;
 
 	/* send query request */
+=======
+	ufshcd_init_query(hba, &request, &response, opcode, idn, index,
+			selector);
+
+	switch (opcode) {
+	case UPIU_QUERY_OPCODE_WRITE_ATTR:
+		request->query_func = UPIU_QUERY_FUNC_STANDARD_WRITE_REQUEST;
+		request->upiu_req.value = cpu_to_be32(*attr_val);
+		break;
+	case UPIU_QUERY_OPCODE_READ_ATTR:
+		request->query_func = UPIU_QUERY_FUNC_STANDARD_READ_REQUEST;
+		break;
+	default:
+		dev_err(hba->dev, "%s: Expected query attr opcode but got = 0x%.2x\n",
+				__func__, opcode);
+		err = -EINVAL;
+		goto out_unlock;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	err = ufshcd_exec_dev_cmd(hba, DEV_CMD_TYPE_QUERY, QUERY_REQ_TIMEOUT);
 
 	if (err) {
@@ -1995,8 +2334,12 @@ static int ufshcd_query_attr(struct ufs_hba *hba, enum query_opcode opcode,
 		goto out_unlock;
 	}
 
+<<<<<<< HEAD
 	if (attr_val)
 		*attr_val = be32_to_cpu(response->upiu_res.value);
+=======
+	*attr_val = be32_to_cpu(response->upiu_res.value);
+>>>>>>> common/deprecated/android-3.18
 
 out_unlock:
 	mutex_unlock(&hba->dev_cmd.lock);
@@ -2020,32 +2363,53 @@ out:
  * received on the response.
  */
 static int ufshcd_query_descriptor(struct ufs_hba *hba,
+<<<<<<< HEAD
 		enum query_opcode opcode, u8 idn, u8 index,
 		u8 selector, u8 *desc_buf, int *buf_len)
 {
 	struct ufs_query_req *request;
 	struct ufs_query_res *response;
+=======
+			enum query_opcode opcode, enum desc_idn idn, u8 index,
+			u8 selector, u8 *desc_buf, int *buf_len)
+{
+	struct ufs_query_req *request = NULL;
+	struct ufs_query_res *response = NULL;
+>>>>>>> common/deprecated/android-3.18
 	int err;
 
 	BUG_ON(!hba);
 
 	ufshcd_hold(hba, false);
+<<<<<<< HEAD
 	if (!desc_buf || !buf_len) {
 		dev_err(hba->dev,
 			"%s: descriptor buffer required for opcode 0x%x\n",
 			__func__, opcode);
+=======
+	if (!desc_buf) {
+		dev_err(hba->dev, "%s: descriptor buffer required for opcode 0x%x\n",
+				__func__, opcode);
+>>>>>>> common/deprecated/android-3.18
 		err = -EINVAL;
 		goto out;
 	}
 
 	if (*buf_len <= QUERY_DESC_MIN_SIZE || *buf_len > QUERY_DESC_MAX_SIZE) {
+<<<<<<< HEAD
 		dev_err(hba->dev,
 			"%s: descriptor buffer size (%d) is out of range\n",
 			__func__, *buf_len);
+=======
+		dev_err(hba->dev, "%s: descriptor buffer size (%d) is out of range\n",
+				__func__, *buf_len);
+		err = -EINVAL;
+>>>>>>> common/deprecated/android-3.18
 		goto out;
 	}
 
 	mutex_lock(&hba->dev_cmd.lock);
+<<<<<<< HEAD
 
 	err = ufshcd_prep_query(hba, opcode, idn, index, selector, NULL);
 	if (err)
@@ -2069,6 +2433,40 @@ static int ufshcd_query_descriptor(struct ufs_hba *hba,
 	*buf_len = be16_to_cpu(response->upiu_res.length);
 
 out_unlock:
+=======
+	ufshcd_init_query(hba, &request, &response, opcode, idn, index,
+			selector);
+	hba->dev_cmd.query.descriptor = desc_buf;
+	request->upiu_req.length = cpu_to_be16(*buf_len);
+
+	switch (opcode) {
+	case UPIU_QUERY_OPCODE_WRITE_DESC:
+		request->query_func = UPIU_QUERY_FUNC_STANDARD_WRITE_REQUEST;
+		break;
+	case UPIU_QUERY_OPCODE_READ_DESC:
+		request->query_func = UPIU_QUERY_FUNC_STANDARD_READ_REQUEST;
+		break;
+	default:
+		dev_err(hba->dev,
+				"%s: Expected query descriptor opcode but got = 0x%.2x\n",
+				__func__, opcode);
+		err = -EINVAL;
+		goto out_unlock;
+	}
+
+	err = ufshcd_exec_dev_cmd(hba, DEV_CMD_TYPE_QUERY, QUERY_REQ_TIMEOUT);
+
+	if (err) {
+		dev_err(hba->dev, "%s: opcode 0x%.2x for idn %d failed, err = %d\n",
+				__func__, opcode, idn, err);
+		goto out_unlock;
+	}
+
+	*buf_len = be16_to_cpu(response->upiu_res.length);
+
+out_unlock:
+	hba->dev_cmd.query.descriptor = NULL;
+>>>>>>> common/deprecated/android-3.18
 	mutex_unlock(&hba->dev_cmd.lock);
 out:
 	ufshcd_release(hba);
@@ -2121,13 +2519,25 @@ static int ufshcd_read_desc_param(struct ufs_hba *hba,
 				      desc_id, desc_index, 0, desc_buf,
 				      &buff_len);
 
+<<<<<<< HEAD
 	if (ret) {
 		dev_err(hba->dev, "%s: Failed reading descriptor. desc_id %d, desc_index %d, param_offset %d, ret %d",
 			__func__, desc_id, desc_index, param_offset, ret);
+=======
+	if (ret || (buff_len < ufs_query_desc_max_size[desc_id]) ||
+	    (desc_buf[QUERY_DESC_LENGTH_OFFSET] !=
+	     ufs_query_desc_max_size[desc_id])
+	    || (desc_buf[QUERY_DESC_DESC_TYPE_OFFSET] != desc_id)) {
+		dev_err(hba->dev, "%s: Failed reading descriptor. desc_id %d param_offset %d buff_len %d ret %d",
+			__func__, desc_id, param_offset, buff_len, ret);
+		if (!ret)
+			ret = -EINVAL;
+>>>>>>> common/deprecated/android-3.18
 
 		goto out;
 	}
 
+<<<<<<< HEAD
 	/* Sanity check */
 	if (desc_buf[QUERY_DESC_DESC_TYPE_OFFSET] != desc_id) {
 		dev_err(hba->dev, "%s: invalid desc_id %d in descriptor header",
@@ -2156,6 +2566,8 @@ static int ufshcd_read_desc_param(struct ufs_hba *hba,
 		goto out;
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (is_kmalloc)
 		memcpy(param_read_buf, &desc_buf[param_offset], param_size);
 out:
@@ -2207,6 +2619,7 @@ static inline int ufshcd_read_unit_desc_param(struct ufs_hba *hba,
 				      param_offset, param_read_buf, param_size);
 }
 
+<<<<<<< HEAD
 int ufshcd_read_device_desc(struct ufs_hba *hba, u8 *buf, u32 size)
 {
 	int err = 0;
@@ -2327,6 +2740,8 @@ out:
 	return err;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /**
  * ufshcd_memory_alloc - allocate memory for host memory space data structures
  * @hba: per adapter instance
@@ -2447,6 +2862,7 @@ static void ufshcd_host_memory_configure(struct ufs_hba *hba)
 	for (i = 0; i < hba->nutrs; i++) {
 		/* Configure UTRD with command descriptor base address */
 		cmd_desc_element_addr =
+<<<<<<< HEAD
 			(cmd_desc_dma_addr + (cmd_desc_size * i));
 		utrdlp[i].command_desc_base_addr_lo =
 			cpu_to_le32(lower_32_bits(cmd_desc_element_addr));
@@ -2469,6 +2885,22 @@ static void ufshcd_host_memory_configure(struct ufs_hba *hba)
 			utrdlp[i].response_upiu_length =
 				cpu_to_le16(ALIGNED_UPIU_SIZE >> 2);
 		}
+=======
+				(cmd_desc_dma_addr + (cmd_desc_size * i));
+		utrdlp[i].command_desc_base_addr_lo =
+				cpu_to_le32(lower_32_bits(cmd_desc_element_addr));
+		utrdlp[i].command_desc_base_addr_hi =
+				cpu_to_le32(upper_32_bits(cmd_desc_element_addr));
+
+		/* Response upiu and prdt offset should be in double words */
+		utrdlp[i].response_upiu_offset =
+				cpu_to_le16((response_offset >> 2));
+		utrdlp[i].prd_table_offset =
+				cpu_to_le16((prdt_offset >> 2));
+		utrdlp[i].response_upiu_length =
+				cpu_to_le16(ALIGNED_UPIU_SIZE >> 2);
+
+>>>>>>> common/deprecated/android-3.18
 		hba->lrb[i].utr_descriptor_ptr = (utrdlp + i);
 		hba->lrb[i].ucd_req_ptr =
 			(struct utp_upiu_req *)(cmd_descp + i);
@@ -2504,6 +2936,7 @@ static int ufshcd_dme_link_startup(struct ufs_hba *hba)
 	return ret;
 }
 
+<<<<<<< HEAD
 static int ufshcd_dme_reset(struct ufs_hba *hba)
 {
 	struct uic_command uic_cmd = {0};
@@ -2535,6 +2968,8 @@ static int ufshcd_dme_enable(struct ufs_hba *hba)
 	return ret;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /**
  * ufshcd_dme_set_attr - UIC command for DME_SET, DME_PEER_SET
  * @hba: per adapter instance
@@ -2641,14 +3076,22 @@ static int ufshcd_uic_pwr_ctrl(struct ufs_hba *hba, struct uic_command *cmd)
 	spin_unlock_irqrestore(hba->host->host_lock, flags);
 	if (ret) {
 		dev_err(hba->dev,
+<<<<<<< HEAD
 			"pwr ctrl cmd 0x%x with mode 0x%x sent error %d\n",
+=======
+			"pwr ctrl cmd 0x%x with mode 0x%x uic error %d\n",
+>>>>>>> common/deprecated/android-3.18
 			cmd->command, cmd->argument3, ret);
 		goto out;
 	}
 	ret = ufshcd_wait_for_uic_cmd(hba, cmd);
 	if (ret) {
 		dev_err(hba->dev,
+<<<<<<< HEAD
 			"pwr ctrl cmd 0x%x with mode 0x%x done uic error %d\n",
+=======
+			"pwr ctrl cmd 0x%x with mode 0x%x uic error %d\n",
+>>>>>>> common/deprecated/android-3.18
 			cmd->command, cmd->argument3, ret);
 		goto out;
 	}
@@ -2670,12 +3113,15 @@ static int ufshcd_uic_pwr_ctrl(struct ufs_hba *hba, struct uic_command *cmd)
 		ret = (status != PWR_OK) ? status : -1;
 	}
 out:
+<<<<<<< HEAD
 	/* Dump debugging information to system memory */
 	if (ret) {
 		if (hba->vops && hba->vops->get_debug_info)
 			hba->vops->get_debug_info(hba);
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	spin_lock_irqsave(hba->host->host_lock, flags);
 	hba->uic_async_done = NULL;
 	spin_unlock_irqrestore(hba->host->host_lock, flags);
@@ -2747,6 +3193,7 @@ static void ufshcd_init_pwr_info(struct ufs_hba *hba)
 	hba->pwr_info.hs_rate = 0;
 }
 
+<<<<<<< HEAD
 static int ufshcd_link_hibern8_ctrl(struct ufs_hba *hba, bool en)
 {
 	int ret;
@@ -2787,6 +3234,8 @@ out:
 	return ret;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /**
  * ufshcd_get_max_pwr_mode - reads the max power mode negotiated with device
  * @hba: per-adapter instance
@@ -2905,6 +3354,7 @@ static int ufshcd_change_power_mode(struct ufs_hba *hba,
 		dev_err(hba->dev,
 			"%s: power mode change failed %d\n", __func__, ret);
 	} else {
+<<<<<<< HEAD
 		if (hba->vops && hba->vops->pwr_change_notify) {
 			ufshcd_hold(hba, false);
 			ret = hba->vops->pwr_change_notify(hba,
@@ -2913,11 +3363,20 @@ static int ufshcd_change_power_mode(struct ufs_hba *hba,
 			if (ret)
 				goto out;
 		}
+=======
+		if (hba->vops && hba->vops->pwr_change_notify)
+			hba->vops->pwr_change_notify(hba,
+				POST_CHANGE, NULL, pwr_mode);
+
+>>>>>>> common/deprecated/android-3.18
 		memcpy(&hba->pwr_info, pwr_mode,
 			sizeof(struct ufs_pa_layer_attr));
 	}
 
+<<<<<<< HEAD
 out:
+=======
+>>>>>>> common/deprecated/android-3.18
 	return ret;
 }
 
@@ -2926,12 +3385,17 @@ out:
  * @hba: per-adapter instance
  * @desired_pwr_mode: desired power configuration
  */
+<<<<<<< HEAD
 int ufshcd_config_pwr_mode(struct ufs_hba *hba,
+=======
+static int ufshcd_config_pwr_mode(struct ufs_hba *hba,
+>>>>>>> common/deprecated/android-3.18
 		struct ufs_pa_layer_attr *desired_pwr_mode)
 {
 	struct ufs_pa_layer_attr final_params = { 0 };
 	int ret;
 
+<<<<<<< HEAD
 	ufshcd_hold(hba, false);
 	if (hba->vops && hba->vops->pwr_change_notify) {
 		ret = hba->vops->pwr_change_notify(hba,
@@ -2948,6 +3412,18 @@ out:
 	return ret;
 }
 EXPORT_SYMBOL_GPL(ufshcd_config_pwr_mode);
+=======
+	if (hba->vops && hba->vops->pwr_change_notify)
+		hba->vops->pwr_change_notify(hba,
+		     PRE_CHANGE, desired_pwr_mode, &final_params);
+	else
+		memcpy(&final_params, desired_pwr_mode, sizeof(final_params));
+
+	ret = ufshcd_change_power_mode(hba, &final_params);
+
+	return ret;
+}
+>>>>>>> common/deprecated/android-3.18
 
 /**
  * ufshcd_complete_dev_init() - checks device readiness
@@ -2957,9 +3433,14 @@ EXPORT_SYMBOL_GPL(ufshcd_config_pwr_mode);
  */
 static int ufshcd_complete_dev_init(struct ufs_hba *hba)
 {
+<<<<<<< HEAD
 	int retries, err = 0;
 	bool flag_res = 1;
 	unsigned long timeout;
+=======
+	int i, retries, err = 0;
+	bool flag_res = 1;
+>>>>>>> common/deprecated/android-3.18
 
 	for (retries = QUERY_REQ_RETRIES; retries > 0; retries--) {
 		/* Set the fDeviceInit flag */
@@ -2976,6 +3457,7 @@ static int ufshcd_complete_dev_init(struct ufs_hba *hba)
 		goto out;
 	}
 
+<<<<<<< HEAD
 	/* Poll fDeviceInit flag to be cleared */
 	timeout = jiffies + msecs_to_jiffies(DEV_INIT_COMPL_TIMEOUT);
 
@@ -3000,6 +3482,28 @@ static int ufshcd_complete_dev_init(struct ufs_hba *hba)
 			__func__);
 		err = -EBUSY;
 	}
+=======
+	/* poll for max. 100 iterations for fDeviceInit flag to clear */
+	for (i = 0; i < 100 && !err && flag_res; i++) {
+		for (retries = QUERY_REQ_RETRIES; retries > 0; retries--) {
+			err = ufshcd_query_flag(hba,
+					UPIU_QUERY_OPCODE_READ_FLAG,
+					QUERY_FLAG_IDN_FDEVICEINIT, &flag_res);
+			if (!err || err == -ETIMEDOUT)
+				break;
+			dev_dbg(hba->dev, "%s: error %d retrying\n", __func__,
+					err);
+		}
+	}
+	if (err)
+		dev_err(hba->dev,
+			"%s reading fDeviceInit flag failed with error %d\n",
+			__func__, err);
+	else if (flag_res)
+		dev_err(hba->dev,
+			"%s fDeviceInit was not cleared by the device\n",
+			__func__);
+>>>>>>> common/deprecated/android-3.18
 
 out:
 	return err;
@@ -3038,9 +3542,12 @@ static int ufshcd_make_hba_operational(struct ufs_hba *hba)
 	ufshcd_writel(hba, upper_32_bits(hba->utmrdl_dma_addr),
 			REG_UTP_TASK_REQ_LIST_BASE_H);
 
+<<<<<<< HEAD
 	hba->tcx_replay_timer_expired_cnt = 0;
 	hba->fcx_protection_timer_expired_cnt = 0;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * UCRDY, UTMRLDY and UTRLRDY bits must be 1
 	 * DEI, HEI bits must be 0
@@ -3060,7 +3567,11 @@ out:
 }
 
 /**
+<<<<<<< HEAD
  * __ufshcd_hba_enable - initialize the controller
+=======
+ * ufshcd_hba_enable - initialize the controller
+>>>>>>> common/deprecated/android-3.18
  * @hba: per adapter instance
  *
  * The controller resets itself and controller firmware initialization
@@ -3069,7 +3580,11 @@ out:
  *
  * Returns 0 on success, non-zero value on failure
  */
+<<<<<<< HEAD
 static int __ufshcd_hba_enable(struct ufs_hba *hba)
+=======
+static int ufshcd_hba_enable(struct ufs_hba *hba)
+>>>>>>> common/deprecated/android-3.18
 {
 	int retry;
 
@@ -3135,6 +3650,7 @@ static int __ufshcd_hba_enable(struct ufs_hba *hba)
 	return 0;
 }
 
+<<<<<<< HEAD
 static int ufshcd_hba_enable(struct ufs_hba *hba)
 {
 	int ret;
@@ -3176,6 +3692,8 @@ static int ufshcd_hba_enable(struct ufs_hba *hba)
 	return ret;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /**
  * ufshcd_link_startup - Initialize unipro link startup
  * @hba: per adapter instance
@@ -3187,7 +3705,10 @@ static int ufshcd_link_startup(struct ufs_hba *hba)
 	int ret;
 	int retries = DME_LINKSTARTUP_RETRIES;
 
+<<<<<<< HEAD
 	ufshcd_hold(hba, false);
+=======
+>>>>>>> common/deprecated/android-3.18
 	do {
 		if (hba->vops && hba->vops->link_startup_notify)
 			hba->vops->link_startup_notify(hba, PRE_CHANGE);
@@ -3223,8 +3744,11 @@ static int ufshcd_link_startup(struct ufs_hba *hba)
 
 	ret = ufshcd_make_hba_operational(hba);
 out:
+<<<<<<< HEAD
 	ufshcd_release(hba);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (ret)
 		dev_err(hba->dev, "link startup failed %d\n", ret);
 	return ret;
@@ -3381,14 +3905,22 @@ static int ufshcd_slave_alloc(struct scsi_device *sdev)
 	/* REPORT SUPPORTED OPERATION CODES is not supported */
 	sdev->no_report_opcodes = 1;
 
+<<<<<<< HEAD
+=======
+	/* WRITE_SAME command is not supported */
+	sdev->no_write_same = 1;
+>>>>>>> common/deprecated/android-3.18
 
 	ufshcd_set_queue_depth(sdev);
 
 	ufshcd_get_lu_power_on_wp_status(hba, sdev);
 
+<<<<<<< HEAD
 	blk_queue_softirq_done(sdev->request_queue, ufshcd_command_done);
 
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -3436,7 +3968,10 @@ static int ufshcd_slave_configure(struct scsi_device *sdev)
 
 	blk_queue_update_dma_pad(q, PRDT_DATA_BYTE_COUNT_PAD - 1);
 	blk_queue_max_segment_size(q, PRDT_DATA_BYTE_COUNT_MAX);
+<<<<<<< HEAD
 	blk_queue_update_dma_alignment(q, PAGE_SIZE - 1);
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }
@@ -3479,6 +4014,12 @@ static int ufshcd_task_req_compl(struct ufs_hba *hba, u32 index, u8 *resp)
 
 	spin_lock_irqsave(hba->host->host_lock, flags);
 
+<<<<<<< HEAD
+=======
+	/* Clear completed tasks from outstanding_tasks */
+	__clear_bit(index, &hba->outstanding_tasks);
+
+>>>>>>> common/deprecated/android-3.18
 	task_req_descp = hba->utmrdl_base_addr;
 	ocs_value = ufshcd_get_tmr_ocs(&task_req_descp[index]);
 
@@ -3551,7 +4092,10 @@ ufshcd_transfer_rsp_status(struct ufs_hba *hba, struct ufshcd_lrb *lrbp)
 
 	switch (ocs) {
 	case OCS_SUCCESS:
+<<<<<<< HEAD
 	case OCS_FATAL_ERROR:
+=======
+>>>>>>> common/deprecated/android-3.18
 		result = ufshcd_get_req_rsp(lrbp->ucd_rsp_ptr);
 
 		switch (result) {
@@ -3569,8 +4113,12 @@ ufshcd_transfer_rsp_status(struct ufs_hba *hba, struct ufshcd_lrb *lrbp)
 			scsi_status = result & MASK_SCSI_STATUS;
 			result = ufshcd_scsi_cmd_status(lrbp, scsi_status);
 
+<<<<<<< HEAD
 			if (ufshcd_is_exception_event(lrbp->ucd_rsp_ptr) &&
 				scsi_host_in_recovery(hba->host))
+=======
+			if (ufshcd_is_exception_event(lrbp->ucd_rsp_ptr))
+>>>>>>> common/deprecated/android-3.18
 				schedule_work(&hba->eeh_work);
 			break;
 		case UPIU_TRANSACTION_REJECT_UPIU:
@@ -3598,6 +4146,10 @@ ufshcd_transfer_rsp_status(struct ufs_hba *hba, struct ufshcd_lrb *lrbp)
 	case OCS_MISMATCH_DATA_BUF_SIZE:
 	case OCS_MISMATCH_RESP_UPIU_SIZE:
 	case OCS_PEER_COMM_FAILURE:
+<<<<<<< HEAD
+=======
+	case OCS_FATAL_ERROR:
+>>>>>>> common/deprecated/android-3.18
 	default:
 		result |= DID_ERROR << 16;
 		dev_err(hba->dev,
@@ -3628,10 +4180,17 @@ static void ufshcd_uic_cmd_compl(struct ufs_hba *hba, u32 intr_status)
 }
 
 /**
+<<<<<<< HEAD
  * __ufshcd_transfer_req_compl - handle SCSI and query command completion
  * @hba: per adapter instance
  */
 static void __ufshcd_transfer_req_compl(struct ufs_hba *hba, int reason)
+=======
+ * ufshcd_transfer_req_compl - handle SCSI and query command completion
+ * @hba: per adapter instance
+ */
+static void ufshcd_transfer_req_compl(struct ufs_hba *hba)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct ufshcd_lrb *lrbp;
 	struct scsi_cmnd *cmd;
@@ -3639,6 +4198,10 @@ static void __ufshcd_transfer_req_compl(struct ufs_hba *hba, int reason)
 	u32 tr_doorbell;
 	int result;
 	int index;
+<<<<<<< HEAD
+=======
+	struct request *req;
+>>>>>>> common/deprecated/android-3.18
 
 	/* Resetting interrupt aggregation counters first and reading the
 	 * DOOR_BELL afterward allows us to handle all the completed requests.
@@ -3647,8 +4210,12 @@ static void __ufshcd_transfer_req_compl(struct ufs_hba *hba, int reason)
 	 * false interrupt if device completes another request after resetting
 	 * aggregation and before reading the DB.
 	 */
+<<<<<<< HEAD
 	if (!(hba->quirks & UFSHCI_QUIRK_SKIP_INTR_AGGR))
 		ufshcd_reset_intr_aggr(hba);
+=======
+	ufshcd_reset_intr_aggr(hba);
+>>>>>>> common/deprecated/android-3.18
 
 	tr_doorbell = ufshcd_readl(hba, REG_UTP_TRANSFER_REQ_DOOR_BELL);
 	completed_reqs = tr_doorbell ^ hba->outstanding_reqs;
@@ -3657,6 +4224,7 @@ static void __ufshcd_transfer_req_compl(struct ufs_hba *hba, int reason)
 		lrbp = &hba->lrb[index];
 		cmd = lrbp->cmd;
 		if (cmd) {
+<<<<<<< HEAD
 #if defined(CONFIG_UFS_FMP_ECRYPT_FS)
 			fmp_clear_sg(lrbp);
 #endif
@@ -3674,6 +4242,33 @@ static void __ufshcd_transfer_req_compl(struct ufs_hba *hba, int reason)
 			if (hba->debug.flag & UFSHCD_DEBUG_LEVEL1)
 				dev_info(hba->dev, "Transfer Done(%d)\n",
 						index);
+=======
+			result = ufshcd_transfer_rsp_status(hba, lrbp);
+			scsi_dma_unmap(cmd);
+			cmd->result = result;
+			/* Mark completed command as NULL in LRB */
+			lrbp->cmd = NULL;
+			clear_bit_unlock(index, &hba->lrb_in_use);
+			req = cmd->request;
+			if (req) {
+				/* Update IO svc time latency histogram */
+				if (req->lat_hist_enabled) {
+					ktime_t completion;
+					u_int64_t delta_us;
+
+					completion = ktime_get();
+					delta_us = ktime_us_delta(completion,
+						  req->lat_hist_io_start);
+					blk_update_latency_hist(
+						(rq_data_dir(req) == READ) ?
+						&hba->io_lat_read :
+						&hba->io_lat_write, delta_us);
+				}
+			}
+			/* Do not touch lrbp after scsi done */
+			cmd->scsi_done(cmd);
+			__ufshcd_release(hba);
+>>>>>>> common/deprecated/android-3.18
 		} else if (lrbp->command_type == UTP_CMD_TYPE_DEV_MANAGE) {
 			if (hba->dev_cmd.complete)
 				complete(hba->dev_cmd.complete);
@@ -3683,6 +4278,7 @@ static void __ufshcd_transfer_req_compl(struct ufs_hba *hba, int reason)
 	/* clear corresponding bits of completed commands */
 	hba->outstanding_reqs ^= completed_reqs;
 
+<<<<<<< HEAD
 	if (!tr_doorbell) {
 		hba->tcx_replay_timer_expired_cnt = 0;
 		hba->fcx_protection_timer_expired_cnt = 0;
@@ -3691,16 +4287,22 @@ static void __ufshcd_transfer_req_compl(struct ufs_hba *hba, int reason)
 #if defined(CONFIG_PM_DEVFREQ)
 	ufshcd_clk_scaling_update_busy(hba);
 #endif
+=======
+	ufshcd_clk_scaling_update_busy(hba);
+>>>>>>> common/deprecated/android-3.18
 
 	/* we might have free'd some tags above */
 	wake_up(&hba->dev_cmd.tag_wq);
 }
 
+<<<<<<< HEAD
 static inline void ufshcd_transfer_req_compl(struct ufs_hba *hba)
 {
 	__ufshcd_transfer_req_compl(hba, 0);
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /**
  * ufshcd_disable_ee - disable exception event
  * @hba: per-adapter instance
@@ -3839,11 +4441,16 @@ out:
 }
 
 /**
+<<<<<<< HEAD
  * ufshcd_force_reset_auto_bkops - force enable of auto bkops
+=======
+ * ufshcd_force_reset_auto_bkops - force reset auto bkops state
+>>>>>>> common/deprecated/android-3.18
  * @hba: per adapter instance
  *
  * After a device reset the device may toggle the BKOPS_EN flag
  * to default value. The s/w tracking variables should be updated
+<<<<<<< HEAD
  * as well. Do this by forcing enable of auto bkops.
  */
 static void  ufshcd_force_reset_auto_bkops(struct ufs_hba *hba)
@@ -3851,6 +4458,22 @@ static void  ufshcd_force_reset_auto_bkops(struct ufs_hba *hba)
 	hba->auto_bkops_enabled = false;
 	hba->ee_ctrl_mask |= MASK_EE_URGENT_BKOPS;
 	ufshcd_enable_auto_bkops(hba);
+=======
+ * as well. This function would change the auto-bkops state based on
+ * UFSHCD_CAP_KEEP_AUTO_BKOPS_ENABLED_EXCEPT_SUSPEND.
+ */
+static void ufshcd_force_reset_auto_bkops(struct ufs_hba *hba)
+{
+	if (ufshcd_keep_autobkops_enabled_except_suspend(hba)) {
+		hba->auto_bkops_enabled = false;
+		hba->ee_ctrl_mask |= MASK_EE_URGENT_BKOPS;
+		ufshcd_enable_auto_bkops(hba);
+	} else {
+		hba->auto_bkops_enabled = true;
+		hba->ee_ctrl_mask &= ~MASK_EE_URGENT_BKOPS;
+		ufshcd_disable_auto_bkops(hba);
+	}
+>>>>>>> common/deprecated/android-3.18
 }
 
 static inline int ufshcd_get_bkops_status(struct ufs_hba *hba, u32 *status)
@@ -3937,6 +4560,10 @@ static void ufshcd_exception_event_handler(struct work_struct *work)
 	hba = container_of(work, struct ufs_hba, eeh_work);
 
 	pm_runtime_get_sync(hba->dev);
+<<<<<<< HEAD
+=======
+	scsi_block_requests(hba->host);
+>>>>>>> common/deprecated/android-3.18
 	err = ufshcd_get_ee_status(hba, &status);
 	if (err) {
 		dev_err(hba->dev, "%s: failed to get exception status %d\n",
@@ -3952,10 +4579,15 @@ static void ufshcd_exception_event_handler(struct work_struct *work)
 					__func__, err);
 	}
 out:
+<<<<<<< HEAD
+=======
+	scsi_unblock_requests(hba->host);
+>>>>>>> common/deprecated/android-3.18
 	pm_runtime_put_sync(hba->dev);
 	return;
 }
 
+<<<<<<< HEAD
 static void ufshcd_command_done(struct request *rq)
 {
 	struct scsi_cmnd *cmd = rq->special;
@@ -3963,6 +4595,8 @@ static void ufshcd_command_done(struct request *rq)
 	scsi_softirq_done(rq);
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /**
  * ufshcd_err_handler - handle UFS errors that require s/w attention
  * @work: pointer to work structure
@@ -4014,6 +4648,7 @@ static void ufshcd_err_handler(struct work_struct *work)
 	/* Fatal errors need reset */
 	if (err_xfer || err_tm || (hba->saved_err & INT_FATAL_ERRORS) ||
 			((hba->saved_err & UIC_ERROR) &&
+<<<<<<< HEAD
 			((hba->saved_uic_err & UFSHCD_UIC_DL_PA_INIT_ERROR) ||
 			 (hba->saved_uic_err & UFSHCD_UIC_DL_ERROR)))) {
 		dev_err(hba->dev,
@@ -4029,6 +4664,20 @@ static void ufshcd_err_handler(struct work_struct *work)
 			dev_err(hba->dev, "%s: reset and restore failed\n",
 					__func__);
 		}
+=======
+			 (hba->saved_uic_err & UFSHCD_UIC_DL_PA_INIT_ERROR))) {
+		err = ufshcd_reset_and_restore(hba);
+		if (err) {
+			dev_err(hba->dev, "%s: reset and restore failed\n",
+					__func__);
+			hba->ufshcd_state = UFSHCD_STATE_ERROR;
+		}
+		/*
+		 * Inform scsi mid-layer that we did reset and allow to handle
+		 * Unit Attention properly.
+		 */
+		scsi_report_bus_reset(hba->host, 0);
+>>>>>>> common/deprecated/android-3.18
 		hba->saved_err = 0;
 		hba->saved_uic_err = 0;
 	}
@@ -4053,6 +4702,7 @@ static void ufshcd_update_uic_error(struct ufs_hba *hba)
 	if (reg & UIC_DATA_LINK_LAYER_ERROR_PA_INIT)
 		hba->uic_error |= UFSHCD_UIC_DL_PA_INIT_ERROR;
 
+<<<<<<< HEAD
 	if (reg & UIC_DATA_LINK_LAYER_ERROR_TCX_REP_TIMER_EXP)
 		hba->tcx_replay_timer_expired_cnt++;
 
@@ -4063,6 +4713,8 @@ static void ufshcd_update_uic_error(struct ufs_hba *hba)
 	    hba->fcx_protection_timer_expired_cnt >= 2)
 		hba->uic_error |= UFSHCD_UIC_DL_ERROR;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* UIC NL/TL/DME errors needs software retry */
 	reg = ufshcd_readl(hba, REG_UIC_ERROR_CODE_NETWORK_LAYER);
 	if (reg)
@@ -4108,10 +4760,13 @@ static void ufshcd_check_errors(struct ufs_hba *hba)
 			hba->saved_err |= hba->errors;
 			hba->saved_uic_err |= hba->uic_error;
 
+<<<<<<< HEAD
 			/* not allow er_work in link transition */
 			if (ufshcd_in_link_transition(hba))
 				return;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 			hba->ufshcd_state = UFSHCD_STATE_ERROR;
 			schedule_work(&hba->eh_work);
 		}
@@ -4134,7 +4789,10 @@ static void ufshcd_tmc_handler(struct ufs_hba *hba)
 
 	tm_doorbell = ufshcd_readl(hba, REG_UTP_TASK_REQ_DOOR_BELL);
 	hba->tm_condition = tm_doorbell ^ hba->outstanding_tasks;
+<<<<<<< HEAD
 	hba->outstanding_tasks ^= hba->tm_condition;
+=======
+>>>>>>> common/deprecated/android-3.18
 	wake_up(&hba->tm_wq);
 }
 
@@ -4191,14 +4849,26 @@ static int ufshcd_clear_tm_cmd(struct ufs_hba *hba, int tag)
 	u32 mask = 1 << tag;
 	unsigned long flags;
 
+<<<<<<< HEAD
 	spin_lock_irqsave(hba->host->host_lock, flags);
 	ufshcd_utmrl_clear(hba, tag);
+=======
+	if (!test_bit(tag, &hba->outstanding_tasks))
+		goto out;
+
+	spin_lock_irqsave(hba->host->host_lock, flags);
+	ufshcd_writel(hba, ~(1 << tag), REG_UTP_TASK_REQ_LIST_CLEAR);
+>>>>>>> common/deprecated/android-3.18
 	spin_unlock_irqrestore(hba->host->host_lock, flags);
 
 	/* poll for max. 1 sec to clear door bell register by h/w */
 	err = ufshcd_wait_for_register(hba,
 			REG_UTP_TASK_REQ_DOOR_BELL,
 			mask, 0, 1000, 1000);
+<<<<<<< HEAD
+=======
+out:
+>>>>>>> common/deprecated/android-3.18
 	return err;
 }
 
@@ -4259,8 +4929,11 @@ static int ufshcd_issue_tm_cmd(struct ufs_hba *hba, int lun_id, int task_id,
 	task_req_upiup->input_param2 = cpu_to_be32(task_id);
 
 	/* send command to the controller */
+<<<<<<< HEAD
 	if (hba->vops && hba->vops->set_nexus_t_task_mgmt)
 		hba->vops->set_nexus_t_task_mgmt(hba, free_slot, tm_function);
+=======
+>>>>>>> common/deprecated/android-3.18
 	__set_bit(free_slot, &hba->outstanding_tasks);
 	ufshcd_writel(hba, 1 << free_slot, REG_UTP_TASK_REQ_DOOR_BELL);
 
@@ -4273,6 +4946,7 @@ static int ufshcd_issue_tm_cmd(struct ufs_hba *hba, int lun_id, int task_id,
 	if (!err) {
 		dev_err(hba->dev, "%s: task management cmd 0x%.2x timed-out\n",
 				__func__, tm_function);
+<<<<<<< HEAD
 		if (!ufshcd_clear_tm_cmd(hba, free_slot)) {
 			spin_lock_irqsave(hba->host->host_lock, flags);
 			__clear_bit(free_slot, &hba->outstanding_tasks);
@@ -4281,6 +4955,11 @@ static int ufshcd_issue_tm_cmd(struct ufs_hba *hba, int lun_id, int task_id,
 			dev_WARN(hba->dev, "%s: unable clear tm cmd (slot %d) after timeout\n",
 					__func__, free_slot);
 		}
+=======
+		if (ufshcd_clear_tm_cmd(hba, free_slot))
+			dev_WARN(hba->dev, "%s: unable clear tm cmd (slot %d) after timeout\n",
+					__func__, free_slot);
+>>>>>>> common/deprecated/android-3.18
 		err = -ETIMEDOUT;
 	} else {
 		err = ufshcd_task_req_compl(hba, free_slot, tm_response);
@@ -4305,19 +4984,31 @@ static int ufshcd_eh_device_reset_handler(struct scsi_cmnd *cmd)
 {
 	struct Scsi_Host *host;
 	struct ufs_hba *hba;
+<<<<<<< HEAD
 	unsigned int tag;
 	u32 pos;
 	int err;
 	u8 resp = 0xF;
 	struct ufshcd_lrb *lrbp;
+=======
+	u32 pos;
+	int err;
+	u8 resp = 0xF, lun;
+>>>>>>> common/deprecated/android-3.18
 	unsigned long flags;
 
 	host = cmd->device->host;
 	hba = shost_priv(host);
+<<<<<<< HEAD
 	tag = cmd->request->tag;
 
 	lrbp = &hba->lrb[tag];
 	err = ufshcd_issue_tm_cmd(hba, lrbp->lun, 0, UFS_LOGICAL_RESET, &resp);
+=======
+
+	lun = ufshcd_scsi_to_upiu_lun(cmd->device->lun);
+	err = ufshcd_issue_tm_cmd(hba, lun, 0, UFS_LOGICAL_RESET, &resp);
+>>>>>>> common/deprecated/android-3.18
 	if (err || resp != UPIU_TASK_MANAGEMENT_FUNC_COMPL) {
 		if (!err)
 			err = resp;
@@ -4326,14 +5017,22 @@ static int ufshcd_eh_device_reset_handler(struct scsi_cmnd *cmd)
 
 	/* clear the commands that were pending for corresponding LUN */
 	for_each_set_bit(pos, &hba->outstanding_reqs, hba->nutrs) {
+<<<<<<< HEAD
 		if (hba->lrb[pos].lun == lrbp->lun) {
+=======
+		if (hba->lrb[pos].lun == lun) {
+>>>>>>> common/deprecated/android-3.18
 			err = ufshcd_clear_cmd(hba, pos);
 			if (err)
 				break;
 		}
 	}
 	spin_lock_irqsave(host->host_lock, flags);
+<<<<<<< HEAD
 	__ufshcd_transfer_req_compl(hba, DID_RESET);
+=======
+	ufshcd_transfer_req_compl(hba);
+>>>>>>> common/deprecated/android-3.18
 	spin_unlock_irqrestore(host->host_lock, flags);
 out:
 	if (!err) {
@@ -4373,6 +5072,7 @@ static int ufshcd_abort(struct scsi_cmnd *cmd)
 	hba = shost_priv(host);
 	tag = cmd->request->tag;
 
+<<<<<<< HEAD
 	dev_err(hba->dev, "%s: tag:%d, cmd:0x%x\n", __func__, tag, cmd->cmnd[0]);
 
 	ufshcd_hold(hba, false);
@@ -4387,13 +5087,22 @@ static int ufshcd_abort(struct scsi_cmnd *cmd)
 			"%s: cmd was already completed\n", __func__);
 		goto out;
 	}
+=======
+	ufshcd_hold(hba, false);
+	/* If command is already aborted/completed, return SUCCESS */
+	if (!(test_bit(tag, &hba->outstanding_reqs)))
+		goto out;
+>>>>>>> common/deprecated/android-3.18
 
 	reg = ufshcd_readl(hba, REG_UTP_TRANSFER_REQ_DOOR_BELL);
 	if (!(reg & (1 << tag))) {
 		dev_err(hba->dev,
 		"%s: cmd was completed, but without a notifying intr, tag = %d",
 		__func__, tag);
+<<<<<<< HEAD
 		goto clean;
+=======
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	lrbp = &hba->lrb[tag];
@@ -4415,25 +5124,34 @@ static int ufshcd_abort(struct scsi_cmnd *cmd)
 				continue;
 			}
 			/* command completed already */
+<<<<<<< HEAD
 			dev_err(hba->dev,
 				"%s: cmd was completed during err handling\n",
 				__func__);
+=======
+>>>>>>> common/deprecated/android-3.18
 			goto out;
 		} else {
 			if (!err)
 				err = resp; /* service response error */
+<<<<<<< HEAD
 			dev_err(hba->dev,
 				"%s: query task failed with err %d\n",
 				__func__, err);
+=======
+>>>>>>> common/deprecated/android-3.18
 			goto out;
 		}
 	}
 
 	if (!poll_cnt) {
 		err = -EBUSY;
+<<<<<<< HEAD
 		dev_err(hba->dev,
 			"%s: cmd might be missed, not pending in device\n",
 			__func__);
+=======
+>>>>>>> common/deprecated/android-3.18
 		goto out;
 	}
 
@@ -4442,9 +5160,12 @@ static int ufshcd_abort(struct scsi_cmnd *cmd)
 	if (err || resp != UPIU_TASK_MANAGEMENT_FUNC_COMPL) {
 		if (!err)
 			err = resp; /* service response error */
+<<<<<<< HEAD
 		dev_err(hba->dev,
 			"%s: abort task failed with err %d\n",
 			__func__, err);
+=======
+>>>>>>> common/deprecated/android-3.18
 		goto out;
 	}
 
@@ -4452,7 +5173,10 @@ static int ufshcd_abort(struct scsi_cmnd *cmd)
 	if (err)
 		goto out;
 
+<<<<<<< HEAD
 clean:
+=======
+>>>>>>> common/deprecated/android-3.18
 	scsi_dma_unmap(cmd);
 
 	spin_lock_irqsave(host->host_lock, flags);
@@ -4464,10 +5188,19 @@ clean:
 	wake_up(&hba->dev_cmd.tag_wq);
 
 out:
+<<<<<<< HEAD
 	if (!err)
 		err = SUCCESS;
 	else
 		err = FAILED;
+=======
+	if (!err) {
+		err = SUCCESS;
+	} else {
+		dev_err(hba->dev, "%s: failed with err %d\n", __func__, err);
+		err = FAILED;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * This ufshcd_release() corresponds to the original scsi cmd that got
@@ -4494,6 +5227,7 @@ static int ufshcd_host_reset_and_restore(struct ufs_hba *hba)
 
 	/* Reset the host controller */
 	spin_lock_irqsave(hba->host->host_lock, flags);
+<<<<<<< HEAD
 	hba->ufshcd_state = UFSHCD_STATE_RESET;
 	ufshcd_set_eh_in_progress(hba);
 	ufshcd_hba_stop(hba);
@@ -4518,6 +5252,23 @@ static int ufshcd_host_reset_and_restore(struct ufs_hba *hba)
 	spin_lock_irqsave(hba->host->host_lock, flags);
 	ufshcd_clear_eh_in_progress(hba);
 	spin_unlock_irqrestore(hba->host->host_lock, flags);
+=======
+	ufshcd_hba_stop(hba);
+	spin_unlock_irqrestore(hba->host->host_lock, flags);
+
+	err = ufshcd_hba_enable(hba);
+	if (err)
+		goto out;
+
+	/* Establish the link again and restore the device */
+	err = ufshcd_probe_hba(hba);
+
+	if (!err && (hba->ufshcd_state != UFSHCD_STATE_OPERATIONAL))
+		err = -EIO;
+out:
+	if (err)
+		dev_err(hba->dev, "%s: Host init failed %d\n", __func__, err);
+>>>>>>> common/deprecated/android-3.18
 
 	return err;
 }
@@ -4537,6 +5288,7 @@ static int ufshcd_reset_and_restore(struct ufs_hba *hba)
 	unsigned long flags;
 	int retries = MAX_HOST_RESET_RETRIES;
 
+<<<<<<< HEAD
 	int tag;
 
 	for_each_set_bit(tag, &hba->outstanding_reqs, hba->nutrs)
@@ -4548,6 +5300,8 @@ static int ufshcd_reset_and_restore(struct ufs_hba *hba)
 
 	ssleep(1);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	do {
 		err = ufshcd_host_reset_and_restore(hba);
 	} while (err && --retries);
@@ -4557,7 +5311,11 @@ static int ufshcd_reset_and_restore(struct ufs_hba *hba)
 	 * outstanding requests in s/w here.
 	 */
 	spin_lock_irqsave(hba->host->host_lock, flags);
+<<<<<<< HEAD
 	__ufshcd_transfer_req_compl(hba, DID_RESET);
+=======
+	ufshcd_transfer_req_compl(hba);
+>>>>>>> common/deprecated/android-3.18
 	ufshcd_tmc_handler(hba);
 	spin_unlock_irqrestore(hba->host->host_lock, flags);
 
@@ -4616,6 +5374,7 @@ static int ufshcd_eh_host_reset_handler(struct scsi_cmnd *cmd)
 	return err;
 }
 
+<<<<<<< HEAD
 static enum blk_eh_timer_return ufshcd_eh_timed_out(struct scsi_cmnd *cmd)
 {
 	struct Scsi_Host *host;
@@ -4641,6 +5400,8 @@ out:
 	return rtn;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /**
  * ufshcd_get_max_icc_level - calculate the ICC level
  * @sup_curr_uA: max. current supported by the regulator
@@ -4789,6 +5550,10 @@ static void ufshcd_init_icc_levels(struct ufs_hba *hba)
 static int ufshcd_scsi_add_wlus(struct ufs_hba *hba)
 {
 	int ret = 0;
+<<<<<<< HEAD
+=======
+	struct scsi_device *sdev_rpmb;
+>>>>>>> common/deprecated/android-3.18
 	struct scsi_device *sdev_boot;
 
 	hba->sdev_ufs_device = __scsi_add_device(hba->host, 0, 0,
@@ -4808,6 +5573,7 @@ static int ufshcd_scsi_add_wlus(struct ufs_hba *hba)
 	}
 	scsi_device_put(sdev_boot);
 
+<<<<<<< HEAD
 	hba->sdev_rpmb = __scsi_add_device(hba->host, 0, 0,
 		ufshcd_upiu_wlun_to_scsi_wlun(UFS_UPIU_RPMB_WLUN), NULL);
 	if (IS_ERR(hba->sdev_rpmb)) {
@@ -4815,6 +5581,15 @@ static int ufshcd_scsi_add_wlus(struct ufs_hba *hba)
 		goto remove_sdev_boot;
 	}
 	scsi_device_put(hba->sdev_rpmb);
+=======
+	sdev_rpmb = __scsi_add_device(hba->host, 0, 0,
+		ufshcd_upiu_wlun_to_scsi_wlun(UFS_UPIU_RPMB_WLUN), NULL);
+	if (IS_ERR(sdev_rpmb)) {
+		ret = PTR_ERR(sdev_rpmb);
+		goto remove_sdev_boot;
+	}
+	scsi_device_put(sdev_rpmb);
+>>>>>>> common/deprecated/android-3.18
 	goto out;
 
 remove_sdev_boot:
@@ -4833,6 +5608,7 @@ out:
  */
 static int ufshcd_probe_hba(struct ufs_hba *hba)
 {
+<<<<<<< HEAD
 	int re_cnt = 0;
 	int ret;
 	unsigned long flags;
@@ -4841,13 +5617,19 @@ retry:
 	ret = ufshcd_hba_enable(hba);
 	if (ret)
 		goto out;
+=======
+	int ret;
+>>>>>>> common/deprecated/android-3.18
 
 	ret = ufshcd_link_startup(hba);
 	if (ret)
 		goto out;
 
+<<<<<<< HEAD
 	dev_info(hba->dev, "UFS link established\n");
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	ufshcd_init_pwr_info(hba);
 
 	/* UniPro link is active now */
@@ -4861,6 +5643,7 @@ retry:
 	if (ret)
 		goto out;
 
+<<<<<<< HEAD
 	dev_info(hba->dev, "UFS device initialized\n");
 
 	ufs_advertise_fixup_device(hba);
@@ -4868,6 +5651,12 @@ retry:
 	/* UFS device is also active now */
 	ufshcd_set_ufs_dev_active(hba);
 	ufshcd_force_reset_auto_bkops(hba);
+=======
+	/* UFS device is also active now */
+	ufshcd_set_ufs_dev_active(hba);
+	ufshcd_force_reset_auto_bkops(hba);
+	hba->ufshcd_state = UFSHCD_STATE_OPERATIONAL;
+>>>>>>> common/deprecated/android-3.18
 	hba->wlun_dev_clr_ua = true;
 
 	if (ufshcd_get_max_pwr_mode(hba)) {
@@ -4876,6 +5665,7 @@ retry:
 			__func__);
 	} else {
 		ret = ufshcd_config_pwr_mode(hba, &hba->max_pwr_info.info);
+<<<<<<< HEAD
 		if (ret) {
 			dev_err(hba->dev, "%s: Failed setting power mode, err = %d\n",
 					__func__, ret);
@@ -4893,6 +5683,13 @@ retry:
 	hba->ufshcd_state = UFSHCD_STATE_OPERATIONAL;
 	spin_unlock_irqrestore(hba->host->host_lock, flags);
 
+=======
+		if (ret)
+			dev_err(hba->dev, "%s: Failed setting power mode, err = %d\n",
+					__func__, ret);
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * If we are in error handling context or in power management callbacks
 	 * context, no need to scan the host
@@ -4909,6 +5706,7 @@ retry:
 		if (!hba->is_init_prefetch)
 			ufshcd_init_icc_levels(hba);
 
+<<<<<<< HEAD
 		scsi_scan_host(hba->host);
 
 		/* Add required well known logical units to scsi mid layer */
@@ -4945,6 +5743,25 @@ out:
 		goto retry;
 	}
 
+=======
+		/* Add required well known logical units to scsi mid layer */
+		ret = ufshcd_scsi_add_wlus(hba);
+		if (ret)
+			goto out;
+
+		scsi_scan_host(hba->host);
+		pm_runtime_put_sync(hba->dev);
+	}
+
+	if (!hba->is_init_prefetch)
+		hba->is_init_prefetch = true;
+
+	/* Resume devfreq after UFS device is detected */
+	if (ufshcd_is_clkscaling_enabled(hba))
+		devfreq_resume_device(hba->devfreq);
+
+out:
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * If we failed to initialize the device or the device is not
 	 * present, turn off the power/clocks etc.
@@ -4981,13 +5798,19 @@ static struct scsi_host_template ufshcd_driver_template = {
 	.eh_abort_handler	= ufshcd_abort,
 	.eh_device_reset_handler = ufshcd_eh_device_reset_handler,
 	.eh_host_reset_handler   = ufshcd_eh_host_reset_handler,
+<<<<<<< HEAD
 	.eh_timed_out		= ufshcd_eh_timed_out,
+=======
+>>>>>>> common/deprecated/android-3.18
 	.this_id		= -1,
 	.sg_tablesize		= SG_ALL,
 	.cmd_per_lun		= UFSHCD_CMD_PER_LUN,
 	.can_queue		= UFSHCD_CAN_QUEUE,
 	.max_host_blocked	= 1,
+<<<<<<< HEAD
 	.skip_settle_delay	= 1,
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 static int ufshcd_config_vreg_load(struct device *dev, struct ufs_vreg *vreg,
@@ -5017,12 +5840,24 @@ static int ufshcd_config_vreg_load(struct device *dev, struct ufs_vreg *vreg,
 static inline int ufshcd_config_vreg_lpm(struct ufs_hba *hba,
 					 struct ufs_vreg *vreg)
 {
+<<<<<<< HEAD
+=======
+	if (!vreg)
+		return 0;
+
+>>>>>>> common/deprecated/android-3.18
 	return ufshcd_config_vreg_load(hba->dev, vreg, UFS_VREG_LPM_LOAD_UA);
 }
 
 static inline int ufshcd_config_vreg_hpm(struct ufs_hba *hba,
 					 struct ufs_vreg *vreg)
 {
+<<<<<<< HEAD
+=======
+	if (!vreg)
+		return 0;
+
+>>>>>>> common/deprecated/android-3.18
 	return ufshcd_config_vreg_load(hba->dev, vreg, vreg->max_uA);
 }
 
@@ -5030,12 +5865,18 @@ static int ufshcd_config_vreg(struct device *dev,
 		struct ufs_vreg *vreg, bool on)
 {
 	int ret = 0;
+<<<<<<< HEAD
 	struct regulator *reg = vreg->reg;
 	const char *name = vreg->name;
+=======
+	struct regulator *reg;
+	const char *name;
+>>>>>>> common/deprecated/android-3.18
 	int min_uV, uA_load;
 
 	BUG_ON(!vreg);
 
+<<<<<<< HEAD
 	if (regulator_count_voltages(reg) > 0) {
 		min_uV = on ? vreg->min_uV : 0;
 		ret = regulator_set_voltage(reg, min_uV, vreg->max_uV);
@@ -5043,6 +5884,21 @@ static int ufshcd_config_vreg(struct device *dev,
 			dev_err(dev, "%s: %s set voltage failed, err=%d\n",
 					__func__, name, ret);
 			goto out;
+=======
+	reg = vreg->reg;
+	name = vreg->name;
+
+	if (regulator_count_voltages(reg) > 0) {
+		if (vreg->min_uV && vreg->max_uV) {
+			min_uV = on ? vreg->min_uV : 0;
+			ret = regulator_set_voltage(reg, min_uV, vreg->max_uV);
+			if (ret) {
+				dev_err(dev,
+					"%s: %s set voltage failed, err=%d\n",
+					__func__, name, ret);
+				goto out;
+			}
+>>>>>>> common/deprecated/android-3.18
 		}
 
 		uA_load = on ? vreg->max_uA : 0;
@@ -5190,13 +6046,18 @@ static int __ufshcd_setup_clocks(struct ufs_hba *hba, bool on,
 	int ret = 0;
 	struct ufs_clk_info *clki;
 	struct list_head *head = &hba->clk_list_head;
+<<<<<<< HEAD
 	const char *ref_clk = "ref_clk";
 	unsigned long flags;
 	bool internal_control = ufshcd_is_link_hibern8(hba);
+=======
+	unsigned long flags;
+>>>>>>> common/deprecated/android-3.18
 
 	if (!head || list_empty(head))
 		goto out;
 
+<<<<<<< HEAD
 	if (internal_control) {
 		if (hba->vops && hba->vops->clock_control_notify)
 			hba->vops->clock_control_notify(hba, on, PRE_CHANGE);
@@ -5206,6 +6067,11 @@ static int __ufshcd_setup_clocks(struct ufs_hba *hba, bool on,
 		if (!IS_ERR_OR_NULL(clki->clk)) {
 			if (skip_ref_clk &&
 			    !strncmp(clki->name, ref_clk, strlen(ref_clk)))
+=======
+	list_for_each_entry(clki, head, list) {
+		if (!IS_ERR_OR_NULL(clki->clk)) {
+			if (skip_ref_clk && !strcmp(clki->name, "ref_clk"))
+>>>>>>> common/deprecated/android-3.18
 				continue;
 
 			if (on && !clki->enabled) {
@@ -5224,11 +6090,14 @@ static int __ufshcd_setup_clocks(struct ufs_hba *hba, bool on,
 		}
 	}
 
+<<<<<<< HEAD
 	if (internal_control) {
 		if (hba->vops && hba->vops->clock_control_notify)
 			hba->vops->clock_control_notify(hba, on, POST_CHANGE);
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (hba->vops && hba->vops->setup_clocks)
 		ret = hba->vops->setup_clocks(hba, on);
 out:
@@ -5280,9 +6149,13 @@ static int ufshcd_init_clocks(struct ufs_hba *hba)
 					clki->max_freq, ret);
 				goto out;
 			}
+<<<<<<< HEAD
 #if defined(CONFIG_PM_DEVFREQ)
 			clki->curr_freq = clki->max_freq;
 #endif
+=======
+			clki->curr_freq = clki->max_freq;
+>>>>>>> common/deprecated/android-3.18
 		}
 		dev_dbg(dev, "%s: clk: %s, rate: %lu\n", __func__,
 				clki->name, clk_get_rate(clki->clk));
@@ -5515,6 +6388,7 @@ static int ufshcd_link_state_transition(struct ufs_hba *hba,
 		return 0;
 
 	if (req_link_state == UIC_LINK_HIBERN8_STATE) {
+<<<<<<< HEAD
 		ufshcd_set_link_trans_hibern8(hba);
 		ret = ufshcd_link_hibern8_ctrl(hba, true);
 		if (!ret)
@@ -5536,6 +6410,13 @@ static int ufshcd_link_state_transition(struct ufs_hba *hba,
 
 			goto out;
 		}
+=======
+		ret = ufshcd_uic_hibern8_enter(hba);
+		if (!ret)
+			ufshcd_set_link_hibern8(hba);
+		else
+			goto out;
+>>>>>>> common/deprecated/android-3.18
 	}
 	/*
 	 * If autobkops is enabled, link can't be turned off because
@@ -5544,17 +6425,24 @@ static int ufshcd_link_state_transition(struct ufs_hba *hba,
 	else if ((req_link_state == UIC_LINK_OFF_STATE) &&
 		   (!check_for_bkops || (check_for_bkops &&
 		    !hba->auto_bkops_enabled))) {
+<<<<<<< HEAD
 		unsigned long flags;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		/*
 		 * Change controller state to "reset state" which
 		 * should also put the link in off/reset state
 		 */
+<<<<<<< HEAD
 		spin_lock_irqsave(hba->host->host_lock, flags);
 		hba->ufshcd_state = UFSHCD_STATE_RESET;
 		ufshcd_hba_stop(hba);
 		spin_unlock_irqrestore(hba->host->host_lock, flags);
 
+=======
+		ufshcd_hba_stop(hba);
+>>>>>>> common/deprecated/android-3.18
 		/*
 		 * TODO: Check if we need any delay to make sure that
 		 * controller is reset
@@ -5654,7 +6542,10 @@ static int ufshcd_suspend(struct ufs_hba *hba, enum ufs_pm_op pm_op)
 	enum ufs_pm_level pm_lvl;
 	enum ufs_dev_pwr_mode req_dev_pwr_mode;
 	enum uic_link_state req_link_state;
+<<<<<<< HEAD
 	bool gating_allowed = !ufshcd_can_fake_clkgating(hba);
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	hba->pm_op_in_progress = 1;
 	if (!ufshcd_is_shutdown_pm(pm_op)) {
@@ -5719,8 +6610,14 @@ static int ufshcd_suspend(struct ufs_hba *hba, enum ufs_pm_op pm_op)
 	if (ret)
 		goto set_dev_active;
 
+<<<<<<< HEAD
 disable_clks:
 #if defined(CONFIG_PM_DEVFREQ)
+=======
+	ufshcd_vreg_set_lpm(hba);
+
+disable_clks:
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * The clock scaling needs access to controller registers. Hence, Wait
 	 * for pending clock scaling work to be done before clocks are
@@ -5730,6 +6627,7 @@ disable_clks:
 		devfreq_suspend_device(hba->devfreq);
 		hba->clk_scaling.window_start_t = 0;
 	}
+<<<<<<< HEAD
 #endif
 
 	/*
@@ -5754,6 +6652,8 @@ disable_clks:
 
 	hba->clk_gating.state = CLKS_OFF;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Call vendor specific suspend callback. As these callbacks may access
 	 * vendor specific host controller register space call them before the
@@ -5765,12 +6665,34 @@ disable_clks:
 			goto set_link_active;
 	}
 
+<<<<<<< HEAD
 	ufshcd_vreg_set_lpm(hba);
 
+=======
+	if (hba->vops && hba->vops->setup_clocks) {
+		ret = hba->vops->setup_clocks(hba, false);
+		if (ret)
+			goto vops_resume;
+	}
+
+	if (!ufshcd_is_link_active(hba))
+		ufshcd_setup_clocks(hba, false);
+	else
+		/* If link is active, device ref_clk can't be switched off */
+		__ufshcd_setup_clocks(hba, false, true);
+
+	hba->clk_gating.state = CLKS_OFF;
+	/*
+	 * Disable the host irq as host controller as there won't be any
+	 * host controller trasanction expected till resume.
+	 */
+	ufshcd_disable_irq(hba);
+>>>>>>> common/deprecated/android-3.18
 	/* Put the host controller in low power mode if possible */
 	ufshcd_hba_vreg_set_lpm(hba);
 	goto out;
 
+<<<<<<< HEAD
 set_link_active:
 	ret = ufshcd_enable_irq(hba);
 	if (ret)
@@ -5783,6 +6705,16 @@ set_link_active:
 		else
 			ufshcd_set_link_off(hba);
 	} else if (ufshcd_is_link_off(hba))
+=======
+vops_resume:
+	if (hba->vops && hba->vops->resume)
+		hba->vops->resume(hba, pm_op);
+set_link_active:
+	ufshcd_vreg_set_hpm(hba);
+	if (ufshcd_is_link_hibern8(hba) && !ufshcd_uic_hibern8_exit(hba))
+		ufshcd_set_link_active(hba);
+	else if (ufshcd_is_link_off(hba))
+>>>>>>> common/deprecated/android-3.18
 		ufshcd_host_reset_and_restore(hba);
 set_dev_active:
 	if (!ufshcd_set_dev_pwr_mode(hba, UFS_ACTIVE_PWR_MODE))
@@ -5792,10 +6724,13 @@ enable_gating:
 	ufshcd_release(hba);
 out:
 	hba->pm_op_in_progress = 0;
+<<<<<<< HEAD
 
 	if (hba->debug.flag & UFSHCD_DEBUG_LEVEL1)
 		dev_info(hba->dev, "UFS suspend done\n");
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	return ret;
 }
 
@@ -5813,6 +6748,7 @@ static int ufshcd_resume(struct ufs_hba *hba, enum ufs_pm_op pm_op)
 {
 	int ret;
 	enum uic_link_state old_link_state;
+<<<<<<< HEAD
 	enum ufs_pm_level pm_lvl;
 	bool gating_allowed = !ufshcd_can_fake_clkgating(hba);
 
@@ -5827,6 +6763,26 @@ static int ufshcd_resume(struct ufs_hba *hba, enum ufs_pm_op pm_op)
 	old_link_state = hba->uic_link_state;
 
 	ufshcd_hba_vreg_set_hpm(hba);
+=======
+
+	hba->pm_op_in_progress = 1;
+	old_link_state = hba->uic_link_state;
+
+	ufshcd_hba_vreg_set_hpm(hba);
+	/* Make sure clocks are enabled before accessing controller */
+	ret = ufshcd_setup_clocks(hba, true);
+	if (ret)
+		goto out;
+
+	/* enable the host irq as host controller would be active soon */
+	ret = ufshcd_enable_irq(hba);
+	if (ret)
+		goto disable_irq_and_vops_clks;
+
+	ret = ufshcd_vreg_set_hpm(hba);
+	if (ret)
+		goto disable_irq_and_vops_clks;
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * Call vendor specific resume callback. As these callbacks may access
@@ -5839,6 +6795,7 @@ static int ufshcd_resume(struct ufs_hba *hba, enum ufs_pm_op pm_op)
 			goto disable_vreg;
 	}
 
+<<<<<<< HEAD
 	if (gating_allowed) {
 		/* Make sure clocks are enabled before accessing controller */
 		ret = ufshcd_setup_clocks(hba, true);
@@ -5864,6 +6821,14 @@ static int ufshcd_resume(struct ufs_hba *hba, enum ufs_pm_op pm_op)
 			ufshcd_set_link_off(hba);
 			goto vendor_suspend;
 		}
+=======
+	if (ufshcd_is_link_hibern8(hba)) {
+		ret = ufshcd_uic_hibern8_exit(hba);
+		if (!ret)
+			ufshcd_set_link_active(hba);
+		else
+			goto vendor_suspend;
+>>>>>>> common/deprecated/android-3.18
 	} else if (ufshcd_is_link_off(hba)) {
 		ret = ufshcd_host_reset_and_restore(hba);
 		/*
@@ -5880,6 +6845,7 @@ static int ufshcd_resume(struct ufs_hba *hba, enum ufs_pm_op pm_op)
 			goto set_old_link_state;
 	}
 
+<<<<<<< HEAD
 	/*
 	 * If BKOPs operations are urgently needed at this moment then
 	 * keep auto-bkops enabled or else disable it.
@@ -5891,6 +6857,21 @@ static int ufshcd_resume(struct ufs_hba *hba, enum ufs_pm_op pm_op)
 	if (ufshcd_is_clkscaling_enabled(hba))
 		devfreq_resume_device(hba->devfreq);
 #endif
+=======
+	if (ufshcd_keep_autobkops_enabled_except_suspend(hba))
+		ufshcd_enable_auto_bkops(hba);
+	else
+		/*
+		 * If BKOPs operations are urgently needed at this moment then
+		 * keep auto-bkops enabled or else disable it.
+		 */
+		ufshcd_urgent_bkops(hba);
+
+	hba->clk_gating.is_suspended = false;
+
+	if (ufshcd_is_clkscaling_enabled(hba))
+		devfreq_resume_device(hba->devfreq);
+>>>>>>> common/deprecated/android-3.18
 
 	/* Schedule clock gating in case of no access to UFS device yet */
 	ufshcd_release(hba);
@@ -5905,6 +6886,7 @@ disable_vreg:
 	ufshcd_vreg_set_lpm(hba);
 disable_irq_and_vops_clks:
 	ufshcd_disable_irq(hba);
+<<<<<<< HEAD
 	if (gating_allowed)
 		ufshcd_setup_clocks(hba, false);
 out:
@@ -5913,6 +6895,11 @@ out:
 	if (hba->debug.flag & UFSHCD_DEBUG_LEVEL1)
 		dev_info(hba->dev, "UFS resume done\n");
 
+=======
+	ufshcd_setup_clocks(hba, false);
+out:
+	hba->pm_op_in_progress = 0;
+>>>>>>> common/deprecated/android-3.18
 	return ret;
 }
 
@@ -5972,7 +6959,14 @@ EXPORT_SYMBOL(ufshcd_system_suspend);
 
 int ufshcd_system_resume(struct ufs_hba *hba)
 {
+<<<<<<< HEAD
 	if (!hba || !hba->is_powered || pm_runtime_suspended(hba->dev))
+=======
+	if (!hba)
+		return -EINVAL;
+
+	if (!hba->is_powered || pm_runtime_suspended(hba->dev))
+>>>>>>> common/deprecated/android-3.18
 		/*
 		 * Let the runtime resume take care of resuming
 		 * if runtime suspended.
@@ -5993,7 +6987,14 @@ EXPORT_SYMBOL(ufshcd_system_resume);
  */
 int ufshcd_runtime_suspend(struct ufs_hba *hba)
 {
+<<<<<<< HEAD
 	if (!hba || !hba->is_powered)
+=======
+	if (!hba)
+		return -EINVAL;
+
+	if (!hba->is_powered)
+>>>>>>> common/deprecated/android-3.18
 		return 0;
 
 	return ufshcd_suspend(hba, UFS_RUNTIME_PM);
@@ -6023,10 +7024,20 @@ EXPORT_SYMBOL(ufshcd_runtime_suspend);
  */
 int ufshcd_runtime_resume(struct ufs_hba *hba)
 {
+<<<<<<< HEAD
 	if (!hba || !hba->is_powered)
 		return 0;
 	else
 		return ufshcd_resume(hba, UFS_RUNTIME_PM);
+=======
+	if (!hba)
+		return -EINVAL;
+
+	if (!hba->is_powered)
+		return 0;
+
+	return ufshcd_resume(hba, UFS_RUNTIME_PM);
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL(ufshcd_runtime_resume);
 
@@ -6048,6 +7059,7 @@ int ufshcd_shutdown(struct ufs_hba *hba)
 {
 	int ret = 0;
 
+<<<<<<< HEAD
 	if (ufshcd_is_ufs_dev_poweroff(hba) && ufshcd_is_link_off(hba))
 		goto out;
 
@@ -6056,6 +7068,15 @@ int ufshcd_shutdown(struct ufs_hba *hba)
 		if (ret)
 			goto out;
 	}
+=======
+	if (!hba->is_powered)
+		goto out;
+
+	if (ufshcd_is_ufs_dev_poweroff(hba) && ufshcd_is_link_off(hba))
+		goto out;
+
+	pm_runtime_get_sync(hba->dev);
+>>>>>>> common/deprecated/android-3.18
 
 	ret = ufshcd_suspend(hba, UFS_SHUTDOWN_PM);
 out:
@@ -6066,6 +7087,64 @@ out:
 }
 EXPORT_SYMBOL(ufshcd_shutdown);
 
+<<<<<<< HEAD
+=======
+/*
+ * Values permitted 0, 1, 2.
+ * 0 -> Disable IO latency histograms (default)
+ * 1 -> Enable IO latency histograms
+ * 2 -> Zero out IO latency histograms
+ */
+static ssize_t
+latency_hist_store(struct device *dev, struct device_attribute *attr,
+		   const char *buf, size_t count)
+{
+	struct ufs_hba *hba = dev_get_drvdata(dev);
+	long value;
+
+	if (kstrtol(buf, 0, &value))
+		return -EINVAL;
+	if (value == BLK_IO_LAT_HIST_ZERO) {
+		memset(&hba->io_lat_read, 0, sizeof(hba->io_lat_read));
+		memset(&hba->io_lat_write, 0, sizeof(hba->io_lat_write));
+	} else if (value == BLK_IO_LAT_HIST_ENABLE ||
+		 value == BLK_IO_LAT_HIST_DISABLE)
+		hba->latency_hist_enabled = value;
+	return count;
+}
+
+ssize_t
+latency_hist_show(struct device *dev, struct device_attribute *attr,
+		  char *buf)
+{
+	struct ufs_hba *hba = dev_get_drvdata(dev);
+	size_t written_bytes;
+
+	written_bytes = blk_latency_hist_show("Read", &hba->io_lat_read,
+			buf, PAGE_SIZE);
+	written_bytes += blk_latency_hist_show("Write", &hba->io_lat_write,
+			buf + written_bytes, PAGE_SIZE - written_bytes);
+
+	return written_bytes;
+}
+
+static DEVICE_ATTR(latency_hist, S_IRUGO | S_IWUSR,
+		   latency_hist_show, latency_hist_store);
+
+static void
+ufshcd_init_latency_hist(struct ufs_hba *hba)
+{
+	if (device_create_file(hba->dev, &dev_attr_latency_hist))
+		dev_err(hba->dev, "Failed to create latency_hist sysfs entry\n");
+}
+
+static void
+ufshcd_exit_latency_hist(struct ufs_hba *hba)
+{
+	device_create_file(hba->dev, &dev_attr_latency_hist);
+}
+
+>>>>>>> common/deprecated/android-3.18
 /**
  * ufshcd_remove - de-allocate SCSI host and host memory space
  *		data structure memory
@@ -6081,10 +7160,16 @@ void ufshcd_remove(struct ufs_hba *hba)
 	scsi_host_put(hba->host);
 
 	ufshcd_exit_clk_gating(hba);
+<<<<<<< HEAD
 #if defined(CONFIG_PM_DEVFREQ)
 	if (ufshcd_is_clkscaling_enabled(hba))
 		devfreq_remove_device(hba->devfreq);
 #endif
+=======
+	ufshcd_exit_latency_hist(hba);
+	if (ufshcd_is_clkscaling_enabled(hba))
+		devfreq_remove_device(hba->devfreq);
+>>>>>>> common/deprecated/android-3.18
 	ufshcd_hba_exit(hba);
 }
 EXPORT_SYMBOL_GPL(ufshcd_remove);
@@ -6141,7 +7226,10 @@ out_error:
 }
 EXPORT_SYMBOL(ufshcd_alloc_host);
 
+<<<<<<< HEAD
 #if defined(CONFIG_PM_DEVFREQ)
+=======
+>>>>>>> common/deprecated/android-3.18
 static int ufshcd_scale_clks(struct ufs_hba *hba, bool scale_up)
 {
 	int ret = 0;
@@ -6192,15 +7280,56 @@ static int ufshcd_devfreq_target(struct device *dev,
 {
 	int err = 0;
 	struct ufs_hba *hba = dev_get_drvdata(dev);
+<<<<<<< HEAD
+=======
+	bool release_clk_hold = false;
+	unsigned long irq_flags;
+>>>>>>> common/deprecated/android-3.18
 
 	if (!ufshcd_is_clkscaling_enabled(hba))
 		return -EINVAL;
 
+<<<<<<< HEAD
+=======
+	spin_lock_irqsave(hba->host->host_lock, irq_flags);
+	if (ufshcd_eh_in_progress(hba)) {
+		spin_unlock_irqrestore(hba->host->host_lock, irq_flags);
+		return 0;
+	}
+
+	if (ufshcd_is_clkgating_allowed(hba) &&
+	    (hba->clk_gating.state != CLKS_ON)) {
+		if (cancel_delayed_work(&hba->clk_gating.gate_work)) {
+			/* hold the vote until the scaling work is completed */
+			hba->clk_gating.active_reqs++;
+			release_clk_hold = true;
+			hba->clk_gating.state = CLKS_ON;
+		} else {
+			/*
+			 * Clock gating work seems to be running in parallel
+			 * hence skip scaling work to avoid deadlock between
+			 * current scaling work and gating work.
+			 */
+			spin_unlock_irqrestore(hba->host->host_lock, irq_flags);
+			return 0;
+		}
+	}
+	spin_unlock_irqrestore(hba->host->host_lock, irq_flags);
+
+>>>>>>> common/deprecated/android-3.18
 	if (*freq == UINT_MAX)
 		err = ufshcd_scale_clks(hba, true);
 	else if (*freq == 0)
 		err = ufshcd_scale_clks(hba, false);
 
+<<<<<<< HEAD
+=======
+	spin_lock_irqsave(hba->host->host_lock, irq_flags);
+	if (release_clk_hold)
+		__ufshcd_release(hba);
+	spin_unlock_irqrestore(hba->host->host_lock, irq_flags);
+
+>>>>>>> common/deprecated/android-3.18
 	return err;
 }
 
@@ -6247,7 +7376,10 @@ static struct devfreq_dev_profile ufs_devfreq_profile = {
 	.target		= ufshcd_devfreq_target,
 	.get_dev_status	= ufshcd_devfreq_get_dev_status,
 };
+<<<<<<< HEAD
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 /**
  * ufshcd_init - Driver initialization routine
@@ -6298,11 +7430,14 @@ int ufshcd_init(struct ufs_hba *hba, void __iomem *mmio_base, unsigned int irq)
 		goto out_disable;
 	}
 
+<<<<<<< HEAD
 	/* Skip pre-CI */
 #ifdef CONFIG_SCSI_SKIP_CACHE_OP
 	scsi_dma_set_skip_cpu_sync();
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* Configure LRB */
 	ufshcd_host_memory_configure(hba);
 
@@ -6333,6 +7468,7 @@ int ufshcd_init(struct ufs_hba *hba, void __iomem *mmio_base, unsigned int irq)
 	/* Initialize device management tag acquire wait queue */
 	init_waitqueue_head(&hba->dev_cmd.tag_wq);
 
+<<<<<<< HEAD
 	/* Initialize debug */
 	ufshcd_init_debug(hba);
 
@@ -6342,6 +7478,9 @@ int ufshcd_init(struct ufs_hba *hba, void __iomem *mmio_base, unsigned int irq)
 		goto out_disable;
 	}
 
+=======
+	ufshcd_init_clk_gating(hba);
+>>>>>>> common/deprecated/android-3.18
 	/* IRQ registration */
 	err = devm_request_irq(dev, irq, ufshcd_intr, IRQF_SHARED, UFSHCD, hba);
 	if (err) {
@@ -6364,7 +7503,17 @@ int ufshcd_init(struct ufs_hba *hba, void __iomem *mmio_base, unsigned int irq)
 		goto exit_gating;
 	}
 
+<<<<<<< HEAD
 #if defined(CONFIG_PM_DEVFREQ)
+=======
+	/* Host controller enable */
+	err = ufshcd_hba_enable(hba);
+	if (err) {
+		dev_err(hba->dev, "Host controller enable failed\n");
+		goto out_remove_scsi_host;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	if (ufshcd_is_clkscaling_enabled(hba)) {
 		hba->devfreq = devfreq_add_device(dev, &ufs_devfreq_profile,
 						   "simple_ondemand", NULL);
@@ -6377,29 +7526,48 @@ int ufshcd_init(struct ufs_hba *hba, void __iomem *mmio_base, unsigned int irq)
 		devfreq_suspend_device(hba->devfreq);
 		hba->clk_scaling.window_start_t = 0;
 	}
+<<<<<<< HEAD
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	/* Hold auto suspend until async scan completes */
 	pm_runtime_get_sync(dev);
 
+<<<<<<< HEAD
+=======
+	ufshcd_init_latency_hist(hba);
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * The device-initialize-sequence hasn't been invoked yet.
 	 * Set the device to power-off state
 	 */
 	ufshcd_set_ufs_dev_poweroff(hba);
 
+<<<<<<< HEAD
 	dev_info(hba->dev, "UFS host initialized\n");
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	async_schedule(ufshcd_async_scan, hba);
 
 	return 0;
 
+<<<<<<< HEAD
 #if defined(CONFIG_PM_DEVFREQ)
 out_remove_scsi_host:
 	scsi_remove_host(hba->host);
 #endif
 exit_gating:
 	ufshcd_exit_clk_gating(hba);
+=======
+out_remove_scsi_host:
+	scsi_remove_host(hba->host);
+exit_gating:
+	ufshcd_exit_clk_gating(hba);
+	ufshcd_exit_latency_hist(hba);
+>>>>>>> common/deprecated/android-3.18
 out_disable:
 	hba->is_irq_enabled = false;
 	scsi_host_put(host);

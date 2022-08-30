@@ -1420,6 +1420,12 @@ static int wlanhdr_to_ethhdr(struct recv_frame *precvframe)
 		ptr = recvframe_pull(precvframe, (rmv_len-sizeof(struct ethhdr) + (bsnaphdr ? 2 : 0)));
 	}
 
+<<<<<<< HEAD
+=======
+	if (!ptr)
+		return _FAIL;
+
+>>>>>>> common/deprecated/android-3.18
 	memcpy(ptr, pattrib->dst, ETH_ALEN);
 	memcpy(ptr+ETH_ALEN, pattrib->src, ETH_ALEN);
 

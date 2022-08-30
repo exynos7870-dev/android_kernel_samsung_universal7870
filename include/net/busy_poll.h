@@ -93,7 +93,11 @@ static inline bool sk_busy_loop(struct sock *sk, int nonblock)
 		goto out;
 
 	ops = napi->dev->netdev_ops;
+<<<<<<< HEAD
 	if (!ops->ndo_busy_poll)
+=======
+	if (!ops || !ops->ndo_busy_poll)
+>>>>>>> common/deprecated/android-3.18
 		goto out;
 
 	do {

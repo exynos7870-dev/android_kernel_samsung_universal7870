@@ -310,6 +310,21 @@ int ocfs2_dentry_attach_lock(struct dentry *dentry,
 
 out_attach:
 	spin_lock(&dentry_attach_lock);
+<<<<<<< HEAD
+=======
+	if (unlikely(dentry->d_fsdata && !alias)) {
+		/* d_fsdata is set by a racing thread which is doing
+		 * the same thing as this thread is doing. Leave the racing
+		 * thread going ahead and we return here.
+		 */
+		spin_unlock(&dentry_attach_lock);
+		iput(dl->dl_inode);
+		ocfs2_lock_res_free(&dl->dl_lockres);
+		kfree(dl);
+		return 0;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	dentry->d_fsdata = dl;
 	dl->dl_count++;
 	spin_unlock(&dentry_attach_lock);

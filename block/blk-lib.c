@@ -26,6 +26,7 @@ static void bio_batch_end_io(struct bio *bio, int err)
 	bio_put(bio);
 }
 
+<<<<<<< HEAD
 static struct bio *next_bio(struct bio *bio, unsigned int nr_pages,
 		int type, gfp_t gfp)
 {
@@ -49,6 +50,31 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
 	unsigned int max_discard_sectors, granularity;
 	int alignment;
 	sector_t bs_mask;
+=======
+/**
+ * blkdev_issue_discard - queue a discard
+ * @bdev:	blockdev to issue discard for
+ * @sector:	start sector
+ * @nr_sects:	number of sectors to discard
+ * @gfp_mask:	memory allocation flags (for bio_alloc)
+ * @flags:	BLKDEV_IFL_* flags to control behaviour
+ *
+ * Description:
+ *    Issue a discard request for the sectors in question.
+ */
+int blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+		sector_t nr_sects, gfp_t gfp_mask, unsigned long flags)
+{
+	DECLARE_COMPLETION_ONSTACK(wait);
+	struct request_queue *q = bdev_get_queue(bdev);
+	int type = REQ_WRITE | REQ_DISCARD;
+	unsigned int max_discard_sectors, granularity;
+	int alignment;
+	struct bio_batch bb;
+	struct bio *bio;
+	int ret = 0;
+	struct blk_plug plug;
+>>>>>>> common/deprecated/android-3.18
 
 	if (!q)
 		return -ENXIO;
@@ -56,11 +82,15 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
 	if (!blk_queue_discard(q))
 		return -EOPNOTSUPP;
 
+<<<<<<< HEAD
 	bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
 	if ((sector | nr_sects) & bs_mask)
 		return -EINVAL;
 
 	/* Zero-sector (unknown) and one-sector granularities are the same. */
+=======
+	/* Zero-sector (unknown) and one-sector granularities are the same.  */
+>>>>>>> common/deprecated/android-3.18
 	granularity = max(q->limits.discard_granularity >> 9, 1U);
 	alignment = (bdev_discard_alignment(bdev) >> 9) % granularity;
 
@@ -81,15 +111,35 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
 		type |= REQ_SECURE;
 	}
 
+<<<<<<< HEAD
 	if (flags & BLKDEV_DISCARD_SYNC)
 		type |= REQ_SYNC;
+=======
+	atomic_set(&bb.done, 1);
+	bb.flags = 1 << BIO_UPTODATE;
+	bb.wait = &wait;
+
+	blk_start_plug(&plug);
+>>>>>>> common/deprecated/android-3.18
 	while (nr_sects) {
 		unsigned int req_sects;
 		sector_t end_sect, tmp;
 
+<<<<<<< HEAD
 		req_sects = min_t(sector_t, nr_sects, max_discard_sectors);
 
 		/**
+=======
+		bio = bio_alloc(gfp_mask, 1);
+		if (!bio) {
+			ret = -ENOMEM;
+			break;
+		}
+
+		req_sects = min_t(sector_t, nr_sects, max_discard_sectors);
+
+		/*
+>>>>>>> common/deprecated/android-3.18
 		 * If splitting a request, and the next starting sector would be
 		 * misaligned, stop the discard at the previous aligned sector.
 		 */
@@ -103,14 +153,27 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
 			req_sects = end_sect - sector;
 		}
 
+<<<<<<< HEAD
 		bio = next_bio(bio, 1, type, gfp_mask);
 		bio->bi_iter.bi_sector = sector;
 		bio->bi_bdev = bdev;
+=======
+		bio->bi_iter.bi_sector = sector;
+		bio->bi_end_io = bio_batch_end_io;
+		bio->bi_bdev = bdev;
+		bio->bi_private = &bb;
+>>>>>>> common/deprecated/android-3.18
 
 		bio->bi_iter.bi_size = req_sects << 9;
 		nr_sects -= req_sects;
 		sector = end_sect;
 
+<<<<<<< HEAD
+=======
+		atomic_inc(&bb.done);
+		submit_bio(type, bio);
+
+>>>>>>> common/deprecated/android-3.18
 		/*
 		 * We can loop for a long time in here, if someone does
 		 * full device discards (like mkfs). Be nice and allow
@@ -119,6 +182,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
 		 */
 		cond_resched();
 	}
+<<<<<<< HEAD
 
 	*biop = bio;
 	return 0;
@@ -155,6 +219,17 @@ int blkdev_issue_discard(struct block_device *bdev, sector_t sector,
 	}
 	blk_finish_plug(&plug);
 
+=======
+	blk_finish_plug(&plug);
+
+	/* Wait for bios in-flight */
+	if (!atomic_dec_and_test(&bb.done))
+		wait_for_completion_io(&wait);
+
+	if (!test_bit(BIO_UPTODATE, &bb.flags))
+		ret = -EIO;
+
+>>>>>>> common/deprecated/android-3.18
 	return ret;
 }
 EXPORT_SYMBOL(blkdev_issue_discard);

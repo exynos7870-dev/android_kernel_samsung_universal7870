@@ -152,6 +152,10 @@ static int v9fs_file_do_lock(struct file *filp, int cmd, struct file_lock *fl)
 	uint8_t status;
 	int res = 0;
 	unsigned char fl_type;
+<<<<<<< HEAD
+=======
+	struct v9fs_session_info *v9ses;
+>>>>>>> common/deprecated/android-3.18
 
 	fid = filp->private_data;
 	BUG_ON(fid == NULL);
@@ -187,6 +191,11 @@ static int v9fs_file_do_lock(struct file *filp, int cmd, struct file_lock *fl)
 	if (IS_SETLKW(cmd))
 		flock.flags = P9_LOCK_FLAGS_BLOCK;
 
+<<<<<<< HEAD
+=======
+	v9ses = v9fs_inode2v9ses(file_inode(filp));
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * if its a blocked request and we get P9_LOCK_BLOCKED as the status
 	 * for lock request, keep on trying
@@ -200,7 +209,12 @@ static int v9fs_file_do_lock(struct file *filp, int cmd, struct file_lock *fl)
 			break;
 		if (status == P9_LOCK_BLOCKED && !IS_SETLKW(cmd))
 			break;
+<<<<<<< HEAD
 		if (schedule_timeout_interruptible(P9_LOCK_TIMEOUT) != 0)
+=======
+		if (schedule_timeout_interruptible(v9ses->session_lock_timeout)
+				!= 0)
+>>>>>>> common/deprecated/android-3.18
 			break;
 	}
 
@@ -602,6 +616,10 @@ v9fs_mmap_file_mmap(struct file *filp, struct vm_area_struct *vma)
 	v9inode = V9FS_I(inode);
 	mutex_lock(&v9inode->v_mutex);
 	if (!v9inode->writeback_fid &&
+<<<<<<< HEAD
+=======
+	    (vma->vm_flags & VM_SHARED) &&
+>>>>>>> common/deprecated/android-3.18
 	    (vma->vm_flags & VM_WRITE)) {
 		/*
 		 * clone a fid and add it to writeback_fid
@@ -808,12 +826,23 @@ static void v9fs_mmap_vm_close(struct vm_area_struct *vma)
 	struct writeback_control wbc = {
 		.nr_to_write = LONG_MAX,
 		.sync_mode = WB_SYNC_ALL,
+<<<<<<< HEAD
 		.range_start = vma->vm_pgoff * PAGE_SIZE,
 		 /* absolute end, byte at end included */
 		.range_end = vma->vm_pgoff * PAGE_SIZE +
 			(vma->vm_end - vma->vm_start - 1),
 	};
 
+=======
+		.range_start = (loff_t)vma->vm_pgoff * PAGE_SIZE,
+		 /* absolute end, byte at end included */
+		.range_end = (loff_t)vma->vm_pgoff * PAGE_SIZE +
+			(vma->vm_end - vma->vm_start - 1),
+	};
+
+	if (!(vma->vm_flags & VM_SHARED))
+		return;
+>>>>>>> common/deprecated/android-3.18
 
 	p9_debug(P9_DEBUG_VFS, "9p VMA close, %p, flushing", vma);
 

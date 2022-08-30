@@ -81,7 +81,14 @@ static struct resource code_resource = {
 };
 
 unsigned long memory_start;
+<<<<<<< HEAD
 unsigned long memory_end;
+=======
+EXPORT_SYMBOL(memory_start);
+
+unsigned long memory_end;
+EXPORT_SYMBOL(memory_end);
+>>>>>>> common/deprecated/android-3.18
 
 void __init setup_arch(char **);
 int get_cpuinfo(char *);

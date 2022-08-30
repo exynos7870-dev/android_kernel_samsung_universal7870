@@ -80,7 +80,11 @@ struct raw_sock {
 	struct sock sk;
 	int bound;
 	int ifindex;
+<<<<<<< HEAD
 	struct notifier_block notifier;
+=======
+	struct list_head notifier;
+>>>>>>> common/deprecated/android-3.18
 	int loopback;
 	int recv_own_msgs;
 	int fd_frames;
@@ -90,6 +94,13 @@ struct raw_sock {
 	can_err_mask_t err_mask;
 };
 
+<<<<<<< HEAD
+=======
+static LIST_HEAD(raw_notifier_list);
+static DEFINE_SPINLOCK(raw_notifier_lock);
+static struct raw_sock *raw_busy_notifier;
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Return pointer to store the extra msg flags for raw_recvmsg().
  * We use the space of one unsigned int beyond the 'struct sockaddr_can'
@@ -164,7 +175,11 @@ static int raw_enable_filters(struct net_device *dev, struct sock *sk,
 	for (i = 0; i < count; i++) {
 		err = can_rx_register(dev, filter[i].can_id,
 				      filter[i].can_mask,
+<<<<<<< HEAD
 				      raw_rcv, sk, "raw");
+=======
+				      raw_rcv, sk, "raw", sk);
+>>>>>>> common/deprecated/android-3.18
 		if (err) {
 			/* clean up successfully registered filters */
 			while (--i >= 0)
@@ -185,7 +200,11 @@ static int raw_enable_errfilter(struct net_device *dev, struct sock *sk,
 
 	if (err_mask)
 		err = can_rx_register(dev, 0, err_mask | CAN_ERR_FLAG,
+<<<<<<< HEAD
 				      raw_rcv, sk, "raw");
+=======
+				      raw_rcv, sk, "raw", sk);
+>>>>>>> common/deprecated/android-3.18
 
 	return err;
 }
@@ -234,6 +253,7 @@ static int raw_enable_allfilters(struct net_device *dev, struct sock *sk)
 	return err;
 }
 
+<<<<<<< HEAD
 static int raw_notifier(struct notifier_block *nb,
 			unsigned long msg, void *ptr)
 {
@@ -249,6 +269,18 @@ static int raw_notifier(struct notifier_block *nb,
 
 	if (ro->ifindex != dev->ifindex)
 		return NOTIFY_DONE;
+=======
+static void raw_notify(struct raw_sock *ro, unsigned long msg,
+		       struct net_device *dev)
+{
+	struct sock *sk = &ro->sk;
+
+	if (!net_eq(dev_net(dev), &init_net))
+		return;
+
+	if (ro->ifindex != dev->ifindex)
+		return;
+>>>>>>> common/deprecated/android-3.18
 
 	switch (msg) {
 
@@ -277,7 +309,32 @@ static int raw_notifier(struct notifier_block *nb,
 			sk->sk_error_report(sk);
 		break;
 	}
+<<<<<<< HEAD
 
+=======
+}
+
+static int raw_notifier(struct notifier_block *nb, unsigned long msg,
+			void *ptr)
+{
+	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
+
+	if (dev->type != ARPHRD_CAN)
+		return NOTIFY_DONE;
+	if (msg != NETDEV_UNREGISTER && msg != NETDEV_DOWN)
+		return NOTIFY_DONE;
+	if (unlikely(raw_busy_notifier)) /* Check for reentrant bug. */
+		return NOTIFY_DONE;
+
+	spin_lock(&raw_notifier_lock);
+	list_for_each_entry(raw_busy_notifier, &raw_notifier_list, notifier) {
+		spin_unlock(&raw_notifier_lock);
+		raw_notify(raw_busy_notifier, msg, dev);
+		spin_lock(&raw_notifier_lock);
+	}
+	raw_busy_notifier = NULL;
+	spin_unlock(&raw_notifier_lock);
+>>>>>>> common/deprecated/android-3.18
 	return NOTIFY_DONE;
 }
 
@@ -300,9 +357,15 @@ static int raw_init(struct sock *sk)
 	ro->fd_frames        = 0;
 
 	/* set notifier */
+<<<<<<< HEAD
 	ro->notifier.notifier_call = raw_notifier;
 
 	register_netdevice_notifier(&ro->notifier);
+=======
+	spin_lock(&raw_notifier_lock);
+	list_add_tail(&ro->notifier, &raw_notifier_list);
+	spin_unlock(&raw_notifier_lock);
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }
@@ -317,7 +380,18 @@ static int raw_release(struct socket *sock)
 
 	ro = raw_sk(sk);
 
+<<<<<<< HEAD
 	unregister_netdevice_notifier(&ro->notifier);
+=======
+	spin_lock(&raw_notifier_lock);
+	while (raw_busy_notifier == ro) {
+		spin_unlock(&raw_notifier_lock);
+		schedule_timeout_uninterruptible(1);
+		spin_lock(&raw_notifier_lock);
+	}
+	list_del(&ro->notifier);
+	spin_unlock(&raw_notifier_lock);
+>>>>>>> common/deprecated/android-3.18
 
 	lock_sock(sk);
 
@@ -466,6 +540,12 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
 		if (optlen % sizeof(struct can_filter) != 0)
 			return -EINVAL;
 
+<<<<<<< HEAD
+=======
+		if (optlen > CAN_RAW_FILTER_MAX * sizeof(struct can_filter))
+			return -EINVAL;
+
+>>>>>>> common/deprecated/android-3.18
 		count = optlen / sizeof(struct can_filter);
 
 		if (count > 1) {
@@ -806,6 +886,13 @@ static const struct can_proto raw_can_proto = {
 	.prot       = &raw_proto,
 };
 
+<<<<<<< HEAD
+=======
+static struct notifier_block canraw_notifier = {
+	.notifier_call = raw_notifier
+};
+
+>>>>>>> common/deprecated/android-3.18
 static __init int raw_module_init(void)
 {
 	int err;
@@ -815,6 +902,11 @@ static __init int raw_module_init(void)
 	err = can_proto_register(&raw_can_proto);
 	if (err < 0)
 		printk(KERN_ERR "can: registration of raw protocol failed\n");
+<<<<<<< HEAD
+=======
+	else
+		register_netdevice_notifier(&canraw_notifier);
+>>>>>>> common/deprecated/android-3.18
 
 	return err;
 }
@@ -822,6 +914,10 @@ static __init int raw_module_init(void)
 static __exit void raw_module_exit(void)
 {
 	can_proto_unregister(&raw_can_proto);
+<<<<<<< HEAD
+=======
+	unregister_netdevice_notifier(&canraw_notifier);
+>>>>>>> common/deprecated/android-3.18
 }
 
 module_init(raw_module_init);

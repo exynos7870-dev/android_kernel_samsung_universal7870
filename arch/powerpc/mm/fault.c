@@ -294,7 +294,11 @@ int __kprobes do_page_fault(struct pt_regs *regs, unsigned long address,
 	 * can result in fault, which will cause a deadlock when called with
 	 * mmap_sem held
 	 */
+<<<<<<< HEAD
 	if (user_mode(regs))
+=======
+	if (!is_exec && user_mode(regs))
+>>>>>>> common/deprecated/android-3.18
 		store_update_sp = store_updates_sp(regs);
 
 	if (user_mode(regs))

@@ -52,10 +52,13 @@ enum vm_event_item { PGPGIN, PGPGOUT, PSWPIN, PSWPOUT,
 		COMPACTMIGRATE_SCANNED, COMPACTFREE_SCANNED,
 		COMPACTISOLATED,
 		COMPACTSTALL, COMPACTFAIL, COMPACTSUCCESS,
+<<<<<<< HEAD
 #ifdef CONFIG_SEC_PHCOMP		
 		COMPACTDEFERED, COMPACTCALLDEFER,
 		PHCOMPDEFERED, PHCOMPCALLDEFER,
 #endif		
+=======
+>>>>>>> common/deprecated/android-3.18
 #endif
 #ifdef CONFIG_HUGETLB_PAGE
 		HTLB_BUDDY_PGALLOC, HTLB_BUDDY_PGALLOC_FAIL,
@@ -84,10 +87,15 @@ enum vm_event_item { PGPGIN, PGPGOUT, PSWPIN, PSWPOUT,
 #endif
 #endif
 #ifdef CONFIG_DEBUG_TLBFLUSH
+<<<<<<< HEAD
 #ifdef CONFIG_SMP
 		NR_TLB_REMOTE_FLUSH,	/* cpu tried to flush others' tlbs */
 		NR_TLB_REMOTE_FLUSH_RECEIVED,/* cpu received ipi for flush */
 #endif /* CONFIG_SMP */
+=======
+		NR_TLB_REMOTE_FLUSH,	/* cpu tried to flush others' tlbs */
+		NR_TLB_REMOTE_FLUSH_RECEIVED,/* cpu received ipi for flush */
+>>>>>>> common/deprecated/android-3.18
 		NR_TLB_LOCAL_FLUSH_ALL,
 		NR_TLB_LOCAL_FLUSH_ONE,
 #endif /* CONFIG_DEBUG_TLBFLUSH */

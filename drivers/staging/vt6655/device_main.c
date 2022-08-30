@@ -1340,6 +1340,13 @@ static int device_rx_srv(struct vnt_private *pDevice, unsigned int uIdx)
 	     pRD = pRD->next) {
 		if (works++ > 15)
 			break;
+<<<<<<< HEAD
+=======
+
+		if (!pRD->pRDInfo->skb)
+			break;
+
+>>>>>>> common/deprecated/android-3.18
 		if (device_receive_frame(pDevice, pRD)) {
 			if (!device_alloc_rx_buf(pDevice, pRD)) {
 				dev_err(&pDevice->pcid->dev,
@@ -2814,11 +2821,21 @@ static int  device_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 		pr_debug(" SIOCSIWSENS\n");
 		rc = -EOPNOTSUPP;
 		break;
+<<<<<<< HEAD
 
 	case SIOCGIWAPLIST: {
 		char buffer[IW_MAX_AP * (sizeof(struct sockaddr) + sizeof(struct iw_quality))];
 
 		if (wrq->u.data.pointer) {
+=======
+	case SIOCGIWAPLIST: {
+		char *buffer = kzalloc(IW_MAX_AP * (sizeof(struct sockaddr) +
+				       sizeof(struct iw_quality)), GFP_KERNEL);
+
+		if (!buffer) {
+			rc = -ENOMEM;
+		} else if (wrq->u.data.pointer) {
+>>>>>>> common/deprecated/android-3.18
 			rc = iwctl_giwaplist(dev, NULL, &(wrq->u.data), buffer);
 			if (rc == 0) {
 				if (copy_to_user(wrq->u.data.pointer,
@@ -2828,6 +2845,10 @@ static int  device_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 					rc = -EFAULT;
 			}
 		}
+<<<<<<< HEAD
+=======
+		kfree(buffer);
+>>>>>>> common/deprecated/android-3.18
 	}
 	break;
 
@@ -2874,7 +2895,10 @@ static int  device_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 		pr_debug(" SIOCGIWGENIE\n");
 		rc = iwctl_giwgenie(dev, NULL, &(wrq->u.data), wrq->u.data.pointer);
 		break;
+<<<<<<< HEAD
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	case SIOCSIWENCODEEXT: {
 		char extra[sizeof(struct iw_encode_ext)+MAX_KEY_LEN+1];
 

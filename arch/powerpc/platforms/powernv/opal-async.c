@@ -39,18 +39,30 @@ int __opal_async_get_token(void)
 	int token;
 
 	spin_lock_irqsave(&opal_async_comp_lock, flags);
+<<<<<<< HEAD
 	token = find_first_bit(opal_async_complete_map, opal_max_async_tokens);
+=======
+	token = find_first_zero_bit(opal_async_token_map, opal_max_async_tokens);
+>>>>>>> common/deprecated/android-3.18
 	if (token >= opal_max_async_tokens) {
 		token = -EBUSY;
 		goto out;
 	}
 
+<<<<<<< HEAD
 	if (__test_and_set_bit(token, opal_async_token_map)) {
+=======
+	if (!__test_and_clear_bit(token, opal_async_complete_map)) {
+>>>>>>> common/deprecated/android-3.18
 		token = -EBUSY;
 		goto out;
 	}
 
+<<<<<<< HEAD
 	__clear_bit(token, opal_async_complete_map);
+=======
+	__set_bit(token, opal_async_token_map);
+>>>>>>> common/deprecated/android-3.18
 
 out:
 	spin_unlock_irqrestore(&opal_async_comp_lock, flags);

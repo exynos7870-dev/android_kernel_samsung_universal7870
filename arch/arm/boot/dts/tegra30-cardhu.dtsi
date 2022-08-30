@@ -200,6 +200,10 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <0x70>;
+<<<<<<< HEAD
+=======
+			reset-gpio = <&gpio TEGRA_GPIO(BB, 0) GPIO_ACTIVE_LOW>;
+>>>>>>> common/deprecated/android-3.18
 		};
 	};
 

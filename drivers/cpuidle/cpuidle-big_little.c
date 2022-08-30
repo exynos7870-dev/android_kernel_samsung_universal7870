@@ -175,6 +175,10 @@ static int __init bl_idle_init(void)
 {
 	int ret;
 	struct device_node *root = of_find_node_by_path("/");
+<<<<<<< HEAD
+=======
+	const struct of_device_id *match_id;
+>>>>>>> common/deprecated/android-3.18
 
 	if (!root)
 		return -ENODEV;
@@ -182,7 +186,15 @@ static int __init bl_idle_init(void)
 	/*
 	 * Initialize the driver just for a compliant set of machines
 	 */
+<<<<<<< HEAD
 	if (!of_match_node(compatible_machine_match, root))
+=======
+	match_id = of_match_node(compatible_machine_match, root);
+
+	of_node_put(root);
+
+	if (!match_id)
+>>>>>>> common/deprecated/android-3.18
 		return -ENODEV;
 	/*
 	 * For now the differentiation between little and big cores

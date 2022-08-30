@@ -229,6 +229,11 @@ static int pcd_block_open(struct block_device *bdev, fmode_t mode)
 	struct pcd_unit *cd = bdev->bd_disk->private_data;
 	int ret;
 
+<<<<<<< HEAD
+=======
+	check_disk_change(bdev);
+
+>>>>>>> common/deprecated/android-3.18
 	mutex_lock(&pcd_mutex);
 	ret = cdrom_open(&cd->info, bdev, mode);
 	mutex_unlock(&pcd_mutex);

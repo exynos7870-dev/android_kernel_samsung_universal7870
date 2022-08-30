@@ -21,6 +21,10 @@
 #include <asm/setup.h>
 #include <asm/apic.h>
 #include <asm/param.h>
+<<<<<<< HEAD
+=======
+#include <asm/tsc.h>
+>>>>>>> common/deprecated/android-3.18
 
 /* CPU reference clock frequency: in KHz */
 #define FREQ_83		83200
@@ -92,7 +96,11 @@ unsigned long try_msr_calibrate_tsc(void)
 
 	if (freq_desc_tables[cpu_index].msr_plat) {
 		rdmsr(MSR_PLATFORM_INFO, lo, hi);
+<<<<<<< HEAD
 		ratio = (lo >> 8) & 0x1f;
+=======
+		ratio = (lo >> 8) & 0xff;
+>>>>>>> common/deprecated/android-3.18
 	} else {
 		rdmsr(MSR_IA32_PERF_STATUS, lo, hi);
 		ratio = (hi >> 8) & 0x1f;

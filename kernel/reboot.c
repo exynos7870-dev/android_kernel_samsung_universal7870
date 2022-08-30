@@ -43,7 +43,10 @@ int reboot_default = 1;
 int reboot_cpu;
 enum reboot_type reboot_type = BOOT_ACPI;
 int reboot_force;
+<<<<<<< HEAD
 int ignore_fs_panic = 0; // To prevent kernel panic by EIO during shutdown
+=======
+>>>>>>> common/deprecated/android-3.18
 
 /*
  * If set, this is used for preparing the system to power off.
@@ -70,6 +73,7 @@ void kernel_restart_prepare(char *cmd)
 {
 	blocking_notifier_call_chain(&reboot_notifier_list, SYS_RESTART, cmd);
 	system_state = SYSTEM_RESTART;
+<<<<<<< HEAD
 
 	/* user process should be freezed before device shutdown */
 	events_check_enabled = false;
@@ -77,6 +81,9 @@ void kernel_restart_prepare(char *cmd)
 
 	usermodehelper_disable();
 	ignore_fs_panic = 1;
+=======
+	usermodehelper_disable();
+>>>>>>> common/deprecated/android-3.18
 	device_shutdown();
 }
 
@@ -237,6 +244,7 @@ static void kernel_shutdown_prepare(enum system_states state)
 	blocking_notifier_call_chain(&reboot_notifier_list,
 		(state == SYSTEM_HALT) ? SYS_HALT : SYS_POWER_OFF, NULL);
 	system_state = state;
+<<<<<<< HEAD
 
 	/* user process should be freezed before device shutdown */
 	events_check_enabled = false;
@@ -244,6 +252,9 @@ static void kernel_shutdown_prepare(enum system_states state)
 
 	usermodehelper_disable();
 	ignore_fs_panic = 1;
+=======
+	usermodehelper_disable();
+>>>>>>> common/deprecated/android-3.18
 	device_shutdown();
 }
 /**
@@ -482,6 +493,7 @@ static int __init reboot_setup(char *str)
 			break;
 
 		case 's':
+<<<<<<< HEAD
 		{
 			int rc;
 
@@ -498,6 +510,24 @@ static int __init reboot_setup(char *str)
 				reboot_mode = REBOOT_SOFT;
 			break;
 		}
+=======
+			if (isdigit(*(str+1)))
+				reboot_cpu = simple_strtoul(str+1, NULL, 0);
+			else if (str[1] == 'm' && str[2] == 'p' &&
+							isdigit(*(str+3)))
+				reboot_cpu = simple_strtoul(str+3, NULL, 0);
+			else
+				reboot_mode = REBOOT_SOFT;
+			if (reboot_cpu >= num_possible_cpus()) {
+				pr_err("Ignoring the CPU number in reboot= option. "
+				       "CPU %d exceeds possible cpu number %d\n",
+				       reboot_cpu, num_possible_cpus());
+				reboot_cpu = 0;
+				break;
+			}
+			break;
+
+>>>>>>> common/deprecated/android-3.18
 		case 'g':
 			reboot_mode = REBOOT_GPIO;
 			break;

@@ -124,6 +124,10 @@ struct snd_usb_substream {
 	unsigned int txfr_quirk:1;	/* allow sub-frame alignment */
 	unsigned int fmt_type;		/* USB audio format type (1-3) */
 	unsigned int pkt_offset_adj;	/* Bytes to drop from beginning of packets (for non-compliant devices) */
+<<<<<<< HEAD
+=======
+	unsigned int stream_offset_adj;	/* Bytes to drop from beginning of stream (for non-compliant devices) */
+>>>>>>> common/deprecated/android-3.18
 
 	unsigned int running: 1;	/* running status */
 

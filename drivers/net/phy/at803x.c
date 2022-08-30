@@ -105,7 +105,11 @@ static int at803x_set_wol(struct phy_device *phydev,
 		mac = (const u8 *) ndev->dev_addr;
 
 		if (!is_valid_ether_addr(mac))
+<<<<<<< HEAD
 			return -EFAULT;
+=======
+			return -EINVAL;
+>>>>>>> common/deprecated/android-3.18
 
 		for (i = 0; i < 3; i++) {
 			phy_write(phydev, AT803X_MMD_ACCESS_CONTROL,

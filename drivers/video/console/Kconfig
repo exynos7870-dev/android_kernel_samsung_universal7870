@@ -22,6 +22,7 @@ config VGA_CONSOLE
 
 	  Say Y.
 
+<<<<<<< HEAD
 config VGACON_SOFT_SCROLLBACK
        bool "Enable Scrollback Buffer in System RAM"
        depends on VGA_CONSOLE
@@ -47,6 +48,8 @@ config VGACON_SOFT_SCROLLBACK_SIZE
 	 buffer.  Each 64KB will give you approximately 16 80x25
 	 screenfuls of scrollback buffer
 
+=======
+>>>>>>> common/deprecated/android-3.18
 config MDA_CONSOLE
 	depends on !M68K && !PARISC && ISA
 	tristate "MDA text console (dual-headed)"

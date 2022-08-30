@@ -16,9 +16,15 @@
 
 	.text
 	.align 4
+<<<<<<< HEAD
 	.globl setjmp
 	.type setjmp, @function
 setjmp:
+=======
+	.globl kernel_setjmp
+	.type kernel_setjmp, @function
+kernel_setjmp:
+>>>>>>> common/deprecated/android-3.18
 #ifdef _REGPARM
 	movl %eax,%edx
 #else
@@ -35,6 +41,7 @@ setjmp:
 	movl %ecx,20(%edx)		# Return address
 	ret
 
+<<<<<<< HEAD
 	.size setjmp,.-setjmp
 
 	.text
@@ -42,6 +49,15 @@ setjmp:
 	.globl longjmp
 	.type longjmp, @function
 longjmp:
+=======
+	.size kernel_setjmp,.-kernel_setjmp
+
+	.text
+	.align 4
+	.globl kernel_longjmp
+	.type kernel_longjmp, @function
+kernel_longjmp:
+>>>>>>> common/deprecated/android-3.18
 #ifdef _REGPARM
 	xchgl %eax,%edx
 #else
@@ -55,4 +71,8 @@ longjmp:
 	movl 16(%edx),%edi
 	jmp *20(%edx)
 
+<<<<<<< HEAD
 	.size longjmp,.-longjmp
+=======
+	.size kernel_longjmp,.-kernel_longjmp
+>>>>>>> common/deprecated/android-3.18

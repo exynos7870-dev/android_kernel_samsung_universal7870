@@ -26,10 +26,15 @@
 #ifdef VERBOSE
 #define VDBG(fmt, args...) pr_debug("[%s]  " fmt , \
 				 __func__, ## args)
+<<<<<<< HEAD
 /*
 #else
 #define VDBG(stuff...)	do {} while (0)
 */
+=======
+#else
+#define VDBG(stuff...)	do {} while (0)
+>>>>>>> common/deprecated/android-3.18
 #endif
 
 #ifdef VERBOSE
@@ -61,8 +66,11 @@ enum otg_fsm_timer {
 
 /* OTG state machine according to the OTG spec */
 struct otg_fsm {
+<<<<<<< HEAD
 	int reset;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* Input */
 	int id;
 	int adp_change;

@@ -180,12 +180,24 @@ static SIMPLE_DEV_PM_OPS(twl4030_vibra_pm_ops,
 			 twl4030_vibra_suspend, twl4030_vibra_resume);
 
 static bool twl4030_vibra_check_coexist(struct twl4030_vibra_data *pdata,
+<<<<<<< HEAD
 			      struct device_node *node)
 {
 	if (pdata && pdata->coexist)
 		return true;
 
 	if (of_find_node_by_name(node, "codec")) {
+=======
+			      struct device_node *parent)
+{
+	struct device_node *node;
+
+	if (pdata && pdata->coexist)
+		return true;
+
+	node = of_get_child_by_name(parent, "codec");
+	if (node) {
+>>>>>>> common/deprecated/android-3.18
 		of_node_put(node);
 		return true;
 	}

@@ -610,8 +610,13 @@ err_out_regions:
 #ifdef CONFIG_PCI
 	if (pdev)
 		pci_release_regions(pdev);
+<<<<<<< HEAD
 #endif
 err_out:
+=======
+err_out:
+#endif
+>>>>>>> common/deprecated/android-3.18
 	if (pdev)
 		pci_disable_device(pdev);
 	return rc;

@@ -183,7 +183,11 @@ static int pie_change(struct Qdisc *sch, struct nlattr *opt)
 {
 	struct pie_sched_data *q = qdisc_priv(sch);
 	struct nlattr *tb[TCA_PIE_MAX + 1];
+<<<<<<< HEAD
 	unsigned int qlen;
+=======
+	unsigned int qlen, dropped = 0;
+>>>>>>> common/deprecated/android-3.18
 	int err;
 
 	if (!opt)
@@ -232,10 +236,18 @@ static int pie_change(struct Qdisc *sch, struct nlattr *opt)
 	while (sch->q.qlen > sch->limit) {
 		struct sk_buff *skb = __skb_dequeue(&sch->q);
 
+<<<<<<< HEAD
 		qdisc_qstats_backlog_dec(sch, skb);
 		qdisc_drop(skb, sch);
 	}
 	qdisc_tree_decrease_qlen(sch, qlen - sch->q.qlen);
+=======
+		dropped += qdisc_pkt_len(skb);
+		qdisc_qstats_backlog_dec(sch, skb);
+		qdisc_drop(skb, sch);
+	}
+	qdisc_tree_reduce_backlog(sch, qlen - sch->q.qlen, dropped);
+>>>>>>> common/deprecated/android-3.18
 
 	sch_tree_unlock(sch);
 	return 0;

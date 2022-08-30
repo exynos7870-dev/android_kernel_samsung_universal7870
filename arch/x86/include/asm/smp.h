@@ -21,6 +21,7 @@
 extern int smp_num_siblings;
 extern unsigned int num_processors;
 
+<<<<<<< HEAD
 static inline bool cpu_has_ht_siblings(void)
 {
 	bool has_siblings = false;
@@ -30,6 +31,8 @@ static inline bool cpu_has_ht_siblings(void)
 	return has_siblings;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 DECLARE_PER_CPU_READ_MOSTLY(cpumask_var_t, cpu_sibling_map);
 DECLARE_PER_CPU_READ_MOSTLY(cpumask_var_t, cpu_core_map);
 /* cpus sharing the last level cache: */

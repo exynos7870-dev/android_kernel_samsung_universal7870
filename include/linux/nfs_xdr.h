@@ -1132,7 +1132,11 @@ struct nfs41_state_protection {
 	struct nfs4_op_map allow;
 };
 
+<<<<<<< HEAD
 #define NFS4_EXCHANGE_ID_LEN	(48)
+=======
+#define NFS4_EXCHANGE_ID_LEN	(127)
+>>>>>>> common/deprecated/android-3.18
 struct nfs41_exchange_id_args {
 	struct nfs_client		*client;
 	nfs4_verifier			*verifier;

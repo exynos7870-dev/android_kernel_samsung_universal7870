@@ -170,7 +170,11 @@ static struct platform_device rtc_device = {
 static __init int add_rtc_cmos(void)
 {
 #ifdef CONFIG_PNP
+<<<<<<< HEAD
 	static const char * const  const ids[] __initconst =
+=======
+	static const char * const ids[] __initconst =
+>>>>>>> common/deprecated/android-3.18
 	    { "PNP0b00", "PNP0b01", "PNP0b02", };
 	struct pnp_dev *dev;
 	struct pnp_id *id;

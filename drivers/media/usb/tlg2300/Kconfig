@@ -1,6 +1,10 @@
 config VIDEO_TLG2300
 	tristate "Telegent TLG2300 USB video capture support"
 	depends on VIDEO_DEV && I2C && SND && DVB_CORE
+<<<<<<< HEAD
+=======
+	depends on BROKEN
+>>>>>>> common/deprecated/android-3.18
 	select VIDEO_TUNER
 	select VIDEO_TVEEPROM
 	depends on RC_CORE

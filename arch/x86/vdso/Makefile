@@ -199,10 +199,18 @@ vdso_img_insttargets := $(vdso_img_sodbg:%.dbg=install_%)
 $(MODLIB)/vdso: FORCE
 	@mkdir -p $(MODLIB)/vdso
 
+<<<<<<< HEAD
 $(vdso_img_insttargets): install_%: $(obj)/%.dbg $(MODLIB)/vdso FORCE
 	$(call cmd,vdso_install)
 
 PHONY += vdso_install $(vdso_img_insttargets)
 vdso_install: $(vdso_img_insttargets) FORCE
+=======
+$(vdso_img_insttargets): install_%: $(obj)/%.dbg $(MODLIB)/vdso
+	$(call cmd,vdso_install)
+
+PHONY += vdso_install $(vdso_img_insttargets)
+vdso_install: $(vdso_img_insttargets)
+>>>>>>> common/deprecated/android-3.18
 
 clean-files := vdso32-syscall* vdso32-sysenter* vdso32-int80*

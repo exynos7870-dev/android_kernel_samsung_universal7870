@@ -77,6 +77,9 @@ endif #IIO_TRIGGER
 source "drivers/iio/pressure/Kconfig"
 source "drivers/iio/proximity/Kconfig"
 source "drivers/iio/temperature/Kconfig"
+<<<<<<< HEAD
 source "drivers/iio/inv_test/Kconfig"
+=======
+>>>>>>> common/deprecated/android-3.18
 
 endif # IIO

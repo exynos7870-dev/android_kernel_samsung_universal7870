@@ -209,8 +209,12 @@ static struct fb_videomode known_lcd_panels[] = {
 		.lower_margin   = 2,
 		.hsync_len      = 0,
 		.vsync_len      = 0,
+<<<<<<< HEAD
 		.sync           = FB_SYNC_CLK_INVERT |
 			FB_SYNC_HOR_HIGH_ACT | FB_SYNC_VERT_HIGH_ACT,
+=======
+		.sync           = FB_SYNC_CLK_INVERT,
+>>>>>>> common/deprecated/android-3.18
 	},
 	/* Sharp LK043T1DG01 */
 	[1] = {
@@ -224,7 +228,11 @@ static struct fb_videomode known_lcd_panels[] = {
 		.lower_margin   = 2,
 		.hsync_len      = 41,
 		.vsync_len      = 10,
+<<<<<<< HEAD
 		.sync           = FB_SYNC_HOR_HIGH_ACT | FB_SYNC_VERT_HIGH_ACT,
+=======
+		.sync           = 0,
+>>>>>>> common/deprecated/android-3.18
 		.flag           = 0,
 	},
 	[2] = {
@@ -239,7 +247,11 @@ static struct fb_videomode known_lcd_panels[] = {
 		.lower_margin   = 10,
 		.hsync_len      = 10,
 		.vsync_len      = 10,
+<<<<<<< HEAD
 		.sync           = FB_SYNC_HOR_HIGH_ACT | FB_SYNC_VERT_HIGH_ACT,
+=======
+		.sync           = 0,
+>>>>>>> common/deprecated/android-3.18
 		.flag           = 0,
 	},
 	[3] = {

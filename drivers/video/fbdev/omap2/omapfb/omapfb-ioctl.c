@@ -493,6 +493,12 @@ static int omapfb_memory_read(struct fb_info *fbi,
 	if (!access_ok(VERIFY_WRITE, mr->buffer, mr->buffer_size))
 		return -EFAULT;
 
+<<<<<<< HEAD
+=======
+	if (mr->w > 4096 || mr->h > 4096)
+		return -EINVAL;
+
+>>>>>>> common/deprecated/android-3.18
 	if (mr->w * mr->h * 3 > mr->buffer_size)
 		return -EINVAL;
 
@@ -506,7 +512,11 @@ static int omapfb_memory_read(struct fb_info *fbi,
 			mr->x, mr->y, mr->w, mr->h);
 
 	if (r > 0) {
+<<<<<<< HEAD
 		if (copy_to_user(mr->buffer, buf, mr->buffer_size))
+=======
+		if (copy_to_user(mr->buffer, buf, r))
+>>>>>>> common/deprecated/android-3.18
 			r = -EFAULT;
 	}
 
@@ -603,6 +613,11 @@ int omapfb_ioctl(struct fb_info *fbi, unsigned int cmd, unsigned long arg)
 
 	int r = 0;
 
+<<<<<<< HEAD
+=======
+	memset(&p, 0, sizeof(p));
+
+>>>>>>> common/deprecated/android-3.18
 	switch (cmd) {
 	case OMAPFB_SYNC_GFX:
 		DBG("ioctl SYNC_GFX\n");

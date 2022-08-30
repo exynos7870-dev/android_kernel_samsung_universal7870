@@ -1621,9 +1621,24 @@ void dasd_int_handler(struct ccw_device *cdev, unsigned long intparm,
 	unsigned long long now;
 	int expires;
 
+<<<<<<< HEAD
 	if (IS_ERR(irb)) {
 		switch (PTR_ERR(irb)) {
 		case -EIO:
+=======
+	cqr = (struct dasd_ccw_req *) intparm;
+	if (IS_ERR(irb)) {
+		switch (PTR_ERR(irb)) {
+		case -EIO:
+			if (cqr && cqr->status == DASD_CQR_CLEAR_PENDING) {
+				device = (struct dasd_device *) cqr->startdev;
+				cqr->status = DASD_CQR_CLEARED;
+				dasd_device_clear_timer(device);
+				wake_up(&dasd_flush_wq);
+				dasd_schedule_device_bh(device);
+				return;
+			}
+>>>>>>> common/deprecated/android-3.18
 			break;
 		case -ETIMEDOUT:
 			DBF_EVENT_DEVID(DBF_WARNING, cdev, "%s: "
@@ -1639,7 +1654,10 @@ void dasd_int_handler(struct ccw_device *cdev, unsigned long intparm,
 	}
 
 	now = get_tod_clock();
+<<<<<<< HEAD
 	cqr = (struct dasd_ccw_req *) intparm;
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* check for conditions that should be handled immediately */
 	if (!cqr ||
 	    !(scsw_dstat(&irb->scsw) == (DEV_STAT_CHN_END | DEV_STAT_DEV_END) &&
@@ -1664,8 +1682,16 @@ void dasd_int_handler(struct ccw_device *cdev, unsigned long intparm,
 	/* check for for attention message */
 	if (scsw_dstat(&irb->scsw) & DEV_STAT_ATTENTION) {
 		device = dasd_device_from_cdev_locked(cdev);
+<<<<<<< HEAD
 		device->discipline->check_attention(device, irb->esw.esw1.lpum);
 		dasd_put_device(device);
+=======
+		if (!IS_ERR(device)) {
+			device->discipline->check_attention(device,
+							    irb->esw.esw1.lpum);
+			dasd_put_device(device);
+		}
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (!cqr)

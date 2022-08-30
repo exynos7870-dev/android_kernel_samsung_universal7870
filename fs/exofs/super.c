@@ -100,6 +100,10 @@ static int parse_options(char *options, struct exofs_mountopt *opts)
 		token = match_token(p, tokens, args);
 		switch (token) {
 		case Opt_name:
+<<<<<<< HEAD
+=======
+			kfree(opts->dev_name);
+>>>>>>> common/deprecated/android-3.18
 			opts->dev_name = match_strdup(&args[0]);
 			if (unlikely(!opts->dev_name)) {
 				EXOFS_ERR("Error allocating dev_name");
@@ -868,8 +872,15 @@ static struct dentry *exofs_mount(struct file_system_type *type,
 	int ret;
 
 	ret = parse_options(data, &opts);
+<<<<<<< HEAD
 	if (ret)
 		return ERR_PTR(ret);
+=======
+	if (ret) {
+		kfree(opts.dev_name);
+		return ERR_PTR(ret);
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	if (!opts.dev_name)
 		opts.dev_name = dev_name;

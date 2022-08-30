@@ -180,7 +180,12 @@ static int sdhci_acpi_sd_probe_slot(struct platform_device *pdev,
 static const struct sdhci_acpi_slot sdhci_acpi_slot_int_emmc = {
 	.chip    = &sdhci_acpi_chip_int,
 	.caps    = MMC_CAP_8_BIT_DATA | MMC_CAP_NONREMOVABLE |
+<<<<<<< HEAD
 		   MMC_CAP_HW_RESET | MMC_CAP_1_8V_DDR,
+=======
+		   MMC_CAP_HW_RESET | MMC_CAP_1_8V_DDR |
+		   MMC_CAP_WAIT_WHILE_BUSY,
+>>>>>>> common/deprecated/android-3.18
 	.caps2   = MMC_CAP2_HC_ERASE_SZ,
 	.flags   = SDHCI_ACPI_RUNTIME_PM,
 	.quirks2 = SDHCI_QUIRK2_PRESET_VALUE_BROKEN | SDHCI_QUIRK2_STOP_WITH_TC,
@@ -190,7 +195,12 @@ static const struct sdhci_acpi_slot sdhci_acpi_slot_int_emmc = {
 static const struct sdhci_acpi_slot sdhci_acpi_slot_int_sdio = {
 	.quirks  = SDHCI_QUIRK_BROKEN_CARD_DETECTION,
 	.quirks2 = SDHCI_QUIRK2_HOST_OFF_CARD_ON,
+<<<<<<< HEAD
 	.caps    = MMC_CAP_NONREMOVABLE | MMC_CAP_POWER_OFF_CARD,
+=======
+	.caps    = MMC_CAP_NONREMOVABLE | MMC_CAP_POWER_OFF_CARD |
+		   MMC_CAP_WAIT_WHILE_BUSY,
+>>>>>>> common/deprecated/android-3.18
 	.flags   = SDHCI_ACPI_RUNTIME_PM,
 	.pm_caps = MMC_PM_KEEP_POWER,
 	.probe_slot	= sdhci_acpi_sdio_probe_slot,
@@ -201,6 +211,10 @@ static const struct sdhci_acpi_slot sdhci_acpi_slot_int_sd = {
 		   SDHCI_ACPI_RUNTIME_PM,
 	.quirks2 = SDHCI_QUIRK2_CARD_ON_NEEDS_BUS_ON |
 		   SDHCI_QUIRK2_STOP_WITH_TC,
+<<<<<<< HEAD
+=======
+	.caps    = MMC_CAP_WAIT_WHILE_BUSY,
+>>>>>>> common/deprecated/android-3.18
 	.probe_slot	= sdhci_acpi_sd_probe_slot,
 };
 

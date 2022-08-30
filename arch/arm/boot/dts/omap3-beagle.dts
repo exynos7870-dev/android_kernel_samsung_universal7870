@@ -176,7 +176,11 @@
 
 	tfp410_pins: pinmux_tfp410_pins {
 		pinctrl-single,pins = <
+<<<<<<< HEAD
 			0x194 (PIN_OUTPUT | MUX_MODE4)	/* hdq_sio.gpio_170 */
+=======
+			0x196 (PIN_OUTPUT | MUX_MODE4)	/* hdq_sio.gpio_170 */
+>>>>>>> common/deprecated/android-3.18
 		>;
 	};
 

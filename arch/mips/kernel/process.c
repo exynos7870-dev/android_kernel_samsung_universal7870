@@ -87,7 +87,10 @@ int copy_thread(unsigned long clone_flags, unsigned long usp,
 	struct thread_info *ti = task_thread_info(p);
 	struct pt_regs *childregs, *regs = current_pt_regs();
 	unsigned long childksp;
+<<<<<<< HEAD
 	p->set_child_tid = p->clear_child_tid = NULL;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	childksp = (unsigned long)task_stack_page(p) + THREAD_SIZE - 32;
 
@@ -437,7 +440,11 @@ unsigned long notrace unwind_stack_by_address(unsigned long stack_page,
 		    *sp + sizeof(*regs) <= stack_page + THREAD_SIZE - 32) {
 			regs = (struct pt_regs *)*sp;
 			pc = regs->cp0_epc;
+<<<<<<< HEAD
 			if (__kernel_text_address(pc)) {
+=======
+			if (!user_mode(regs) && __kernel_text_address(pc)) {
+>>>>>>> common/deprecated/android-3.18
 				*sp = regs->regs[29];
 				*ra = regs->regs[31];
 				return pc;

@@ -452,7 +452,12 @@ static int cxusb_rc_query(struct dvb_usb_device *d, u32 *event, int *state)
 	u8 ircode[4];
 	int i;
 
+<<<<<<< HEAD
 	cxusb_ctrl_msg(d, CMD_GET_IR_CODE, NULL, 0, ircode, 4);
+=======
+	if (cxusb_ctrl_msg(d, CMD_GET_IR_CODE, NULL, 0, ircode, 4) < 0)
+		return 0;
+>>>>>>> common/deprecated/android-3.18
 
 	*event = 0;
 	*state = REMOTE_NO_KEY_PRESSED;
@@ -923,6 +928,11 @@ static int dvico_bluebird_xc2028_callback(void *ptr, int component,
 	case XC2028_RESET_CLK:
 		deb_info("%s: XC2028_RESET_CLK %d\n", __func__, arg);
 		break;
+<<<<<<< HEAD
+=======
+	case XC2028_I2C_FLUSH:
+		break;
+>>>>>>> common/deprecated/android-3.18
 	default:
 		deb_info("%s: unknown command %d, arg %d\n", __func__,
 			 command, arg);
@@ -1875,7 +1885,11 @@ static struct dvb_usb_device_properties cxusb_bluebird_lgz201_properties = {
 
 	.size_of_priv     = sizeof(struct cxusb_state),
 
+<<<<<<< HEAD
 	.num_adapters = 2,
+=======
+	.num_adapters = 1,
+>>>>>>> common/deprecated/android-3.18
 	.adapter = {
 		{
 		.num_frontends = 1,

@@ -118,7 +118,14 @@ static const struct file_operations dw_spi_regs_ops = {
 
 static int dw_spi_debugfs_init(struct dw_spi *dws)
 {
+<<<<<<< HEAD
 	dws->debugfs = debugfs_create_dir("dw_spi", NULL);
+=======
+	char name[128];
+
+	snprintf(name, 128, "dw_spi-%s", dev_name(&dws->master->dev));
+	dws->debugfs = debugfs_create_dir(name, NULL);
+>>>>>>> common/deprecated/android-3.18
 	if (!dws->debugfs)
 		return -ENOMEM;
 
@@ -412,6 +419,12 @@ static void pump_transfers(unsigned long data)
 
 	cr0 = chip->cr0;
 
+<<<<<<< HEAD
+=======
+	/* Ensure dw->rx and dw->rx_end are visible */
+	smp_mb();
+
+>>>>>>> common/deprecated/android-3.18
 	/* Handle per transfer options for bpw and speed */
 	if (transfer->speed_hz) {
 		speed = chip->speed_hz;
@@ -650,6 +663,11 @@ int dw_spi_add_host(struct device *dev, struct dw_spi *dws)
 	dws->dma_addr = (dma_addr_t)(dws->paddr + 0x60);
 	snprintf(dws->name, sizeof(dws->name), "dw_spi%d", dws->bus_num);
 
+<<<<<<< HEAD
+=======
+	spi_master_set_devdata(master, dws);
+
+>>>>>>> common/deprecated/android-3.18
 	ret = devm_request_irq(dev, dws->irq, dw_spi_irq, IRQF_SHARED,
 			dws->name, dws);
 	if (ret < 0) {
@@ -680,8 +698,12 @@ int dw_spi_add_host(struct device *dev, struct dw_spi *dws)
 
 	tasklet_init(&dws->pump_transfers, pump_transfers, (unsigned long)dws);
 
+<<<<<<< HEAD
 	spi_master_set_devdata(master, dws);
 	ret = devm_spi_register_master(dev, master);
+=======
+	ret = spi_register_master(master);
+>>>>>>> common/deprecated/android-3.18
 	if (ret) {
 		dev_err(&master->dev, "problem registering spi master\n");
 		goto err_dma_exit;
@@ -706,6 +728,11 @@ void dw_spi_remove_host(struct dw_spi *dws)
 		return;
 	dw_spi_debugfs_remove(dws);
 
+<<<<<<< HEAD
+=======
+	spi_unregister_master(dws->master);
+
+>>>>>>> common/deprecated/android-3.18
 	if (dws->dma_ops && dws->dma_ops->dma_exit)
 		dws->dma_ops->dma_exit(dws);
 	spi_enable_chip(dws, 0);

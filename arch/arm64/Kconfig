@@ -21,7 +21,11 @@ config ARM64
 	select DCACHE_WORD_ACCESS
 	select GENERIC_ALLOCATOR
 	select GENERIC_CLOCKEVENTS
+<<<<<<< HEAD
 	select GENERIC_CLOCKEVENTS_BROADCAST if SMP
+=======
+	select GENERIC_CLOCKEVENTS_BROADCAST
+>>>>>>> common/deprecated/android-3.18
 	select GENERIC_CPU_AUTOPROBE
 	select GENERIC_EARLY_IOREMAP
 	select GENERIC_IOMAP
@@ -73,7 +77,10 @@ config ARM64
 	select PERF_USE_VMALLOC
 	select POWER_RESET
 	select POWER_SUPPLY
+<<<<<<< HEAD
 	select RTC_LIB
+=======
+>>>>>>> common/deprecated/android-3.18
 	select SPARSE_IRQ
 	select SYSCTL_EXCEPTION_TRACE
 	select HAVE_CONTEXT_TRACKING
@@ -126,6 +133,13 @@ config ILLEGAL_POINTER_VALUE
 config STACKTRACE_SUPPORT
 	def_bool y
 
+<<<<<<< HEAD
+=======
+config ILLEGAL_POINTER_VALUE
+	hex
+	default 0xdead000000000000
+
+>>>>>>> common/deprecated/android-3.18
 config LOCKDEP_SUPPORT
 	def_bool y
 
@@ -159,6 +173,12 @@ config NEED_DMA_MAP_STATE
 config NEED_SG_DMA_LENGTH
 	def_bool y
 
+<<<<<<< HEAD
+=======
+config SMP
+	def_bool y
+
+>>>>>>> common/deprecated/android-3.18
 config SWIOTLB
 	def_bool y
 
@@ -171,6 +191,7 @@ config KERNEL_MODE_NEON
 config FIX_EARLYCON_MEM
 	def_bool y
 
+<<<<<<< HEAD
 config GENERIC_BUG
 	def_bool y
 	depends on BUG
@@ -180,6 +201,14 @@ config SEC_FACTORY
 	default n
 	help
 	  It will support a sec factory mode
+=======
+config PGTABLE_LEVELS
+	int
+	default 2 if ARM64_64K_PAGES && ARM64_VA_BITS_42
+	default 3 if ARM64_64K_PAGES && ARM64_VA_BITS_48
+	default 3 if ARM64_4K_PAGES && ARM64_VA_BITS_39
+	default 4 if ARM64_4K_PAGES && ARM64_VA_BITS_48
+>>>>>>> common/deprecated/android-3.18
 
 source "init/Kconfig"
 
@@ -207,6 +236,7 @@ config ARCH_XGENE
 	help
 	  This enables support for AppliedMicro X-Gene SOC Family
 
+<<<<<<< HEAD
 menu "Samsung Exynos"
 config ARCH_EXYNOS
 	bool
@@ -284,6 +314,8 @@ endmenu
 
 source "arch/arm64/mach-exynos/Kconfig"
 
+=======
+>>>>>>> common/deprecated/android-3.18
 endmenu
 
 menu "Bus support"
@@ -494,6 +526,7 @@ config ARM64_VA_BITS
 	default 42 if ARM64_VA_BITS_42
 	default 48 if ARM64_VA_BITS_48
 
+<<<<<<< HEAD
 config ARM64_PGTABLE_LEVELS
 	int
 	default 2 if ARM64_64K_PAGES && ARM64_VA_BITS_42
@@ -501,11 +534,14 @@ config ARM64_PGTABLE_LEVELS
 	default 3 if ARM64_4K_PAGES && ARM64_VA_BITS_39
 	default 4 if ARM64_4K_PAGES && ARM64_VA_BITS_48
 
+=======
+>>>>>>> common/deprecated/android-3.18
 config CPU_BIG_ENDIAN
        bool "Build big-endian kernel"
        help
          Say Y if you plan on running a kernel in big-endian mode.
 
+<<<<<<< HEAD
 config SMP
 	bool "Symmetric Multi-Processing"
 	help
@@ -522,6 +558,10 @@ config SMP
 config SCHED_MC
 	bool "Multi-core scheduler support"
 	depends on SMP
+=======
+config SCHED_MC
+	bool "Multi-core scheduler support"
+>>>>>>> common/deprecated/android-3.18
 	help
 	  Multi-core scheduler support improves the CPU scheduler's decision
 	  making when dealing with multi-core CPU chips at a cost of slightly
@@ -529,12 +569,16 @@ config SCHED_MC
 
 config SCHED_SMT
 	bool "SMT scheduler support"
+<<<<<<< HEAD
 	depends on SMP
+=======
+>>>>>>> common/deprecated/android-3.18
 	help
 	  Improves the CPU scheduler's decision making when dealing with
 	  MultiThreading at a cost of slightly increased overhead in some
 	  places. If unsure say N here.
 
+<<<<<<< HEAD
 config DISABLE_CPU_SCHED_DOMAIN_BALANCE
 	bool "(EXPERIMENTAL) Disable CPU level scheduler load-balancing"
 	help
@@ -636,12 +680,19 @@ config NR_CPUS
 	int "Maximum number of CPUs (2-64)"
 	range 2 64
 	depends on SMP
+=======
+config NR_CPUS
+	int "Maximum number of CPUs (2-64)"
+>>>>>>> common/deprecated/android-3.18
 	# These have to remain sorted largest to smallest
 	default "64"
 
 config HOTPLUG_CPU
 	bool "Support for hot-pluggable CPUs"
+<<<<<<< HEAD
 	depends on SMP
+=======
+>>>>>>> common/deprecated/android-3.18
 	help
 	  Say Y here to experiment with turning CPUs off and on.  CPUs
 	  can be controlled through /sys/devices/system/cpu.
@@ -722,6 +773,21 @@ config FORCE_MAX_ZONEORDER
 	default "14" if (ARM64_64K_PAGES && TRANSPARENT_HUGEPAGE)
 	default "11"
 
+<<<<<<< HEAD
+=======
+config UNMAP_KERNEL_AT_EL0
+	bool "Unmap kernel when running in userspace (aka \"KAISER\")" if EXPERT
+	default y
+	help
+	  Speculation attacks against some high-performance processors can
+	  be used to bypass MMU permission checks and leak kernel data to
+	  userspace. This can be defended against by unmapping the kernel
+	  when running in userspace, mapping it back in on exception entry
+	  via a trampoline page in the vector table.
+
+	  If unsure, say Y.
+
+>>>>>>> common/deprecated/android-3.18
 menuconfig ARMV8_DEPRECATED
 	bool "Emulate deprecated/obsolete ARMv8 instructions"
 	depends on COMPAT
@@ -790,6 +856,56 @@ config SETEND_EMULATION
 
 endif
 
+<<<<<<< HEAD
+=======
+config ARM64_SW_TTBR0_PAN
+	bool "Emulate Privileged Access Never using TTBR0_EL1 switching"
+	help
+	  Enabling this option prevents the kernel from accessing
+	  user-space memory directly by pointing TTBR0_EL1 to a reserved
+	  zeroed area and reserved ASID. The user access routines
+	  restore the valid TTBR0_EL1 temporarily.
+
+menu "ARMv8.1 architectural features"
+
+config ARM64_PAN
+	bool "Enable support for Privileged Access Never (PAN)"
+	default y
+	help
+	 Privileged Access Never (PAN; part of the ARMv8.1 Extensions)
+	 prevents the kernel or hypervisor from accessing user-space (EL0)
+	 memory directly.
+
+	 Choosing this option will cause any unprotected (not using
+	 copy_to_user et al) memory access to fail with a permission fault.
+
+	 The feature is detected at runtime, and will remain as a 'nop'
+	 instruction if the cpu does not implement the feature.
+
+endmenu
+
+config ARM64_UAO
+	bool "Enable support for User Access Override (UAO)"
+	default y
+	help
+	  User Access Override (UAO; part of the ARMv8.2 Extensions)
+	  causes the 'unprivileged' variant of the load/store instructions to
+	  be overriden to be privileged.
+
+	  This option changes get_user() and friends to use the 'unprivileged'
+	  variant of the load/store instructions. This ensures that user-space
+	  really did have access to the supplied memory. When addr_limit is
+	  set to kernel memory the UAO bit will be set, allowing privileged
+	  access to kernel memory.
+
+	  Choosing this option will cause copy_to_user() et al to use user-space
+	  memory permissions.
+
+	  The feature is detected at runtime, the kernel will use the
+	  regular load/store instructions if the cpu does not implement the
+	  feature.
+
+>>>>>>> common/deprecated/android-3.18
 endmenu
 
 menu "Boot options"
@@ -848,6 +964,7 @@ config EFI
 	  allow the kernel to be booted as an EFI application. This
 	  is only useful on systems that have UEFI firmware.
 
+<<<<<<< HEAD
 config TIMA
 	bool "Enable TIMA(Trustzone based Integrity Measurement Archtecture feature"
 	default n
@@ -888,6 +1005,8 @@ config TIMA_TEST_INFRA
 	help
 	  Kernel bits of the TIMA test infrastructure
 
+=======
+>>>>>>> common/deprecated/android-3.18
 config BUILD_ARM64_APPENDED_DTB_IMAGE
 	bool "Build a concatenated Image.gz/dtb by default"
 	depends on OF
@@ -903,6 +1022,20 @@ config BUILD_ARM64_APPENDED_DTB_IMAGE_NAMES
 	  Space separated list of names of dtbs to append when
 	  building a concatenated Image.gz-dtb.
 
+<<<<<<< HEAD
+=======
+config DMI
+	bool "Enable support for SMBIOS (DMI) tables"
+	depends on EFI
+	default y
+	help
+	  This enables SMBIOS/DMI feature for systems.
+
+	  This option is only useful on systems that have UEFI firmware.
+	  However, even with this option, the resultant kernel should
+	  continue to boot on existing non-UEFI platforms.
+
+>>>>>>> common/deprecated/android-3.18
 endmenu
 
 menu "Userspace binary formats"
@@ -912,7 +1045,11 @@ source "fs/Kconfig.binfmt"
 config COMPAT
 	bool "Kernel support for 32-bit EL0"
 	depends on !ARM64_64K_PAGES
+<<<<<<< HEAD
 	select COMPAT_BINFMT_ELF
+=======
+	select COMPAT_BINFMT_ELF if BINFMT_ELF
+>>>>>>> common/deprecated/android-3.18
 	select HAVE_UID16
 	select OLD_SIGSUSPEND3
 	select COMPAT_OLD_SIGACTION
@@ -929,10 +1066,16 @@ config SYSVIPC_COMPAT
 	depends on COMPAT && SYSVIPC
 
 config KEYS_COMPAT
+<<<<<<< HEAD
 	def_bool y if COMPAT && KEYS
 	help
 	  This option enables support for a 32-bit keyctl syscall callback function under
 	  a 64-bit kernel.
+=======
+	def_bool y
+	depends on COMPAT && KEYS
+
+>>>>>>> common/deprecated/android-3.18
 endmenu
 
 menu "Power management options"
@@ -953,6 +1096,25 @@ source "drivers/cpuidle/Kconfig"
 
 source "drivers/cpufreq/Kconfig"
 
+<<<<<<< HEAD
+=======
+config ARM64_ERRATUM_843419
+	bool "Cortex-A53: 843419: A load or store might access an incorrect address"
+	depends on MODULES
+	default y
+	help
+	  This option builds kernel modules using the large memory model in
+	  order to avoid the use of the ADRP instruction, which can cause
+	  a subsequent memory access to use an incorrect address on Cortex-A53
+	  parts up to r0p4.
+
+	  Note that the kernel itself must be linked with a version of ld
+	  which fixes potentially affected ADRP instructions through the
+	  use of veneers.
+
+	  If unsure, say Y.
+
+>>>>>>> common/deprecated/android-3.18
 endmenu
 
 source "net/Kconfig"

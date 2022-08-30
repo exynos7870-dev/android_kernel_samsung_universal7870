@@ -277,7 +277,12 @@ error:
  * Create and join an anonymous session keyring or join a named session
  * keyring, creating it if necessary.  A named session keyring must have Search
  * permission for it to be joined.  Session keyrings without this permit will
+<<<<<<< HEAD
  * be skipped over.
+=======
+ * be skipped over.  It is not permitted for userspace to create or join
+ * keyrings whose name begin with a dot.
+>>>>>>> common/deprecated/android-3.18
  *
  * If successful, the ID of the joined session keyring will be returned.
  */
@@ -294,12 +299,24 @@ long keyctl_join_session_keyring(const char __user *_name)
 			ret = PTR_ERR(name);
 			goto error;
 		}
+<<<<<<< HEAD
+=======
+
+		ret = -EPERM;
+		if (name[0] == '.')
+			goto error_name;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/* join the session */
 	ret = join_session_keyring(name);
+<<<<<<< HEAD
 	kfree(name);
 
+=======
+error_name:
+	kfree(name);
+>>>>>>> common/deprecated/android-3.18
 error:
 	return ret;
 }
@@ -738,10 +755,17 @@ long keyctl_read_key(key_serial_t keyid, char __user *buffer, size_t buflen)
 	}
 
 	key = key_ref_to_ptr(key_ref);
+<<<<<<< HEAD
 	if (test_bit(KEY_FLAG_NEGATIVE, &key->flags)) {
 		ret = -ENOKEY;
 		goto error2;
 	}
+=======
+
+	ret = key_read_state(key);
+	if (ret < 0)
+		goto error2; /* Negatively instantiated */
+>>>>>>> common/deprecated/android-3.18
 
 	/* see if we can read it directly */
 	ret = key_permission(key_ref, KEY_NEED_READ);
@@ -769,7 +793,11 @@ can_read_key:
 		down_read(&key->sem);
 		ret = key_validate(key);
 		if (ret == 0)
+<<<<<<< HEAD
  			ret = key->type->read(key, buffer, buflen);
+=======
+			ret = key->type->read(key, buffer, buflen);
+>>>>>>> common/deprecated/android-3.18
 		up_read(&key->sem);
 	}
 
@@ -854,8 +882,13 @@ long keyctl_chown_key(key_serial_t id, uid_t user, gid_t group)
 				key_quota_root_maxbytes : key_quota_maxbytes;
 
 			spin_lock(&newowner->lock);
+<<<<<<< HEAD
 			if (newowner->qnkeys + 1 >= maxkeys ||
 			    newowner->qnbytes + key->quotalen >= maxbytes ||
+=======
+			if (newowner->qnkeys + 1 > maxkeys ||
+			    newowner->qnbytes + key->quotalen > maxbytes ||
+>>>>>>> common/deprecated/android-3.18
 			    newowner->qnbytes + key->quotalen <
 			    newowner->qnbytes)
 				goto quota_overrun;
@@ -873,7 +906,11 @@ long keyctl_chown_key(key_serial_t id, uid_t user, gid_t group)
 		atomic_dec(&key->user->nkeys);
 		atomic_inc(&newowner->nkeys);
 
+<<<<<<< HEAD
 		if (test_bit(KEY_FLAG_INSTANTIATED, &key->flags)) {
+=======
+		if (key->state != KEY_IS_UNINSTANTIATED) {
+>>>>>>> common/deprecated/android-3.18
 			atomic_dec(&key->user->nikeys);
 			atomic_inc(&newowner->nikeys);
 		}

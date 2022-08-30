@@ -54,6 +54,11 @@ struct net {
 #endif
 	spinlock_t		rules_mod_lock;
 
+<<<<<<< HEAD
+=======
+	u32			hash_mix;
+
+>>>>>>> common/deprecated/android-3.18
 	struct list_head	list;		/* list of network namespaces */
 	struct list_head	cleanup_list;	/* namespaces on death row */
 	struct list_head	exit_list;	/* Use only net_mutex */
@@ -112,6 +117,10 @@ struct net {
 #endif
 #if IS_ENABLED(CONFIG_NF_DEFRAG_IPV6)
 	struct netns_nf_frag	nf_frag;
+<<<<<<< HEAD
+=======
+	struct ctl_table_header *nf_frag_frags_hdr;
+>>>>>>> common/deprecated/android-3.18
 #endif
 	struct sock		*nfnl;
 	struct sock		*nfnl_stash;
@@ -200,6 +209,14 @@ int net_eq(const struct net *net1, const struct net *net2)
 	return net1 == net2;
 }
 
+<<<<<<< HEAD
+=======
+static inline int check_net(const struct net *net)
+{
+	return atomic_read(&net->count) != 0;
+}
+
+>>>>>>> common/deprecated/android-3.18
 void net_drop_ns(void *);
 
 #else
@@ -224,6 +241,14 @@ int net_eq(const struct net *net1, const struct net *net2)
 	return 1;
 }
 
+<<<<<<< HEAD
+=======
+static inline int check_net(const struct net *net)
+{
+	return 1;
+}
+
+>>>>>>> common/deprecated/android-3.18
 #define net_drop_ns NULL
 #endif
 

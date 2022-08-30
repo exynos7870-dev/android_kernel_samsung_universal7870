@@ -441,7 +441,12 @@ static int sensor_hub_raw_event(struct hid_device *hdev,
 		return 1;
 
 	ptr = raw_data;
+<<<<<<< HEAD
 	ptr++; /* Skip report id */
+=======
+	if (report->id)
+		ptr++; /* Skip report id */
+>>>>>>> common/deprecated/android-3.18
 
 	spin_lock_irqsave(&pdata->lock, flags);
 

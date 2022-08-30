@@ -24,6 +24,11 @@
 #include <linux/workqueue.h>
 #include <linux/hyperv.h>
 
+<<<<<<< HEAD
+=======
+#include "hyperv_vmbus.h"
+
+>>>>>>> common/deprecated/android-3.18
 #define VSS_MAJOR  5
 #define VSS_MINOR  0
 #define VSS_VERSION    (VSS_MAJOR << 16 | VSS_MINOR)
@@ -203,7 +208,10 @@ void hv_vss_onchannelcallback(void *context)
 			 */
 
 			vss_transaction.recv_len = recvlen;
+<<<<<<< HEAD
 			vss_transaction.recv_channel = channel;
+=======
+>>>>>>> common/deprecated/android-3.18
 			vss_transaction.recv_req_id = requestid;
 			vss_transaction.active = true;
 			vss_transaction.msg = (struct hv_vss_msg *)vss_msg;
@@ -259,10 +267,23 @@ hv_vss_init(struct hv_util_service *srv)
 {
 	int err;
 
+<<<<<<< HEAD
+=======
+	if (vmbus_proto_version < VERSION_WIN8_1) {
+		pr_warn("Integration service 'Backup (volume snapshot)'"
+			" not supported on this host version.\n");
+		return -ENOTSUPP;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	err = cn_add_callback(&vss_id, vss_name, vss_cn_callback);
 	if (err)
 		return err;
 	recv_buffer = srv->recv_buffer;
+<<<<<<< HEAD
+=======
+	vss_transaction.recv_channel = srv->channel;
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * When this driver loads, the user level daemon that

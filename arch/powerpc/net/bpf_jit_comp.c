@@ -78,6 +78,7 @@ static void bpf_jit_build_prologue(struct bpf_prog *fp, u32 *image,
 		PPC_LI(r_X, 0);
 	}
 
+<<<<<<< HEAD
 	switch (filter[0].code) {
 	case BPF_RET | BPF_K:
 	case BPF_LD | BPF_W | BPF_LEN:
@@ -90,6 +91,11 @@ static void bpf_jit_build_prologue(struct bpf_prog *fp, u32 *image,
 		/* make sure we dont leak kernel information to user */
 		PPC_LI(r_A, 0);
 	}
+=======
+	/* make sure we dont leak kernel information to user */
+	if (bpf_needs_clear_a(&filter[0]))
+		PPC_LI(r_A, 0);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void bpf_jit_build_epilogue(u32 *image, struct codegen_context *ctx)

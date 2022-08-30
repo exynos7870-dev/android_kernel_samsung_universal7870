@@ -143,7 +143,12 @@ struct pci_iommu_arena
 };
 
 #if defined(CONFIG_ALPHA_SRM) && \
+<<<<<<< HEAD
     (defined(CONFIG_ALPHA_CIA) || defined(CONFIG_ALPHA_LCA))
+=======
+    (defined(CONFIG_ALPHA_CIA) || defined(CONFIG_ALPHA_LCA) || \
+     defined(CONFIG_ALPHA_AVANTI))
+>>>>>>> common/deprecated/android-3.18
 # define NEED_SRM_SAVE_RESTORE
 #else
 # undef NEED_SRM_SAVE_RESTORE

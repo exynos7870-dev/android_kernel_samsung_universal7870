@@ -19,7 +19,10 @@ obj-$(CONFIG_PARISC)		+= parisc/
 obj-$(CONFIG_RAPIDIO)		+= rapidio/
 obj-y				+= video/
 obj-y				+= idle/
+<<<<<<< HEAD
 obj-y				+= trace/
+=======
+>>>>>>> common/deprecated/android-3.18
 
 # IPMI must come before ACPI in order to provide IPMI opregion support
 obj-$(CONFIG_IPMI_HANDLER)	+= char/ipmi/
@@ -60,6 +63,7 @@ obj-$(CONFIG_CONNECTOR)		+= connector/
 obj-$(CONFIG_FB_I810)           += video/fbdev/i810/
 obj-$(CONFIG_FB_INTEL)          += video/fbdev/intelfb/
 
+<<<<<<< HEAD
 obj-$(CONFIG_VBUS_NOTIFIER)	+= staging/samsung/sec_notifier/
 # added by khoonk on 2018.01.02
 ifndef CONFIG_IFPMIC_SUPPORT
@@ -72,6 +76,10 @@ endif
 obj-$(CONFIG_PARPORT)		+= parport/
 obj-y				+= base/ block/ misc/ mfd/
 obj-$(CONFIG_SAMSUNG_NFC)		+= nfc/
+=======
+obj-$(CONFIG_PARPORT)		+= parport/
+obj-y				+= base/ block/ misc/ mfd/ nfc/
+>>>>>>> common/deprecated/android-3.18
 obj-$(CONFIG_DMA_SHARED_BUFFER) += dma-buf/
 obj-$(CONFIG_NUBUS)		+= nubus/
 obj-y				+= macintosh/
@@ -101,8 +109,15 @@ obj-$(CONFIG_TC)		+= tc/
 obj-$(CONFIG_UWB)		+= uwb/
 obj-$(CONFIG_USB_PHY)		+= usb/
 obj-$(CONFIG_USB)		+= usb/
+<<<<<<< HEAD
 obj-$(CONFIG_PCI)		+= usb/
 obj-$(CONFIG_USB_GADGET)	+= usb/
+=======
+obj-$(CONFIG_USB_SUPPORT)	+= usb/
+obj-$(CONFIG_PCI)		+= usb/
+obj-$(CONFIG_USB_GADGET)	+= usb/
+obj-$(CONFIG_OF)		+= usb/
+>>>>>>> common/deprecated/android-3.18
 obj-$(CONFIG_SERIO)		+= input/serio/
 obj-$(CONFIG_GAMEPORT)		+= input/gameport/
 obj-$(CONFIG_INPUT)		+= input/
@@ -162,6 +177,7 @@ obj-$(CONFIG_VIRT_DRIVERS)	+= virt/
 obj-$(CONFIG_HYPERV)		+= hv/
 
 obj-$(CONFIG_PM_DEVFREQ)	+= devfreq/
+<<<<<<< HEAD
 # added by khoonk on 2018.01.06
 ifndef CONFIG_IFPMIC_SUPPORT
 ifeq ($(CONFIG_BATTERY_SAMSUNG_V2), y)
@@ -176,6 +192,11 @@ obj-$(CONFIG_IIO)		+= iio/
 
 #Sensor
 obj-$(CONFIG_SENSORS)		+= sensors/
+=======
+obj-$(CONFIG_EXTCON)		+= extcon/
+obj-$(CONFIG_MEMORY)		+= memory/
+obj-$(CONFIG_IIO)		+= iio/
+>>>>>>> common/deprecated/android-3.18
 obj-$(CONFIG_VME_BUS)		+= vme/
 obj-$(CONFIG_IPACK_BUS)		+= ipack/
 obj-$(CONFIG_NTB)		+= ntb/
@@ -184,6 +205,7 @@ obj-$(CONFIG_POWERCAP)		+= powercap/
 obj-$(CONFIG_MCB)		+= mcb/
 obj-$(CONFIG_RAS)		+= ras/
 obj-$(CONFIG_THUNDERBOLT)	+= thunderbolt/
+<<<<<<< HEAD
 obj-$(CONFIG_EXYNOS_BTS)	+= bts/
 obj-$(CONFIG_MARVELL_DRIVERS)	+= marvell/
 # Mobicore driver
@@ -204,3 +226,5 @@ obj-$(CONFIG_SENSORS_SSP)	+= sensorhub/
 #GPS
 obj-$(CONFIG_GPS_BCMxxxxx)	+= gps/
 obj-$(CONFIG_GPS_BCM4752)	+= gps/
+=======
+>>>>>>> common/deprecated/android-3.18

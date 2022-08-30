@@ -2327,6 +2327,7 @@ static int cgroup_attach_task(struct cgroup *dst_cgrp,
 	return ret;
 }
 
+<<<<<<< HEAD
 int subsys_cgroup_allow_attach(struct cgroup_subsys_state *css, struct cgroup_taskset *tset)
 {
 	const struct cred *cred = current_cred(), *tcred;
@@ -2365,6 +2366,8 @@ static int cgroup_allow_attach(struct cgroup *cgrp, struct cgroup_taskset *tset)
 	return 0;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * Find the task_struct of the task to attach by vpid and pass it along to the
  * function to attach either it or all tasks in its threadgroup. Will lock
@@ -2402,6 +2405,7 @@ retry_find_task:
 		tcred = __task_cred(tsk);
 		if (!uid_eq(cred->euid, GLOBAL_ROOT_UID) &&
 		    !uid_eq(cred->euid, tcred->uid) &&
+<<<<<<< HEAD
 		    !uid_eq(cred->euid, tcred->suid)) {
 			/*
 			 * if the default permission check fails, give each
@@ -2421,6 +2425,13 @@ retry_find_task:
 				rcu_read_unlock();
 				goto out_unlock_cgroup;
 			}
+=======
+		    !uid_eq(cred->euid, tcred->suid) &&
+		    !ns_capable(tcred->user_ns, CAP_SYS_NICE)) {
+			rcu_read_unlock();
+			ret = -EACCES;
+			goto out_unlock_cgroup;
+>>>>>>> common/deprecated/android-3.18
 		}
 	} else
 		tsk = current;
@@ -3008,6 +3019,13 @@ static int cgroup_rename(struct kernfs_node *kn, struct kernfs_node *new_parent,
 	struct cgroup *cgrp = kn->priv;
 	int ret;
 
+<<<<<<< HEAD
+=======
+	/* do not accept '\n' to prevent making /proc/<pid>/cgroup unparsable */
+	if (strchr(new_name_str, '\n'))
+		return -EINVAL;
+
+>>>>>>> common/deprecated/android-3.18
 	if (kernfs_type(kn) != KERNFS_DIR)
 		return -ENOTDIR;
 	if (kn->parent != new_parent)
@@ -3722,7 +3740,15 @@ int cgroup_transfer_tasks(struct cgroup *to, struct cgroup *from)
 	 */
 	do {
 		css_task_iter_start(&from->self, &it);
+<<<<<<< HEAD
 		task = css_task_iter_next(&it);
+=======
+
+		do {
+			task = css_task_iter_next(&it);
+		} while (task && (task->flags & PF_EXITING));
+
+>>>>>>> common/deprecated/android-3.18
 		if (task)
 			get_task_struct(task);
 		css_task_iter_end(&it);
@@ -4367,11 +4393,21 @@ static void css_free_work_fn(struct work_struct *work)
 
 	if (css->ss) {
 		/* css free path */
+<<<<<<< HEAD
 		if (css->parent)
 			css_put(css->parent);
 
 		css->ss->css_free(css);
 		cgroup_put(cgrp);
+=======
+		struct cgroup_subsys_state *parent = css->parent;
+
+		css->ss->css_free(css);
+		cgroup_put(cgrp);
+
+		if (parent)
+			css_put(parent);
+>>>>>>> common/deprecated/android-3.18
 	} else {
 		/* cgroup free path */
 		atomic_dec(&cgrp->root->nr_cgrps);
@@ -4462,6 +4498,10 @@ static void init_and_link_css(struct cgroup_subsys_state *css,
 	memset(css, 0, sizeof(*css));
 	css->cgroup = cgrp;
 	css->ss = ss;
+<<<<<<< HEAD
+=======
+	css->id = -1;
+>>>>>>> common/deprecated/android-3.18
 	INIT_LIST_HEAD(&css->sibling);
 	INIT_LIST_HEAD(&css->children);
 	css->serial_nr = css_serial_nr_next++;
@@ -4542,7 +4582,11 @@ static int create_css(struct cgroup *cgrp, struct cgroup_subsys *ss,
 
 	err = cgroup_idr_alloc(&ss->css_idr, NULL, 2, 0, GFP_NOWAIT);
 	if (err < 0)
+<<<<<<< HEAD
 		goto err_free_percpu_ref;
+=======
+		goto err_free_css;
+>>>>>>> common/deprecated/android-3.18
 	css->id = err;
 
 	if (visible) {
@@ -4574,9 +4618,12 @@ err_list_del:
 	list_del_rcu(&css->sibling);
 	cgroup_clear_dir(css->cgroup, 1 << css->ss->id);
 err_free_id:
+<<<<<<< HEAD
 	cgroup_idr_remove(&ss->css_idr, css->id);
 err_free_percpu_ref:
 	percpu_ref_exit(&css->refcnt);
+=======
+>>>>>>> common/deprecated/android-3.18
 err_free_css:
 	call_rcu(&css->rcu_head, css_free_rcu_fn);
 	return err;
@@ -5514,7 +5561,11 @@ static int cgroup_css_links_read(struct seq_file *seq, void *v)
 		struct task_struct *task;
 		int count = 0;
 
+<<<<<<< HEAD
 		seq_printf(seq, "css_set %pK\n", cset);
+=======
+		seq_printf(seq, "css_set %p\n", cset);
+>>>>>>> common/deprecated/android-3.18
 
 		list_for_each_entry(task, &cset->tasks, cg_list) {
 			if (count++ > MAX_TASKS_SHOWN_PER_CSS)

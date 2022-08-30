@@ -156,12 +156,22 @@ void *probe_kthread_data(struct task_struct *task)
 
 static void __kthread_parkme(struct kthread *self)
 {
+<<<<<<< HEAD
 	__set_current_state(TASK_PARKED);
 	while (test_bit(KTHREAD_SHOULD_PARK, &self->flags)) {
 		if (!test_and_set_bit(KTHREAD_IS_PARKED, &self->flags))
 			complete(&self->parked);
 		schedule();
 		__set_current_state(TASK_PARKED);
+=======
+	for (;;) {
+		set_current_state(TASK_PARKED);
+		if (!test_bit(KTHREAD_SHOULD_PARK, &self->flags))
+			break;
+		if (!test_and_set_bit(KTHREAD_IS_PARKED, &self->flags))
+			complete(&self->parked);
+		schedule();
+>>>>>>> common/deprecated/android-3.18
 	}
 	clear_bit(KTHREAD_IS_PARKED, &self->flags);
 	__set_current_state(TASK_RUNNING);
@@ -308,10 +318,23 @@ struct task_struct *kthread_create_on_node(int (*threadfn)(void *data),
 	task = create->result;
 	if (!IS_ERR(task)) {
 		static const struct sched_param param = { .sched_priority = 0 };
+<<<<<<< HEAD
 		va_list args;
 
 		va_start(args, namefmt);
 		vsnprintf(task->comm, sizeof(task->comm), namefmt, args);
+=======
+		char name[TASK_COMM_LEN];
+		va_list args;
+
+		va_start(args, namefmt);
+		/*
+		 * task is already visible to other tasks, so updating
+		 * COMM must be protected.
+		 */
+		vsnprintf(name, sizeof(name), namefmt, args);
+		set_task_comm(task, name);
+>>>>>>> common/deprecated/android-3.18
 		va_end(args);
 		/*
 		 * root may have changed our (kthreadd's) priority or CPU mask.
@@ -325,16 +348,42 @@ struct task_struct *kthread_create_on_node(int (*threadfn)(void *data),
 }
 EXPORT_SYMBOL(kthread_create_on_node);
 
+<<<<<<< HEAD
 static void __kthread_bind(struct task_struct *p, unsigned int cpu, long state)
 {
 	/* Must have done schedule() in kthread() before we set_task_cpu */
+=======
+static void __kthread_bind_mask(struct task_struct *p, const struct cpumask *mask, long state)
+{
+	unsigned long flags;
+
+>>>>>>> common/deprecated/android-3.18
 	if (!wait_task_inactive(p, state)) {
 		WARN_ON(1);
 		return;
 	}
+<<<<<<< HEAD
 	/* It's safe because the task is inactive. */
 	do_set_cpus_allowed(p, cpumask_of(cpu));
 	p->flags |= PF_NO_SETAFFINITY;
+=======
+
+	/* It's safe because the task is inactive. */
+	raw_spin_lock_irqsave(&p->pi_lock, flags);
+	do_set_cpus_allowed(p, mask);
+	p->flags |= PF_NO_SETAFFINITY;
+	raw_spin_unlock_irqrestore(&p->pi_lock, flags);
+}
+
+static void __kthread_bind(struct task_struct *p, unsigned int cpu, long state)
+{
+	__kthread_bind_mask(p, cpumask_of(cpu), state);
+}
+
+void kthread_bind_mask(struct task_struct *p, const struct cpumask *mask)
+{
+	__kthread_bind_mask(p, mask, TASK_UNINTERRUPTIBLE);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**

@@ -42,6 +42,10 @@
 #include <linux/sched/sysctl.h>
 #include <linux/slab.h>
 #include <linux/compat.h>
+<<<<<<< HEAD
+=======
+#include <linux/random.h>
+>>>>>>> common/deprecated/android-3.18
 
 #include <asm/uaccess.h>
 #include <asm/unistd.h>
@@ -956,13 +960,36 @@ EXPORT_SYMBOL(add_timer);
  */
 void add_timer_on(struct timer_list *timer, int cpu)
 {
+<<<<<<< HEAD
 	struct tvec_base *base = per_cpu(tvec_bases, cpu);
+=======
+	struct tvec_base *new_base = per_cpu(tvec_bases, cpu);
+	struct tvec_base *base;
+>>>>>>> common/deprecated/android-3.18
 	unsigned long flags;
 
 	timer_stats_timer_set_start_info(timer);
 	BUG_ON(timer_pending(timer) || !timer->function);
+<<<<<<< HEAD
 	spin_lock_irqsave(&base->lock, flags);
 	timer_set_base(timer, base);
+=======
+
+	/*
+	 * If @timer was on a different CPU, it should be migrated with the
+	 * old base locked to prevent other operations proceeding with the
+	 * wrong base locked.  See lock_timer_base().
+	 */
+	base = lock_timer_base(timer, &flags);
+	if (base != new_base) {
+		timer_set_base(timer, NULL);
+		spin_unlock(&base->lock);
+		base = new_base;
+		spin_lock(&base->lock);
+		timer_set_base(timer, base);
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	debug_activate(timer, timer->expires);
 	internal_add_timer(base, timer);
 	spin_unlock_irqrestore(&base->lock, flags);
@@ -1138,9 +1165,13 @@ static void call_timer_fn(struct timer_list *timer, void (*fn)(unsigned long),
 	lock_map_acquire(&lockdep_map);
 
 	trace_timer_expire_entry(timer);
+<<<<<<< HEAD
 	exynos_ss_irq(ESS_FLAG_CALL_TIMER_FN, fn, irqs_disabled(), ESS_FLAG_IN);
 	fn(data);
 	exynos_ss_irq(ESS_FLAG_CALL_TIMER_FN, fn, irqs_disabled(), ESS_FLAG_OUT);
+=======
+	fn(data);
+>>>>>>> common/deprecated/android-3.18
 	trace_timer_expire_exit(timer);
 
 	lock_map_release(&lockdep_map);
@@ -1391,6 +1422,16 @@ void update_process_times(int user_tick)
 #endif
 	scheduler_tick();
 	run_posix_cpu_timers(p);
+<<<<<<< HEAD
+=======
+
+	/* The current CPU might make use of net randoms without receiving IRQs
+	 * to renew them often enough. Let's update the net_rand_state from a
+	 * non-constant value that's not affine to the number of calls to make
+	 * sure it's updated when there's some activity (we don't care in idle).
+	 */
+	this_cpu_add(net_rand_state.s1, rol32(jiffies, 24) + user_tick);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*

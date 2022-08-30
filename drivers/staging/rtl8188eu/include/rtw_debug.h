@@ -75,7 +75,11 @@ extern u32 GlobalDebugLevel;
 #define DBG_88E_LEVEL(_level, fmt, arg...)				\
 	do {								\
 		if (_level <= GlobalDebugLevel)				\
+<<<<<<< HEAD
 			pr_info(DRIVER_PREFIX"ERROR " fmt, ##arg);	\
+=======
+			pr_info(DRIVER_PREFIX fmt, ##arg);	\
+>>>>>>> common/deprecated/android-3.18
 	} while (0)
 
 #define DBG_88E(...)							\

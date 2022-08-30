@@ -93,8 +93,15 @@ int set_foreign_p2m_mapping(struct gnttab_map_grant_ref *map_ops,
 	for (i = 0; i < count; i++) {
 		if (map_ops[i].status)
 			continue;
+<<<<<<< HEAD
 		set_phys_to_machine(map_ops[i].host_addr >> PAGE_SHIFT,
 				    map_ops[i].dev_bus_addr >> PAGE_SHIFT);
+=======
+		if (unlikely(!set_phys_to_machine(map_ops[i].host_addr >> PAGE_SHIFT,
+						  map_ops[i].dev_bus_addr >> PAGE_SHIFT))) {
+			return -ENOMEM;
+		}
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	return 0;

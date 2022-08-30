@@ -18,12 +18,16 @@
 #include <linux/pm_domain.h>
 #include <linux/amba/bus.h>
 #include <linux/sizes.h>
+<<<<<<< HEAD
 #include <linux/of.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #include <asm/irq.h>
 
 #define to_amba_driver(d)	container_of(d, struct amba_driver, drv)
 
+<<<<<<< HEAD
 static void adma_hw_reset(struct device *dev)
 {
 	struct device_node *np = dev->of_node;
@@ -78,6 +82,8 @@ static void adma_hw_reset(struct device *dev)
 	iounmap(lpass_dma_reset);
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static const struct amba_id *
 amba_lookup(const struct amba_id *table, struct amba_device *dev)
 {
@@ -271,10 +277,18 @@ static int amba_remove(struct device *dev)
 {
 	struct amba_device *pcdev = to_amba_device(dev);
 	struct amba_driver *drv = to_amba_driver(dev->driver);
+<<<<<<< HEAD
 	int ret;
 
 	pm_runtime_get_sync(dev);
 	ret = drv->remove(pcdev);
+=======
+	int ret = 0;
+
+	pm_runtime_get_sync(dev);
+	if (drv->remove)
+		ret = drv->remove(pcdev);
+>>>>>>> common/deprecated/android-3.18
 	pm_runtime_put_noidle(dev);
 
 	/* Undo the runtime PM settings in amba_probe() */
@@ -291,7 +305,13 @@ static int amba_remove(struct device *dev)
 static void amba_shutdown(struct device *dev)
 {
 	struct amba_driver *drv = to_amba_driver(dev->driver);
+<<<<<<< HEAD
 	drv->shutdown(to_amba_device(dev));
+=======
+
+	if (drv->shutdown)
+		drv->shutdown(to_amba_device(dev));
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -304,12 +324,22 @@ static void amba_shutdown(struct device *dev)
  */
 int amba_driver_register(struct amba_driver *drv)
 {
+<<<<<<< HEAD
 	drv->drv.bus = &amba_bustype;
 
 #define SETFN(fn)	if (drv->fn) drv->drv.fn = amba_##fn
 	SETFN(probe);
 	SETFN(remove);
 	SETFN(shutdown);
+=======
+	if (!drv->probe)
+		return -EINVAL;
+
+	drv->drv.bus = &amba_bustype;
+	drv->drv.probe = amba_probe;
+	drv->drv.remove = amba_remove;
+	drv->drv.shutdown = amba_shutdown;
+>>>>>>> common/deprecated/android-3.18
 
 	return driver_register(&drv->drv);
 }
@@ -355,9 +385,12 @@ int amba_device_add(struct amba_device *dev, struct resource *parent)
 	WARN_ON(dev->irq[0] == (unsigned int)-1);
 	WARN_ON(dev->irq[1] == (unsigned int)-1);
 
+<<<<<<< HEAD
 	if (strstr(dev_name(&dev->dev), "adma"))
 		adma_hw_reset(&dev->dev);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	ret = request_resource(parent, &dev->res);
 	if (ret)
 		goto err_out;

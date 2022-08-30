@@ -161,6 +161,10 @@ struct enic {
 	u16 num_vfs;
 #endif
 	spinlock_t enic_api_lock;
+<<<<<<< HEAD
+=======
+	bool enic_api_busy;
+>>>>>>> common/deprecated/android-3.18
 	struct enic_port_profile *pp;
 
 	/* work queue cache line section */

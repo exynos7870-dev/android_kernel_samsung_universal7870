@@ -88,10 +88,13 @@ int csum_partial_copy_fromiovecend(unsigned char *kdata, struct iovec *iov,
 	__wsum csum = *csump;
 	int partial_cnt = 0, err = 0;
 
+<<<<<<< HEAD
 	/* No data? Done! */
 	if (len == 0)
 		return 0;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* Skip over the finished iovecs */
 	while (offset >= iov->iov_len) {
 		offset -= iov->iov_len;

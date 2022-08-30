@@ -10,12 +10,15 @@
 #include <linux/ratelimit.h>
 #include <linux/msdos_fs.h>
 
+<<<<<<< HEAD
 #ifdef CONFIG_FAT_SUPPORT_STLOG
 #include <linux/stlog.h>
 #else
 #define ST_LOG(fmt,...) 
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * vfat shortname flags
  */
@@ -353,6 +356,14 @@ static inline void fatent_brelse(struct fat_entry *fatent)
 	fatent->fat_inode = NULL;
 }
 
+<<<<<<< HEAD
+=======
+static inline bool fat_valid_entry(struct msdos_sb_info *sbi, int entry)
+{
+	return FAT_START_ENT <= entry && entry < sbi->max_cluster;
+}
+
+>>>>>>> common/deprecated/android-3.18
 extern void fat_ent_access_init(struct super_block *sb);
 extern int fat_ent_read(struct inode *inode, struct fat_entry *fatent,
 			int entry);
@@ -422,6 +433,7 @@ void fat_cache_destroy(void);
 extern const struct export_operations fat_export_ops;
 extern const struct export_operations fat_export_ops_nostale;
 
+<<<<<<< HEAD
 /* fat/xattr.c */
 extern int fat_setxattr(struct dentry *dentry, const char *name,
 				const void *value, size_t size, int flags);
@@ -430,6 +442,8 @@ extern ssize_t fat_getxattr(struct dentry *dentry, const char *name,
 extern ssize_t fat_listxattr(struct dentry *dentry, char *list, size_t size);
 extern int fat_removexattr(struct dentry *dentry, const char *name);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /* helper for printk */
 typedef unsigned long long	llu;
 

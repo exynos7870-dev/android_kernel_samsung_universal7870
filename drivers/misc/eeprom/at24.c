@@ -274,6 +274,12 @@ static ssize_t at24_read(struct at24_data *at24,
 	if (unlikely(!count))
 		return count;
 
+<<<<<<< HEAD
+=======
+	if (off + count > at24->chip.byte_len)
+		return -EINVAL;
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Read data from chip, protecting against concurrent updates
 	 * from this host, but not from other I2C masters.
@@ -328,6 +334,12 @@ static ssize_t at24_eeprom_write(struct at24_data *at24, const char *buf,
 	unsigned long timeout, write_time;
 	unsigned next_page;
 
+<<<<<<< HEAD
+=======
+	if (offset + count > at24->chip.byte_len)
+		return -EINVAL;
+
+>>>>>>> common/deprecated/android-3.18
 	/* Get corresponding I2C address and adjust offset */
 	client = at24_translate_offset(at24, &offset);
 

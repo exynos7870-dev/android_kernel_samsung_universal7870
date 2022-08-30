@@ -38,12 +38,26 @@
 #include <linux/uio.h>
 #include <linux/uaccess.h>
 #include <linux/module.h>
+<<<<<<< HEAD
+=======
+#include <linux/compat.h>
+>>>>>>> common/deprecated/android-3.18
 #include <sound/core.h>
 #include <sound/initval.h>
 #include <sound/compress_params.h>
 #include <sound/compress_offload.h>
 #include <sound/compress_driver.h>
 
+<<<<<<< HEAD
+=======
+/* struct snd_compr_codec_caps overflows the ioctl bit size for some
+ * architectures, so we need to disable the relevant ioctls.
+ */
+#if _IOC_SIZEBITS < 14
+#define COMPR_CODEC_CAPS_OVERFLOW
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 /* TODO:
  * - add substream support for multiple devices in case of
  *	SND_DYNAMIC_MINORS is not used
@@ -438,6 +452,10 @@ out:
 	return retval;
 }
 
+<<<<<<< HEAD
+=======
+#ifndef COMPR_CODEC_CAPS_OVERFLOW
+>>>>>>> common/deprecated/android-3.18
 static int
 snd_compr_get_codec_caps(struct snd_compr_stream *stream, unsigned long arg)
 {
@@ -461,6 +479,10 @@ out:
 	kfree(caps);
 	return retval;
 }
+<<<<<<< HEAD
+=======
+#endif /* !COMPR_CODEC_CAPS_OVERFLOW */
+>>>>>>> common/deprecated/android-3.18
 
 /* revisit this with snd_pcm_preallocate_xxx */
 static int snd_compr_allocate_buffer(struct snd_compr_stream *stream,
@@ -491,7 +513,12 @@ static int snd_compress_check_input(struct snd_compr_params *params)
 {
 	/* first let's check the buffer parameter's */
 	if (params->buffer.fragment_size == 0 ||
+<<<<<<< HEAD
 	    params->buffer.fragments > INT_MAX / params->buffer.fragment_size)
+=======
+	    params->buffer.fragments > U32_MAX / params->buffer.fragment_size ||
+	    params->buffer.fragments == 0)
+>>>>>>> common/deprecated/android-3.18
 		return -EINVAL;
 
 	/* now codec parameters */
@@ -540,10 +567,14 @@ snd_compr_set_params(struct snd_compr_stream *stream, unsigned long arg)
 		stream->metadata_set = false;
 		stream->next_track = false;
 
+<<<<<<< HEAD
 		if (stream->direction == SND_COMPRESS_PLAYBACK)
 			stream->runtime->state = SNDRV_PCM_STATE_SETUP;
 		else
 			stream->runtime->state = SNDRV_PCM_STATE_PREPARED;
+=======
+		stream->runtime->state = SNDRV_PCM_STATE_SETUP;
+>>>>>>> common/deprecated/android-3.18
 	} else {
 		return -EPERM;
 	}
@@ -621,10 +652,16 @@ snd_compr_set_metadata(struct snd_compr_stream *stream, unsigned long arg)
 static inline int
 snd_compr_tstamp(struct snd_compr_stream *stream, unsigned long arg)
 {
+<<<<<<< HEAD
 	struct snd_compr_tstamp tstamp;
 	int ret;
 
 	memset(&tstamp, 0, sizeof(tstamp));
+=======
+	struct snd_compr_tstamp tstamp = {0};
+	int ret;
+
+>>>>>>> common/deprecated/android-3.18
 	ret = snd_compr_update_tstamp(stream, &tstamp);
 	if (ret == 0)
 		ret = copy_to_user((struct snd_compr_tstamp __user *)arg,
@@ -636,11 +673,18 @@ static int snd_compr_pause(struct snd_compr_stream *stream)
 {
 	int retval;
 
+<<<<<<< HEAD
 	if (stream->runtime->state != SNDRV_PCM_STATE_RUNNING
 		&& stream->runtime->state != SNDRV_PCM_STATE_DRAINING)
 		return -EPERM;
 	retval = stream->ops->trigger(stream, SNDRV_PCM_TRIGGER_PAUSE_PUSH);
 	if (!retval && stream->runtime->state != SNDRV_PCM_STATE_DRAINING)
+=======
+	if (stream->runtime->state != SNDRV_PCM_STATE_RUNNING)
+		return -EPERM;
+	retval = stream->ops->trigger(stream, SNDRV_PCM_TRIGGER_PAUSE_PUSH);
+	if (!retval)
+>>>>>>> common/deprecated/android-3.18
 		stream->runtime->state = SNDRV_PCM_STATE_PAUSED;
 	return retval;
 }
@@ -649,11 +693,18 @@ static int snd_compr_resume(struct snd_compr_stream *stream)
 {
 	int retval;
 
+<<<<<<< HEAD
 	if (stream->runtime->state != SNDRV_PCM_STATE_PAUSED
 		&& stream->runtime->state != SNDRV_PCM_STATE_DRAINING)
 		return -EPERM;
 	retval = stream->ops->trigger(stream, SNDRV_PCM_TRIGGER_PAUSE_RELEASE);
 	if (!retval && stream->runtime->state != SNDRV_PCM_STATE_DRAINING)
+=======
+	if (stream->runtime->state != SNDRV_PCM_STATE_PAUSED)
+		return -EPERM;
+	retval = stream->ops->trigger(stream, SNDRV_PCM_TRIGGER_PAUSE_RELEASE);
+	if (!retval)
+>>>>>>> common/deprecated/android-3.18
 		stream->runtime->state = SNDRV_PCM_STATE_RUNNING;
 	return retval;
 }
@@ -662,8 +713,22 @@ static int snd_compr_start(struct snd_compr_stream *stream)
 {
 	int retval;
 
+<<<<<<< HEAD
 	if (stream->runtime->state != SNDRV_PCM_STATE_PREPARED)
 		return -EPERM;
+=======
+	switch (stream->runtime->state) {
+	case SNDRV_PCM_STATE_SETUP:
+		if (stream->direction != SND_COMPRESS_CAPTURE)
+			return -EPERM;
+		break;
+	case SNDRV_PCM_STATE_PREPARED:
+		break;
+	default:
+		return -EPERM;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	retval = stream->ops->trigger(stream, SNDRV_PCM_TRIGGER_START);
 	if (!retval)
 		stream->runtime->state = SNDRV_PCM_STATE_RUNNING;
@@ -674,11 +739,28 @@ static int snd_compr_stop(struct snd_compr_stream *stream)
 {
 	int retval;
 
+<<<<<<< HEAD
 	if (stream->runtime->state == SNDRV_PCM_STATE_PREPARED ||
 			stream->runtime->state == SNDRV_PCM_STATE_SETUP)
 		return -EPERM;
 	retval = stream->ops->trigger(stream, SNDRV_PCM_TRIGGER_STOP);
 	if (!retval) {
+=======
+	switch (stream->runtime->state) {
+	case SNDRV_PCM_STATE_OPEN:
+	case SNDRV_PCM_STATE_SETUP:
+	case SNDRV_PCM_STATE_PREPARED:
+		return -EPERM;
+	default:
+		break;
+	}
+
+	retval = stream->ops->trigger(stream, SNDRV_PCM_TRIGGER_STOP);
+	if (!retval) {
+		/* clear flags and stop any drain wait */
+		stream->partial_drain = false;
+		stream->metadata_set = false;
+>>>>>>> common/deprecated/android-3.18
 		snd_compr_drain_notify(stream);
 		stream->runtime->total_bytes_available = 0;
 		stream->runtime->total_bytes_transferred = 0;
@@ -698,9 +780,13 @@ static int snd_compress_wait_for_drain(struct snd_compr_stream *stream)
 	 * stream will be moved to SETUP state, even if draining resulted in an
 	 * error. We can trigger next track after this.
 	 */
+<<<<<<< HEAD
 #ifndef CONFIG_SND_SAMSUNG_SEIREN_OFFLOAD
 	stream->runtime->state = SNDRV_PCM_STATE_DRAINING;
 #endif
+=======
+	stream->runtime->state = SNDRV_PCM_STATE_DRAINING;
+>>>>>>> common/deprecated/android-3.18
 	mutex_unlock(&stream->device->lock);
 
 	/* we wait for drain to complete here, drain can return when
@@ -727,6 +813,7 @@ static int snd_compr_drain(struct snd_compr_stream *stream)
 {
 	int retval;
 
+<<<<<<< HEAD
 	if (stream->runtime->state == SNDRV_PCM_STATE_PREPARED ||
 			stream->runtime->state == SNDRV_PCM_STATE_SETUP)
 		return -EPERM;
@@ -734,6 +821,20 @@ static int snd_compr_drain(struct snd_compr_stream *stream)
 #ifdef CONFIG_SND_SAMSUNG_SEIREN_OFFLOAD
 	stream->runtime->state = SNDRV_PCM_STATE_DRAINING;
 #endif
+=======
+	switch (stream->runtime->state) {
+	case SNDRV_PCM_STATE_OPEN:
+	case SNDRV_PCM_STATE_SETUP:
+	case SNDRV_PCM_STATE_PREPARED:
+	case SNDRV_PCM_STATE_PAUSED:
+		return -EPERM;
+	case SNDRV_PCM_STATE_XRUN:
+		return -EPIPE;
+	default:
+		break;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	retval = stream->ops->trigger(stream, SND_COMPR_TRIGGER_DRAIN);
 	if (retval) {
 		pr_debug("SND_COMPR_TRIGGER_DRAIN failed %d\n", retval);
@@ -769,16 +870,36 @@ static int snd_compr_next_track(struct snd_compr_stream *stream)
 static int snd_compr_partial_drain(struct snd_compr_stream *stream)
 {
 	int retval;
+<<<<<<< HEAD
 	if (stream->runtime->state == SNDRV_PCM_STATE_PREPARED ||
 			stream->runtime->state == SNDRV_PCM_STATE_SETUP)
 		return -EPERM;
 #ifdef CONFIG_SND_SAMSUNG_SEIREN_OFFLOAD
 	stream->runtime->state = SNDRV_PCM_STATE_DRAINING;
 #endif
+=======
+
+	switch (stream->runtime->state) {
+	case SNDRV_PCM_STATE_OPEN:
+	case SNDRV_PCM_STATE_SETUP:
+	case SNDRV_PCM_STATE_PREPARED:
+	case SNDRV_PCM_STATE_PAUSED:
+		return -EPERM;
+	case SNDRV_PCM_STATE_XRUN:
+		return -EPIPE;
+	default:
+		break;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	/* stream can be drained only when next track has been signalled */
 	if (stream->next_track == false)
 		return -EPERM;
 
+<<<<<<< HEAD
+=======
+	stream->partial_drain = true;
+>>>>>>> common/deprecated/android-3.18
 	retval = stream->ops->trigger(stream, SND_COMPR_TRIGGER_PARTIAL_DRAIN);
 	if (retval) {
 		pr_debug("Partial drain returned failure\n");
@@ -810,9 +931,17 @@ static long snd_compr_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 	case _IOC_NR(SNDRV_COMPRESS_GET_CAPS):
 		retval = snd_compr_get_caps(stream, arg);
 		break;
+<<<<<<< HEAD
 	case _IOC_NR(SNDRV_COMPRESS_GET_CODEC_CAPS):
 		retval = snd_compr_get_codec_caps(stream, arg);
 		break;
+=======
+#ifndef COMPR_CODEC_CAPS_OVERFLOW
+	case _IOC_NR(SNDRV_COMPRESS_GET_CODEC_CAPS):
+		retval = snd_compr_get_codec_caps(stream, arg);
+		break;
+#endif
+>>>>>>> common/deprecated/android-3.18
 	case _IOC_NR(SNDRV_COMPRESS_SET_PARAMS):
 		retval = snd_compr_set_params(stream, arg);
 		break;
@@ -858,6 +987,18 @@ static long snd_compr_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 	return retval;
 }
 
+<<<<<<< HEAD
+=======
+/* support of 32bit userspace on 64bit platforms */
+#ifdef CONFIG_COMPAT
+static long snd_compr_ioctl_compat(struct file *file, unsigned int cmd,
+						unsigned long arg)
+{
+	return snd_compr_ioctl(file, cmd, (unsigned long)compat_ptr(arg));
+}
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 static const struct file_operations snd_compr_file_ops = {
 		.owner =	THIS_MODULE,
 		.open =		snd_compr_open,
@@ -865,7 +1006,13 @@ static const struct file_operations snd_compr_file_ops = {
 		.write =	snd_compr_write,
 		.read =		snd_compr_read,
 		.unlocked_ioctl = snd_compr_ioctl,
+<<<<<<< HEAD
 		.compat_ioctl = snd_compr_ioctl,
+=======
+#ifdef CONFIG_COMPAT
+		.compat_ioctl = snd_compr_ioctl_compat,
+#endif
+>>>>>>> common/deprecated/android-3.18
 		.mmap =		snd_compr_mmap,
 		.poll =		snd_compr_poll,
 };

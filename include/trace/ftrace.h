@@ -765,7 +765,11 @@ perf_trace_##call(void *__data, proto)					\
 	struct ftrace_event_call *event_call = __data;			\
 	struct ftrace_data_offsets_##call __maybe_unused __data_offsets;\
 	struct ftrace_raw_##call *entry;				\
+<<<<<<< HEAD
 	struct pt_regs __regs;						\
+=======
+	struct pt_regs *__regs;						\
+>>>>>>> common/deprecated/android-3.18
 	u64 __addr = 0, __count = 1;					\
 	struct task_struct *__task = NULL;				\
 	struct hlist_head *head;					\
@@ -784,18 +788,30 @@ perf_trace_##call(void *__data, proto)					\
 			     sizeof(u64));				\
 	__entry_size -= sizeof(u32);					\
 									\
+<<<<<<< HEAD
 	perf_fetch_caller_regs(&__regs);				\
+=======
+>>>>>>> common/deprecated/android-3.18
 	entry = perf_trace_buf_prepare(__entry_size,			\
 			event_call->event.type, &__regs, &rctx);	\
 	if (!entry)							\
 		return;							\
 									\
+<<<<<<< HEAD
+=======
+	perf_fetch_caller_regs(__regs);					\
+									\
+>>>>>>> common/deprecated/android-3.18
 	tstruct								\
 									\
 	{ assign; }							\
 									\
 	perf_trace_buf_submit(entry, __entry_size, rctx, __addr,	\
+<<<<<<< HEAD
 		__count, &__regs, head, __task);			\
+=======
+		__count, __regs, head, __task);				\
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*

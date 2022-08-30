@@ -31,6 +31,14 @@ int mfd_cell_enable(struct platform_device *pdev)
 	const struct mfd_cell *cell = mfd_get_cell(pdev);
 	int err = 0;
 
+<<<<<<< HEAD
+=======
+	if (!cell->enable) {
+		dev_dbg(&pdev->dev, "No .enable() call-back registered\n");
+		return 0;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	/* only call enable hook if the cell wasn't previously enabled */
 	if (atomic_inc_return(cell->usage_count) == 1)
 		err = cell->enable(pdev);
@@ -48,6 +56,14 @@ int mfd_cell_disable(struct platform_device *pdev)
 	const struct mfd_cell *cell = mfd_get_cell(pdev);
 	int err = 0;
 
+<<<<<<< HEAD
+=======
+	if (!cell->disable) {
+		dev_dbg(&pdev->dev, "No .disable() call-back registered\n");
+		return 0;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	/* only disable if no other clients are using it */
 	if (atomic_dec_return(cell->usage_count) == 0)
 		err = cell->disable(pdev);
@@ -326,6 +342,11 @@ int mfd_clone_cell(const char *cell, const char **clones, size_t n_clones)
 					clones[i]);
 	}
 
+<<<<<<< HEAD
+=======
+	put_device(dev);
+
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 EXPORT_SYMBOL(mfd_clone_cell);

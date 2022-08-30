@@ -132,6 +132,10 @@ static inline u32 ath79_pll_rr(unsigned reg)
 static inline void ath79_reset_wr(unsigned reg, u32 val)
 {
 	__raw_writel(val, ath79_reset_base + reg);
+<<<<<<< HEAD
+=======
+	(void) __raw_readl(ath79_reset_base + reg); /* flush */
+>>>>>>> common/deprecated/android-3.18
 }
 
 static inline u32 ath79_reset_rr(unsigned reg)

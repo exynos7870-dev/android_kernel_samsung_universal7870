@@ -875,6 +875,13 @@ static int usb_probe(struct usb_interface *intf, const struct usb_device_id *id)
 	int ret, pipe, i;
 
 	interface = intf->cur_altsetting;
+<<<<<<< HEAD
+=======
+
+	if (interface->desc.bNumEndpoints < 1)
+		return -ENODEV;
+
+>>>>>>> common/deprecated/android-3.18
 	endpoint = &interface->endpoint[0].desc;
 	if (!usb_endpoint_is_int_in(endpoint))
 		return -ENODEV;

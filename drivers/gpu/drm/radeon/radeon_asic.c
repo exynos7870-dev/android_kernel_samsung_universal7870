@@ -1190,7 +1190,11 @@ static struct radeon_asic rs780_asic = {
 static struct radeon_asic_ring rv770_uvd_ring = {
 	.ib_execute = &uvd_v1_0_ib_execute,
 	.emit_fence = &uvd_v2_2_fence_emit,
+<<<<<<< HEAD
 	.emit_semaphore = &uvd_v1_0_semaphore_emit,
+=======
+	.emit_semaphore = &uvd_v2_2_semaphore_emit,
+>>>>>>> common/deprecated/android-3.18
 	.cs_parse = &radeon_uvd_cs_parse,
 	.ring_test = &uvd_v1_0_ring_test,
 	.ib_test = &uvd_v1_0_ib_test,

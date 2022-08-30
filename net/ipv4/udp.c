@@ -90,6 +90,10 @@
 #include <linux/socket.h>
 #include <linux/sockios.h>
 #include <linux/igmp.h>
+<<<<<<< HEAD
+=======
+#include <linux/inetdevice.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/in.h>
 #include <linux/errno.h>
 #include <linux/timer.h>
@@ -951,8 +955,15 @@ int udp_sendmsg(struct kiocb *iocb, struct sock *sk, struct msghdr *msg,
 	if (msg->msg_controllen) {
 		err = ip_cmsg_send(sock_net(sk), msg, &ipc,
 				   sk->sk_family == AF_INET6);
+<<<<<<< HEAD
 		if (err)
 			return err;
+=======
+		if (unlikely(err)) {
+			kfree(ipc.opt);
+			return err;
+		}
+>>>>>>> common/deprecated/android-3.18
 		if (ipc.opt)
 			free = 1;
 		connected = 0;
@@ -974,8 +985,15 @@ int udp_sendmsg(struct kiocb *iocb, struct sock *sk, struct msghdr *msg,
 	ipc.addr = faddr = daddr;
 
 	if (ipc.opt && ipc.opt->opt.srr) {
+<<<<<<< HEAD
 		if (!daddr)
 			return -EINVAL;
+=======
+		if (!daddr) {
+			err = -EINVAL;
+			goto out_free;
+		}
+>>>>>>> common/deprecated/android-3.18
 		faddr = ipc.opt->opt.faddr;
 		connected = 0;
 	}
@@ -1081,6 +1099,10 @@ do_append_data:
 
 out:
 	ip_rt_put(rt);
+<<<<<<< HEAD
+=======
+out_free:
+>>>>>>> common/deprecated/android-3.18
 	if (free)
 		kfree(ipc.opt);
 	if (!err)
@@ -1289,7 +1311,11 @@ try_again:
 	else {
 		err = skb_copy_and_csum_datagram_iovec(skb,
 						       sizeof(struct udphdr),
+<<<<<<< HEAD
 						       msg->msg_iov, copied);
+=======
+						       msg->msg_iov);
+>>>>>>> common/deprecated/android-3.18
 
 		if (err == -EINVAL)
 			goto csum_copy_err;
@@ -1439,7 +1465,11 @@ static void udp_v4_rehash(struct sock *sk)
 	udp_lib_rehash(sk, new_hash);
 }
 
+<<<<<<< HEAD
 static int __udp_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
+=======
+int __udp_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
+>>>>>>> common/deprecated/android-3.18
 {
 	int rc;
 
@@ -1533,7 +1563,11 @@ int udp_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
 	/*
 	 * 	UDP-Lite specific tests, ignored on UDP sockets
 	 */
+<<<<<<< HEAD
 	if ((is_udplite & UDPLITE_RECV_CC)  &&  UDP_SKB_CB(skb)->partial_cov) {
+=======
+	if ((up->pcflag & UDPLITE_RECV_CC)  &&  UDP_SKB_CB(skb)->partial_cov) {
+>>>>>>> common/deprecated/android-3.18
 
 		/*
 		 * MIB statistics other than incrementing the error count are
@@ -1564,8 +1598,12 @@ int udp_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
 		}
 	}
 
+<<<<<<< HEAD
 	if (rcu_access_pointer(sk->sk_filter) &&
 	    udp_lib_checksum_complete(skb))
+=======
+	if (udp_lib_checksum_complete(skb))
+>>>>>>> common/deprecated/android-3.18
 		goto csum_error;
 
 
@@ -1660,10 +1698,17 @@ static int __udp4_lib_mcast_deliver(struct net *net, struct sk_buff *skb,
 
 	if (use_hash2) {
 		hash2_any = udp4_portaddr_hash(net, htonl(INADDR_ANY), hnum) &
+<<<<<<< HEAD
 			    udp_table.mask;
 		hash2 = udp4_portaddr_hash(net, daddr, hnum) & udp_table.mask;
 start_lookup:
 		hslot = &udp_table.hash2[hash2];
+=======
+			    udptable->mask;
+		hash2 = udp4_portaddr_hash(net, daddr, hnum) & udptable->mask;
+start_lookup:
+		hslot = &udptable->hash2[hash2];
+>>>>>>> common/deprecated/android-3.18
 		offset = offsetof(typeof(*sk), __sk_common.skc_portaddr_node);
 	}
 
@@ -1718,10 +1763,25 @@ static inline int udp4_csum_init(struct sk_buff *skb, struct udphdr *uh,
 		err = udplite_checksum_init(skb, uh);
 		if (err)
 			return err;
+<<<<<<< HEAD
 	}
 
 	return skb_checksum_init_zero_check(skb, proto, uh->check,
 					    inet_compute_pseudo);
+=======
+
+		if (UDP_SKB_CB(skb)->partial_cov) {
+			skb->csum = inet_compute_pseudo(skb, proto);
+			return 0;
+		}
+	}
+
+	/* Note, we are only interested in != 0 or == 0, thus the
+	 * force to int.
+	 */
+	return (__force int)skb_checksum_init_zero_check(skb, proto, uh->check,
+							 inet_compute_pseudo);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
@@ -1951,6 +2011,10 @@ void udp_v4_early_demux(struct sk_buff *skb)
 	struct sock *sk;
 	struct dst_entry *dst;
 	int dif = skb->dev->ifindex;
+<<<<<<< HEAD
+=======
+	int ours;
+>>>>>>> common/deprecated/android-3.18
 
 	/* validate the packet */
 	if (!pskb_may_pull(skb, skb_transport_offset(skb) + sizeof(struct udphdr)))
@@ -1960,6 +2024,7 @@ void udp_v4_early_demux(struct sk_buff *skb)
 	uh = udp_hdr(skb);
 
 	if (skb->pkt_type == PACKET_BROADCAST ||
+<<<<<<< HEAD
 	    skb->pkt_type == PACKET_MULTICAST)
 		sk = __udp4_lib_mcast_demux_lookup(net, uh->dest, iph->daddr,
 						   uh->source, iph->saddr, dif);
@@ -1968,18 +2033,58 @@ void udp_v4_early_demux(struct sk_buff *skb)
 					     uh->source, iph->saddr, dif);
 	else
 		return;
+=======
+	    skb->pkt_type == PACKET_MULTICAST) {
+		struct in_device *in_dev = __in_dev_get_rcu(skb->dev);
+
+		if (!in_dev)
+			return;
+
+		/* we are supposed to accept bcast packets */
+		if (skb->pkt_type == PACKET_MULTICAST) {
+			ours = ip_check_mc_rcu(in_dev, iph->daddr, iph->saddr,
+					       iph->protocol);
+			if (!ours)
+				return;
+		}
+
+		sk = __udp4_lib_mcast_demux_lookup(net, uh->dest, iph->daddr,
+						   uh->source, iph->saddr, dif);
+	} else if (skb->pkt_type == PACKET_HOST) {
+		sk = __udp4_lib_demux_lookup(net, uh->dest, iph->daddr,
+					     uh->source, iph->saddr, dif);
+	} else {
+		return;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	if (!sk)
 		return;
 
 	skb->sk = sk;
 	skb->destructor = sock_efree;
+<<<<<<< HEAD
 	dst = sk->sk_rx_dst;
 
 	if (dst)
 		dst = dst_check(dst, 0);
 	if (dst)
 		skb_dst_set_noref(skb, dst);
+=======
+	dst = READ_ONCE(sk->sk_rx_dst);
+
+	if (dst)
+		dst = dst_check(dst, 0);
+	if (dst) {
+		/* DST_NOCACHE can not be used without taking a reference */
+		if (dst->flags & DST_NOCACHE) {
+			if (likely(atomic_inc_not_zero(&dst->__refcnt)))
+				skb_dst_set(skb, dst);
+		} else {
+			skb_dst_set_noref(skb, dst);
+		}
+	}
+>>>>>>> common/deprecated/android-3.18
 }
 
 int udp_rcv(struct sk_buff *skb)
@@ -2217,6 +2322,23 @@ unsigned int udp_poll(struct file *file, struct socket *sock, poll_table *wait)
 }
 EXPORT_SYMBOL(udp_poll);
 
+<<<<<<< HEAD
+=======
+int udp_abort(struct sock *sk, int err)
+{
+	lock_sock(sk);
+
+	sk->sk_err = err;
+	sk->sk_error_report(sk);
+	udp_disconnect(sk, 0);
+
+	release_sock(sk);
+
+	return 0;
+}
+EXPORT_SYMBOL_GPL(udp_abort);
+
+>>>>>>> common/deprecated/android-3.18
 struct proto udp_prot = {
 	.name		   = "UDP",
 	.owner		   = THIS_MODULE,
@@ -2248,6 +2370,10 @@ struct proto udp_prot = {
 	.compat_getsockopt = compat_udp_getsockopt,
 #endif
 	.clear_sk	   = sk_prot_clear_portaddr_nulls,
+<<<<<<< HEAD
+=======
+	.diag_destroy	   = udp_abort,
+>>>>>>> common/deprecated/android-3.18
 };
 EXPORT_SYMBOL(udp_prot);
 

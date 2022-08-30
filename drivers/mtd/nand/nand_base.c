@@ -600,7 +600,12 @@ static void nand_command(struct mtd_info *mtd, unsigned int command,
 		chip->cmd_ctrl(mtd, readcmd, ctrl);
 		ctrl &= ~NAND_CTRL_CHANGE;
 	}
+<<<<<<< HEAD
 	chip->cmd_ctrl(mtd, command, ctrl);
+=======
+	if (command != NAND_CMD_NONE)
+		chip->cmd_ctrl(mtd, command, ctrl);
+>>>>>>> common/deprecated/android-3.18
 
 	/* Address cycle, when necessary */
 	ctrl = NAND_CTRL_ALE | NAND_CTRL_CHANGE;
@@ -629,6 +634,10 @@ static void nand_command(struct mtd_info *mtd, unsigned int command,
 	 */
 	switch (command) {
 
+<<<<<<< HEAD
+=======
+	case NAND_CMD_NONE:
+>>>>>>> common/deprecated/android-3.18
 	case NAND_CMD_PAGEPROG:
 	case NAND_CMD_ERASE1:
 	case NAND_CMD_ERASE2:
@@ -691,7 +700,13 @@ static void nand_command_lp(struct mtd_info *mtd, unsigned int command,
 	}
 
 	/* Command latch cycle */
+<<<<<<< HEAD
 	chip->cmd_ctrl(mtd, command, NAND_NCE | NAND_CLE | NAND_CTRL_CHANGE);
+=======
+	if (command != NAND_CMD_NONE)
+		chip->cmd_ctrl(mtd, command,
+			       NAND_NCE | NAND_CLE | NAND_CTRL_CHANGE);
+>>>>>>> common/deprecated/android-3.18
 
 	if (column != -1 || page_addr != -1) {
 		int ctrl = NAND_CTRL_CHANGE | NAND_NCE | NAND_ALE;
@@ -724,6 +739,10 @@ static void nand_command_lp(struct mtd_info *mtd, unsigned int command,
 	 */
 	switch (command) {
 
+<<<<<<< HEAD
+=======
+	case NAND_CMD_NONE:
+>>>>>>> common/deprecated/android-3.18
 	case NAND_CMD_CACHEDPROG:
 	case NAND_CMD_PAGEPROG:
 	case NAND_CMD_ERASE1:
@@ -1872,6 +1891,10 @@ static int nand_write_oob_syndrome(struct mtd_info *mtd,
 static int nand_do_read_oob(struct mtd_info *mtd, loff_t from,
 			    struct mtd_oob_ops *ops)
 {
+<<<<<<< HEAD
+=======
+	unsigned int max_bitflips = 0;
+>>>>>>> common/deprecated/android-3.18
 	int page, realpage, chipnr;
 	struct nand_chip *chip = mtd->priv;
 	struct mtd_ecc_stats stats;
@@ -1932,6 +1955,11 @@ static int nand_do_read_oob(struct mtd_info *mtd, loff_t from,
 				nand_wait_ready(mtd);
 		}
 
+<<<<<<< HEAD
+=======
+		max_bitflips = max_t(unsigned int, max_bitflips, ret);
+
+>>>>>>> common/deprecated/android-3.18
 		readlen -= len;
 		if (!readlen)
 			break;
@@ -1957,7 +1985,11 @@ static int nand_do_read_oob(struct mtd_info *mtd, loff_t from,
 	if (mtd->ecc_stats.failed - stats.failed)
 		return -EBADMSG;
 
+<<<<<<< HEAD
 	return  mtd->ecc_stats.corrected - stats.corrected ? -EUCLEAN : 0;
+=======
+	return max_bitflips;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -2424,7 +2456,11 @@ static int nand_do_write_ops(struct mtd_info *mtd, loff_t to,
 		int cached = writelen > bytes && page != blockmask;
 		uint8_t *wbuf = buf;
 		int use_bufpoi;
+<<<<<<< HEAD
 		int part_pagewr = (column || writelen < (mtd->writesize - 1));
+=======
+		int part_pagewr = (column || writelen < mtd->writesize);
+>>>>>>> common/deprecated/android-3.18
 
 		if (part_pagewr)
 			use_bufpoi = 1;
@@ -2501,6 +2537,7 @@ static int panic_nand_write(struct mtd_info *mtd, loff_t to, size_t len,
 			    size_t *retlen, const uint8_t *buf)
 {
 	struct nand_chip *chip = mtd->priv;
+<<<<<<< HEAD
 	struct mtd_oob_ops ops;
 	int ret;
 
@@ -2510,6 +2547,20 @@ static int panic_nand_write(struct mtd_info *mtd, loff_t to, size_t len,
 	/* Grab the device */
 	panic_nand_get_device(chip, mtd, FL_WRITING);
 
+=======
+	int chipnr = (int)(to >> chip->chip_shift);
+	struct mtd_oob_ops ops;
+	int ret;
+
+	/* Grab the device */
+	panic_nand_get_device(chip, mtd, FL_WRITING);
+
+	chip->select_chip(mtd, chipnr);
+
+	/* Wait for the device to get ready */
+	panic_nand_wait(mtd, chip, 400);
+
+>>>>>>> common/deprecated/android-3.18
 	ops.len = len;
 	ops.datbuf = (uint8_t *)buf;
 	ops.oobbuf = NULL;
@@ -3780,7 +3831,10 @@ ident_done:
  * This is the first phase of the normal nand_scan() function. It reads the
  * flash ID and sets up MTD fields accordingly.
  *
+<<<<<<< HEAD
  * The mtd->owner field must be set to the module of the caller.
+=======
+>>>>>>> common/deprecated/android-3.18
  */
 int nand_scan_ident(struct mtd_info *mtd, int maxchips,
 		    struct nand_flash_dev *table)
@@ -3789,6 +3843,12 @@ int nand_scan_ident(struct mtd_info *mtd, int maxchips,
 	struct nand_chip *chip = mtd->priv;
 	struct nand_flash_dev *type;
 
+<<<<<<< HEAD
+=======
+	if (!mtd->name && mtd->dev.parent)
+		mtd->name = dev_name(mtd->dev.parent);
+
+>>>>>>> common/deprecated/android-3.18
 	/* Set the default functions */
 	nand_set_defaults(chip, chip->options & NAND_BUSWIDTH_16);
 
@@ -4191,19 +4251,26 @@ EXPORT_SYMBOL(nand_scan_tail);
  *
  * This fills out all the uninitialized function pointers with the defaults.
  * The flash ID is read and the mtd/chip structures are filled with the
+<<<<<<< HEAD
  * appropriate values. The mtd->owner field must be set to the module of the
  * caller.
+=======
+ * appropriate values.
+>>>>>>> common/deprecated/android-3.18
  */
 int nand_scan(struct mtd_info *mtd, int maxchips)
 {
 	int ret;
 
+<<<<<<< HEAD
 	/* Many callers got this wrong, so check for it for a while... */
 	if (!mtd->owner && caller_is_module()) {
 		pr_crit("%s called with NULL mtd->owner!\n", __func__);
 		BUG();
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	ret = nand_scan_ident(mtd, maxchips, NULL);
 	if (!ret)
 		ret = nand_scan_tail(mtd);
@@ -4212,6 +4279,7 @@ int nand_scan(struct mtd_info *mtd, int maxchips)
 EXPORT_SYMBOL(nand_scan);
 
 /**
+<<<<<<< HEAD
  * nand_release - [NAND Interface] Free resources held by the NAND device
  * @mtd: MTD device structure
  */
@@ -4224,6 +4292,16 @@ void nand_release(struct mtd_info *mtd)
 
 	mtd_device_unregister(mtd);
 
+=======
+ * nand_cleanup - [NAND Interface] Free resources held by the NAND device
+ * @chip: NAND chip object
+ */
+void nand_cleanup(struct nand_chip *chip)
+{
+	if (chip->ecc.mode == NAND_ECC_SOFT_BCH)
+		nand_bch_free((struct nand_bch_control *)chip->ecc.priv);
+
+>>>>>>> common/deprecated/android-3.18
 	/* Free bad block table memory */
 	kfree(chip->bbt);
 	if (!(chip->options & NAND_OWN_BUFFERS))
@@ -4234,6 +4312,21 @@ void nand_release(struct mtd_info *mtd)
 			& NAND_BBT_DYNAMICSTRUCT)
 		kfree(chip->badblock_pattern);
 }
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL_GPL(nand_cleanup);
+
+/**
+ * nand_release - [NAND Interface] Unregister the MTD device and free resources
+ *		  held by the NAND device
+ * @mtd: MTD device structure
+ */
+void nand_release(struct mtd_info *mtd)
+{
+	mtd_device_unregister(mtd);
+	nand_cleanup(mtd->priv);
+}
+>>>>>>> common/deprecated/android-3.18
 EXPORT_SYMBOL_GPL(nand_release);
 
 static int __init nand_base_init(void)

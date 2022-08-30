@@ -54,7 +54,11 @@
 #define SB800_PM_WATCHDOG_CONFIG	0x4C
 
 #define SB800_PCI_WATCHDOG_DECODE_EN	(1 << 0)
+<<<<<<< HEAD
 #define SB800_PM_WATCHDOG_DISABLE	(1 << 2)
+=======
+#define SB800_PM_WATCHDOG_DISABLE	(1 << 1)
+>>>>>>> common/deprecated/android-3.18
 #define SB800_PM_WATCHDOG_SECOND_RES	(3 << 0)
 #define SB800_ACPI_MMIO_DECODE_EN	(1 << 0)
 #define SB800_ACPI_MMIO_SEL		(1 << 1)

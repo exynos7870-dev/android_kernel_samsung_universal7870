@@ -598,6 +598,7 @@ static struct usb_gadget_strings *fn_strings[] = {
 	NULL,
 };
 
+<<<<<<< HEAD
 static struct usb_qualifier_descriptor devqual_desc = {
 	.bLength = sizeof devqual_desc,
 	.bDescriptorType = USB_DT_DEVICE_QUALIFIER,
@@ -610,6 +611,8 @@ static struct usb_qualifier_descriptor devqual_desc = {
 	.bRESERVED = 0,
 };
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static struct usb_interface_assoc_descriptor iad_desc = {
 	.bLength = sizeof iad_desc,
 	.bDescriptorType = USB_DT_INTERFACE_ASSOCIATION,
@@ -941,6 +944,7 @@ static struct usb_descriptor_header *hs_audio_desc[] = {
 };
 
 struct cntrl_cur_lay3 {
+<<<<<<< HEAD
 	__u32	dCUR;
 };
 
@@ -949,6 +953,16 @@ struct cntrl_range_lay3 {
 	__u32	dMIN;
 	__u32	dMAX;
 	__u32	dRES;
+=======
+	__le32	dCUR;
+};
+
+struct cntrl_range_lay3 {
+	__le16	wNumSubRanges;
+	__le32	dMIN;
+	__le32	dMAX;
+	__le32	dRES;
+>>>>>>> common/deprecated/android-3.18
 } __packed;
 
 static inline void
@@ -1029,6 +1043,11 @@ afunc_bind(struct usb_configuration *cfg, struct usb_function *fn)
 		dev_err(dev, "%s:%d Error!\n", __func__, __LINE__);
 		return ret;
 	}
+<<<<<<< HEAD
+=======
+	iad_desc.bFirstInterface = ret;
+
+>>>>>>> common/deprecated/android-3.18
 	std_ac_if_desc.bInterfaceNumber = ret;
 	agdev->ac_intf = ret;
 	agdev->ac_alt = 0;
@@ -1056,14 +1075,22 @@ afunc_bind(struct usb_configuration *cfg, struct usb_function *fn)
 	agdev->out_ep = usb_ep_autoconfig(gadget, &fs_epout_desc);
 	if (!agdev->out_ep) {
 		dev_err(dev, "%s:%d Error!\n", __func__, __LINE__);
+<<<<<<< HEAD
 		goto err;
+=======
+		return ret;
+>>>>>>> common/deprecated/android-3.18
 	}
 	agdev->out_ep->driver_data = agdev;
 
 	agdev->in_ep = usb_ep_autoconfig(gadget, &fs_epin_desc);
 	if (!agdev->in_ep) {
 		dev_err(dev, "%s:%d Error!\n", __func__, __LINE__);
+<<<<<<< HEAD
 		goto err;
+=======
+		return ret;
+>>>>>>> common/deprecated/android-3.18
 	}
 	agdev->in_ep->driver_data = agdev;
 
@@ -1077,7 +1104,11 @@ afunc_bind(struct usb_configuration *cfg, struct usb_function *fn)
 
 	ret = usb_assign_descriptors(fn, fs_audio_desc, hs_audio_desc, NULL);
 	if (ret)
+<<<<<<< HEAD
 		goto err;
+=======
+		return ret;
+>>>>>>> common/deprecated/android-3.18
 
 	prm = &agdev->uac2.c_prm;
 	prm->max_psize = hs_epout_desc.wMaxPacketSize;
@@ -1092,16 +1123,26 @@ afunc_bind(struct usb_configuration *cfg, struct usb_function *fn)
 	prm->rbuf = kzalloc(prm->max_psize * USB_XFERS, GFP_KERNEL);
 	if (!prm->rbuf) {
 		prm->max_psize = 0;
+<<<<<<< HEAD
 		goto err_free_descs;
+=======
+		goto err;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	ret = alsa_uac2_init(agdev);
 	if (ret)
+<<<<<<< HEAD
 		goto err_free_descs;
 	return 0;
 
 err_free_descs:
 	usb_free_all_descriptors(fn);
+=======
+		goto err;
+	return 0;
+
+>>>>>>> common/deprecated/android-3.18
 err:
 	kfree(agdev->uac2.p_prm.rbuf);
 	kfree(agdev->uac2.c_prm.rbuf);
@@ -1109,6 +1150,11 @@ err:
 		agdev->in_ep->driver_data = NULL;
 	if (agdev->out_ep)
 		agdev->out_ep->driver_data = NULL;
+<<<<<<< HEAD
+=======
+err_free_descs:
+	usb_free_all_descriptors(fn);
+>>>>>>> common/deprecated/android-3.18
 	return -EINVAL;
 }
 
@@ -1162,14 +1208,22 @@ afunc_set_alt(struct usb_function *fn, unsigned intf, unsigned alt)
 			factor = 1000;
 		} else {
 			ep_desc = &hs_epin_desc;
+<<<<<<< HEAD
 			factor = 125;
+=======
+			factor = 8000;
+>>>>>>> common/deprecated/android-3.18
 		}
 
 		/* pre-compute some values for iso_complete() */
 		uac2->p_framesize = opts->p_ssize *
 				    num_channels(opts->p_chmask);
 		rate = opts->p_srate * uac2->p_framesize;
+<<<<<<< HEAD
 		uac2->p_interval = (1 << (ep_desc->bInterval - 1)) * factor;
+=======
+		uac2->p_interval = factor / (1 << (ep_desc->bInterval - 1));
+>>>>>>> common/deprecated/android-3.18
 		uac2->p_pktsize = min_t(unsigned int, rate / uac2->p_interval,
 					prm->max_psize);
 
@@ -1270,11 +1324,20 @@ in_rq_cur(struct usb_function *fn, const struct usb_ctrlrequest *cr)
 
 	if (control_selector == UAC2_CS_CONTROL_SAM_FREQ) {
 		struct cntrl_cur_lay3 c;
+<<<<<<< HEAD
 
 		if (entity_id == USB_IN_CLK_ID)
 			c.dCUR = p_srate;
 		else if (entity_id == USB_OUT_CLK_ID)
 			c.dCUR = c_srate;
+=======
+		memset(&c, 0, sizeof(struct cntrl_cur_lay3));
+
+		if (entity_id == USB_IN_CLK_ID)
+			c.dCUR = cpu_to_le32(p_srate);
+		else if (entity_id == USB_OUT_CLK_ID)
+			c.dCUR = cpu_to_le32(c_srate);
+>>>>>>> common/deprecated/android-3.18
 
 		value = min_t(unsigned, w_length, sizeof c);
 		memcpy(req->buf, &c, value);
@@ -1312,15 +1375,25 @@ in_rq_range(struct usb_function *fn, const struct usb_ctrlrequest *cr)
 
 	if (control_selector == UAC2_CS_CONTROL_SAM_FREQ) {
 		if (entity_id == USB_IN_CLK_ID)
+<<<<<<< HEAD
 			r.dMIN = p_srate;
 		else if (entity_id == USB_OUT_CLK_ID)
 			r.dMIN = c_srate;
+=======
+			r.dMIN = cpu_to_le32(p_srate);
+		else if (entity_id == USB_OUT_CLK_ID)
+			r.dMIN = cpu_to_le32(c_srate);
+>>>>>>> common/deprecated/android-3.18
 		else
 			return -EOPNOTSUPP;
 
 		r.dMAX = r.dMIN;
 		r.dRES = 0;
+<<<<<<< HEAD
 		r.wNumSubRanges = 1;
+=======
+		r.wNumSubRanges = cpu_to_le16(1);
+>>>>>>> common/deprecated/android-3.18
 
 		value = min_t(unsigned, w_length, sizeof r);
 		memcpy(req->buf, &r, value);

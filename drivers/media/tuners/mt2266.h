@@ -24,7 +24,11 @@ struct mt2266_config {
 	u8 i2c_address;
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_MEDIA_TUNER_MT2266)
+=======
+#if IS_REACHABLE(CONFIG_MEDIA_TUNER_MT2266)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend * mt2266_attach(struct dvb_frontend *fe, struct i2c_adapter *i2c, struct mt2266_config *cfg);
 #else
 static inline struct dvb_frontend * mt2266_attach(struct dvb_frontend *fe, struct i2c_adapter *i2c, struct mt2266_config *cfg)

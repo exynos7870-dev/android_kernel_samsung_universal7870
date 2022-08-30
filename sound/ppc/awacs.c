@@ -991,6 +991,10 @@ snd_pmac_awacs_init(struct snd_pmac *chip)
 		if (err < 0)
 			return err;
 	}
+<<<<<<< HEAD
+=======
+	master_vol = NULL;
+>>>>>>> common/deprecated/android-3.18
 	if (pm7500)
 		err = build_mixers(chip,
 				   ARRAY_SIZE(snd_pmac_awacs_mixers_pmac7500),

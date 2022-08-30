@@ -658,10 +658,27 @@ out:
 struct dib0700_rc_response {
 	u8 report_id;
 	u8 data_state;
+<<<<<<< HEAD
 	u8 system;
 	u8 not_system;
 	u8 data;
 	u8 not_data;
+=======
+	union {
+		struct {
+			u8 system;
+			u8 not_system;
+			u8 data;
+			u8 not_data;
+		} nec;
+		struct {
+			u8 not_used;
+			u8 system;
+			u8 data;
+			u8 not_data;
+		} rc5;
+	};
+>>>>>>> common/deprecated/android-3.18
 };
 #define RC_MSG_SIZE_V1_20 6
 
@@ -670,7 +687,11 @@ static void dib0700_rc_urb_completion(struct urb *purb)
 	struct dvb_usb_device *d = purb->context;
 	struct dib0700_rc_response *poll_reply;
 	enum rc_type protocol;
+<<<<<<< HEAD
 	u32 uninitialized_var(keycode);
+=======
+	u32 keycode;
+>>>>>>> common/deprecated/android-3.18
 	u8 toggle;
 
 	deb_info("%s()\n", __func__);
@@ -697,8 +718,13 @@ static void dib0700_rc_urb_completion(struct urb *purb)
 
 	deb_data("IR ID = %02X state = %02X System = %02X %02X Cmd = %02X %02X (len %d)\n",
 		 poll_reply->report_id, poll_reply->data_state,
+<<<<<<< HEAD
 		 poll_reply->system, poll_reply->not_system,
 		 poll_reply->data, poll_reply->not_data,
+=======
+		 poll_reply->nec.system, poll_reply->nec.not_system,
+		 poll_reply->nec.data, poll_reply->nec.not_data,
+>>>>>>> common/deprecated/android-3.18
 		 purb->actual_length);
 
 	switch (d->props.rc.core.protocol) {
@@ -707,6 +733,7 @@ static void dib0700_rc_urb_completion(struct urb *purb)
 		toggle = 0;
 
 		/* NEC protocol sends repeat code as 0 0 0 FF */
+<<<<<<< HEAD
 		if (poll_reply->system     == 0x00 &&
 		    poll_reply->not_system == 0x00 &&
 		    poll_reply->data       == 0x00 &&
@@ -731,6 +758,33 @@ static void dib0700_rc_urb_completion(struct urb *purb)
 			deb_data("NEC normal protocol\n");
 			keycode = RC_SCANCODE_NEC(poll_reply->system,
 						   poll_reply->data);
+=======
+		if (poll_reply->nec.system     == 0x00 &&
+		    poll_reply->nec.not_system == 0x00 &&
+		    poll_reply->nec.data       == 0x00 &&
+		    poll_reply->nec.not_data   == 0xff) {
+			poll_reply->data_state = 2;
+			rc_repeat(d->rc_dev);
+			goto resubmit;
+		}
+
+		if ((poll_reply->nec.data ^ poll_reply->nec.not_data) != 0xff) {
+			deb_data("NEC32 protocol\n");
+			keycode = RC_SCANCODE_NEC32(poll_reply->nec.system     << 24 |
+						     poll_reply->nec.not_system << 16 |
+						     poll_reply->nec.data       << 8  |
+						     poll_reply->nec.not_data);
+		} else if ((poll_reply->nec.system ^ poll_reply->nec.not_system) != 0xff) {
+			deb_data("NEC extended protocol\n");
+			keycode = RC_SCANCODE_NECX(poll_reply->nec.system << 8 |
+						    poll_reply->nec.not_system,
+						    poll_reply->nec.data);
+
+		} else {
+			deb_data("NEC normal protocol\n");
+			keycode = RC_SCANCODE_NEC(poll_reply->nec.system,
+						   poll_reply->nec.data);
+>>>>>>> common/deprecated/android-3.18
 		}
 
 		break;
@@ -738,11 +792,24 @@ static void dib0700_rc_urb_completion(struct urb *purb)
 		deb_data("RC5 protocol\n");
 		protocol = RC_TYPE_RC5;
 		toggle = poll_reply->report_id;
+<<<<<<< HEAD
 		keycode = RC_SCANCODE_RC5(poll_reply->system, poll_reply->data);
+=======
+		keycode = RC_SCANCODE_RC5(poll_reply->rc5.system, poll_reply->rc5.data);
+
+		if ((poll_reply->rc5.data ^ poll_reply->rc5.not_data) != 0xff) {
+			/* Key failed integrity check */
+			err("key failed integrity check: %02x %02x %02x %02x",
+			    poll_reply->rc5.not_used, poll_reply->rc5.system,
+			    poll_reply->rc5.data, poll_reply->rc5.not_data);
+			goto resubmit;
+		}
+>>>>>>> common/deprecated/android-3.18
 
 		break;
 	}
 
+<<<<<<< HEAD
 	if ((poll_reply->data + poll_reply->not_data) != 0xff) {
 		/* Key failed integrity check */
 		err("key failed integrity check: %02x %02x %02x %02x",
@@ -751,6 +818,8 @@ static void dib0700_rc_urb_completion(struct urb *purb)
 		goto resubmit;
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	rc_keydown(d->rc_dev, protocol, keycode, toggle);
 
 resubmit:
@@ -775,6 +844,12 @@ int dib0700_rc_setup(struct dvb_usb_device *d, struct usb_interface *intf)
 
 	/* Starting in firmware 1.20, the RC info is provided on a bulk pipe */
 
+<<<<<<< HEAD
+=======
+	if (intf->cur_altsetting->desc.bNumEndpoints < rc_ep + 1)
+		return -ENODEV;
+
+>>>>>>> common/deprecated/android-3.18
 	purb = usb_alloc_urb(0, GFP_KERNEL);
 	if (purb == NULL) {
 		err("rc usb alloc urb failed");
@@ -794,7 +869,11 @@ int dib0700_rc_setup(struct dvb_usb_device *d, struct usb_interface *intf)
 	 * Some devices like the Hauppauge NovaTD model 52009 use an interrupt
 	 * endpoint, while others use a bulk one.
 	 */
+<<<<<<< HEAD
 	e = &intf->altsetting[0].endpoint[rc_ep].desc;
+=======
+	e = &intf->cur_altsetting->endpoint[rc_ep].desc;
+>>>>>>> common/deprecated/android-3.18
 	if (usb_endpoint_dir_in(e)) {
 		if (usb_endpoint_xfer_bulk(e)) {
 			pipe = usb_rcvbulkpipe(d->udev, rc_ep);

@@ -55,7 +55,11 @@
 #define ISL6405_ENT2	0x20
 #define ISL6405_ISEL2	0x40
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_ISL6405)
+=======
+#if IS_REACHABLE(CONFIG_DVB_ISL6405)
+>>>>>>> common/deprecated/android-3.18
 /* override_set and override_clear control which system register bits (above)
  * to always set & clear
  */

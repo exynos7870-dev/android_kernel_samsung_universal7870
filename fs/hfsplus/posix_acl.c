@@ -68,8 +68,13 @@ int hfsplus_set_posix_acl(struct inode *inode, struct posix_acl *acl,
 	case ACL_TYPE_ACCESS:
 		xattr_name = POSIX_ACL_XATTR_ACCESS;
 		if (acl) {
+<<<<<<< HEAD
 			err = posix_acl_equiv_mode(acl, &inode->i_mode);
 			if (err < 0)
+=======
+			err = posix_acl_update_mode(inode, &inode->i_mode, &acl);
+			if (err)
+>>>>>>> common/deprecated/android-3.18
 				return err;
 		}
 		err = 0;

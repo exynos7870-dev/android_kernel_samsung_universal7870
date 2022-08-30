@@ -325,6 +325,11 @@ static int m2p_hw_setup(struct ep93xx_dma_chan *edmac)
 		| M2P_CONTROL_ENABLE;
 	m2p_set_control(edmac, control);
 
+<<<<<<< HEAD
+=======
+	edmac->buffer = 0;
+
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -1092,7 +1097,10 @@ fail:
  * @period_len: length of a single period
  * @dir: direction of the operation
  * @flags: tx descriptor status flags
+<<<<<<< HEAD
  * @context: operation context (ignored)
+=======
+>>>>>>> common/deprecated/android-3.18
  *
  * Prepares a descriptor for cyclic DMA operation. This means that once the
  * descriptor is submitted, we will be submitting in a @period_len sized
@@ -1105,8 +1113,12 @@ fail:
 static struct dma_async_tx_descriptor *
 ep93xx_dma_prep_dma_cyclic(struct dma_chan *chan, dma_addr_t dma_addr,
 			   size_t buf_len, size_t period_len,
+<<<<<<< HEAD
 			   enum dma_transfer_direction dir, unsigned long flags,
 			   void *context)
+=======
+			   enum dma_transfer_direction dir, unsigned long flags)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct ep93xx_dma_chan *edmac = to_ep93xx_dma_chan(chan);
 	struct ep93xx_dma_desc *desc, *first;

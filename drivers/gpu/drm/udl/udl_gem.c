@@ -51,7 +51,11 @@ udl_gem_create(struct drm_file *file,
 		return ret;
 	}
 
+<<<<<<< HEAD
 	drm_gem_object_unreference(&obj->base);
+=======
+	drm_gem_object_unreference_unlocked(&obj->base);
+>>>>>>> common/deprecated/android-3.18
 	*handle_p = handle;
 	return 0;
 }

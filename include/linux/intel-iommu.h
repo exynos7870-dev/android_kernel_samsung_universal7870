@@ -338,6 +338,11 @@ struct intel_iommu {
 #endif
 	struct device	*iommu_dev; /* IOMMU-sysfs device */
 	int		node;
+<<<<<<< HEAD
+=======
+
+	struct dmar_drhd_unit *drhd;
+>>>>>>> common/deprecated/android-3.18
 };
 
 static inline void __iommu_flush_cache(

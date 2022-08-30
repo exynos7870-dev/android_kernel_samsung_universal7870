@@ -2,7 +2,11 @@
 # Makefile for the industrial I/O core.
 #
 
+<<<<<<< HEAD
 obj-$(CONFIG_IIO) += industrialio.o alarm.o
+=======
+obj-$(CONFIG_IIO) += industrialio.o
+>>>>>>> common/deprecated/android-3.18
 industrialio-y := industrialio-core.o industrialio-event.o inkern.o
 industrialio-$(CONFIG_IIO_BUFFER) += industrialio-buffer.o
 industrialio-$(CONFIG_IIO_TRIGGER) += industrialio-trigger.o
@@ -27,4 +31,7 @@ obj-y += pressure/
 obj-y += proximity/
 obj-y += temperature/
 obj-y += trigger/
+<<<<<<< HEAD
 obj-y += inv_test/
+=======
+>>>>>>> common/deprecated/android-3.18

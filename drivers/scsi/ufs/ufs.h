@@ -43,9 +43,15 @@
 #define GENERAL_UPIU_REQUEST_SIZE 32
 #define QUERY_DESC_MAX_SIZE       255
 #define QUERY_DESC_MIN_SIZE       2
+<<<<<<< HEAD
 #define QUERY_DESC_HDR_SIZE 2
 #define QUERY_OSF_SIZE            (GENERAL_UPIU_REQUEST_SIZE - \
 					(sizeof(struct utp_upiu_header)))
+=======
+#define QUERY_OSF_SIZE            (GENERAL_UPIU_REQUEST_SIZE - \
+					(sizeof(struct utp_upiu_header)))
+#define RESPONSE_UPIU_SENSE_DATA_LENGTH	18
+>>>>>>> common/deprecated/android-3.18
 
 #define UPIU_HEADER_DWORD(byte3, byte2, byte1, byte0)\
 			cpu_to_be32((byte3 << 24) | (byte2 << 16) |\
@@ -136,6 +142,7 @@ enum flag_idn {
 
 /* Attribute idn for Query requests */
 enum attr_idn {
+<<<<<<< HEAD
 	QUERY_ATTR_IDN_BOOT_LU_EN	= 0x00,
 	QUERY_ATTR_IDN_RESERVED		= 0x01,
 	QUERY_ATTR_IDN_POWER_MODE	= 0x02,
@@ -154,6 +161,12 @@ enum attr_idn {
 	QUERY_ATTR_IDN_SECONDS_PASSED	= 0x0F,
 	QUERY_ATTR_IDN_CNTX_CONF	= 0x10,
 	QUERY_ATTR_IDN_CORR_PRG_BLK_NUM	= 0x11,
+=======
+	QUERY_ATTR_IDN_ACTIVE_ICC_LVL	= 0x03,
+	QUERY_ATTR_IDN_BKOPS_STATUS	= 0x05,
+	QUERY_ATTR_IDN_EE_CONTROL	= 0x0D,
+	QUERY_ATTR_IDN_EE_STATUS	= 0x0E,
+>>>>>>> common/deprecated/android-3.18
 };
 
 /* Descriptor idn for Query requests */
@@ -167,8 +180,11 @@ enum desc_idn {
 	QUERY_DESC_IDN_RFU_1		= 0x6,
 	QUERY_DESC_IDN_GEOMETRY		= 0x7,
 	QUERY_DESC_IDN_POWER		= 0x8,
+<<<<<<< HEAD
 	QUERY_DESC_IDN_HEALTH           = 0x9,
 	QUERY_DESC_IDN_RFU_2            = 0xA,
+=======
+>>>>>>> common/deprecated/android-3.18
 	QUERY_DESC_IDN_MAX,
 };
 
@@ -178,7 +194,11 @@ enum desc_header_offset {
 };
 
 enum ufs_desc_max_size {
+<<<<<<< HEAD
 	QUERY_DESC_DEVICE_MAX_SIZE		= 0x40,
+=======
+	QUERY_DESC_DEVICE_MAX_SIZE		= 0x1F,
+>>>>>>> common/deprecated/android-3.18
 	QUERY_DESC_CONFIGURAION_MAX_SIZE	= 0x90,
 	QUERY_DESC_UNIT_MAX_SIZE		= 0x23,
 	QUERY_DESC_INTERCONNECT_MAX_SIZE	= 0x06,
@@ -189,7 +209,10 @@ enum ufs_desc_max_size {
 	QUERY_DESC_STRING_MAX_SIZE		= 0xFE,
 	QUERY_DESC_GEOMETRY_MAZ_SIZE		= 0x44,
 	QUERY_DESC_POWER_MAX_SIZE		= 0x62,
+<<<<<<< HEAD
 	QUERY_DESC_HEALTH_MAX_SIZE		= 0x37,
+=======
+>>>>>>> common/deprecated/android-3.18
 	QUERY_DESC_RFU_MAX_SIZE			= 0x00,
 };
 
@@ -293,6 +316,7 @@ enum {
 	QUERY_RESULT_GENERAL_FAILURE            = 0xFF,
 };
 
+<<<<<<< HEAD
 /* Device descriptor parameters offsets in bytes*/
 enum device_desc_param {
 	DEVICE_DESC_PARAM_LEN			= 0x0,
@@ -333,6 +357,8 @@ enum health_device_desc_param {
 	HEALTH_DEVICE_DESC_PARAM_RESERVED	=0x5,
 };
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /* UTP Transfer Request Command Type (CT) */
 enum {
 	UPIU_COMMAND_SET_TYPE_SCSI	= 0x0,
@@ -441,7 +467,11 @@ struct utp_cmd_rsp {
 	__be32 residual_transfer_count;
 	__be32 reserved[4];
 	__be16 sense_data_len;
+<<<<<<< HEAD
 	u8 sense_data[18];
+=======
+	u8 sense_data[RESPONSE_UPIU_SENSE_DATA_LENGTH];
+>>>>>>> common/deprecated/android-3.18
 };
 
 /**

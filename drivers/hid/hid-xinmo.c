@@ -46,6 +46,10 @@ static int xinmo_event(struct hid_device *hdev, struct hid_field *field,
 
 static const struct hid_device_id xinmo_devices[] = {
 	{ HID_USB_DEVICE(USB_VENDOR_ID_XIN_MO, USB_DEVICE_ID_XIN_MO_DUAL_ARCADE) },
+<<<<<<< HEAD
+=======
+	{ HID_USB_DEVICE(USB_VENDOR_ID_XIN_MO, USB_DEVICE_ID_THT_2P_ARCADE) },
+>>>>>>> common/deprecated/android-3.18
 	{ }
 };
 

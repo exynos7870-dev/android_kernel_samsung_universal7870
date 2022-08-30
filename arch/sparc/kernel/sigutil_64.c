@@ -37,7 +37,14 @@ int restore_fpu_state(struct pt_regs *regs, __siginfo_fpu_t __user *fpu)
 	unsigned long fprs;
 	int err;
 
+<<<<<<< HEAD
 	err = __get_user(fprs, &fpu->si_fprs);
+=======
+	if (((unsigned long) fpu) & 7)
+		return -EFAULT;
+
+	err = get_user(fprs, &fpu->si_fprs);
+>>>>>>> common/deprecated/android-3.18
 	fprs_write(0);
 	regs->tstate &= ~TSTATE_PEF;
 	if (fprs & FPRS_DL)
@@ -72,7 +79,14 @@ int restore_rwin_state(__siginfo_rwin_t __user *rp)
 	struct thread_info *t = current_thread_info();
 	int i, wsaved, err;
 
+<<<<<<< HEAD
 	__get_user(wsaved, &rp->wsaved);
+=======
+	if (((unsigned long) rp) & 7)
+		return -EFAULT;
+
+	get_user(wsaved, &rp->wsaved);
+>>>>>>> common/deprecated/android-3.18
 	if (wsaved > NSWINS)
 		return -EFAULT;
 

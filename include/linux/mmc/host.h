@@ -15,12 +15,17 @@
 #include <linux/sched.h>
 #include <linux/device.h>
 #include <linux/fault-inject.h>
+<<<<<<< HEAD
 #include <linux/wakelock.h>
+=======
+#include <linux/blkdev.h>
+>>>>>>> common/deprecated/android-3.18
 
 #include <linux/mmc/core.h>
 #include <linux/mmc/card.h>
 #include <linux/mmc/pm.h>
 
+<<<<<<< HEAD
 #define MMC_DRIVER_TYPE_0	0	/* Default, x1 */
 #define MMC_DRIVER_TYPE_1	1	/* x1.5 */
 #define MMC_DRIVER_TYPE_2	2	/* x0.75 */
@@ -28,6 +33,8 @@
 #define MMC_DRIVER_TYPE_4	4	/* x1.2 */
 #define MMC_DRIVER_TYPE_5	5	/* x2 */
 
+=======
+>>>>>>> common/deprecated/android-3.18
 struct mmc_ios {
 	unsigned int	clock;			/* clock rate */
 	unsigned short	vdd;
@@ -71,7 +78,10 @@ struct mmc_ios {
 #define MMC_TIMING_MMC_DDR52	8
 #define MMC_TIMING_MMC_HS200	9
 #define MMC_TIMING_MMC_HS400	10
+<<<<<<< HEAD
 #define MMC_TIMING_MMC_HS400_ES	11
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	unsigned char	signal_voltage;		/* signalling voltage (1.8V or 3.3V) */
 
@@ -156,7 +166,10 @@ struct mmc_host_ops {
 	 */
 	int	(*multi_io_quirk)(struct mmc_card *card,
 				  unsigned int direction, int blk_size);
+<<<<<<< HEAD
 	void	(*shutdown)(struct mmc_host *host);
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 struct mmc_card;
@@ -221,7 +234,10 @@ struct mmc_host {
 	unsigned int		f_min;
 	unsigned int		f_max;
 	unsigned int		f_init;
+<<<<<<< HEAD
 	u32 			device_drv; /* device strength */
+=======
+>>>>>>> common/deprecated/android-3.18
 	u32			ocr_avail;
 	u32			ocr_avail_sdio;	/* SDIO-specific OCR */
 	u32			ocr_avail_sd;	/* SD-specific OCR */
@@ -300,6 +316,7 @@ struct mmc_host {
 #define MMC_CAP2_HS400_1_2V	(1 << 16)	/* Can support HS400 1.2V */
 #define MMC_CAP2_HS400		(MMC_CAP2_HS400_1_8V | \
 				 MMC_CAP2_HS400_1_2V)
+<<<<<<< HEAD
 #define MMC_CAP2_SDIO_IRQ_NOTHREAD	(1 << 17)
 #define MMC_CAP2_STROBE_ENHANCED	(1 << 18) /* enhanced strobe */
 #define MMC_CAP2_SKIP_INIT_SCAN		(1 << 19) /* skip init mmc scan */
@@ -311,6 +328,10 @@ struct mmc_host {
 #endif /*(CONFIG_BCM43454) || (CONFIG_BCM43454_MODULE) || \
 	(CONFIG_BCM43455) || (CONFIG_BCM43455_MODULE)|| \
 	(CONFIG_BCM43456) || (CONFIG_BCM43456_MODULE)*/
+=======
+#define MMC_CAP2_SDIO_IRQ_NOTHREAD (1 << 17)
+
+>>>>>>> common/deprecated/android-3.18
 	mmc_pm_flag_t		pm_caps;	/* supported pm features */
 
 #ifdef CONFIG_MMC_CLKGATE
@@ -359,21 +380,27 @@ struct mmc_host {
 	int			claim_cnt;	/* "claim" nesting count */
 
 	struct delayed_work	detect;
+<<<<<<< HEAD
 	struct wake_lock        detect_wake_lock;
 	const char              *wlock_name;
 #ifdef CONFIG_MARVELL_DRIVERS
     void                *detect_complete;
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	int			detect_change;	/* card detect flag */
 	struct mmc_slot		slot;
 
 	const struct mmc_bus_ops *bus_ops;	/* current bus driver */
 	unsigned int		bus_refs;	/* reference counter */
 
+<<<<<<< HEAD
 	unsigned int		bus_resume_flags;
 #define MMC_BUSRESUME_MANUAL_RESUME (1 << 0)
 #define MMC_BUSRESUME_NEEDS_RESUME  (1 << 1)
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	unsigned int		sdio_irqs;
 	struct task_struct	*sdio_irq_thread;
 	bool			sdio_irq_pending;
@@ -412,8 +439,18 @@ struct mmc_host {
 		int				num_funcs;
 	} embedded_sdio_data;
 #endif
+<<<<<<< HEAD
 	int			pm_progress;	/* pm_notify is in progress */
 	int (*sdcard_uevent)(struct mmc_card *card);
+=======
+
+#ifdef CONFIG_BLOCK
+	int			latency_hist_enabled;
+	struct io_latency_state io_lat_read;
+	struct io_latency_state io_lat_write;
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 	unsigned long		private[0] ____cacheline_aligned;
 };
 
@@ -441,6 +478,7 @@ static inline void *mmc_priv(struct mmc_host *host)
 #define mmc_dev(x)	((x)->parent)
 #define mmc_classdev(x)	(&(x)->class_dev)
 #define mmc_hostname(x)	(dev_name(&(x)->class_dev))
+<<<<<<< HEAD
 #define mmc_bus_needs_resume(host) ((host)->bus_resume_flags & MMC_BUSRESUME_NEEDS_RESUME)
 #define mmc_bus_manual_resume(host) ((host)->bus_resume_flags & MMC_BUSRESUME_MANUAL_RESUME)
 
@@ -454,6 +492,8 @@ static inline void mmc_set_bus_resume_policy(struct mmc_host *host, int manual)
 }
 
 extern int mmc_resume_bus(struct mmc_host *host);
+=======
+>>>>>>> common/deprecated/android-3.18
 
 int mmc_power_save_host(struct mmc_host *host);
 int mmc_power_restore_host(struct mmc_host *host);
@@ -559,11 +599,16 @@ static inline int mmc_card_hs(struct mmc_card *card)
 
 static inline int mmc_card_uhs(struct mmc_card *card)
 {
+<<<<<<< HEAD
 	return card->host->ios.timing == MMC_TIMING_UHS_SDR12 ||
 		card->host->ios.timing == MMC_TIMING_UHS_SDR25 ||
 		card->host->ios.timing == MMC_TIMING_UHS_SDR50 ||
 		card->host->ios.timing == MMC_TIMING_UHS_SDR104 ||
 		card->host->ios.timing == MMC_TIMING_UHS_DDR50;
+=======
+	return card->host->ios.timing >= MMC_TIMING_UHS_SDR12 &&
+		card->host->ios.timing <= MMC_TIMING_UHS_DDR50;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static inline bool mmc_card_hs200(struct mmc_card *card)
@@ -578,8 +623,12 @@ static inline bool mmc_card_ddr52(struct mmc_card *card)
 
 static inline bool mmc_card_hs400(struct mmc_card *card)
 {
+<<<<<<< HEAD
 	return card->host->ios.timing == MMC_TIMING_MMC_HS400 ||
 		card->host->ios.timing == MMC_TIMING_MMC_HS400_ES;
+=======
+	return card->host->ios.timing == MMC_TIMING_MMC_HS400;
+>>>>>>> common/deprecated/android-3.18
 }
 
 #endif /* LINUX_MMC_HOST_H */

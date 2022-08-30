@@ -1047,8 +1047,15 @@ static int __init aic94xx_init(void)
 
 	aic94xx_transport_template =
 		sas_domain_attach_transport(&aic94xx_transport_functions);
+<<<<<<< HEAD
 	if (!aic94xx_transport_template)
 		goto out_destroy_caches;
+=======
+	if (!aic94xx_transport_template) {
+		err = -ENOMEM;
+		goto out_destroy_caches;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	err = pci_register_driver(&aic94xx_pci_driver);
 	if (err)

@@ -11,7 +11,10 @@
  * (at your option) any later version.
  */
 
+<<<<<<< HEAD
 #include <asm/cacheflush.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 #include <linux/clk.h>
 #include <linux/mm.h>
 #include <linux/pagemap.h>
@@ -22,6 +25,11 @@
 #include <media/v4l2-dev.h>
 #include <media/v4l2-ioctl.h>
 
+<<<<<<< HEAD
+=======
+#include <asm/cacheflush.h>
+
+>>>>>>> common/deprecated/android-3.18
 #include "iss_video.h"
 #include "iss.h"
 

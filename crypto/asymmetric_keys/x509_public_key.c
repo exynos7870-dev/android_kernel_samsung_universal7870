@@ -28,17 +28,41 @@ static bool use_builtin_keys;
 static struct asymmetric_key_id *ca_keyid;
 
 #ifndef MODULE
+<<<<<<< HEAD
+=======
+static struct {
+	struct asymmetric_key_id id;
+	unsigned char data[10];
+} cakey;
+
+>>>>>>> common/deprecated/android-3.18
 static int __init ca_keys_setup(char *str)
 {
 	if (!str)		/* default system keyring */
 		return 1;
 
 	if (strncmp(str, "id:", 3) == 0) {
+<<<<<<< HEAD
 		struct asymmetric_key_id *p;
 		p = asymmetric_key_hex_to_key_id(str + 3);
 		if (p == ERR_PTR(-EINVAL))
 			pr_err("Unparsable hex string in ca_keys\n");
 		else if (!IS_ERR(p))
+=======
+		struct asymmetric_key_id *p = &cakey.id;
+		size_t hexlen = (strlen(str) - 3) / 2;
+		int ret;
+
+		if (hexlen == 0 || hexlen > sizeof(cakey.data)) {
+			pr_err("Missing or invalid ca_keys id\n");
+			return 1;
+		}
+
+		ret = __asymmetric_key_hex_to_key_id(str + 3, p, hexlen);
+		if (ret < 0)
+			pr_err("Unparsable ca_keys id hex string\n");
+		else
+>>>>>>> common/deprecated/android-3.18
 			ca_keyid = p;	/* owner key 'id:xxxxxx' */
 	} else if (strcmp(str, "builtin") == 0) {
 		use_builtin_keys = true;
@@ -294,10 +318,13 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
 		srlen = cert->raw_serial_size;
 		q = cert->raw_serial;
 	}
+<<<<<<< HEAD
 	if (srlen > 1 && *q == 0) {
 		srlen--;
 		q++;
 	}
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	ret = -ENOMEM;
 	desc = kmalloc(sulen + 2 + srlen * 2 + 1, GFP_KERNEL);

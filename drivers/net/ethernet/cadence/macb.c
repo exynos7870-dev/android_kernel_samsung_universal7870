@@ -464,7 +464,11 @@ static int macb_halt_tx(struct macb *bp)
 		if (!(status & MACB_BIT(TGO)))
 			return 0;
 
+<<<<<<< HEAD
 		usleep_range(10, 250);
+=======
+		udelay(250);
+>>>>>>> common/deprecated/android-3.18
 	} while (time_before(halt_time, timeout));
 
 	return -ETIMEDOUT;
@@ -1777,6 +1781,12 @@ static struct net_device_stats *gem_get_stats(struct macb *bp)
 	struct gem_stats *hwstat = &bp->hw_stats.gem;
 	struct net_device_stats *nstat = &bp->stats;
 
+<<<<<<< HEAD
+=======
+	if (!netif_running(bp->dev))
+		return nstat;
+
+>>>>>>> common/deprecated/android-3.18
 	gem_update_stats(bp);
 
 	nstat->rx_errors = (hwstat->rx_frame_check_sequence_errors +

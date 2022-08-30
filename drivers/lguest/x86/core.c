@@ -47,6 +47,10 @@
 #include <asm/lguest.h>
 #include <asm/uaccess.h>
 #include <asm/i387.h>
+<<<<<<< HEAD
+=======
+#include <asm/tlbflush.h>
+>>>>>>> common/deprecated/android-3.18
 #include "../lg.h"
 
 static int cpu_had_pge;
@@ -452,9 +456,15 @@ void lguest_arch_handle_trap(struct lg_cpu *cpu)
 static void adjust_pge(void *on)
 {
 	if (on)
+<<<<<<< HEAD
 		write_cr4(read_cr4() | X86_CR4_PGE);
 	else
 		write_cr4(read_cr4() & ~X86_CR4_PGE);
+=======
+		cr4_set_bits(X86_CR4_PGE);
+	else
+		cr4_clear_bits(X86_CR4_PGE);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*H:020

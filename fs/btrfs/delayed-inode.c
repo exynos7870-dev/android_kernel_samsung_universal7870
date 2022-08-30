@@ -1689,7 +1689,11 @@ int btrfs_should_delete_dir_index(struct list_head *del_list,
  *
  */
 int btrfs_readdir_delayed_dir_index(struct dir_context *ctx,
+<<<<<<< HEAD
 				    struct list_head *ins_list)
+=======
+				    struct list_head *ins_list, bool *emitted)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct btrfs_dir_item *di;
 	struct btrfs_delayed_item *curr, *next;
@@ -1733,6 +1737,10 @@ int btrfs_readdir_delayed_dir_index(struct dir_context *ctx,
 
 		if (over)
 			return 1;
+<<<<<<< HEAD
+=======
+		*emitted = true;
+>>>>>>> common/deprecated/android-3.18
 	}
 	return 0;
 }

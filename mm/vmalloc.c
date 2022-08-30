@@ -439,7 +439,15 @@ nocache:
 	}
 
 found:
+<<<<<<< HEAD
 	if (addr + size > vend)
+=======
+	/*
+	 * Check also calculated address against the vstart,
+	 * because it can be 0 because of big align request.
+	 */
+	if (addr + size > vend || addr < vstart)
+>>>>>>> common/deprecated/android-3.18
 		goto overflow;
 
 	va->va_start = addr;
@@ -1440,7 +1448,11 @@ static void __vunmap(const void *addr, int deallocate_pages)
 			addr))
 		return;
 
+<<<<<<< HEAD
 	area = remove_vm_area(addr);
+=======
+	area = find_vm_area(addr);
+>>>>>>> common/deprecated/android-3.18
 	if (unlikely(!area)) {
 		WARN(1, KERN_ERR "Trying to vfree() nonexistent vm area (%p)\n",
 				addr);
@@ -1450,6 +1462,10 @@ static void __vunmap(const void *addr, int deallocate_pages)
 	debug_check_no_locks_freed(addr, area->size);
 	debug_check_no_obj_freed(addr, area->size);
 
+<<<<<<< HEAD
+=======
+	remove_vm_area(addr);
+>>>>>>> common/deprecated/android-3.18
 	if (deallocate_pages) {
 		int i;
 
@@ -1651,6 +1667,15 @@ void *__vmalloc_node_range(unsigned long size, unsigned long align,
 		return NULL;
 
 	/*
+<<<<<<< HEAD
+=======
+	 * First make sure the mappings are removed from all page-tables
+	 * before they are freed.
+	 */
+	vmalloc_sync_unmappings();
+
+	/*
+>>>>>>> common/deprecated/android-3.18
 	 * In this function, newly allocated vm_struct has VM_UNINITIALIZED
 	 * flag. It means that vm_struct is not fully initialized.
 	 * Now, it is fully initialized, so remove this flag here.
@@ -2139,7 +2164,11 @@ int remap_vmalloc_range_partial(struct vm_area_struct *vma, unsigned long uaddr,
 	if (!(area->flags & VM_USERMAP))
 		return -EINVAL;
 
+<<<<<<< HEAD
 	if (kaddr + size > area->addr + area->size)
+=======
+	if (kaddr + size > area->addr + get_vm_area_size(area))
+>>>>>>> common/deprecated/android-3.18
 		return -EINVAL;
 
 	do {
@@ -2185,6 +2214,7 @@ int remap_vmalloc_range(struct vm_area_struct *vma, void *addr,
 EXPORT_SYMBOL(remap_vmalloc_range);
 
 /*
+<<<<<<< HEAD
  * Implement a stub for vmalloc_sync_all() if the architecture chose not to
  * have one.
  */
@@ -2192,6 +2222,21 @@ void __weak vmalloc_sync_all(void)
 {
 }
 
+=======
+ * Implement stubs for vmalloc_sync_[un]mappings () if the architecture chose
+ * not to have one.
+ *
+ * The purpose of this function is to make sure the vmalloc area
+ * mappings are identical in all page-tables in the system.
+ */
+void __weak vmalloc_sync_mappings(void)
+{
+}
+
+void __weak vmalloc_sync_unmappings(void)
+{
+}
+>>>>>>> common/deprecated/android-3.18
 
 static int f(pte_t *pte, pgtable_t table, unsigned long addr, void *data)
 {

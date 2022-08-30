@@ -67,7 +67,11 @@ int debugfs_valid_mountpoint(const char *debugfs)
 
 	if (statfs(debugfs, &st_fs) < 0)
 		return -ENOENT;
+<<<<<<< HEAD
 	else if (st_fs.f_type != (long) DEBUGFS_MAGIC)
+=======
+	else if ((long)st_fs.f_type != (long)DEBUGFS_MAGIC)
+>>>>>>> common/deprecated/android-3.18
 		return -ENOENT;
 
 	return 0;

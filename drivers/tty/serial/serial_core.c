@@ -38,10 +38,13 @@
 #include <asm/irq.h>
 #include <asm/uaccess.h>
 
+<<<<<<< HEAD
 #if defined(CONFIG_BT_BCM43XX) || defined(CONFIG_BT_QCA9377)
 #define BT4339_LINE 0
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * This is used to lock changes in serial line configuration.
  */
@@ -189,6 +192,7 @@ static int uart_port_startup(struct tty_struct *tty, struct uart_state *state,
 
 		spin_lock_irq(&uport->lock);
 		if (uart_cts_enabled(uport) &&
+<<<<<<< HEAD
 		    !(uport->ops->get_mctrl(uport) & TIOCM_CTS)) {
 #if defined(CONFIG_BT_BCM43XX) || defined(CONFIG_BT_QCA9377)
 				if (uport->line != BT4339_LINE)
@@ -197,6 +201,10 @@ static int uart_port_startup(struct tty_struct *tty, struct uart_state *state,
 				uport->hw_stopped = 1;
 #endif
 			}
+=======
+		    !(uport->ops->get_mctrl(uport) & TIOCM_CTS))
+			uport->hw_stopped = 1;
+>>>>>>> common/deprecated/android-3.18
 		else
 			uport->hw_stopped = 0;
 		spin_unlock_irq(&uport->lock);
@@ -1013,7 +1021,11 @@ static int uart_break_ctl(struct tty_struct *tty, int break_state)
 
 	mutex_lock(&port->mutex);
 
+<<<<<<< HEAD
 	if (uport->type != PORT_UNKNOWN)
+=======
+	if (uport->type != PORT_UNKNOWN && uport->ops->break_ctl)
+>>>>>>> common/deprecated/android-3.18
 		uport->ops->break_ctl(uport, break_state);
 
 	mutex_unlock(&port->mutex);
@@ -1324,12 +1336,16 @@ static void uart_set_termios(struct tty_struct *tty,
 	else if (!(old_termios->c_cflag & CRTSCTS) && (cflag & CRTSCTS)) {
 		spin_lock_irq(&uport->lock);
 		if (!(uport->ops->get_mctrl(uport) & TIOCM_CTS)) {
+<<<<<<< HEAD
 #if defined(CONFIG_BT_BCM43XX) || defined(CONFIG_BT_QCA9377)
 			if (uport->line != BT4339_LINE)
 				uport->hw_stopped = 1;
 #else
 			uport->hw_stopped = 1;
 #endif
+=======
+			uport->hw_stopped = 1;
+>>>>>>> common/deprecated/android-3.18
 			uport->ops->stop_tx(uport);
 		}
 		spin_unlock_irq(&uport->lock);
@@ -1349,6 +1365,7 @@ static void uart_close(struct tty_struct *tty, struct file *filp)
 	struct uart_port *uport;
 	unsigned long flags;
 
+<<<<<<< HEAD
 	if (!state) {
 		struct uart_driver *drv = tty->driver->driver_state;
 
@@ -1359,6 +1376,10 @@ static void uart_close(struct tty_struct *tty, struct file *filp)
 		spin_unlock_irq(&port->lock);
 		return;
 	}
+=======
+	if (!state)
+		return;
+>>>>>>> common/deprecated/android-3.18
 
 	uport = state->uart_port;
 	port = &state->port;
@@ -1578,10 +1599,13 @@ static int uart_open(struct tty_struct *tty, struct file *filp)
 
 	pr_debug("uart_open(%d) called\n", line);
 
+<<<<<<< HEAD
 	spin_lock_irq(&port->lock);
 	++port->count;
 	spin_unlock_irq(&port->lock);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * We take the semaphore here to guarantee that we won't be re-entered
 	 * while allocating the state structure, or while we request any IRQs
@@ -1594,11 +1618,25 @@ static int uart_open(struct tty_struct *tty, struct file *filp)
 		goto end;
 	}
 
+<<<<<<< HEAD
 	if (!state->uart_port || state->uart_port->flags & UPF_DEAD) {
 		retval = -ENXIO;
 		goto err_unlock;
 	}
 
+=======
+	port->count++;
+	if (!state->uart_port || state->uart_port->flags & UPF_DEAD) {
+		retval = -ENXIO;
+		goto err_dec_count;
+	}
+
+	/*
+	 * Once we set tty->driver_data here, we are guaranteed that
+	 * uart_close() will decrement the driver module use count.
+	 * Any failures from here onwards should not touch the count.
+	 */
+>>>>>>> common/deprecated/android-3.18
 	tty->driver_data = state;
 	state->uart_port->state = state;
 	state->port.low_latency =
@@ -1619,7 +1657,12 @@ static int uart_open(struct tty_struct *tty, struct file *filp)
 
 end:
 	return retval;
+<<<<<<< HEAD
 err_unlock:
+=======
+err_dec_count:
+	port->count--;
+>>>>>>> common/deprecated/android-3.18
 	mutex_unlock(&port->mutex);
 	goto end;
 }
@@ -2631,6 +2674,10 @@ int uart_add_one_port(struct uart_driver *drv, struct uart_port *uport)
 	if (uport->cons && uport->dev)
 		of_console_check(uport->dev->of_node, uport->cons->name, uport->line);
 
+<<<<<<< HEAD
+=======
+	tty_port_link_device(port, drv->tty_driver, uport->line);
+>>>>>>> common/deprecated/android-3.18
 	uart_configure_port(drv, state, uport);
 
 	num_groups = 2;

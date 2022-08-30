@@ -169,11 +169,18 @@ struct usb_hcd {
 	 * bandwidth_mutex should be dropped after a successful control message
 	 * to the device, or resetting the bandwidth after a failed attempt.
 	 */
+<<<<<<< HEAD
+=======
+	struct mutex		*address0_mutex;
+>>>>>>> common/deprecated/android-3.18
 	struct mutex		*bandwidth_mutex;
 	struct usb_hcd		*shared_hcd;
 	struct usb_hcd		*primary_hcd;
 
+<<<<<<< HEAD
 	bool			is_in_hub_event;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #define HCD_BUFFER_POOLS	4
 	struct dma_pool		*pool[HCD_BUFFER_POOLS];
@@ -499,6 +506,7 @@ extern void usb_destroy_configuration(struct usb_device *dev);
 
 #include <linux/usb/ch11.h>
 
+<<<<<<< HEAD
 #ifdef CONFIG_HOST_COMPLIANT_TEST
 /*
  * Hub Port Test Mode Selector Codes
@@ -538,6 +546,8 @@ extern void usb_destroy_configuration(struct usb_device *dev);
 
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * As of USB 2.0, full/low speed devices are segregated into trees.
  * One type grows from USB 1.1 host controllers (OHCI, UHCI etc).
@@ -584,9 +594,15 @@ extern void usb_ep0_reinit(struct usb_device *);
 	((USB_DIR_IN|USB_TYPE_STANDARD|USB_RECIP_INTERFACE)<<8)
 
 #define EndpointRequest \
+<<<<<<< HEAD
 	((USB_DIR_IN|USB_TYPE_STANDARD|USB_RECIP_INTERFACE)<<8)
 #define EndpointOutRequest \
 	((USB_DIR_OUT|USB_TYPE_STANDARD|USB_RECIP_INTERFACE)<<8)
+=======
+	((USB_DIR_IN|USB_TYPE_STANDARD|USB_RECIP_ENDPOINT)<<8)
+#define EndpointOutRequest \
+	((USB_DIR_OUT|USB_TYPE_STANDARD|USB_RECIP_ENDPOINT)<<8)
+>>>>>>> common/deprecated/android-3.18
 
 /* class requests from the USB 2.0 hub spec, table 11-15 */
 /* GetBusState and SetHubDescriptor are optional, omitted */

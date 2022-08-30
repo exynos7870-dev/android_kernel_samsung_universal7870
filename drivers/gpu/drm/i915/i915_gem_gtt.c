@@ -1745,6 +1745,10 @@ void i915_global_gtt_cleanup(struct drm_device *dev)
 		struct i915_hw_ppgtt *ppgtt = dev_priv->mm.aliasing_ppgtt;
 
 		ppgtt->base.cleanup(&ppgtt->base);
+<<<<<<< HEAD
+=======
+		kfree(ppgtt);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (drm_mm_initialized(&vm->mm)) {

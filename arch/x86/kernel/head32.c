@@ -31,6 +31,10 @@ static void __init i386_default_early_setup(void)
 
 asmlinkage __visible void __init i386_start_kernel(void)
 {
+<<<<<<< HEAD
+=======
+	cr4_init_shadow();
+>>>>>>> common/deprecated/android-3.18
 	sanitize_boot_params(&boot_params);
 
 	/* Call the subarch specific early setup function */

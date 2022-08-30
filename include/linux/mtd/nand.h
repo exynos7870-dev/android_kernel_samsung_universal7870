@@ -36,7 +36,11 @@ extern int nand_scan_ident(struct mtd_info *mtd, int max_chips,
 			   struct nand_flash_dev *table);
 extern int nand_scan_tail(struct mtd_info *mtd);
 
+<<<<<<< HEAD
 /* Free resources held by the NAND device */
+=======
+/* Unregister the MTD device and free resources held by the NAND device */
+>>>>>>> common/deprecated/android-3.18
 extern void nand_release(struct mtd_info *mtd);
 
 /* Internal helper for board drivers which need to override command function */
@@ -176,17 +180,28 @@ typedef enum {
 /* Chip may not exist, so silence any errors in scan */
 #define NAND_SCAN_SILENT_NODEV	0x00040000
 /*
+<<<<<<< HEAD
  * This option could be defined by controller drivers to protect against
  * kmap'ed, vmalloc'ed highmem buffers being passed from upper layers
  */
 #define NAND_USE_BOUNCE_BUFFER	0x00080000
 /*
+=======
+>>>>>>> common/deprecated/android-3.18
  * Autodetect nand buswidth with readid/onfi.
  * This suppose the driver will configure the hardware in 8 bits mode
  * when calling nand_scan_ident, and update its configuration
  * before calling nand_scan_tail.
  */
 #define NAND_BUSWIDTH_AUTO      0x00080000
+<<<<<<< HEAD
+=======
+/*
+ * This option could be defined by controller drivers to protect against
+ * kmap'ed, vmalloc'ed highmem buffers being passed from upper layers
+ */
+#define NAND_USE_BOUNCE_BUFFER	0x00100000
+>>>>>>> common/deprecated/android-3.18
 
 /* Options set by nand scan */
 /* Nand scan has allocated controller struct */
@@ -274,7 +289,11 @@ struct nand_onfi_params {
 	__le16 t_r;
 	__le16 t_ccs;
 	__le16 src_sync_timing_mode;
+<<<<<<< HEAD
 	__le16 src_ssync_features;
+=======
+	u8 src_ssync_features;
+>>>>>>> common/deprecated/android-3.18
 	__le16 clk_pin_capacitance_typ;
 	__le16 io_pin_capacitance_typ;
 	__le16 input_pin_capacitance_typ;
@@ -282,7 +301,11 @@ struct nand_onfi_params {
 	u8 driver_strength_support;
 	__le16 t_int_r;
 	__le16 t_ald;
+<<<<<<< HEAD
 	u8 reserved4[7];
+=======
+	u8 reserved4[8];
+>>>>>>> common/deprecated/android-3.18
 
 	/* vendor */
 	__le16 vendor_revision;
@@ -1012,4 +1035,11 @@ struct nand_sdr_timings {
 
 /* get timing characteristics from ONFI timing mode. */
 const struct nand_sdr_timings *onfi_async_timing_mode_to_sdr_timings(int mode);
+<<<<<<< HEAD
+=======
+
+/* Free resources held by the NAND device */
+void nand_cleanup(struct nand_chip *chip);
+
+>>>>>>> common/deprecated/android-3.18
 #endif /* __LINUX_MTD_NAND_H */

@@ -171,9 +171,14 @@ source security/smack/Kconfig
 source security/tomoyo/Kconfig
 source security/apparmor/Kconfig
 source security/yama/Kconfig
+<<<<<<< HEAD
 source security/mstdrv/Kconfig
 source security/integrity/Kconfig
 source security/tz_iccc/Kconfig
+=======
+
+source security/integrity/Kconfig
+>>>>>>> common/deprecated/android-3.18
 
 choice
 	prompt "Default security module"

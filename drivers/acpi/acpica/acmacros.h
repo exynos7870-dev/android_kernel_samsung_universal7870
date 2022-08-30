@@ -63,12 +63,17 @@
 #define ACPI_SET64(ptr, val)            (*ACPI_CAST64 (ptr) = (u64) (val))
 
 /*
+<<<<<<< HEAD
  * printf() format helpers. These macros are workarounds for the difficulties
+=======
+ * printf() format helper. This macros is a workaround for the difficulties
+>>>>>>> common/deprecated/android-3.18
  * with emitting 64-bit integers and 64-bit pointers with the same code
  * for both 32-bit and 64-bit hosts.
  */
 #define ACPI_FORMAT_UINT64(i)           ACPI_HIDWORD(i), ACPI_LODWORD(i)
 
+<<<<<<< HEAD
 #if ACPI_MACHINE_WIDTH == 64
 #define ACPI_FORMAT_NATIVE_UINT(i)      ACPI_FORMAT_UINT64(i)
 #define ACPI_FORMAT_TO_UINT(i)          ACPI_FORMAT_UINT64(i)
@@ -80,6 +85,8 @@
 #define ACPI_PRINTF_UINT                 "0x%8.8X"
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * Macros for moving data around to/from buffers that are possibly unaligned.
  * If the hardware supports the transfer of unaligned data, just do the store.

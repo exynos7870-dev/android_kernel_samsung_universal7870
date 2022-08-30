@@ -341,7 +341,11 @@ qlcnic_pcie_sem_lock(struct qlcnic_adapter *adapter, int sem, u32 id_reg)
 			}
 			return -EIO;
 		}
+<<<<<<< HEAD
 		usleep_range(1000, 1500);
+=======
+		udelay(1200);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (id_reg)

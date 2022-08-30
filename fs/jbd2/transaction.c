@@ -515,6 +515,10 @@ int jbd2_journal_start_reserved(handle_t *handle, unsigned int type,
 	 */
 	ret = start_this_handle(journal, handle, GFP_NOFS);
 	if (ret < 0) {
+<<<<<<< HEAD
+=======
+		handle->h_journal = journal;
+>>>>>>> common/deprecated/android-3.18
 		jbd2_journal_free_reserved(handle);
 		return ret;
 	}
@@ -551,7 +555,10 @@ int jbd2_journal_extend(handle_t *handle, int nblocks)
 	int result;
 	int wanted;
 
+<<<<<<< HEAD
 	WARN_ON(!transaction);
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (is_handle_aborted(handle))
 		return -EROFS;
 	journal = transaction->t_journal;
@@ -627,7 +634,10 @@ int jbd2__journal_restart(handle_t *handle, int nblocks, gfp_t gfp_mask)
 	tid_t		tid;
 	int		need_to_start, ret;
 
+<<<<<<< HEAD
 	WARN_ON(!transaction);
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* If we've had an abort of any type, don't even think about
 	 * actually doing the restart! */
 	if (is_handle_aborted(handle))
@@ -785,7 +795,10 @@ do_get_write_access(handle_t *handle, struct journal_head *jh,
 	int need_copy = 0;
 	unsigned long start_lock, time_lock;
 
+<<<<<<< HEAD
 	WARN_ON(!transaction);
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (is_handle_aborted(handle))
 		return -EROFS;
 	journal = transaction->t_journal;
@@ -1051,7 +1064,10 @@ int jbd2_journal_get_create_access(handle_t *handle, struct buffer_head *bh)
 	int err;
 
 	jbd_debug(5, "journal_head %p\n", jh);
+<<<<<<< HEAD
 	WARN_ON(!transaction);
+=======
+>>>>>>> common/deprecated/android-3.18
 	err = -EROFS;
 	if (is_handle_aborted(handle))
 		goto out;
@@ -1091,6 +1107,10 @@ int jbd2_journal_get_create_access(handle_t *handle, struct buffer_head *bh)
 		JBUFFER_TRACE(jh, "file as BJ_Reserved");
 		spin_lock(&journal->j_list_lock);
 		__jbd2_journal_file_buffer(jh, transaction, BJ_Reserved);
+<<<<<<< HEAD
+=======
+		spin_unlock(&journal->j_list_lock);
+>>>>>>> common/deprecated/android-3.18
 	} else if (jh->b_transaction == journal->j_committing_transaction) {
 		/* first access by this transaction */
 		jh->b_modified = 0;
@@ -1098,8 +1118,13 @@ int jbd2_journal_get_create_access(handle_t *handle, struct buffer_head *bh)
 		JBUFFER_TRACE(jh, "set next transaction");
 		spin_lock(&journal->j_list_lock);
 		jh->b_next_transaction = transaction;
+<<<<<<< HEAD
 	}
 	spin_unlock(&journal->j_list_lock);
+=======
+		spin_unlock(&journal->j_list_lock);
+	}
+>>>>>>> common/deprecated/android-3.18
 	jbd_unlock_bh_state(bh);
 
 	/*
@@ -1266,7 +1291,10 @@ int jbd2_journal_dirty_metadata(handle_t *handle, struct buffer_head *bh)
 	struct journal_head *jh;
 	int ret = 0;
 
+<<<<<<< HEAD
 	WARN_ON(!transaction);
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (is_handle_aborted(handle))
 		return -EROFS;
 	journal = transaction->t_journal;
@@ -1286,11 +1314,18 @@ int jbd2_journal_dirty_metadata(handle_t *handle, struct buffer_head *bh)
 		 * of the transaction. This needs to be done
 		 * once a transaction -bzzz
 		 */
+<<<<<<< HEAD
 		jh->b_modified = 1;
+=======
+>>>>>>> common/deprecated/android-3.18
 		if (handle->h_buffer_credits <= 0) {
 			ret = -ENOSPC;
 			goto out_unlock_bh;
 		}
+<<<<<<< HEAD
+=======
+		jh->b_modified = 1;
+>>>>>>> common/deprecated/android-3.18
 		handle->h_buffer_credits--;
 	}
 
@@ -1397,7 +1432,10 @@ int jbd2_journal_forget (handle_t *handle, struct buffer_head *bh)
 	int err = 0;
 	int was_modified = 0;
 
+<<<<<<< HEAD
 	WARN_ON(!transaction);
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (is_handle_aborted(handle))
 		return -EROFS;
 	journal = transaction->t_journal;
@@ -1477,6 +1515,7 @@ int jbd2_journal_forget (handle_t *handle, struct buffer_head *bh)
 		/* However, if the buffer is still owned by a prior
 		 * (committing) transaction, we can't drop it yet... */
 		JBUFFER_TRACE(jh, "belongs to older transaction");
+<<<<<<< HEAD
 		/* ... but we CAN drop it from the new transaction if we
 		 * have also modified it since the original commit. */
 
@@ -1485,6 +1524,23 @@ int jbd2_journal_forget (handle_t *handle, struct buffer_head *bh)
 			spin_lock(&journal->j_list_lock);
 			jh->b_next_transaction = NULL;
 			spin_unlock(&journal->j_list_lock);
+=======
+		/* ... but we CAN drop it from the new transaction through
+		 * marking the buffer as freed and set j_next_transaction to
+		 * the new transaction, so that not only the commit code
+		 * knows it should clear dirty bits when it is done with the
+		 * buffer, but also the buffer can be checkpointed only
+		 * after the new transaction commits. */
+
+		set_buffer_freed(bh);
+
+		if (!jh->b_next_transaction) {
+			spin_lock(&journal->j_list_lock);
+			jh->b_next_transaction = transaction;
+			spin_unlock(&journal->j_list_lock);
+		} else {
+			J_ASSERT(jh->b_next_transaction == transaction);
+>>>>>>> common/deprecated/android-3.18
 
 			/*
 			 * only drop a reference if this transaction modified
@@ -1530,8 +1586,27 @@ int jbd2_journal_stop(handle_t *handle)
 	tid_t tid;
 	pid_t pid;
 
+<<<<<<< HEAD
 	if (!transaction)
 		goto free_and_exit;
+=======
+	if (!transaction) {
+		/*
+		 * Handle is already detached from the transaction so
+		 * there is nothing to do other than decrease a refcount,
+		 * or free the handle if refcount drops to zero
+		 */
+		if (--handle->h_ref > 0) {
+			jbd_debug(4, "h_ref %d -> %d\n", handle->h_ref + 1,
+							 handle->h_ref);
+			return err;
+		} else {
+			if (handle->h_rsv_handle)
+				jbd2_free_handle(handle->h_rsv_handle);
+			goto free_and_exit;
+		}
+	}
+>>>>>>> common/deprecated/android-3.18
 	journal = transaction->t_journal;
 
 	J_ASSERT(journal_current_handle() == handle);
@@ -1769,6 +1844,7 @@ static void __jbd2_journal_temp_unlink_buffer(struct journal_head *jh)
 
 	__blist_del_buffer(list, jh);
 	jh->b_jlist = BJ_None;
+<<<<<<< HEAD
 	if (test_clear_buffer_jbddirty(bh)) {
 #ifdef CONFIG_JOURNAL_DATA_TAG
 		if (transaction->t_journal->j_flags & JBD2_JOURNAL_TAG)
@@ -1776,6 +1852,12 @@ static void __jbd2_journal_temp_unlink_buffer(struct journal_head *jh)
 #endif
 		mark_buffer_dirty_sync(bh); /* Expose it to the VM */
 	}
+=======
+	if (transaction && is_journal_aborted(transaction->t_journal))
+		clear_buffer_jbddirty(bh);
+	else if (test_clear_buffer_jbddirty(bh))
+		mark_buffer_dirty(bh);	/* Expose it to the VM */
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
@@ -1787,6 +1869,12 @@ static void __jbd2_journal_temp_unlink_buffer(struct journal_head *jh)
  */
 static void __jbd2_journal_unfile_buffer(struct journal_head *jh)
 {
+<<<<<<< HEAD
+=======
+	J_ASSERT_JH(jh, jh->b_transaction != NULL);
+	J_ASSERT_JH(jh, jh->b_next_transaction == NULL);
+
+>>>>>>> common/deprecated/android-3.18
 	__jbd2_journal_temp_unlink_buffer(jh);
 	jh->b_transaction = NULL;
 	jbd2_journal_put_journal_head(jh);
@@ -1878,6 +1966,10 @@ int jbd2_journal_try_to_free_buffers(journal_t *journal,
 {
 	struct buffer_head *head;
 	struct buffer_head *bh;
+<<<<<<< HEAD
+=======
+	bool has_write_io_error = false;
+>>>>>>> common/deprecated/android-3.18
 	int ret = 0;
 
 	J_ASSERT(PageLocked(page));
@@ -1902,11 +1994,32 @@ int jbd2_journal_try_to_free_buffers(journal_t *journal,
 		jbd_unlock_bh_state(bh);
 		if (buffer_jbd(bh))
 			goto busy;
+<<<<<<< HEAD
+=======
+
+		/*
+		 * If we free a metadata buffer which has been failed to
+		 * write out, the jbd2 checkpoint procedure will not detect
+		 * this failure and may lead to filesystem inconsistency
+		 * after cleanup journal tail.
+		 */
+		if (buffer_write_io_error(bh)) {
+			pr_err("JBD2: Error while async write back metadata bh %llu.",
+			       (unsigned long long)bh->b_blocknr);
+			has_write_io_error = true;
+		}
+>>>>>>> common/deprecated/android-3.18
 	} while ((bh = bh->b_this_page) != head);
 
 	ret = try_to_free_buffers(page);
 
 busy:
+<<<<<<< HEAD
+=======
+	if (has_write_io_error)
+		jbd2_journal_abort(journal, -EIO);
+
+>>>>>>> common/deprecated/android-3.18
 	return ret;
 }
 
@@ -2102,14 +2215,26 @@ static int journal_unmap_buffer(journal_t *journal, struct buffer_head *bh,
 			return -EBUSY;
 		}
 		/*
+<<<<<<< HEAD
 		 * OK, buffer won't be reachable after truncate. We just set
 		 * j_next_transaction to the running transaction (if there is
 		 * one) and mark buffer as freed so that commit code knows it
 		 * should clear dirty bits when it is done with the buffer.
+=======
+		 * OK, buffer won't be reachable after truncate. We just clear
+		 * b_modified to not confuse transaction credit accounting, and
+		 * set j_next_transaction to the running transaction (if there
+		 * is one) and mark buffer as freed so that commit code knows
+		 * it should clear dirty bits when it is done with the buffer.
+>>>>>>> common/deprecated/android-3.18
 		 */
 		set_buffer_freed(bh);
 		if (journal->j_running_transaction && buffer_jbddirty(bh))
 			jh->b_next_transaction = journal->j_running_transaction;
+<<<<<<< HEAD
+=======
+		jh->b_modified = 0;
+>>>>>>> common/deprecated/android-3.18
 		jbd2_journal_put_journal_head(jh);
 		spin_unlock(&journal->j_list_lock);
 		jbd_unlock_bh_state(bh);
@@ -2330,6 +2455,16 @@ void __jbd2_journal_refile_buffer(struct journal_head *jh)
 
 	was_dirty = test_clear_buffer_jbddirty(bh);
 	__jbd2_journal_temp_unlink_buffer(jh);
+<<<<<<< HEAD
+=======
+
+	/*
+	 * b_transaction must be set, otherwise the new b_transaction won't
+	 * be holding jh reference
+	 */
+	J_ASSERT_JH(jh, jh->b_transaction != NULL);
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * We set b_transaction here because b_next_transaction will inherit
 	 * our jh reference and thus __jbd2_journal_file_buffer() must not
@@ -2378,7 +2513,10 @@ int jbd2_journal_file_inode(handle_t *handle, struct jbd2_inode *jinode)
 	transaction_t *transaction = handle->h_transaction;
 	journal_t *journal;
 
+<<<<<<< HEAD
 	WARN_ON(!transaction);
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (is_handle_aborted(handle))
 		return -EROFS;
 	journal = transaction->t_journal;

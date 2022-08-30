@@ -176,6 +176,11 @@ int main(int argc, char *argv[])
 			break;
 		case '?':
 			printf("usbip: invalid option\n");
+<<<<<<< HEAD
+=======
+			/* Terminate after printing error */
+			/* FALLTHRU */
+>>>>>>> common/deprecated/android-3.18
 		default:
 			usbip_usage();
 			goto out;

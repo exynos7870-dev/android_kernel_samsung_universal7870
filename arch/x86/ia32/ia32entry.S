@@ -422,6 +422,10 @@ ENTRY(ia32_syscall)
 	/*CFI_REL_OFFSET	cs,CS-RIP*/
 	CFI_REL_OFFSET	rip,RIP-RIP
 	PARAVIRT_ADJUST_EXCEPTION_FRAME
+<<<<<<< HEAD
+=======
+	ASM_CLAC			/* Do this early to minimize exposure */
+>>>>>>> common/deprecated/android-3.18
 	SWAPGS
 	/*
 	 * No need to follow this irqs on/off section: the syscall

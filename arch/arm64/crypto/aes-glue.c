@@ -205,7 +205,11 @@ static int ctr_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
 		err = blkcipher_walk_done(desc, &walk,
 					  walk.nbytes % AES_BLOCK_SIZE);
 	}
+<<<<<<< HEAD
 	if (nbytes) {
+=======
+	if (walk.nbytes % AES_BLOCK_SIZE) {
+>>>>>>> common/deprecated/android-3.18
 		u8 *tdst = walk.dst.virt.addr + blocks * AES_BLOCK_SIZE;
 		u8 *tsrc = walk.src.virt.addr + blocks * AES_BLOCK_SIZE;
 		u8 __aligned(8) tail[AES_BLOCK_SIZE];

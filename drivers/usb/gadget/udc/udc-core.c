@@ -57,6 +57,11 @@ static DEFINE_MUTEX(udc_lock);
 int usb_gadget_map_request(struct usb_gadget *gadget,
 		struct usb_request *req, int is_in)
 {
+<<<<<<< HEAD
+=======
+	struct device *dev = gadget->dev.parent;
+
+>>>>>>> common/deprecated/android-3.18
 	if (req->length == 0)
 		return 0;
 
@@ -66,7 +71,11 @@ int usb_gadget_map_request(struct usb_gadget *gadget,
 		mapped = dma_map_sg(&gadget->dev, req->sg, req->num_sgs,
 				is_in ? DMA_TO_DEVICE : DMA_FROM_DEVICE);
 		if (mapped == 0) {
+<<<<<<< HEAD
 			dev_err(&gadget->dev, "failed to map SGs\n");
+=======
+			dev_err(dev, "failed to map SGs\n");
+>>>>>>> common/deprecated/android-3.18
 			return -EFAULT;
 		}
 
@@ -92,7 +101,11 @@ void usb_gadget_unmap_request(struct usb_gadget *gadget,
 		return;
 
 	if (req->num_mapped_sgs) {
+<<<<<<< HEAD
 		dma_unmap_sg(&gadget->dev, req->sg, req->num_mapped_sgs,
+=======
+		dma_unmap_sg(&gadget->dev, req->sg, req->num_sgs,
+>>>>>>> common/deprecated/android-3.18
 				is_in ? DMA_TO_DEVICE : DMA_FROM_DEVICE);
 
 		req->num_mapped_sgs = 0;
@@ -301,6 +314,10 @@ err4:
 
 err3:
 	put_device(&udc->dev);
+<<<<<<< HEAD
+=======
+	device_del(&gadget->dev);
+>>>>>>> common/deprecated/android-3.18
 
 err2:
 	put_device(&gadget->dev);
@@ -400,6 +417,7 @@ static int udc_bind_to_driver(struct usb_udc *udc, struct usb_gadget_driver *dri
 		driver->unbind(udc->gadget);
 		goto err1;
 	}
+<<<<<<< HEAD
 	/*
 	 * HACK: The Android gadget driver disconnects the gadget
 	 * on bind and expects the gadget to stay disconnected until
@@ -409,6 +427,9 @@ static int udc_bind_to_driver(struct usb_udc *udc, struct usb_gadget_driver *dri
 	 *
 	 * usb_gadget_connect(udc->gadget);
 	 */
+=======
+	usb_gadget_connect(udc->gadget);
+>>>>>>> common/deprecated/android-3.18
 
 	kobject_uevent(&udc->dev.kobj, KOBJ_CHANGE);
 	return 0;
@@ -514,10 +535,20 @@ static ssize_t usb_udc_softconn_store(struct device *dev,
 		struct device_attribute *attr, const char *buf, size_t n)
 {
 	struct usb_udc		*udc = container_of(dev, struct usb_udc, dev);
+<<<<<<< HEAD
 
 	if (!udc->driver) {
 		dev_err(dev, "soft-connect without a gadget driver\n");
 		return -EOPNOTSUPP;
+=======
+	ssize_t			ret;
+
+	mutex_lock(&udc_lock);
+	if (!udc->driver) {
+		dev_err(dev, "soft-connect without a gadget driver\n");
+		ret = -EOPNOTSUPP;
+		goto out;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (sysfs_streq(buf, "connect")) {
@@ -528,10 +559,21 @@ static ssize_t usb_udc_softconn_store(struct device *dev,
 		usb_gadget_udc_stop(udc->gadget, udc->driver);
 	} else {
 		dev_err(dev, "unsupported command '%s'\n", buf);
+<<<<<<< HEAD
 		return -EINVAL;
 	}
 
 	return n;
+=======
+		ret = -EINVAL;
+		goto out;
+	}
+
+	ret = n;
+out:
+	mutex_unlock(&udc_lock);
+	return ret;
+>>>>>>> common/deprecated/android-3.18
 }
 static DEVICE_ATTR(soft_connect, S_IWUSR, NULL, usb_udc_softconn_store);
 

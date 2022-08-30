@@ -454,12 +454,27 @@ static void iommu_set_irq_remapping(struct intel_iommu *iommu, int mode)
 
 	/* Enable interrupt-remapping */
 	iommu->gcmd |= DMA_GCMD_IRE;
+<<<<<<< HEAD
 	iommu->gcmd &= ~DMA_GCMD_CFI;  /* Block compatibility-format MSIs */
 	writel(iommu->gcmd, iommu->reg + DMAR_GCMD_REG);
 
 	IOMMU_WAIT_OP(iommu, DMAR_GSTS_REG,
 		      readl, (sts & DMA_GSTS_IRES), sts);
 
+=======
+	writel(iommu->gcmd, iommu->reg + DMAR_GCMD_REG);
+	IOMMU_WAIT_OP(iommu, DMAR_GSTS_REG,
+		      readl, (sts & DMA_GSTS_IRES), sts);
+
+	/* Block compatibility-format MSIs */
+	if (sts & DMA_GSTS_CFIS) {
+		iommu->gcmd &= ~DMA_GCMD_CFI;
+		writel(iommu->gcmd, iommu->reg + DMAR_GCMD_REG);
+		IOMMU_WAIT_OP(iommu, DMAR_GSTS_REG,
+			      readl, !(sts & DMA_GSTS_CFIS), sts);
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * With CFI clear in the Global Command register, we should be
 	 * protected from dangerous (i.e. compatibility) interrupts
@@ -531,7 +546,11 @@ static void iommu_disable_irq_remapping(struct intel_iommu *iommu)
 
 	raw_spin_lock_irqsave(&iommu->register_lock, flags);
 
+<<<<<<< HEAD
 	sts = dmar_readq(iommu->reg + DMAR_GSTS_REG);
+=======
+	sts = readl(iommu->reg + DMAR_GSTS_REG);
+>>>>>>> common/deprecated/android-3.18
 	if (!(sts & DMA_GSTS_IRES))
 		goto end;
 

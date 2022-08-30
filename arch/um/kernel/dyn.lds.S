@@ -6,6 +6,15 @@ OUTPUT_ARCH(ELF_ARCH)
 ENTRY(_start)
 jiffies = jiffies_64;
 
+<<<<<<< HEAD
+=======
+VERSION {
+  {
+    local: *;
+  };
+}
+
+>>>>>>> common/deprecated/android-3.18
 SECTIONS
 {
   PROVIDE (__executable_start = START);

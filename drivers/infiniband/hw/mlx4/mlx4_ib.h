@@ -417,7 +417,11 @@ struct mlx4_ib_demux_ctx {
 	struct workqueue_struct *wq;
 	struct workqueue_struct *ud_wq;
 	spinlock_t ud_lock;
+<<<<<<< HEAD
 	__be64 subnet_prefix;
+=======
+	atomic64_t subnet_prefix;
+>>>>>>> common/deprecated/android-3.18
 	__be64 guid_cache[128];
 	struct mlx4_ib_dev *dev;
 	/* the following lock protects both mcg_table and mcg_mgid0_list */

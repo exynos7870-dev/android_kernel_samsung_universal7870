@@ -138,7 +138,11 @@ u32 pci_ohci_read_reg(int reg)
 		break;
 	case PCI_OHCI_INT_REG:
 		_rdmsr(DIVIL_MSR_REG(PIC_YSEL_LOW), &hi, &lo);
+<<<<<<< HEAD
 		if ((lo & 0x00000f00) == CS5536_USB_INTR)
+=======
+		if (((lo >> PIC_YSEL_LOW_USB_SHIFT) & 0xf) == CS5536_USB_INTR)
+>>>>>>> common/deprecated/android-3.18
 			conf_data = 1;
 		break;
 	default:

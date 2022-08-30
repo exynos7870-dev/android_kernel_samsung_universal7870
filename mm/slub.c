@@ -34,10 +34,13 @@
 #include <linux/prefetch.h>
 #include <linux/memcontrol.h>
 
+<<<<<<< HEAD
 #ifdef CONFIG_SEC_DEBUG_AUTO_SUMMARY
 #include <linux/sec_debug.h>
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #include <trace/events/kmem.h>
 
 #include "internal.h"
@@ -567,9 +570,14 @@ static void print_track(const char *s, struct track *t)
 	if (!t->addr)
 		return;
 
+<<<<<<< HEAD
 	pr_auto(ASL7, "INFO: %s in %pS age=%lu cpu=%u pid=%d\n",
 	       s, (void *)t->addr, jiffies - t->when, t->cpu, t->pid);
 
+=======
+	pr_err("INFO: %s in %pS age=%lu cpu=%u pid=%d\n",
+	       s, (void *)t->addr, jiffies - t->when, t->cpu, t->pid);
+>>>>>>> common/deprecated/android-3.18
 #ifdef CONFIG_STACKTRACE
 	{
 		int i;
@@ -606,10 +614,16 @@ static void slab_bug(struct kmem_cache *s, char *fmt, ...)
 	va_start(args, fmt);
 	vaf.fmt = fmt;
 	vaf.va = &args;
+<<<<<<< HEAD
 
 	pr_auto(ASL7, "=============================================================================\n");
 	pr_auto(ASL7, "BUG %s (%s): %pV\n", s->name, print_tainted(), &vaf);
 	pr_auto(ASL7, "-----------------------------------------------------------------------------\n\n");
+=======
+	pr_err("=============================================================================\n");
+	pr_err("BUG %s (%s): %pV\n", s->name, print_tainted(), &vaf);
+	pr_err("-----------------------------------------------------------------------------\n\n");
+>>>>>>> common/deprecated/android-3.18
 
 	add_taint(TAINT_BAD_PAGE, LOCKDEP_NOW_UNRELIABLE);
 	va_end(args);
@@ -636,7 +650,11 @@ static void print_trailer(struct kmem_cache *s, struct page *page, u8 *p)
 
 	print_page_info(page);
 
+<<<<<<< HEAD
 	pr_auto(ASL7, "INFO: Object 0x%p @offset=%tu fp=0x%p\n",
+=======
+	pr_err("INFO: Object 0x%p @offset=%tu fp=0x%p\n\n",
+>>>>>>> common/deprecated/android-3.18
 	       p, p - addr, get_freepointer(s, p));
 
 	if (s->flags & SLAB_RED_ZONE)
@@ -668,6 +686,7 @@ static void print_trailer(struct kmem_cache *s, struct page *page, u8 *p)
 static void object_err(struct kmem_cache *s, struct page *page,
 			u8 *object, char *reason)
 {
+<<<<<<< HEAD
 	pr_auto_once(7);
 	slab_bug(s, "%s", reason);
 	print_trailer(s, page, object);
@@ -697,6 +716,13 @@ static void slab_err(struct kmem_cache *s, struct page *page,
 }
 
 static void slab_err_nopanic(struct kmem_cache *s, struct page *page,
+=======
+	slab_bug(s, "%s", reason);
+	print_trailer(s, page, object);
+}
+
+static __printf(3, 4) void slab_err(struct kmem_cache *s, struct page *page,
+>>>>>>> common/deprecated/android-3.18
 			const char *fmt, ...)
 {
 	va_list args;
@@ -748,6 +774,7 @@ static int check_bytes_and_report(struct kmem_cache *s, struct page *page,
 	while (end > fault && end[-1] == value)
 		end--;
 
+<<<<<<< HEAD
 	pr_auto_once(7);
 	slab_bug(s, "%s overwritten", what);
 
@@ -759,6 +786,12 @@ static int check_bytes_and_report(struct kmem_cache *s, struct page *page,
 
 	if (slub_debug)
 		panic("SLUB ERROR: check_bytes_and_report. Can it be restored?");
+=======
+	slab_bug(s, "%s overwritten", what);
+	pr_err("INFO: 0x%p-0x%p. First byte 0x%x instead of 0x%x\n",
+					fault, end - 1, fault[0], value);
+	print_trailer(s, page, object);
+>>>>>>> common/deprecated/android-3.18
 
 	restore_bytes(s, what, value, fault, end);
 	return 0;
@@ -846,12 +879,18 @@ static int slab_pad_check(struct kmem_cache *s, struct page *page)
 	while (end > fault && end[-1] == POISON_INUSE)
 		end--;
 
+<<<<<<< HEAD
 	slab_err_nopanic(s, page, "Padding overwritten. 0x%p-0x%p", fault, end - 1);
 	print_section("Padding ", end - remainder, remainder);
 
 	if (slub_debug)
 		panic("SLUB ERROR: slab_pad_check. Can it be restored?");
 
+=======
+	slab_err(s, page, "Padding overwritten. 0x%p-0x%p", fault, end - 1);
+	print_section("Padding ", end - remainder, remainder);
+
+>>>>>>> common/deprecated/android-3.18
 	restore_bytes(s, "slab padding", POISON_INUSE, end - remainder, end);
 	return 0;
 }
@@ -926,12 +965,20 @@ static int check_slab(struct kmem_cache *s, struct page *page)
 	maxobj = order_objects(compound_order(page), s->size, s->reserved);
 	if (page->objects > maxobj) {
 		slab_err(s, page, "objects %u > max %u",
+<<<<<<< HEAD
 			s->name, page->objects, maxobj);
+=======
+			page->objects, maxobj);
+>>>>>>> common/deprecated/android-3.18
 		return 0;
 	}
 	if (page->inuse > page->objects) {
 		slab_err(s, page, "inuse %u > max %u",
+<<<<<<< HEAD
 			s->name, page->inuse, page->objects);
+=======
+			page->inuse, page->objects);
+>>>>>>> common/deprecated/android-3.18
 		return 0;
 	}
 	/* Slab_pad_check fixes things up after itself */
@@ -948,7 +995,11 @@ static int on_freelist(struct kmem_cache *s, struct page *page, void *search)
 	int nr = 0;
 	void *fp;
 	void *object = NULL;
+<<<<<<< HEAD
 	unsigned long max_objects;
+=======
+	int max_objects;
+>>>>>>> common/deprecated/android-3.18
 
 	fp = page->freelist;
 	while (fp && nr <= page->objects) {
@@ -1251,6 +1302,7 @@ unsigned long kmem_cache_flags(unsigned long object_size,
 	 * Enable debugging if selected on the kernel commandline.
 	 */
 	if (slub_debug && (!slub_debug_slabs || (name &&
+<<<<<<< HEAD
 		!strncmp(slub_debug_slabs, name, strlen(slub_debug_slabs))))) {
 		flags |= slub_debug;
 
@@ -1262,6 +1314,11 @@ unsigned long kmem_cache_flags(unsigned long object_size,
 			flags &= ~SLAB_STORE_USER;
 	}
 
+=======
+		!strncmp(slub_debug_slabs, name, strlen(slub_debug_slabs)))))
+		flags |= slub_debug;
+
+>>>>>>> common/deprecated/android-3.18
 	return flags;
 }
 #else
@@ -1662,7 +1719,11 @@ static void *get_partial_node(struct kmem_cache *s, struct kmem_cache_node *n,
 {
 	struct page *page, *page2;
 	void *object = NULL;
+<<<<<<< HEAD
 	int available = 0;
+=======
+	unsigned int available = 0;
+>>>>>>> common/deprecated/android-3.18
 	int objects;
 
 	/*
@@ -1778,8 +1839,11 @@ static void *get_partial(struct kmem_cache *s, gfp_t flags, int node,
 
 	if (node == NUMA_NO_NODE)
 		searchnode = numa_mem_id();
+<<<<<<< HEAD
 	else if (!node_present_pages(node))
 		searchnode = node_to_mem_node(node);
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	object = get_partial_node(s, get_node(s, searchnode), c, flags);
 	if (object || node != NUMA_NO_NODE)
@@ -2355,6 +2419,7 @@ static void *__slab_alloc(struct kmem_cache *s, gfp_t gfpflags, int node,
 #endif
 
 	page = c->page;
+<<<<<<< HEAD
 	if (!page)
 		goto new_slab;
 redo:
@@ -2366,6 +2431,29 @@ redo:
 			searchnode = node_to_mem_node(node);
 
 		if (unlikely(!node_match(page, searchnode))) {
+=======
+	if (!page) {
+		/*
+		 * if the node is not online or has no normal memory, just
+		 * ignore the node constraint
+		 */
+		if (unlikely(node != NUMA_NO_NODE &&
+			     !node_state(node, N_NORMAL_MEMORY)))
+			node = NUMA_NO_NODE;
+		goto new_slab;
+	}
+redo:
+
+	if (unlikely(!node_match(page, node))) {
+		/*
+		 * same as above but node_match() being false already
+		 * implies node != NUMA_NO_NODE
+		 */
+		if (!node_state(node, N_NORMAL_MEMORY)) {
+			node = NUMA_NO_NODE;
+			goto redo;
+		} else {
+>>>>>>> common/deprecated/android-3.18
 			stat(s, ALLOC_NODE_MISMATCH);
 			deactivate_slab(s, page, c->freelist);
 			c->page = NULL;
@@ -2744,11 +2832,21 @@ redo:
 	preempt_enable();
 
 	if (likely(page == c->page)) {
+<<<<<<< HEAD
 		set_freepointer(s, object, c->freelist);
 
 		if (unlikely(!this_cpu_cmpxchg_double(
 				s->cpu_slab->freelist, s->cpu_slab->tid,
 				c->freelist, tid,
+=======
+		void **freelist = READ_ONCE(c->freelist);
+
+		set_freepointer(s, object, freelist);
+
+		if (unlikely(!this_cpu_cmpxchg_double(
+				s->cpu_slab->freelist, s->cpu_slab->tid,
+				freelist, tid,
+>>>>>>> common/deprecated/android-3.18
 				object, next_tid(tid)))) {
 
 			note_cmpxchg_failure("slab_free", s, tid);
@@ -3233,7 +3331,11 @@ static void list_slab_objects(struct kmem_cache *s, struct page *page,
 				     sizeof(long), GFP_ATOMIC);
 	if (!map)
 		return;
+<<<<<<< HEAD
 	slab_err_nopanic(s, page, text, s->name);
+=======
+	slab_err(s, page, text, s->name);
+>>>>>>> common/deprecated/android-3.18
 	slab_lock(page);
 
 	get_map(s, page, map);
@@ -3244,10 +3346,13 @@ static void list_slab_objects(struct kmem_cache *s, struct page *page,
 			print_tracking(s, p);
 		}
 	}
+<<<<<<< HEAD
 	
 	if (slub_debug)
 		panic("SLUB ERROR: list_slab_objects.");
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	slab_unlock(page);
 	kfree(map);
 #endif
@@ -4348,7 +4453,21 @@ static ssize_t show_slab_objects(struct kmem_cache *s,
 		}
 	}
 
+<<<<<<< HEAD
 	get_online_mems();
+=======
+	/*
+	 * It is impossible to take "mem_hotplug_lock" here with "kernfs_mutex"
+	 * already held which will conflict with an existing lock order:
+	 *
+	 * mem_hotplug_lock->slab_mutex->kernfs_mutex
+	 *
+	 * We don't really need mem_hotplug_lock (to hold off
+	 * slab_mem_going_offline_callback) here because slab's memory hot
+	 * unplug code doesn't destroy the kmem_cache->node[] data.
+	 */
+
+>>>>>>> common/deprecated/android-3.18
 #ifdef CONFIG_SLUB_DEBUG
 	if (flags & SO_ALL) {
 		struct kmem_cache_node *n;
@@ -4389,7 +4508,10 @@ static ssize_t show_slab_objects(struct kmem_cache *s,
 			x += sprintf(buf + x, " N%d=%lu",
 					node, nodes[node]);
 #endif
+<<<<<<< HEAD
 	put_online_mems();
+=======
+>>>>>>> common/deprecated/android-3.18
 	kfree(nodes);
 	return x + sprintf(buf + x, "\n");
 }
@@ -4500,10 +4622,17 @@ static ssize_t cpu_partial_show(struct kmem_cache *s, char *buf)
 static ssize_t cpu_partial_store(struct kmem_cache *s, const char *buf,
 				 size_t length)
 {
+<<<<<<< HEAD
 	unsigned long objects;
 	int err;
 
 	err = kstrtoul(buf, 10, &objects);
+=======
+	unsigned int objects;
+	int err;
+
+	err = kstrtouint(buf, 10, &objects);
+>>>>>>> common/deprecated/android-3.18
 	if (err)
 		return err;
 	if (objects && !kmem_cache_has_cpu_partial(s))
@@ -5093,6 +5222,10 @@ static void memcg_propagate_slab_attrs(struct kmem_cache *s)
 		char mbuf[64];
 		char *buf;
 		struct slab_attribute *attr = to_slab_attr(slab_attrs[i]);
+<<<<<<< HEAD
+=======
+		ssize_t len;
+>>>>>>> common/deprecated/android-3.18
 
 		if (!attr || !attr->store || !attr->show)
 			continue;
@@ -5108,7 +5241,12 @@ static void memcg_propagate_slab_attrs(struct kmem_cache *s)
 		 */
 		if (buffer)
 			buf = buffer;
+<<<<<<< HEAD
 		else if (root_cache->max_attr_size < ARRAY_SIZE(mbuf))
+=======
+		else if (root_cache->max_attr_size < ARRAY_SIZE(mbuf) &&
+			 !IS_ENABLED(CONFIG_SLUB_STATS))
+>>>>>>> common/deprecated/android-3.18
 			buf = mbuf;
 		else {
 			buffer = (char *) get_zeroed_page(GFP_KERNEL);
@@ -5117,8 +5255,14 @@ static void memcg_propagate_slab_attrs(struct kmem_cache *s)
 			buf = buffer;
 		}
 
+<<<<<<< HEAD
 		attr->show(root_cache, buf);
 		attr->store(s, buf, strlen(buf));
+=======
+		len = attr->show(root_cache, buf);
+		if (len > 0)
+			attr->store(s, buf, len);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (buffer)

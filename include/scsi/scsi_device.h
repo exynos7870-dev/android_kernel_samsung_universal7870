@@ -262,6 +262,11 @@ struct scsi_dh_data {
 enum scsi_target_state {
 	STARGET_CREATED = 1,
 	STARGET_RUNNING,
+<<<<<<< HEAD
+=======
+	STARGET_REMOVE,
+	STARGET_CREATED_REMOVE,
+>>>>>>> common/deprecated/android-3.18
 	STARGET_DEL,
 };
 

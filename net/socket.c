@@ -89,6 +89,10 @@
 #include <linux/magic.h>
 #include <linux/slab.h>
 #include <linux/xattr.h>
+<<<<<<< HEAD
+=======
+#include <linux/nospec.h>
+>>>>>>> common/deprecated/android-3.18
 
 #include <asm/uaccess.h>
 #include <asm/unistd.h>
@@ -459,7 +463,11 @@ static struct socket *sockfd_lookup_light(int fd, int *err, int *fput_needed)
 	if (f.file) {
 		sock = sock_from_file(f.file, err);
 		if (likely(sock)) {
+<<<<<<< HEAD
 			*fput_needed = f.flags;
+=======
+			*fput_needed = f.flags & FDPUT_FPUT;
+>>>>>>> common/deprecated/android-3.18
 			return sock;
 		}
 		fdput(f);
@@ -473,6 +481,7 @@ static struct socket *sockfd_lookup_light(int fd, int *err, int *fput_needed)
 static ssize_t sockfs_getxattr(struct dentry *dentry,
 			       const char *name, void *value, size_t size)
 {
+<<<<<<< HEAD
 	const char *proto_name;
 	size_t proto_size;
 	int error;
@@ -494,6 +503,17 @@ static ssize_t sockfs_getxattr(struct dentry *dentry,
 
 out:
 	return error;
+=======
+	if (!strcmp(name, XATTR_NAME_SOCKPROTONAME)) {
+		if (value) {
+			if (dentry->d_name.len + 1 > size)
+				return -ERANGE;
+			memcpy(value, dentry->d_name.name, dentry->d_name.len + 1);
+		}
+		return dentry->d_name.len + 1;
+	}
+	return -EOPNOTSUPP;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static ssize_t sockfs_listxattr(struct dentry *dentry, char *buffer,
@@ -524,6 +544,7 @@ static ssize_t sockfs_listxattr(struct dentry *dentry, char *buffer,
 	return used;
 }
 
+<<<<<<< HEAD
 int sockfs_setattr(struct dentry *dentry, struct iattr *iattr)
 {
 	int err = simple_setattr(dentry, iattr);
@@ -532,6 +553,19 @@ int sockfs_setattr(struct dentry *dentry, struct iattr *iattr)
 		struct socket *sock = SOCKET_I(dentry->d_inode);
 
 		sock->sk->sk_uid = iattr->ia_uid;
+=======
+static int sockfs_setattr(struct dentry *dentry, struct iattr *iattr)
+{
+	int err = simple_setattr(dentry, iattr);
+
+	if (!err && (iattr->ia_valid & ATTR_UID)) {
+		struct socket *sock = SOCKET_I(dentry->d_inode);
+
+		if (sock->sk)
+			sock->sk->sk_uid = iattr->ia_uid;
+		else
+			err = -ENOENT;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	return err;
@@ -555,9 +589,12 @@ static struct socket *sock_alloc(void)
 {
 	struct inode *inode;
 	struct socket *sock;
+<<<<<<< HEAD
     /* START_OF_KNOX_VPN */
     struct timespec open_timespec;
     /* END_OF_KNOX_VPN */
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	inode = new_inode_pseudo(sock_mnt->mnt_sb);
 	if (!inode)
@@ -565,6 +602,7 @@ static struct socket *sock_alloc(void)
 
 	sock = SOCKET_I(inode);
 
+<<<<<<< HEAD
 	/* START_OF_KNOX_VPN */
     if(sock) {
         sock->knox_sent = 0;
@@ -574,6 +612,8 @@ static struct socket *sock_alloc(void)
     }
     /* END_OF_KNOX_VPN */
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	kmemcheck_annotate_bitfield(sock, type);
 	inode->i_ino = get_next_ino();
 	inode->i_mode = S_IFSOCK | S_IRWXUGO;
@@ -611,12 +651,25 @@ const struct file_operations bad_sock_fops = {
  *	an inode not a file.
  */
 
+<<<<<<< HEAD
 void sock_release(struct socket *sock)
+=======
+static void __sock_release(struct socket *sock, struct inode *inode)
+>>>>>>> common/deprecated/android-3.18
 {
 	if (sock->ops) {
 		struct module *owner = sock->ops->owner;
 
+<<<<<<< HEAD
 		sock->ops->release(sock);
+=======
+		if (inode)
+			mutex_lock(&inode->i_mutex);
+		sock->ops->release(sock);
+		sock->sk = NULL;
+		if (inode)
+			mutex_unlock(&inode->i_mutex);
+>>>>>>> common/deprecated/android-3.18
 		sock->ops = NULL;
 		module_put(owner);
 	}
@@ -632,6 +685,7 @@ void sock_release(struct socket *sock)
 		iput(SOCK_INODE(sock));
 		return;
 	}
+<<<<<<< HEAD
 	/* START_OF_KNOX_VPN */
     sock->knox_sent = 0;
     sock->knox_recv = 0;
@@ -640,6 +694,15 @@ void sock_release(struct socket *sock)
 
 	sock->file = NULL;
 }
+=======
+	sock->file = NULL;
+}
+
+void sock_release(struct socket *sock)
+{
+	__sock_release(sock, NULL);
+}
+>>>>>>> common/deprecated/android-3.18
 EXPORT_SYMBOL(sock_release);
 
 void __sock_tx_timestamp(const struct sock *sk, __u8 *tx_flags)
@@ -1206,7 +1269,11 @@ static int sock_mmap(struct file *file, struct vm_area_struct *vma)
 
 static int sock_close(struct inode *inode, struct file *filp)
 {
+<<<<<<< HEAD
 	sock_release(SOCKET_I(inode));
+=======
+	__sock_release(SOCKET_I(inode), inode);
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -1899,6 +1966,10 @@ SYSCALL_DEFINE6(recvfrom, int, fd, void __user *, ubuf, size_t, size,
 	msg.msg_name = addr ? (struct sockaddr *)&address : NULL;
 	/* We assume all kernel code knows the size of sockaddr_storage */
 	msg.msg_namelen = 0;
+<<<<<<< HEAD
+=======
+	msg.msg_flags = 0;
+>>>>>>> common/deprecated/android-3.18
 	if (sock->file->f_flags & O_NONBLOCK)
 		flags |= MSG_DONTWAIT;
 	err = sock_recvmsg(sock, &msg, size, flags);
@@ -2053,6 +2124,7 @@ static int ___sys_sendmsg(struct socket *sock, struct msghdr __user *msg,
 	int err, ctl_len, total_len;
 
 	err = -EFAULT;
+<<<<<<< HEAD
 	if (MSG_CMSG_COMPAT & flags) {
 		if (get_compat_msghdr(msg_sys, msg_compat))
 			return -EFAULT;
@@ -2061,6 +2133,14 @@ static int ___sys_sendmsg(struct socket *sock, struct msghdr __user *msg,
 		if (err)
 			return err;
 	}
+=======
+	if (MSG_CMSG_COMPAT & flags)
+		err = get_compat_msghdr(msg_sys, msg_compat);
+	else
+		err = copy_msghdr_from_user(msg_sys, msg);
+	if (err)
+		return err;
+>>>>>>> common/deprecated/android-3.18
 
 	if (msg_sys->msg_iovlen > UIO_FASTIOV) {
 		err = -EMSGSIZE;
@@ -2267,10 +2347,18 @@ static int ___sys_recvmsg(struct socket *sock, struct msghdr __user *msg,
 
 	if (MSG_CMSG_COMPAT & flags)
 		err = get_compat_msghdr(msg_sys, msg_compat);
+<<<<<<< HEAD
 	else 
 		err = copy_msghdr_from_user(msg_sys, msg);
 	if (err < 0)
 			return err;
+=======
+	else
+		err = copy_msghdr_from_user(msg_sys, msg);
+	if (err)
+		return err;
+
+>>>>>>> common/deprecated/android-3.18
 	if (msg_sys->msg_iovlen > UIO_FASTIOV) {
 		err = -EMSGSIZE;
 		if (msg_sys->msg_iovlen > UIO_MAXIOV)
@@ -2392,8 +2480,15 @@ int __sys_recvmmsg(int fd, struct mmsghdr __user *mmsg, unsigned int vlen,
 		return err;
 
 	err = sock_error(sock->sk);
+<<<<<<< HEAD
 	if (err)
 		goto out_put;
+=======
+	if (err) {
+		datagrams = err;
+		goto out_put;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	entry = mmsg;
 	compat_entry = (struct compat_mmsghdr __user *)mmsg;
@@ -2528,6 +2623,10 @@ SYSCALL_DEFINE2(socketcall, int, call, unsigned long __user *, args)
 
 	if (call < 1 || call > SYS_SENDMMSG)
 		return -EINVAL;
+<<<<<<< HEAD
+=======
+	call = array_index_nospec(call, SYS_SENDMMSG + 1);
+>>>>>>> common/deprecated/android-3.18
 
 	len = nargs[call];
 	if (len > sizeof(a))
@@ -2953,9 +3052,20 @@ static int ethtool_ioctl(struct net *net, struct compat_ifreq __user *ifr32)
 		    copy_in_user(&rxnfc->fs.ring_cookie,
 				 &compat_rxnfc->fs.ring_cookie,
 				 (void __user *)(&rxnfc->fs.location + 1) -
+<<<<<<< HEAD
 				 (void __user *)&rxnfc->fs.ring_cookie) ||
 		    copy_in_user(&rxnfc->rule_cnt, &compat_rxnfc->rule_cnt,
 				 sizeof(rxnfc->rule_cnt)))
+=======
+				 (void __user *)&rxnfc->fs.ring_cookie))
+			return -EFAULT;
+		if (ethcmd == ETHTOOL_GRXCLSRLALL) {
+			if (put_user(rule_cnt, &rxnfc->rule_cnt))
+				return -EFAULT;
+		} else if (copy_in_user(&rxnfc->rule_cnt,
+					&compat_rxnfc->rule_cnt,
+					sizeof(rxnfc->rule_cnt)))
+>>>>>>> common/deprecated/android-3.18
 			return -EFAULT;
 	}
 
@@ -3303,7 +3413,10 @@ static int compat_sock_ioctl_trans(struct file *file, struct socket *sock,
 	case SIOCSIFVLAN:
 	case SIOCADDDLCI:
 	case SIOCDELDLCI:
+<<<<<<< HEAD
 	case SIOCKILLADDR:
+=======
+>>>>>>> common/deprecated/android-3.18
 		return sock_ioctl(file, cmd, arg);
 
 	case SIOCGIFFLAGS:
@@ -3344,6 +3457,10 @@ static int compat_sock_ioctl_trans(struct file *file, struct socket *sock,
 	case SIOCSARP:
 	case SIOCGARP:
 	case SIOCDARP:
+<<<<<<< HEAD
+=======
+	case SIOCOUTQNSD:
+>>>>>>> common/deprecated/android-3.18
 	case SIOCATMARK:
 		return sock_do_ioctl(net, sock, cmd, arg);
 	}
@@ -3504,3 +3621,52 @@ int kernel_sock_shutdown(struct socket *sock, enum sock_shutdown_cmd how)
 	return sock->ops->shutdown(sock, how);
 }
 EXPORT_SYMBOL(kernel_sock_shutdown);
+<<<<<<< HEAD
+=======
+
+/* This routine returns the IP overhead imposed by a socket i.e.
+ * the length of the underlying IP header, depending on whether
+ * this is an IPv4 or IPv6 socket and the length from IP options turned
+ * on at the socket. Assumes that the caller has a lock on the socket.
+ */
+u32 kernel_sock_ip_overhead(struct sock *sk)
+{
+	struct inet_sock *inet;
+	struct ip_options_rcu *opt;
+	u32 overhead = 0;
+	bool owned_by_user;
+#if IS_ENABLED(CONFIG_IPV6)
+	struct ipv6_pinfo *np;
+	struct ipv6_txoptions *optv6 = NULL;
+#endif /* IS_ENABLED(CONFIG_IPV6) */
+
+	if (!sk)
+		return overhead;
+
+	owned_by_user = sock_owned_by_user(sk);
+	switch (sk->sk_family) {
+	case AF_INET:
+		inet = inet_sk(sk);
+		overhead += sizeof(struct iphdr);
+		opt = rcu_dereference_protected(inet->inet_opt,
+						owned_by_user);
+		if (opt)
+			overhead += opt->opt.optlen;
+		return overhead;
+#if IS_ENABLED(CONFIG_IPV6)
+	case AF_INET6:
+		np = inet6_sk(sk);
+		overhead += sizeof(struct ipv6hdr);
+		if (np)
+			optv6 = rcu_dereference_protected(np->opt,
+							  owned_by_user);
+		if (optv6)
+			overhead += (optv6->opt_flen + optv6->opt_nflen);
+		return overhead;
+#endif /* IS_ENABLED(CONFIG_IPV6) */
+	default: /* Returns 0 overhead if the socket is not ipv4 or ipv6 */
+		return overhead;
+	}
+}
+EXPORT_SYMBOL(kernel_sock_ip_overhead);
+>>>>>>> common/deprecated/android-3.18

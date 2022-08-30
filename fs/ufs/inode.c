@@ -902,6 +902,14 @@ void ufs_evict_inode(struct inode * inode)
 	invalidate_inode_buffers(inode);
 	clear_inode(inode);
 
+<<<<<<< HEAD
 	if (want_delete)
 		ufs_free_inode(inode);
+=======
+	if (want_delete) {
+		lock_ufs(inode->i_sb);
+		ufs_free_inode(inode);
+		unlock_ufs(inode->i_sb);
+	}
+>>>>>>> common/deprecated/android-3.18
 }

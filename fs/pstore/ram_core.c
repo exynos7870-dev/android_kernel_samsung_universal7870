@@ -17,6 +17,7 @@
 #include <linux/device.h>
 #include <linux/err.h>
 #include <linux/errno.h>
+<<<<<<< HEAD
 #include <linux/kernel.h>
 #include <linux/init.h>
 #include <linux/io.h>
@@ -26,6 +27,18 @@
 #include <linux/slab.h>
 #include <linux/vmalloc.h>
 #include <linux/pstore_ram.h>
+=======
+#include <linux/init.h>
+#include <linux/io.h>
+#include <linux/kernel.h>
+#include <linux/list.h>
+#include <linux/memblock.h>
+#include <linux/pstore_ram.h>
+#include <linux/rslib.h>
+#include <linux/slab.h>
+#include <linux/uaccess.h>
+#include <linux/vmalloc.h>
+>>>>>>> common/deprecated/android-3.18
 #include <asm/page.h>
 
 struct persistent_ram_buffer {
@@ -48,6 +61,7 @@ static inline size_t buffer_start(struct persistent_ram_zone *prz)
 }
 
 /* increase and wrap the start pointer, returning the old value */
+<<<<<<< HEAD
 static size_t buffer_start_add_atomic(struct persistent_ram_zone *prz, size_t a)
 {
 	int old;
@@ -90,6 +104,16 @@ static size_t buffer_start_add_locked(struct persistent_ram_zone *prz, size_t a)
 	unsigned long flags;
 
 	raw_spin_lock_irqsave(&buffer_lock, flags);
+=======
+static size_t buffer_start_add(struct persistent_ram_zone *prz, size_t a)
+{
+	int old;
+	int new;
+	unsigned long flags = 0;
+
+	if (!(prz->flags & PRZ_FLAG_NO_LOCK))
+		raw_spin_lock_irqsave(&prz->buffer_lock, flags);
+>>>>>>> common/deprecated/android-3.18
 
 	old = atomic_read(&prz->buffer->start);
 	new = old + a;
@@ -97,12 +121,18 @@ static size_t buffer_start_add_locked(struct persistent_ram_zone *prz, size_t a)
 		new -= prz->buffer_size;
 	atomic_set(&prz->buffer->start, new);
 
+<<<<<<< HEAD
 	raw_spin_unlock_irqrestore(&buffer_lock, flags);
+=======
+	if (!(prz->flags & PRZ_FLAG_NO_LOCK))
+		raw_spin_unlock_irqrestore(&prz->buffer_lock, flags);
+>>>>>>> common/deprecated/android-3.18
 
 	return old;
 }
 
 /* increase the size counter until it hits the max size */
+<<<<<<< HEAD
 static void buffer_size_add_locked(struct persistent_ram_zone *prz, size_t a)
 {
 	size_t old;
@@ -110,6 +140,16 @@ static void buffer_size_add_locked(struct persistent_ram_zone *prz, size_t a)
 	unsigned long flags;
 
 	raw_spin_lock_irqsave(&buffer_lock, flags);
+=======
+static void buffer_size_add(struct persistent_ram_zone *prz, size_t a)
+{
+	size_t old;
+	size_t new;
+	unsigned long flags = 0;
+
+	if (!(prz->flags & PRZ_FLAG_NO_LOCK))
+		raw_spin_lock_irqsave(&prz->buffer_lock, flags);
+>>>>>>> common/deprecated/android-3.18
 
 	old = atomic_read(&prz->buffer->size);
 	if (old == prz->buffer_size)
@@ -121,12 +161,19 @@ static void buffer_size_add_locked(struct persistent_ram_zone *prz, size_t a)
 	atomic_set(&prz->buffer->size, new);
 
 exit:
+<<<<<<< HEAD
 	raw_spin_unlock_irqrestore(&buffer_lock, flags);
 }
 
 static size_t (*buffer_start_add)(struct persistent_ram_zone *, size_t) = buffer_start_add_atomic;
 static void (*buffer_size_add)(struct persistent_ram_zone *, size_t) = buffer_size_add_atomic;
 
+=======
+	if (!(prz->flags & PRZ_FLAG_NO_LOCK))
+		raw_spin_unlock_irqrestore(&prz->buffer_lock, flags);
+}
+
+>>>>>>> common/deprecated/android-3.18
 static void notrace persistent_ram_encode_rs8(struct persistent_ram_zone *prz,
 	uint8_t *data, size_t len, uint8_t *ecc)
 {
@@ -207,10 +254,17 @@ static void persistent_ram_ecc_old(struct persistent_ram_zone *prz)
 			size = buffer->data + prz->buffer_size - block;
 		numerr = persistent_ram_decode_rs8(prz, block, size, par);
 		if (numerr > 0) {
+<<<<<<< HEAD
 			pr_info("error in block %p, %d\n", block, numerr);
 			prz->corrected_bytes += numerr;
 		} else if (numerr < 0) {
 			pr_info("uncorrectable error in block %p\n", block);
+=======
+			pr_devel("error in block %p, %d\n", block, numerr);
+			prz->corrected_bytes += numerr;
+		} else if (numerr < 0) {
+			pr_devel("uncorrectable error in block %p\n", block);
+>>>>>>> common/deprecated/android-3.18
 			prz->bad_blocks++;
 		}
 		block += prz->ecc_info.block_size;
@@ -299,10 +353,27 @@ static void notrace persistent_ram_update(struct persistent_ram_zone *prz,
 	const void *s, unsigned int start, unsigned int count)
 {
 	struct persistent_ram_buffer *buffer = prz->buffer;
+<<<<<<< HEAD
 	memcpy(buffer->data + start, s, count);
 	persistent_ram_update_ecc(prz, start, count);
 }
 
+=======
+	memcpy_toio(buffer->data + start, s, count);
+	persistent_ram_update_ecc(prz, start, count);
+}
+
+static int notrace persistent_ram_update_user(struct persistent_ram_zone *prz,
+	const void __user *s, unsigned int start, unsigned int count)
+{
+	struct persistent_ram_buffer *buffer = prz->buffer;
+	int ret = unlikely(__copy_from_user(buffer->data + start, s, count)) ?
+		-EFAULT : 0;
+	persistent_ram_update_ecc(prz, start, count);
+	return ret;
+}
+
+>>>>>>> common/deprecated/android-3.18
 void persistent_ram_save_old(struct persistent_ram_zone *prz)
 {
 	struct persistent_ram_buffer *buffer = prz->buffer;
@@ -322,8 +393,13 @@ void persistent_ram_save_old(struct persistent_ram_zone *prz)
 	}
 
 	prz->old_log_size = size;
+<<<<<<< HEAD
 	memcpy(prz->old_log, &buffer->data[start], size - start);
 	memcpy(prz->old_log + size - start, &buffer->data[0], start);
+=======
+	memcpy_fromio(prz->old_log, &buffer->data[start], size - start);
+	memcpy_fromio(prz->old_log + size - start, &buffer->data[0], start);
+>>>>>>> common/deprecated/android-3.18
 }
 
 int notrace persistent_ram_write(struct persistent_ram_zone *prz,
@@ -356,6 +432,41 @@ int notrace persistent_ram_write(struct persistent_ram_zone *prz,
 	return count;
 }
 
+<<<<<<< HEAD
+=======
+int notrace persistent_ram_write_user(struct persistent_ram_zone *prz,
+	const void __user *s, unsigned int count)
+{
+	int rem, ret = 0, c = count;
+	size_t start;
+
+	if (unlikely(!access_ok(VERIFY_READ, s, count)))
+		return -EFAULT;
+	if (unlikely(c > prz->buffer_size)) {
+		s += c - prz->buffer_size;
+		c = prz->buffer_size;
+	}
+
+	buffer_size_add(prz, c);
+
+	start = buffer_start_add(prz, c);
+
+	rem = prz->buffer_size - start;
+	if (unlikely(rem < c)) {
+		ret = persistent_ram_update_user(prz, s, start, rem);
+		s += rem;
+		c -= rem;
+		start = 0;
+	}
+	if (likely(!ret))
+		ret = persistent_ram_update_user(prz, s, start, c);
+
+	persistent_ram_update_header_ecc(prz);
+
+	return unlikely(ret) ? ret : count;
+}
+
+>>>>>>> common/deprecated/android-3.18
 size_t persistent_ram_old_size(struct persistent_ram_zone *prz)
 {
 	return prz->old_log_size;
@@ -393,11 +504,15 @@ static void *persistent_ram_vmap(phys_addr_t start, size_t size,
 	page_start = start - offset_in_page(start);
 	page_count = DIV_ROUND_UP(size + offset_in_page(start), PAGE_SIZE);
 
+<<<<<<< HEAD
 #ifndef CONFIG_EXYNOS_SNAPSHOT_PSTORE
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (memtype)
 		prot = pgprot_noncached(PAGE_KERNEL);
 	else
 		prot = pgprot_writecombine(PAGE_KERNEL);
+<<<<<<< HEAD
 #else
 	/*
 	 * If using exynos-snapshot, we can get the debug information
@@ -406,6 +521,9 @@ static void *persistent_ram_vmap(phys_addr_t start, size_t size,
 	 */
 	prot = PAGE_KERNEL;
 #endif
+=======
+
+>>>>>>> common/deprecated/android-3.18
 	pages = kmalloc_array(page_count, sizeof(struct page *), GFP_KERNEL);
 	if (!pages) {
 		pr_err("%s: Failed to allocate array for %u pages\n",
@@ -420,7 +538,16 @@ static void *persistent_ram_vmap(phys_addr_t start, size_t size,
 	vaddr = vmap(pages, page_count, VM_MAP, prot);
 	kfree(pages);
 
+<<<<<<< HEAD
 	return vaddr;
+=======
+	/*
+	 * Since vmap() uses page granularity, we must add the offset
+	 * into the page here, to get the byte granularity address
+	 * into the mapping to represent the actual "start" location.
+	 */
+	return vaddr + offset_in_page(start);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void *persistent_ram_iomap(phys_addr_t start, size_t size,
@@ -434,14 +561,25 @@ static void *persistent_ram_iomap(phys_addr_t start, size_t size,
 		return NULL;
 	}
 
+<<<<<<< HEAD
 	buffer_start_add = buffer_start_add_locked;
 	buffer_size_add = buffer_size_add_locked;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (memtype)
 		va = ioremap(start, size);
 	else
 		va = ioremap_wc(start, size);
 
+<<<<<<< HEAD
+=======
+	/*
+	 * Since request_mem_region() and ioremap() are byte-granularity
+	 * there is no need handle anything special like we do when the
+	 * vmap() case in persistent_ram_vmap() above.
+	 */
+>>>>>>> common/deprecated/android-3.18
 	return va;
 }
 
@@ -462,7 +600,11 @@ static int persistent_ram_buffer_map(phys_addr_t start, phys_addr_t size,
 		return -ENOMEM;
 	}
 
+<<<<<<< HEAD
 	prz->buffer = prz->vaddr + offset_in_page(start);
+=======
+	prz->buffer = prz->vaddr;
+>>>>>>> common/deprecated/android-3.18
 	prz->buffer_size = size - sizeof(struct persistent_ram_buffer);
 
 	return 0;
@@ -480,21 +622,41 @@ static int persistent_ram_post_init(struct persistent_ram_zone *prz, u32 sig,
 	sig ^= PERSISTENT_RAM_SIG;
 
 	if (prz->buffer->sig == sig) {
+<<<<<<< HEAD
+=======
+		if (buffer_size(prz) == 0) {
+			pr_debug("found existing empty buffer\n");
+			return 0;
+		}
+
+>>>>>>> common/deprecated/android-3.18
 		if (buffer_size(prz) > prz->buffer_size ||
 		    buffer_start(prz) > buffer_size(prz))
 			pr_info("found existing invalid buffer, size %zu, start %zu\n",
 				buffer_size(prz), buffer_start(prz));
 		else {
+<<<<<<< HEAD
 			pr_info("found existing buffer, size %zu, start %zu\n",
+=======
+			pr_debug("found existing buffer, size %zu, start %zu\n",
+>>>>>>> common/deprecated/android-3.18
 				 buffer_size(prz), buffer_start(prz));
 			persistent_ram_save_old(prz);
 			return 0;
 		}
 	} else {
+<<<<<<< HEAD
 		pr_info("no valid data in buffer (sig = 0x%08x)\n",
 			 prz->buffer->sig);
 	}
 
+=======
+		pr_debug("no valid data in buffer (sig = 0x%08x)\n",
+			 prz->buffer->sig);
+	}
+
+	/* Rewind missing or invalid memory area. */
+>>>>>>> common/deprecated/android-3.18
 	prz->buffer->sig = sig;
 	persistent_ram_zap(prz);
 
@@ -508,7 +670,12 @@ void persistent_ram_free(struct persistent_ram_zone *prz)
 
 	if (prz->vaddr) {
 		if (pfn_valid(prz->paddr >> PAGE_SHIFT)) {
+<<<<<<< HEAD
 			vunmap(prz->vaddr);
+=======
+			/* We must vunmap() at page-granularity. */
+			vunmap(prz->vaddr - offset_in_page(prz->paddr));
+>>>>>>> common/deprecated/android-3.18
 		} else {
 			iounmap(prz->vaddr);
 			release_mem_region(prz->paddr, prz->size);
@@ -521,7 +688,11 @@ void persistent_ram_free(struct persistent_ram_zone *prz)
 
 struct persistent_ram_zone *persistent_ram_new(phys_addr_t start, size_t size,
 			u32 sig, struct persistent_ram_ecc_info *ecc_info,
+<<<<<<< HEAD
 			unsigned int memtype)
+=======
+			unsigned int memtype, u32 flags)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct persistent_ram_zone *prz;
 	int ret = -ENOMEM;
@@ -532,6 +703,13 @@ struct persistent_ram_zone *persistent_ram_new(phys_addr_t start, size_t size,
 		goto err;
 	}
 
+<<<<<<< HEAD
+=======
+	/* Initialize general buffer state. */
+	raw_spin_lock_init(&prz->buffer_lock);
+	prz->flags = flags;
+
+>>>>>>> common/deprecated/android-3.18
 	ret = persistent_ram_buffer_map(start, size, prz, memtype);
 	if (ret)
 		goto err;

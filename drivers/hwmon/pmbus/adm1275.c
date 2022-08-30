@@ -67,7 +67,11 @@ static int adm1275_read_word_data(struct i2c_client *client, int page, int reg)
 	const struct adm1275_data *data = to_adm1275_data(info);
 	int ret = 0;
 
+<<<<<<< HEAD
 	if (page)
+=======
+	if (page > 0)
+>>>>>>> common/deprecated/android-3.18
 		return -ENXIO;
 
 	switch (reg) {
@@ -144,7 +148,11 @@ static int adm1275_write_word_data(struct i2c_client *client, int page, int reg,
 {
 	int ret;
 
+<<<<<<< HEAD
 	if (page)
+=======
+	if (page > 0)
+>>>>>>> common/deprecated/android-3.18
 		return -ENXIO;
 
 	switch (reg) {

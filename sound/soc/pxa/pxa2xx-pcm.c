@@ -156,3 +156,7 @@ module_platform_driver(pxa_pcm_driver);
 MODULE_AUTHOR("Nicolas Pitre");
 MODULE_DESCRIPTION("Intel PXA2xx PCM DMA module");
 MODULE_LICENSE("GPL");
+<<<<<<< HEAD
+=======
+MODULE_ALIAS("platform:pxa-pcm-audio");
+>>>>>>> common/deprecated/android-3.18

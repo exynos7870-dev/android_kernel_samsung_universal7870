@@ -296,7 +296,11 @@
 			};
 
 			eth3: ethernet@34000 {
+<<<<<<< HEAD
 				compatible = "marvell,armada-370-neta";
+=======
+				compatible = "marvell,armada-xp-neta";
+>>>>>>> common/deprecated/android-3.18
 				reg = <0x34000 0x4000>;
 				interrupts = <14>;
 				clocks = <&gateclk 1>;

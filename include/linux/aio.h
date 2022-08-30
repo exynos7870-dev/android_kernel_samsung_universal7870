@@ -34,7 +34,10 @@ struct kiocb {
 	struct kioctx		*ki_ctx;	/* NULL for sync ops */
 	kiocb_cancel_fn		*ki_cancel;
 	void			*private;
+<<<<<<< HEAD
 	int ki_flags;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	union {
 		void __user		*user;

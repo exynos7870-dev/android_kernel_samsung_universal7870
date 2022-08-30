@@ -69,10 +69,17 @@ all tags TAGS:
 	$(make)
 
 #
+<<<<<<< HEAD
 # The clean target is not really parallel, don't print the jobs info:
 #
 clean:
 	$(make)
+=======
+# Explicitly disable parallelism for the clean target.
+#
+clean:
+	$(make) -j1
+>>>>>>> common/deprecated/android-3.18
 
 #
 # The build-test target is not really parallel, don't print the jobs info:

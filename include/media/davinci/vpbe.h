@@ -96,7 +96,11 @@ struct vpbe_config {
 	struct encoder_config_info *ext_encoders;
 	/* amplifier information goes here */
 	struct amp_config_info *amp;
+<<<<<<< HEAD
 	int num_outputs;
+=======
+	unsigned int num_outputs;
+>>>>>>> common/deprecated/android-3.18
 	/* Order is venc outputs followed by LCD and then external encoders */
 	struct vpbe_output *outputs;
 };

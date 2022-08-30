@@ -461,6 +461,10 @@
 			compatible = "samsung,exynos4210-ohci";
 			reg = <0xec300000 0x100>;
 			interrupts = <23>;
+<<<<<<< HEAD
+=======
+			interrupt-parent = <&vic1>;
+>>>>>>> common/deprecated/android-3.18
 			clocks = <&clocks CLK_USB_HOST>;
 			clock-names = "usbhost";
 			#address-cells = <1>;

@@ -3,7 +3,11 @@
  *
  * Zero an entire page.
  */
+<<<<<<< HEAD
 
+=======
+#include <asm/export.h>
+>>>>>>> common/deprecated/android-3.18
 	.text
 	.align 4
 	.global clear_page
@@ -37,3 +41,7 @@ clear_page:
 	nop
 
 	.end clear_page
+<<<<<<< HEAD
+=======
+	EXPORT_SYMBOL(clear_page)
+>>>>>>> common/deprecated/android-3.18

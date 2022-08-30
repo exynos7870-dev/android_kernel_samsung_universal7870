@@ -1117,9 +1117,12 @@ static int soc_probe_component(struct snd_soc_card *card,
 	}
 
 	list_for_each_entry(dai, &component->dai_list, list) {
+<<<<<<< HEAD
 		if (dai->playback_widget || dai->capture_widget)
 			continue;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		ret = snd_soc_dapm_new_dai_widgets(dapm, dai);
 		if (ret != 0) {
 			dev_err(component->dev,
@@ -1871,6 +1874,12 @@ static int soc_cleanup_card_resources(struct snd_soc_card *card)
 	for (i = 0; i < card->num_aux_devs; i++)
 		soc_remove_aux_dev(card, i);
 
+<<<<<<< HEAD
+=======
+	/* free the ALSA card at first; this syncs with pending operations */
+	snd_card_free(card->snd_card);
+
+>>>>>>> common/deprecated/android-3.18
 	/* remove and free each DAI */
 	soc_remove_dai_links(card);
 
@@ -1882,9 +1891,13 @@ static int soc_cleanup_card_resources(struct snd_soc_card *card)
 
 	snd_soc_dapm_free(&card->dapm);
 
+<<<<<<< HEAD
 	snd_card_free(card->snd_card);
 	return 0;
 
+=======
+	return 0;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /* removes a socdev */
@@ -2518,6 +2531,7 @@ int snd_soc_info_volsw(struct snd_kcontrol *kcontrol,
 }
 EXPORT_SYMBOL_GPL(snd_soc_info_volsw);
 
+<<<<<<< HEAD
 /*
  * snd_soc_info_volsw_sx - Mixer info callback for SX TLV controls
  * @kcontrol: mixer control
@@ -2546,6 +2560,8 @@ int snd_soc_info_volsw_sx(struct snd_kcontrol *kcontrol,
 }
 EXPORT_SYMBOL_GPL(snd_soc_info_volsw_sx);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /**
  * snd_soc_get_volsw - single mixer get callback
  * @kcontrol: mixer control
@@ -3178,11 +3194,19 @@ int snd_soc_bytes_tlv_callback(struct snd_kcontrol *kcontrol, int op_flag,
 	switch (op_flag) {
 	case SNDRV_CTL_TLV_OP_READ:
 		if (params->get)
+<<<<<<< HEAD
 			ret = params->get(kcontrol, tlv, count);
 		break;
 	case SNDRV_CTL_TLV_OP_WRITE:
 		if (params->put)
 			ret = params->put(kcontrol, tlv, count);
+=======
+			ret = params->get(tlv, count);
+		break;
+	case SNDRV_CTL_TLV_OP_WRITE:
+		if (params->put)
+			ret = params->put(tlv, count);
+>>>>>>> common/deprecated/android-3.18
 		break;
 	}
 	return ret;

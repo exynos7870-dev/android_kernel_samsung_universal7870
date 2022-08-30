@@ -88,7 +88,11 @@ static int dac_mute_put(struct snd_kcontrol *ctl,
 	int changed;
 
 	mutex_lock(&chip->mutex);
+<<<<<<< HEAD
 	changed = !value->value.integer.value[0] != chip->dac_mute;
+=======
+	changed = (!value->value.integer.value[0]) != chip->dac_mute;
+>>>>>>> common/deprecated/android-3.18
 	if (changed) {
 		chip->dac_mute = !value->value.integer.value[0];
 		chip->model.update_dac_mute(chip);

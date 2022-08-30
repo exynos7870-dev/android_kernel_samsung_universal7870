@@ -19,6 +19,10 @@
  */
 
 #include <linux/init.h>
+<<<<<<< HEAD
+=======
+#include <linux/delay.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/bootmem.h>
 #include <linux/mmzone.h>
 #include <linux/mm.h>

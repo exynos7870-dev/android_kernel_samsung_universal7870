@@ -457,9 +457,19 @@ void truncate_inode_pages_final(struct address_space *mapping)
 		 */
 		spin_lock_irq(&mapping->tree_lock);
 		spin_unlock_irq(&mapping->tree_lock);
+<<<<<<< HEAD
 
 		truncate_inode_pages(mapping, 0);
 	}
+=======
+	}
+
+	/*
+	 * Cleancache needs notification even if there are no pages or shadow
+	 * entries.
+	 */
+	truncate_inode_pages(mapping, 0);
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL(truncate_inode_pages_final);
 
@@ -513,7 +523,11 @@ unsigned long invalidate_mapping_pages(struct address_space *mapping,
 			 * of interest and try to speed up its reclaim.
 			 */
 			if (!ret)
+<<<<<<< HEAD
 				deactivate_page(page);
+=======
+				deactivate_file_page(page);
+>>>>>>> common/deprecated/android-3.18
 			count += ret;
 		}
 		pagevec_remove_exceptionals(&pvec);

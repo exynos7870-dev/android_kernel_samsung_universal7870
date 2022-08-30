@@ -272,7 +272,11 @@ static void ipu_irq_err(unsigned int irq, struct irq_desc *desc)
 	u32 status;
 	int i, line;
 
+<<<<<<< HEAD
 	for (i = IPU_IRQ_NR_FN_BANKS; i < IPU_IRQ_NR_BANKS; i++) {
+=======
+	for (i = 0; i < IPU_IRQ_NR_BANKS; i++) {
+>>>>>>> common/deprecated/android-3.18
 		struct ipu_irq_bank *bank = irq_bank + i;
 
 		raw_spin_lock(&bank_lock);

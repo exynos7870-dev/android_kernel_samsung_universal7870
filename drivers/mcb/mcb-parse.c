@@ -57,7 +57,11 @@ static int chameleon_parse_gdd(struct mcb_bus *bus,
 	mdev->id = GDD_DEV(reg1);
 	mdev->rev = GDD_REV(reg1);
 	mdev->var = GDD_VAR(reg1);
+<<<<<<< HEAD
 	mdev->bar = GDD_BAR(reg1);
+=======
+	mdev->bar = GDD_BAR(reg2);
+>>>>>>> common/deprecated/android-3.18
 	mdev->group = GDD_GRP(reg2);
 	mdev->inst = GDD_INS(reg2);
 

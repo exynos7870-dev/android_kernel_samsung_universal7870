@@ -9,7 +9,11 @@
  * past count, whereas libc may write to count+1.  This follows the generic
  * implementation in lib/string.c and is, IMHO, more sensible.
  */
+<<<<<<< HEAD
 
+=======
+#include <asm/export.h>
+>>>>>>> common/deprecated/android-3.18
 	.text
 
 	.align 3
@@ -82,3 +86,7 @@ $zerocount:
 	ret
 
 	.end strncat
+<<<<<<< HEAD
+=======
+	EXPORT_SYMBOL(strncat)
+>>>>>>> common/deprecated/android-3.18

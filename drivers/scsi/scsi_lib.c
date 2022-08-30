@@ -616,7 +616,11 @@ static int scsi_alloc_sgtable(struct scsi_data_buffer *sdb, int nents,
 	}
 
 	ret = __sg_alloc_table(&sdb->table, nents, SCSI_MAX_SG_SEGMENTS,
+<<<<<<< HEAD
 			       first_chunk, gfp_mask, scsi_sg_alloc);
+=======
+			       first_chunk, GFP_ATOMIC, scsi_sg_alloc);
+>>>>>>> common/deprecated/android-3.18
 	if (unlikely(ret))
 		scsi_free_sgtable(sdb, mq);
 	return ret;
@@ -919,9 +923,18 @@ void scsi_io_completion(struct scsi_cmnd *cmd, unsigned int good_bytes)
 	}
 
 	/*
+<<<<<<< HEAD
 	 * If we finished all bytes in the request we are done now.
 	 */
 	if (!scsi_end_request(req, error, good_bytes, 0))
+=======
+	 * special case: failed zero length commands always need to
+	 * drop down into the retry code. Otherwise, if we finished
+	 * all bytes in the request we are done now.
+	 */
+	if (!(blk_rq_bytes(req) == 0 && error) &&
+	    !scsi_end_request(req, error, good_bytes, 0))
+>>>>>>> common/deprecated/android-3.18
 		return;
 
 	/*
@@ -1113,7 +1126,12 @@ int scsi_init_io(struct scsi_cmnd *cmd, gfp_t gfp_mask)
 	bool is_mq = (rq->mq_ctx != NULL);
 	int error;
 
+<<<<<<< HEAD
 	BUG_ON(!rq->nr_phys_segments);
+=======
+	if (WARN_ON_ONCE(!rq->nr_phys_segments))
+		return -EINVAL;
+>>>>>>> common/deprecated/android-3.18
 
 	error = scsi_init_sgtable(rq, &cmd->sdb, gfp_mask);
 	if (error)
@@ -1600,7 +1618,11 @@ static void scsi_kill_request(struct request *req, struct request_queue *q)
 	blk_complete_request(req);
 }
 
+<<<<<<< HEAD
 void scsi_softirq_done(struct request *rq)
+=======
+static void scsi_softirq_done(struct request *rq)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct scsi_cmnd *cmd = rq->special;
 	unsigned long wait_for = (cmd->allowed + 1) * rq->timeout;

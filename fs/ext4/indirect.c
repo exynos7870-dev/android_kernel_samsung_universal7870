@@ -565,7 +565,11 @@ int ext4_ind_map_blocks(handle_t *handle, struct inode *inode,
 				       EXT4_FEATURE_RO_COMPAT_BIGALLOC)) {
 		EXT4_ERROR_INODE(inode, "Can't allocate blocks for "
 				 "non-extent mapped inodes with bigalloc");
+<<<<<<< HEAD
 		return -ENOSPC;
+=======
+		return -EUCLEAN;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/* Set up for the direct block allocation */
@@ -935,8 +939,12 @@ static int ext4_clear_blocks(handle_t *handle, struct inode *inode,
 	else if (ext4_should_journal_data(inode))
 		flags |= EXT4_FREE_BLOCKS_FORGET;
 
+<<<<<<< HEAD
 	if (!ext4_data_block_valid(EXT4_SB(inode->i_sb), block_to_free,
 				   count)) {
+=======
+	if (!ext4_inode_block_valid(inode, block_to_free, count)) {
+>>>>>>> common/deprecated/android-3.18
 		EXT4_ERROR_INODE(inode, "attempt to clear invalid "
 				 "blocks %llu len %lu",
 				 (unsigned long long) block_to_free, count);
@@ -1098,8 +1106,12 @@ static void ext4_free_branches(handle_t *handle, struct inode *inode,
 			if (!nr)
 				continue;		/* A hole */
 
+<<<<<<< HEAD
 			if (!ext4_data_block_valid(EXT4_SB(inode->i_sb),
 						   nr, 1)) {
+=======
+			if (!ext4_inode_block_valid(inode, nr, 1)) {
+>>>>>>> common/deprecated/android-3.18
 				EXT4_ERROR_INODE(inode,
 						 "invalid indirect mapped "
 						 "block %lu (level %d)",
@@ -1312,6 +1324,10 @@ int ext4_ind_remove_space(handle_t *handle, struct inode *inode,
 	ext4_lblk_t offsets[4], offsets2[4];
 	Indirect chain[4], chain2[4];
 	Indirect *partial, *partial2;
+<<<<<<< HEAD
+=======
+	Indirect *p = NULL, *p2 = NULL;
+>>>>>>> common/deprecated/android-3.18
 	ext4_lblk_t max_block;
 	__le32 nr = 0, nr2 = 0;
 	int n = 0, n2 = 0;
@@ -1353,7 +1369,11 @@ int ext4_ind_remove_space(handle_t *handle, struct inode *inode,
 		}
 
 
+<<<<<<< HEAD
 		partial = ext4_find_shared(inode, n, offsets, chain, &nr);
+=======
+		partial = p = ext4_find_shared(inode, n, offsets, chain, &nr);
+>>>>>>> common/deprecated/android-3.18
 		if (nr) {
 			if (partial == chain) {
 				/* Shared branch grows from the inode */
@@ -1378,13 +1398,20 @@ int ext4_ind_remove_space(handle_t *handle, struct inode *inode,
 				partial->p + 1,
 				(__le32 *)partial->bh->b_data+addr_per_block,
 				(chain+n-1) - partial);
+<<<<<<< HEAD
 			BUFFER_TRACE(partial->bh, "call brelse");
 			brelse(partial->bh);
+=======
+>>>>>>> common/deprecated/android-3.18
 			partial--;
 		}
 
 end_range:
+<<<<<<< HEAD
 		partial2 = ext4_find_shared(inode, n2, offsets2, chain2, &nr2);
+=======
+		partial2 = p2 = ext4_find_shared(inode, n2, offsets2, chain2, &nr2);
+>>>>>>> common/deprecated/android-3.18
 		if (nr2) {
 			if (partial2 == chain2) {
 				/*
@@ -1414,16 +1441,24 @@ end_range:
 					   (__le32 *)partial2->bh->b_data,
 					   partial2->p,
 					   (chain2+n2-1) - partial2);
+<<<<<<< HEAD
 			BUFFER_TRACE(partial2->bh, "call brelse");
 			brelse(partial2->bh);
+=======
+>>>>>>> common/deprecated/android-3.18
 			partial2--;
 		}
 		goto do_indirects;
 	}
 
 	/* Punch happened within the same level (n == n2) */
+<<<<<<< HEAD
 	partial = ext4_find_shared(inode, n, offsets, chain, &nr);
 	partial2 = ext4_find_shared(inode, n2, offsets2, chain2, &nr2);
+=======
+	partial = p = ext4_find_shared(inode, n, offsets, chain, &nr);
+	partial2 = p2 = ext4_find_shared(inode, n2, offsets2, chain2, &nr2);
+>>>>>>> common/deprecated/android-3.18
 
 	/* Free top, but only if partial2 isn't its subtree. */
 	if (nr) {
@@ -1480,11 +1515,15 @@ end_range:
 					   partial->p + 1,
 					   partial2->p,
 					   (chain+n-1) - partial);
+<<<<<<< HEAD
 			BUFFER_TRACE(partial->bh, "call brelse");
 			brelse(partial->bh);
 			BUFFER_TRACE(partial2->bh, "call brelse");
 			brelse(partial2->bh);
 			return 0;
+=======
+			goto cleanup;
+>>>>>>> common/deprecated/android-3.18
 		}
 
 		/*
@@ -1499,8 +1538,11 @@ end_range:
 					   partial->p + 1,
 					   (__le32 *)partial->bh->b_data+addr_per_block,
 					   (chain+n-1) - partial);
+<<<<<<< HEAD
 			BUFFER_TRACE(partial->bh, "call brelse");
 			brelse(partial->bh);
+=======
+>>>>>>> common/deprecated/android-3.18
 			partial--;
 		}
 		if (partial2 > chain2 && depth2 <= depth) {
@@ -1508,11 +1550,29 @@ end_range:
 					   (__le32 *)partial2->bh->b_data,
 					   partial2->p,
 					   (chain2+n2-1) - partial2);
+<<<<<<< HEAD
 			BUFFER_TRACE(partial2->bh, "call brelse");
 			brelse(partial2->bh);
 			partial2--;
 		}
 	}
+=======
+			partial2--;
+		}
+	}
+
+cleanup:
+	while (p && p > chain) {
+		BUFFER_TRACE(p->bh, "call brelse");
+		brelse(p->bh);
+		p--;
+	}
+	while (p2 && p2 > chain2) {
+		BUFFER_TRACE(p2->bh, "call brelse");
+		brelse(p2->bh);
+		p2--;
+	}
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 
 do_indirects:
@@ -1520,7 +1580,11 @@ do_indirects:
 	switch (offsets[0]) {
 	default:
 		if (++n >= n2)
+<<<<<<< HEAD
 			return 0;
+=======
+			break;
+>>>>>>> common/deprecated/android-3.18
 		nr = i_data[EXT4_IND_BLOCK];
 		if (nr) {
 			ext4_free_branches(handle, inode, NULL, &nr, &nr+1, 1);
@@ -1528,7 +1592,11 @@ do_indirects:
 		}
 	case EXT4_IND_BLOCK:
 		if (++n >= n2)
+<<<<<<< HEAD
 			return 0;
+=======
+			break;
+>>>>>>> common/deprecated/android-3.18
 		nr = i_data[EXT4_DIND_BLOCK];
 		if (nr) {
 			ext4_free_branches(handle, inode, NULL, &nr, &nr+1, 2);
@@ -1536,7 +1604,11 @@ do_indirects:
 		}
 	case EXT4_DIND_BLOCK:
 		if (++n >= n2)
+<<<<<<< HEAD
 			return 0;
+=======
+			break;
+>>>>>>> common/deprecated/android-3.18
 		nr = i_data[EXT4_TIND_BLOCK];
 		if (nr) {
 			ext4_free_branches(handle, inode, NULL, &nr, &nr+1, 3);
@@ -1545,5 +1617,9 @@ do_indirects:
 	case EXT4_TIND_BLOCK:
 		;
 	}
+<<<<<<< HEAD
 	return 0;
+=======
+	goto cleanup;
+>>>>>>> common/deprecated/android-3.18
 }

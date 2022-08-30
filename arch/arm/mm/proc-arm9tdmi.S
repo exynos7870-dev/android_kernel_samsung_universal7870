@@ -70,7 +70,11 @@ __arm9tdmi_setup:
 
 		.align
 
+<<<<<<< HEAD
 		.section ".proc.info.init", #alloc, #execinstr
+=======
+		.section ".proc.info.init", #alloc
+>>>>>>> common/deprecated/android-3.18
 
 .macro arm9tdmi_proc_info name:req, cpu_val:req, cpu_mask:req, cpu_name:req
 		.type	__\name\()_proc_info, #object
@@ -79,7 +83,11 @@ __\name\()_proc_info:
 		.long	\cpu_mask
 		.long	0
 		.long	0
+<<<<<<< HEAD
 		b	__arm9tdmi_setup
+=======
+		initfn	__arm9tdmi_setup, __\name\()_proc_info
+>>>>>>> common/deprecated/android-3.18
 		.long	cpu_arch_name
 		.long	cpu_elf_name
 		.long	HWCAP_SWP | HWCAP_THUMB | HWCAP_26BIT

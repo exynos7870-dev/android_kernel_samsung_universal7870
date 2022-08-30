@@ -1136,6 +1136,11 @@ static ssize_t qlcnic_83xx_sysfs_flash_write_handler(struct file *filp,
 		return QL_STATUS_INVALID_PARAM;
 
 	ret = kstrtoul(buf, 16, &data);
+<<<<<<< HEAD
+=======
+	if (ret)
+		return ret;
+>>>>>>> common/deprecated/android-3.18
 
 	switch (data) {
 	case QLC_83XX_FLASH_SECTOR_ERASE_CMD:

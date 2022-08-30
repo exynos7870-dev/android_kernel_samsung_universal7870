@@ -373,7 +373,11 @@ static int gab_remove(struct platform_device *pdev)
 	}
 
 	kfree(adc_bat->psy.properties);
+<<<<<<< HEAD
 	cancel_delayed_work(&adc_bat->bat_work);
+=======
+	cancel_delayed_work_sync(&adc_bat->bat_work);
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 

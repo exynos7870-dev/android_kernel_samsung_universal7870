@@ -1921,7 +1921,11 @@ static int ehca_set_pagebuf_user2(struct ehca_mr_pginfo *pginfo,
 				  u64 *kpage)
 {
 	int ret = 0;
+<<<<<<< HEAD
 	u64 pgaddr, prev_pgaddr;
+=======
+	u64 pgaddr, prev_pgaddr = 0;
+>>>>>>> common/deprecated/android-3.18
 	u32 j = 0;
 	int kpages_per_hwpage = pginfo->hwpage_size / PAGE_SIZE;
 	int nr_kpages = kpages_per_hwpage;
@@ -2417,6 +2421,10 @@ static int ehca_reg_bmap_mr_rpages(struct ehca_shca *shca,
 		ehca_err(&shca->ib_device, "kpage alloc failed");
 		return -ENOMEM;
 	}
+<<<<<<< HEAD
+=======
+	hret = H_SUCCESS;
+>>>>>>> common/deprecated/android-3.18
 	for (top = 0; top < EHCA_MAP_ENTRIES; top++) {
 		if (!ehca_bmap_valid(ehca_bmap->top[top]))
 			continue;

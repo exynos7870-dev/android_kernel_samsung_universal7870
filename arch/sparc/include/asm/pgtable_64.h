@@ -666,6 +666,7 @@ static inline unsigned long pmd_pfn(pmd_t pmd)
 	return pte_pfn(pte);
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_TRANSPARENT_HUGEPAGE
 static inline unsigned long pmd_young(pmd_t pmd)
 {
@@ -674,6 +675,9 @@ static inline unsigned long pmd_young(pmd_t pmd)
 	return pte_young(pte);
 }
 
+=======
+#define __HAVE_ARCH_PMD_WRITE
+>>>>>>> common/deprecated/android-3.18
 static inline unsigned long pmd_write(pmd_t pmd)
 {
 	pte_t pte = __pte(pmd_val(pmd));
@@ -681,6 +685,24 @@ static inline unsigned long pmd_write(pmd_t pmd)
 	return pte_write(pte);
 }
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_TRANSPARENT_HUGEPAGE
+static inline unsigned long pmd_dirty(pmd_t pmd)
+{
+	pte_t pte = __pte(pmd_val(pmd));
+
+	return pte_dirty(pte);
+}
+
+static inline unsigned long pmd_young(pmd_t pmd)
+{
+	pte_t pte = __pte(pmd_val(pmd));
+
+	return pte_young(pte);
+}
+
+>>>>>>> common/deprecated/android-3.18
 static inline unsigned long pmd_trans_huge(pmd_t pmd)
 {
 	pte_t pte = __pte(pmd_val(pmd));

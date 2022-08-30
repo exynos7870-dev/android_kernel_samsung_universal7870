@@ -364,6 +364,10 @@ void menu_finalize(struct menu *parent)
 			menu->parent = parent;
 			last_menu = menu;
 		}
+<<<<<<< HEAD
+=======
+		expr_free(basedep);
+>>>>>>> common/deprecated/android-3.18
 		if (last_menu) {
 			parent->list = parent->next;
 			parent->next = last_menu->next;

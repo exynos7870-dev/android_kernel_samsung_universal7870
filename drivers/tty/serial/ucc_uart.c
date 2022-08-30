@@ -1478,6 +1478,12 @@ static struct of_device_id ucc_uart_match[] = {
 		.type = "serial",
 		.compatible = "ucc_uart",
 	},
+<<<<<<< HEAD
+=======
+	{
+		.compatible = "fsl,t1040-ucc-uart",
+	},
+>>>>>>> common/deprecated/android-3.18
 	{},
 };
 MODULE_DEVICE_TABLE(of, ucc_uart_match);

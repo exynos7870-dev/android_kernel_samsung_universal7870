@@ -21,9 +21,12 @@ endif
 obj-$(CONFIG_VIDEO_DEV) += v4l2-core/
 obj-$(CONFIG_DVB_CORE)  += dvb-core/
 
+<<<<<<< HEAD
 obj-$(CONFIG_MEDIA_M2M1SHOT) += m2m1shot.o m2m1shot-helper.o
 obj-$(CONFIG_MEDIA_M2M1SHOT_TESTDEV) += m2m1shot-testdev.o
 
+=======
+>>>>>>> common/deprecated/android-3.18
 # There are both core and drivers at RC subtree - merge before drivers
 obj-y += rc/
 
@@ -33,6 +36,10 @@ obj-y += rc/
 
 obj-y += common/ platform/ pci/ usb/ mmc/ firewire/ parport/
 obj-$(CONFIG_VIDEO_DEV) += radio/
+<<<<<<< HEAD
 obj-$(CONFIG_TDMB)  += tdmb/
 obj-$(CONFIG_ISDBT) += isdbt/
 obj-$(CONFIG_MTV) += mtv/
+=======
+
+>>>>>>> common/deprecated/android-3.18

@@ -10,7 +10,11 @@
  * version has cropped that bit o' nastiness as well as assuming that
  * __stxncpy is in range of a branch.
  */
+<<<<<<< HEAD
 
+=======
+#include <asm/export.h>
+>>>>>>> common/deprecated/android-3.18
 	.set noat
 	.set noreorder
 
@@ -79,3 +83,7 @@ $zerolen:
 	ret
 
 	.end	strncpy
+<<<<<<< HEAD
+=======
+	EXPORT_SYMBOL(strncpy)
+>>>>>>> common/deprecated/android-3.18

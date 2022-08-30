@@ -40,6 +40,7 @@
 typedef int (*initcall_t)(void);
 typedef void (*exitcall_t)(void);
 
+<<<<<<< HEAD
 #ifndef __KERNEL__
 #ifndef __section
 # define __section(S) __attribute__ ((__section__(#S)))
@@ -62,6 +63,10 @@ typedef void (*exitcall_t)(void);
 #else
 #include <linux/compiler.h>
 #endif
+=======
+#include <linux/compiler.h>
+
+>>>>>>> common/deprecated/android-3.18
 /* These are for everybody (although not all archs will actually
    discard it in modules) */
 #define __init		__section(.init.text)
@@ -131,7 +136,11 @@ extern struct uml_param __uml_setup_start, __uml_setup_end;
 #define __uml_postsetup_call	__used __section(.uml.postsetup.init)
 #define __uml_exit_call		__used __section(.uml.exitcall.exit)
 
+<<<<<<< HEAD
 #ifndef __KERNEL__
+=======
+#ifdef __UM_HOST__
+>>>>>>> common/deprecated/android-3.18
 
 #define __define_initcall(level,fn) \
 	static initcall_t __initcall_##fn __used \

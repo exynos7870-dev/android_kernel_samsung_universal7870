@@ -29,6 +29,10 @@
 #include <linux/mutex.h>
 #include <linux/module.h>
 #include <linux/delay.h>
+<<<<<<< HEAD
+=======
+#include <linux/nospec.h>
+>>>>>>> common/deprecated/android-3.18
 #include <sound/rawmidi.h>
 #include <sound/info.h>
 #include <sound/control.h>
@@ -107,6 +111,20 @@ static void snd_rawmidi_input_event_work(struct work_struct *work)
 		runtime->event(runtime->substream);
 }
 
+<<<<<<< HEAD
+=======
+/* buffer refcount management: call with runtime->lock held */
+static inline void snd_rawmidi_buffer_ref(struct snd_rawmidi_runtime *runtime)
+{
+	runtime->buffer_ref++;
+}
+
+static inline void snd_rawmidi_buffer_unref(struct snd_rawmidi_runtime *runtime)
+{
+	runtime->buffer_ref--;
+}
+
+>>>>>>> common/deprecated/android-3.18
 static int snd_rawmidi_runtime_create(struct snd_rawmidi_substream *substream)
 {
 	struct snd_rawmidi_runtime *runtime;
@@ -115,7 +133,10 @@ static int snd_rawmidi_runtime_create(struct snd_rawmidi_substream *substream)
 		return -ENOMEM;
 	runtime->substream = substream;
 	spin_lock_init(&runtime->lock);
+<<<<<<< HEAD
 	mutex_init(&runtime->realloc_mutex);
+=======
+>>>>>>> common/deprecated/android-3.18
 	init_waitqueue_head(&runtime->sleep);
 	INIT_WORK(&runtime->event_work, snd_rawmidi_input_event_work);
 	runtime->event = NULL;
@@ -125,7 +146,11 @@ static int snd_rawmidi_runtime_create(struct snd_rawmidi_substream *substream)
 		runtime->avail = 0;
 	else
 		runtime->avail = runtime->buffer_size;
+<<<<<<< HEAD
 	if ((runtime->buffer = kmalloc(runtime->buffer_size, GFP_KERNEL)) == NULL) {
+=======
+	if ((runtime->buffer = kzalloc(runtime->buffer_size, GFP_KERNEL)) == NULL) {
+>>>>>>> common/deprecated/android-3.18
 		kfree(runtime);
 		return -ENOMEM;
 	}
@@ -590,19 +615,32 @@ static int snd_rawmidi_info_user(struct snd_rawmidi_substream *substream,
 	return 0;
 }
 
+<<<<<<< HEAD
 int snd_rawmidi_info_select(struct snd_card *card, struct snd_rawmidi_info *info)
+=======
+static int __snd_rawmidi_info_select(struct snd_card *card,
+				     struct snd_rawmidi_info *info)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct snd_rawmidi *rmidi;
 	struct snd_rawmidi_str *pstr;
 	struct snd_rawmidi_substream *substream;
 
+<<<<<<< HEAD
 	mutex_lock(&register_mutex);
 	rmidi = snd_rawmidi_search(card, info->device);
 	mutex_unlock(&register_mutex);
+=======
+	rmidi = snd_rawmidi_search(card, info->device);
+>>>>>>> common/deprecated/android-3.18
 	if (!rmidi)
 		return -ENXIO;
 	if (info->stream < 0 || info->stream > 1)
 		return -EINVAL;
+<<<<<<< HEAD
+=======
+	info->stream = array_index_nospec(info->stream, 2);
+>>>>>>> common/deprecated/android-3.18
 	pstr = &rmidi->streams[info->stream];
 	if (pstr->substream_count == 0)
 		return -ENOENT;
@@ -614,6 +652,19 @@ int snd_rawmidi_info_select(struct snd_card *card, struct snd_rawmidi_info *info
 	}
 	return -ENXIO;
 }
+<<<<<<< HEAD
+=======
+
+int snd_rawmidi_info_select(struct snd_card *card, struct snd_rawmidi_info *info)
+{
+	int ret;
+
+	mutex_lock(&register_mutex);
+	ret = __snd_rawmidi_info_select(card, info);
+	mutex_unlock(&register_mutex);
+	return ret;
+}
+>>>>>>> common/deprecated/android-3.18
 EXPORT_SYMBOL(snd_rawmidi_info_select);
 
 static int snd_rawmidi_info_select_user(struct snd_card *card,
@@ -637,11 +688,17 @@ static int snd_rawmidi_info_select_user(struct snd_card *card,
 int snd_rawmidi_output_params(struct snd_rawmidi_substream *substream,
 			      struct snd_rawmidi_params * params)
 {
+<<<<<<< HEAD
 	char *newbuf;
 	char *oldbuf;
 	struct snd_rawmidi_runtime *runtime = substream->runtime;
 	unsigned long flags;
 
+=======
+	char *newbuf, *oldbuf;
+	struct snd_rawmidi_runtime *runtime = substream->runtime;
+	
+>>>>>>> common/deprecated/android-3.18
 	if (substream->append && substream->use_count > 1)
 		return -EBUSY;
 	snd_rawmidi_drain_output(substream);
@@ -652,6 +709,7 @@ int snd_rawmidi_output_params(struct snd_rawmidi_substream *substream,
 		return -EINVAL;
 	}
 	if (params->buffer_size != runtime->buffer_size) {
+<<<<<<< HEAD
 		mutex_lock(&runtime->realloc_mutex);
 		newbuf = __krealloc(runtime->buffer, params->buffer_size,
 				  GFP_KERNEL);
@@ -660,14 +718,31 @@ int snd_rawmidi_output_params(struct snd_rawmidi_substream *substream,
 			return -ENOMEM;
 		}
 		spin_lock_irqsave(&runtime->lock, flags);
+=======
+		newbuf = kzalloc(params->buffer_size, GFP_KERNEL);
+		if (!newbuf)
+			return -ENOMEM;
+		spin_lock_irq(&runtime->lock);
+		if (runtime->buffer_ref) {
+			spin_unlock_irq(&runtime->lock);
+			kfree(newbuf);
+			return -EBUSY;
+		}
+>>>>>>> common/deprecated/android-3.18
 		oldbuf = runtime->buffer;
 		runtime->buffer = newbuf;
 		runtime->buffer_size = params->buffer_size;
 		runtime->avail = runtime->buffer_size;
+<<<<<<< HEAD
 		spin_unlock_irqrestore(&runtime->lock, flags);
 		if (oldbuf != newbuf)
 			kfree(oldbuf);
 		mutex_unlock(&runtime->realloc_mutex);
+=======
+		runtime->appl_ptr = runtime->hw_ptr = 0;
+		spin_unlock_irq(&runtime->lock);
+		kfree(oldbuf);
+>>>>>>> common/deprecated/android-3.18
 	}
 	runtime->avail_min = params->avail_min;
 	substream->active_sensing = !params->no_active_sensing;
@@ -678,10 +753,15 @@ EXPORT_SYMBOL(snd_rawmidi_output_params);
 int snd_rawmidi_input_params(struct snd_rawmidi_substream *substream,
 			     struct snd_rawmidi_params * params)
 {
+<<<<<<< HEAD
 	char *newbuf;
 	char *oldbuf;
 	struct snd_rawmidi_runtime *runtime = substream->runtime;
 	unsigned long flags;
+=======
+	char *newbuf, *oldbuf;
+	struct snd_rawmidi_runtime *runtime = substream->runtime;
+>>>>>>> common/deprecated/android-3.18
 
 	snd_rawmidi_drain_input(substream);
 	if (params->buffer_size < 32 || params->buffer_size > 1024L * 1024L) {
@@ -691,6 +771,7 @@ int snd_rawmidi_input_params(struct snd_rawmidi_substream *substream,
 		return -EINVAL;
 	}
 	if (params->buffer_size != runtime->buffer_size) {
+<<<<<<< HEAD
 		mutex_lock(&runtime->realloc_mutex);
 		newbuf = __krealloc(runtime->buffer, params->buffer_size,
 				  GFP_KERNEL);
@@ -706,6 +787,18 @@ int snd_rawmidi_input_params(struct snd_rawmidi_substream *substream,
 		if (oldbuf != newbuf)
 			kfree(oldbuf);
 		mutex_unlock(&runtime->realloc_mutex);
+=======
+		newbuf = kmalloc(params->buffer_size, GFP_KERNEL);
+		if (!newbuf)
+			return -ENOMEM;
+		spin_lock_irq(&runtime->lock);
+		oldbuf = runtime->buffer;
+		runtime->buffer = newbuf;
+		runtime->buffer_size = params->buffer_size;
+		runtime->appl_ptr = runtime->hw_ptr = 0;
+		spin_unlock_irq(&runtime->lock);
+		kfree(oldbuf);
+>>>>>>> common/deprecated/android-3.18
 	}
 	runtime->avail_min = params->avail_min;
 	return 0;
@@ -975,13 +1068,22 @@ static long snd_rawmidi_kernel_read1(struct snd_rawmidi_substream *substream,
 	unsigned long flags;
 	long result = 0, count1;
 	struct snd_rawmidi_runtime *runtime = substream->runtime;
+<<<<<<< HEAD
 
 	if (userbuf)
 		mutex_lock(&runtime->realloc_mutex);
+=======
+	unsigned long appl_ptr;
+	int err = 0;
+
+	spin_lock_irqsave(&runtime->lock, flags);
+	snd_rawmidi_buffer_ref(runtime);
+>>>>>>> common/deprecated/android-3.18
 	while (count > 0 && runtime->avail) {
 		count1 = runtime->buffer_size - runtime->appl_ptr;
 		if (count1 > count)
 			count1 = count;
+<<<<<<< HEAD
 		spin_lock_irqsave(&runtime->lock, flags);
 		if (count1 > (int)runtime->avail)
 			count1 = runtime->avail;
@@ -1006,6 +1108,35 @@ static long snd_rawmidi_kernel_read1(struct snd_rawmidi_substream *substream,
 	if (userbuf)
 		mutex_unlock(&runtime->realloc_mutex);
 	return result;
+=======
+		if (count1 > (int)runtime->avail)
+			count1 = runtime->avail;
+
+		/* update runtime->appl_ptr before unlocking for userbuf */
+		appl_ptr = runtime->appl_ptr;
+		runtime->appl_ptr += count1;
+		runtime->appl_ptr %= runtime->buffer_size;
+		runtime->avail -= count1;
+
+		if (kernelbuf)
+			memcpy(kernelbuf + result, runtime->buffer + appl_ptr, count1);
+		if (userbuf) {
+			spin_unlock_irqrestore(&runtime->lock, flags);
+			if (copy_to_user(userbuf + result,
+					 runtime->buffer + appl_ptr, count1))
+				err = -EFAULT;
+			spin_lock_irqsave(&runtime->lock, flags);
+			if (err)
+				goto out;
+		}
+		result += count1;
+		count -= count1;
+	}
+ out:
+	snd_rawmidi_buffer_unref(runtime);
+	spin_unlock_irqrestore(&runtime->lock, flags);
+	return result > 0 ? result : err;
+>>>>>>> common/deprecated/android-3.18
 }
 
 long snd_rawmidi_kernel_read(struct snd_rawmidi_substream *substream,
@@ -1093,11 +1224,16 @@ int snd_rawmidi_transmit_empty(struct snd_rawmidi_substream *substream)
 EXPORT_SYMBOL(snd_rawmidi_transmit_empty);
 
 /**
+<<<<<<< HEAD
  * snd_rawmidi_transmit_peek - copy data from the internal buffer
+=======
+ * __snd_rawmidi_transmit_peek - copy data from the internal buffer
+>>>>>>> common/deprecated/android-3.18
  * @substream: the rawmidi substream
  * @buffer: the buffer pointer
  * @count: data size to transfer
  *
+<<<<<<< HEAD
  * Copies data from the internal output buffer to the given buffer.
  *
  * Call this in the interrupt handler when the midi output is ready,
@@ -1110,6 +1246,13 @@ int snd_rawmidi_transmit_peek(struct snd_rawmidi_substream *substream,
 			      unsigned char *buffer, int count)
 {
 	unsigned long flags;
+=======
+ * This is a variant of snd_rawmidi_transmit_peek() without spinlock.
+ */
+int __snd_rawmidi_transmit_peek(struct snd_rawmidi_substream *substream,
+			      unsigned char *buffer, int count)
+{
+>>>>>>> common/deprecated/android-3.18
 	int result, count1;
 	struct snd_rawmidi_runtime *runtime = substream->runtime;
 
@@ -1119,7 +1262,10 @@ int snd_rawmidi_transmit_peek(struct snd_rawmidi_substream *substream,
 		return -EINVAL;
 	}
 	result = 0;
+<<<<<<< HEAD
 	spin_lock_irqsave(&runtime->lock, flags);
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (runtime->avail >= runtime->buffer_size) {
 		/* warning: lowlevel layer MUST trigger down the hardware */
 		goto __skip;
@@ -1144,12 +1290,74 @@ int snd_rawmidi_transmit_peek(struct snd_rawmidi_substream *substream,
 		}
 	}
       __skip:
+<<<<<<< HEAD
+=======
+	return result;
+}
+EXPORT_SYMBOL(__snd_rawmidi_transmit_peek);
+
+/**
+ * snd_rawmidi_transmit_peek - copy data from the internal buffer
+ * @substream: the rawmidi substream
+ * @buffer: the buffer pointer
+ * @count: data size to transfer
+ *
+ * Copies data from the internal output buffer to the given buffer.
+ *
+ * Call this in the interrupt handler when the midi output is ready,
+ * and call snd_rawmidi_transmit_ack() after the transmission is
+ * finished.
+ *
+ * Return: The size of copied data, or a negative error code on failure.
+ */
+int snd_rawmidi_transmit_peek(struct snd_rawmidi_substream *substream,
+			      unsigned char *buffer, int count)
+{
+	struct snd_rawmidi_runtime *runtime = substream->runtime;
+	int result;
+	unsigned long flags;
+
+	spin_lock_irqsave(&runtime->lock, flags);
+	result = __snd_rawmidi_transmit_peek(substream, buffer, count);
+>>>>>>> common/deprecated/android-3.18
 	spin_unlock_irqrestore(&runtime->lock, flags);
 	return result;
 }
 EXPORT_SYMBOL(snd_rawmidi_transmit_peek);
 
 /**
+<<<<<<< HEAD
+=======
+ * __snd_rawmidi_transmit_ack - acknowledge the transmission
+ * @substream: the rawmidi substream
+ * @count: the transferred count
+ *
+ * This is a variant of __snd_rawmidi_transmit_ack() without spinlock.
+ */
+int __snd_rawmidi_transmit_ack(struct snd_rawmidi_substream *substream, int count)
+{
+	struct snd_rawmidi_runtime *runtime = substream->runtime;
+
+	if (runtime->buffer == NULL) {
+		rmidi_dbg(substream->rmidi,
+			  "snd_rawmidi_transmit_ack: output is not active!!!\n");
+		return -EINVAL;
+	}
+	snd_BUG_ON(runtime->avail + count > runtime->buffer_size);
+	runtime->hw_ptr += count;
+	runtime->hw_ptr %= runtime->buffer_size;
+	runtime->avail += count;
+	substream->bytes += count;
+	if (count > 0) {
+		if (runtime->drain || snd_rawmidi_ready(substream))
+			wake_up(&runtime->sleep);
+	}
+	return count;
+}
+EXPORT_SYMBOL(__snd_rawmidi_transmit_ack);
+
+/**
+>>>>>>> common/deprecated/android-3.18
  * snd_rawmidi_transmit_ack - acknowledge the transmission
  * @substream: the rawmidi substream
  * @count: the transferred count
@@ -1162,6 +1370,7 @@ EXPORT_SYMBOL(snd_rawmidi_transmit_peek);
  */
 int snd_rawmidi_transmit_ack(struct snd_rawmidi_substream *substream, int count)
 {
+<<<<<<< HEAD
 	unsigned long flags;
 	struct snd_rawmidi_runtime *runtime = substream->runtime;
 
@@ -1182,6 +1391,16 @@ int snd_rawmidi_transmit_ack(struct snd_rawmidi_substream *substream, int count)
 	}
 	spin_unlock_irqrestore(&runtime->lock, flags);
 	return count;
+=======
+	struct snd_rawmidi_runtime *runtime = substream->runtime;
+	int result;
+	unsigned long flags;
+
+	spin_lock_irqsave(&runtime->lock, flags);
+	result = __snd_rawmidi_transmit_ack(substream, count);
+	spin_unlock_irqrestore(&runtime->lock, flags);
+	return result;
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL(snd_rawmidi_transmit_ack);
 
@@ -1198,12 +1417,31 @@ EXPORT_SYMBOL(snd_rawmidi_transmit_ack);
 int snd_rawmidi_transmit(struct snd_rawmidi_substream *substream,
 			 unsigned char *buffer, int count)
 {
+<<<<<<< HEAD
 	if (!substream->opened)
 		return -EBADFD;
 	count = snd_rawmidi_transmit_peek(substream, buffer, count);
 	if (count < 0)
 		return count;
 	return snd_rawmidi_transmit_ack(substream, count);
+=======
+	struct snd_rawmidi_runtime *runtime = substream->runtime;
+	int result;
+	unsigned long flags;
+
+	spin_lock_irqsave(&runtime->lock, flags);
+	if (!substream->opened)
+		result = -EBADFD;
+	else {
+		count = __snd_rawmidi_transmit_peek(substream, buffer, count);
+		if (count <= 0)
+			result = count;
+		else
+			result = __snd_rawmidi_transmit_ack(substream, count);
+	}
+	spin_unlock_irqrestore(&runtime->lock, flags);
+	return result;
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL(snd_rawmidi_transmit);
 
@@ -1215,36 +1453,68 @@ static long snd_rawmidi_kernel_write1(struct snd_rawmidi_substream *substream,
 	unsigned long flags;
 	long count1, result;
 	struct snd_rawmidi_runtime *runtime = substream->runtime;
+<<<<<<< HEAD
 
 	if (snd_BUG_ON(!kernelbuf && !userbuf))
+=======
+	unsigned long appl_ptr;
+
+	if (!kernelbuf && !userbuf)
+>>>>>>> common/deprecated/android-3.18
 		return -EINVAL;
 	if (snd_BUG_ON(!runtime->buffer))
 		return -EINVAL;
 
 	result = 0;
+<<<<<<< HEAD
 	if (userbuf)
 		mutex_lock(&runtime->realloc_mutex);
+=======
+>>>>>>> common/deprecated/android-3.18
 	spin_lock_irqsave(&runtime->lock, flags);
 	if (substream->append) {
 		if ((long)runtime->avail < count) {
 			spin_unlock_irqrestore(&runtime->lock, flags);
+<<<<<<< HEAD
 			if (userbuf)
 				mutex_unlock(&runtime->realloc_mutex);
 			return -EAGAIN;
 		}
 	}
+=======
+			return -EAGAIN;
+		}
+	}
+	snd_rawmidi_buffer_ref(runtime);
+>>>>>>> common/deprecated/android-3.18
 	while (count > 0 && runtime->avail > 0) {
 		count1 = runtime->buffer_size - runtime->appl_ptr;
 		if (count1 > count)
 			count1 = count;
 		if (count1 > (long)runtime->avail)
 			count1 = runtime->avail;
+<<<<<<< HEAD
 		if (kernelbuf)
 			memcpy(runtime->buffer + runtime->appl_ptr,
 			       kernelbuf + result, count1);
 		else if (userbuf) {
 			spin_unlock_irqrestore(&runtime->lock, flags);
 			if (copy_from_user(runtime->buffer + runtime->appl_ptr,
+=======
+
+		/* update runtime->appl_ptr before unlocking for userbuf */
+		appl_ptr = runtime->appl_ptr;
+		runtime->appl_ptr += count1;
+		runtime->appl_ptr %= runtime->buffer_size;
+		runtime->avail -= count1;
+
+		if (kernelbuf)
+			memcpy(runtime->buffer + appl_ptr,
+			       kernelbuf + result, count1);
+		else if (userbuf) {
+			spin_unlock_irqrestore(&runtime->lock, flags);
+			if (copy_from_user(runtime->buffer + appl_ptr,
+>>>>>>> common/deprecated/android-3.18
 					   userbuf + result, count1)) {
 				spin_lock_irqsave(&runtime->lock, flags);
 				result = result > 0 ? result : -EFAULT;
@@ -1252,17 +1522,25 @@ static long snd_rawmidi_kernel_write1(struct snd_rawmidi_substream *substream,
 			}
 			spin_lock_irqsave(&runtime->lock, flags);
 		}
+<<<<<<< HEAD
 		runtime->appl_ptr += count1;
 		runtime->appl_ptr %= runtime->buffer_size;
 		runtime->avail -= count1;
+=======
+>>>>>>> common/deprecated/android-3.18
 		result += count1;
 		count -= count1;
 	}
       __end:
 	count1 = runtime->avail < runtime->buffer_size;
+<<<<<<< HEAD
 	spin_unlock_irqrestore(&runtime->lock, flags);
 	if (userbuf)
 		mutex_unlock(&runtime->realloc_mutex);
+=======
+	snd_rawmidi_buffer_unref(runtime);
+	spin_unlock_irqrestore(&runtime->lock, flags);
+>>>>>>> common/deprecated/android-3.18
 	if (count1)
 		snd_rawmidi_output_trigger(substream, 1);
 	return result;
@@ -1615,6 +1893,10 @@ static int snd_rawmidi_dev_register(struct snd_device *device)
 		return -EBUSY;
 	}
 	list_add_tail(&rmidi->list, &snd_rawmidi_devices);
+<<<<<<< HEAD
+=======
+	mutex_unlock(&register_mutex);
+>>>>>>> common/deprecated/android-3.18
 	sprintf(name, "midiC%iD%i", rmidi->card->number, rmidi->device);
 	if ((err = snd_register_device(SNDRV_DEVICE_TYPE_RAWMIDI,
 				       rmidi->card, rmidi->device,
@@ -1628,6 +1910,10 @@ static int snd_rawmidi_dev_register(struct snd_device *device)
 	if (rmidi->ops && rmidi->ops->dev_register &&
 	    (err = rmidi->ops->dev_register(rmidi)) < 0) {
 		snd_unregister_device(SNDRV_DEVICE_TYPE_RAWMIDI, rmidi->card, rmidi->device);
+<<<<<<< HEAD
+=======
+		mutex_lock(&register_mutex);
+>>>>>>> common/deprecated/android-3.18
 		list_del(&rmidi->list);
 		mutex_unlock(&register_mutex);
 		return err;
@@ -1660,7 +1946,10 @@ static int snd_rawmidi_dev_register(struct snd_device *device)
 		}
 	}
 #endif /* CONFIG_SND_OSSEMUL */
+<<<<<<< HEAD
 	mutex_unlock(&register_mutex);
+=======
+>>>>>>> common/deprecated/android-3.18
 	sprintf(name, "midi%d", rmidi->device);
 	entry = snd_info_create_card_entry(rmidi->card, name, rmidi->card->proc_root);
 	if (entry) {

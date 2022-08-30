@@ -190,5 +190,9 @@ struct can_filter {
 };
 
 #define CAN_INV_FILTER 0x20000000U /* to be set in can_filter.can_id */
+<<<<<<< HEAD
+=======
+#define CAN_RAW_FILTER_MAX 512 /* maximum number of can_filter set via setsockopt() */
+>>>>>>> common/deprecated/android-3.18
 
 #endif /* !_UAPI_CAN_H */

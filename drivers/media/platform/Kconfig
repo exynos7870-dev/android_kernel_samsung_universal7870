@@ -33,8 +33,11 @@ source "drivers/media/platform/omap/Kconfig"
 
 source "drivers/media/platform/blackfin/Kconfig"
 
+<<<<<<< HEAD
 source "drivers/media/platform/exynos/Kconfig"
 
+=======
+>>>>>>> common/deprecated/android-3.18
 config VIDEO_SH_VOU
 	tristate "SuperH VOU video output driver"
 	depends on MEDIA_CAMERA_SUPPORT

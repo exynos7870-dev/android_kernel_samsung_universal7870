@@ -219,6 +219,10 @@ issue:
 	ret = of_mdiobus_register(bus, np1);
 	if (ret) {
 		mdiobus_free(bus);
+<<<<<<< HEAD
+=======
+		lp->mii_bus = NULL;
+>>>>>>> common/deprecated/android-3.18
 		return ret;
 	}
 	return 0;

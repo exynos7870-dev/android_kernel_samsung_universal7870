@@ -61,6 +61,7 @@ DEFINE_EVENT(regulator_basic, regulator_disable,
 
 );
 
+<<<<<<< HEAD
 DEFINE_EVENT(regulator_basic, regulator_disable_delay,
 
 	TP_PROTO(const char *name),
@@ -68,6 +69,8 @@ DEFINE_EVENT(regulator_basic, regulator_disable_delay,
 	TP_ARGS(name)
 
 );
+=======
+>>>>>>> common/deprecated/android-3.18
 DEFINE_EVENT(regulator_basic, regulator_disable_complete,
 
 	TP_PROTO(const char *name),

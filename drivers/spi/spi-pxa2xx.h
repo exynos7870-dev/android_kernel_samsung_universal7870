@@ -43,7 +43,11 @@ struct driver_data {
 
 	/* SSP register addresses */
 	void __iomem *ioaddr;
+<<<<<<< HEAD
 	u32 ssdr_physical;
+=======
+	phys_addr_t ssdr_physical;
+>>>>>>> common/deprecated/android-3.18
 
 	/* SSP masks*/
 	u32 dma_cr1;

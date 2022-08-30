@@ -15,6 +15,10 @@
 #include <linux/debugfs.h>
 #include <linux/mm.h>
 #include <linux/module.h>
+<<<<<<< HEAD
+=======
+#include <linux/sched.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/seq_file.h>
 
 #include <asm/pgtable.h>
@@ -371,6 +375,10 @@ void ptdump_walk_pgd_level(struct seq_file *m, pgd_t *pgd)
 		} else
 			note_page(m, &st, __pgprot(0), 1);
 
+<<<<<<< HEAD
+=======
+		cond_resched();
+>>>>>>> common/deprecated/android-3.18
 		start++;
 	}
 

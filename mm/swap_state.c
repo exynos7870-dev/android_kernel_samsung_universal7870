@@ -20,6 +20,10 @@
 #include <linux/page_cgroup.h>
 
 #include <asm/pgtable.h>
+<<<<<<< HEAD
+=======
+#include "internal.h"
+>>>>>>> common/deprecated/android-3.18
 
 /*
  * swapper_space is a fiction, retained to simplify the path through
@@ -330,7 +334,11 @@ struct page *read_swap_cache_async(swp_entry_t entry, gfp_t gfp_mask,
 		/*
 		 * call radix_tree_preload() while we can wait.
 		 */
+<<<<<<< HEAD
 		err = radix_tree_maybe_preload(gfp_mask & GFP_KERNEL);
+=======
+		err = radix_tree_maybe_preload(gfp_mask & GFP_RECLAIM_MASK);
+>>>>>>> common/deprecated/android-3.18
 		if (err)
 			break;
 
@@ -391,7 +399,10 @@ struct page *read_swap_cache_async(swp_entry_t entry, gfp_t gfp_mask,
 	return found_page;
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_SWAP_ENABLE_READAHEAD
+=======
+>>>>>>> common/deprecated/android-3.18
 static unsigned long swapin_nr_pages(unsigned long offset)
 {
 	static unsigned long prev_offset;
@@ -435,7 +446,10 @@ static unsigned long swapin_nr_pages(unsigned long offset)
 
 	return pages;
 }
+<<<<<<< HEAD
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 /**
  * swapin_readahead - swap in pages in hope we need them soon
@@ -459,7 +473,10 @@ static unsigned long swapin_nr_pages(unsigned long offset)
 struct page *swapin_readahead(swp_entry_t entry, gfp_t gfp_mask,
 			struct vm_area_struct *vma, unsigned long addr)
 {
+<<<<<<< HEAD
 #ifdef CONFIG_SWAP_ENABLE_READAHEAD
+=======
+>>>>>>> common/deprecated/android-3.18
 	struct page *page;
 	unsigned long entry_offset = swp_offset(entry);
 	unsigned long offset = entry_offset;
@@ -492,6 +509,9 @@ struct page *swapin_readahead(swp_entry_t entry, gfp_t gfp_mask,
 
 	lru_add_drain();	/* Push any new pages onto the LRU now */
 skip:
+<<<<<<< HEAD
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	return read_swap_cache_async(entry, gfp_mask, vma, addr);
 }

@@ -20,7 +20,11 @@
  * Try not to change the actual algorithm if possible for consistency.
  */
 
+<<<<<<< HEAD
 
+=======
+#include <asm/export.h>
+>>>>>>> common/deprecated/android-3.18
 	.text
 
 	.align 4
@@ -92,3 +96,7 @@ $zerocount:
 	ret			# L0 :
 
 	.end strncat
+<<<<<<< HEAD
+=======
+	EXPORT_SYMBOL(strncat)
+>>>>>>> common/deprecated/android-3.18

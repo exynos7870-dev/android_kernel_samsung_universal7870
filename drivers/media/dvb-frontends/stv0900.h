@@ -58,7 +58,11 @@ struct stv0900_config {
 	void (*set_lock_led)(struct dvb_frontend *fe, int offon);
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_STV0900)
+=======
+#if IS_REACHABLE(CONFIG_DVB_STV0900)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend *stv0900_attach(const struct stv0900_config *config,
 					struct i2c_adapter *i2c, int demod);
 #else

@@ -347,6 +347,10 @@ static int pc300_pci_init_one(struct pci_dev *pdev,
 	    card->rambase == NULL) {
 		pr_err("ioremap() failed\n");
 		pc300_pci_remove_one(pdev);
+<<<<<<< HEAD
+=======
+		return -ENOMEM;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/* PLX PCI 9050 workaround for local configuration register read bug */

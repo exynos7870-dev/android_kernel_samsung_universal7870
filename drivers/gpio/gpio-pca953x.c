@@ -21,6 +21,10 @@
 #ifdef CONFIG_OF_GPIO
 #include <linux/of_platform.h>
 #endif
+<<<<<<< HEAD
+=======
+#include <asm/unaligned.h>
+>>>>>>> common/deprecated/android-3.18
 
 #define PCA953X_INPUT		0
 #define PCA953X_OUTPUT		1
@@ -75,7 +79,11 @@ MODULE_DEVICE_TABLE(i2c, pca953x_id);
 #define MAX_BANK 5
 #define BANK_SZ 8
 
+<<<<<<< HEAD
 #define NBANK(chip) (chip->gpio_chip.ngpio / BANK_SZ)
+=======
+#define NBANK(chip) DIV_ROUND_UP(chip->gpio_chip.ngpio, BANK_SZ)
+>>>>>>> common/deprecated/android-3.18
 
 struct pca953x_chip {
 	unsigned gpio_start;
@@ -154,7 +162,11 @@ static int pca953x_write_regs(struct pca953x_chip *chip, int reg, u8 *val)
 		switch (chip->chip_type) {
 		case PCA953X_TYPE:
 			ret = i2c_smbus_write_word_data(chip->client,
+<<<<<<< HEAD
 							reg << 1, (u16) *val);
+=======
+			    reg << 1, cpu_to_le16(get_unaligned((u16 *)val)));
+>>>>>>> common/deprecated/android-3.18
 			break;
 		case PCA957X_TYPE:
 			ret = i2c_smbus_write_byte_data(chip->client, reg << 1,

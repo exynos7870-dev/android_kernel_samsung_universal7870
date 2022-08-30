@@ -40,7 +40,10 @@
 MODULE_AUTHOR("Laurent Canet <canetl@esiee.fr>, Thibaut Varene <varenet@parisc-linux.org>, Helge Deller <deller@gmx.de>");
 MODULE_DESCRIPTION("HP GSC PS2 port driver");
 MODULE_LICENSE("GPL");
+<<<<<<< HEAD
 MODULE_DEVICE_TABLE(parisc, gscps2_device_tbl);
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #define PFX "gscps2.c: "
 
@@ -384,9 +387,15 @@ static int gscps2_probe(struct parisc_device *dev)
 		goto fail;
 #endif
 
+<<<<<<< HEAD
 	printk(KERN_INFO "serio: %s port at 0x%p irq %d @ %s\n",
 		ps2port->port->name,
 		ps2port->addr,
+=======
+	pr_info("serio: %s port at 0x%08lx irq %d @ %s\n",
+		ps2port->port->name,
+		hpa,
+>>>>>>> common/deprecated/android-3.18
 		ps2port->padev->irq,
 		ps2port->port->phys);
 
@@ -439,6 +448,10 @@ static struct parisc_device_id gscps2_device_tbl[] = {
 #endif
 	{ 0, }	/* 0 terminated list */
 };
+<<<<<<< HEAD
+=======
+MODULE_DEVICE_TABLE(parisc, gscps2_device_tbl);
+>>>>>>> common/deprecated/android-3.18
 
 static struct parisc_driver parisc_ps2_driver = {
 	.name		= "gsc_ps2",

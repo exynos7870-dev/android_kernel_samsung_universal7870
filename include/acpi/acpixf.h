@@ -431,6 +431,7 @@ ACPI_EXTERNAL_RETURN_STATUS(acpi_status __init acpi_load_tables(void))
 ACPI_EXTERNAL_RETURN_STATUS(acpi_status __init acpi_reallocate_root_table(void))
 
 ACPI_EXTERNAL_RETURN_STATUS(acpi_status __init
+<<<<<<< HEAD
 			    acpi_find_root_pointer(acpi_size * rsdp_address))
 
 ACPI_EXTERNAL_RETURN_STATUS(acpi_status
@@ -438,6 +439,15 @@ ACPI_EXTERNAL_RETURN_STATUS(acpi_status
 						  u32 instance,
 						  struct acpi_table_header
 						  *out_table_header))
+=======
+			    acpi_find_root_pointer(acpi_physical_address *
+						   rsdp_address))
+ACPI_EXTERNAL_RETURN_STATUS(acpi_status
+			     acpi_get_table_header(acpi_string signature,
+						   u32 instance,
+						   struct acpi_table_header
+						   *out_table_header))
+>>>>>>> common/deprecated/android-3.18
 ACPI_EXTERNAL_RETURN_STATUS(acpi_status
 			     acpi_get_table(acpi_string signature, u32 instance,
 					    struct acpi_table_header

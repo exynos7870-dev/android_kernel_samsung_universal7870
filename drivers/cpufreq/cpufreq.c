@@ -28,6 +28,12 @@
 #include <linux/slab.h>
 #include <linux/suspend.h>
 #include <linux/tick.h>
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_SMP
+#include <linux/sched.h>
+#endif
+>>>>>>> common/deprecated/android-3.18
 #include <trace/events/power.h>
 
 /**
@@ -102,6 +108,15 @@ bool have_governor_per_policy(void)
 }
 EXPORT_SYMBOL_GPL(have_governor_per_policy);
 
+<<<<<<< HEAD
+=======
+bool cpufreq_driver_is_slow(void)
+{
+	return !(cpufreq_driver->flags & CPUFREQ_DRIVER_FAST);
+}
+EXPORT_SYMBOL_GPL(cpufreq_driver_is_slow);
+
+>>>>>>> common/deprecated/android-3.18
 struct kobject *get_governor_parent_kobj(struct cpufreq_policy *policy)
 {
 	if (have_governor_per_policy())
@@ -278,6 +293,53 @@ static inline void adjust_jiffies(unsigned long val, struct cpufreq_freqs *ci)
 }
 #endif
 
+<<<<<<< HEAD
+=======
+/*********************************************************************
+ *               FREQUENCY INVARIANT CPU CAPACITY                    *
+ *********************************************************************/
+
+static DEFINE_PER_CPU(unsigned long, freq_scale) = SCHED_CAPACITY_SCALE;
+static DEFINE_PER_CPU(unsigned long, max_freq_scale) = SCHED_CAPACITY_SCALE;
+
+static void
+scale_freq_capacity(struct cpufreq_policy *policy, struct cpufreq_freqs *freqs)
+{
+	unsigned long cur = freqs ? freqs->new : policy->cur;
+	unsigned long scale = (cur << SCHED_CAPACITY_SHIFT) / policy->max;
+	struct cpufreq_cpuinfo *cpuinfo = &policy->cpuinfo;
+	int cpu;
+
+	pr_debug("cpus %*pbl cur/cur max freq %lu/%u kHz freq scale %lu\n",
+		 cpumask_pr_args(policy->cpus), cur, policy->max, scale);
+
+	for_each_cpu(cpu, policy->cpus)
+		per_cpu(freq_scale, cpu) = scale;
+
+	if (freqs)
+		return;
+
+	scale = (policy->max << SCHED_CAPACITY_SHIFT) / cpuinfo->max_freq;
+
+	pr_debug("cpus %*pbl cur max/max freq %u/%u kHz max freq scale %lu\n",
+		 cpumask_pr_args(policy->cpus), policy->max, cpuinfo->max_freq,
+		 scale);
+
+	for_each_cpu(cpu, policy->cpus)
+		per_cpu(max_freq_scale, cpu) = scale;
+}
+
+unsigned long cpufreq_scale_freq_capacity(struct sched_domain *sd, int cpu)
+{
+	return per_cpu(freq_scale, cpu);
+}
+
+unsigned long cpufreq_scale_max_freq_capacity(int cpu)
+{
+	return per_cpu(max_freq_scale, cpu);
+}
+
+>>>>>>> common/deprecated/android-3.18
 static void __cpufreq_notify_transition(struct cpufreq_policy *policy,
 		struct cpufreq_freqs *freqs, unsigned int state)
 {
@@ -334,11 +396,14 @@ static void __cpufreq_notify_transition(struct cpufreq_policy *policy,
 static void cpufreq_notify_transition(struct cpufreq_policy *policy,
 		struct cpufreq_freqs *freqs, unsigned int state)
 {
+<<<<<<< HEAD
 	if (!policy) {
 		pr_debug("have not policy for transition notify");
 		return;
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	for_each_cpu(freqs->cpu, policy->cpus)
 		__cpufreq_notify_transition(policy, freqs, state);
 }
@@ -359,6 +424,12 @@ static void cpufreq_notify_post_transition(struct cpufreq_policy *policy,
 void cpufreq_freq_transition_begin(struct cpufreq_policy *policy,
 		struct cpufreq_freqs *freqs)
 {
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_SMP
+	int cpu;
+#endif
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * Catch double invocations of _begin() which lead to self-deadlock.
@@ -386,6 +457,15 @@ wait:
 
 	spin_unlock(&policy->transition_lock);
 
+<<<<<<< HEAD
+=======
+	scale_freq_capacity(policy, freqs);
+#ifdef CONFIG_SMP
+	for_each_cpu(cpu, policy->cpus)
+		trace_cpu_capacity(capacity_curr_of(cpu), cpu);
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 	cpufreq_notify_transition(policy, freqs, CPUFREQ_PRECHANGE);
 }
 EXPORT_SYMBOL_GPL(cpufreq_freq_transition_begin);
@@ -546,6 +626,11 @@ static ssize_t store_##file_name					\
 	ret = cpufreq_get_policy(&new_policy, policy->cpu);		\
 	if (ret)							\
 		return -EINVAL;						\
+<<<<<<< HEAD
+=======
+	new_policy.min = policy->user_policy.min;			\
+	new_policy.max = policy->user_policy.max;			\
+>>>>>>> common/deprecated/android-3.18
 									\
 	ret = sscanf(buf, "%u", &new_policy.object);			\
 	if (ret != 1)							\
@@ -567,9 +652,17 @@ static ssize_t show_cpuinfo_cur_freq(struct cpufreq_policy *policy,
 					char *buf)
 {
 	unsigned int cur_freq = __cpufreq_get(policy->cpu);
+<<<<<<< HEAD
 	if (!cur_freq)
 		return sprintf(buf, "<unknown>");
 	return sprintf(buf, "%u\n", cur_freq);
+=======
+
+	if (cur_freq)
+		return sprintf(buf, "%u\n", cur_freq);
+
+	return sprintf(buf, "<unknown>\n");
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -770,6 +863,12 @@ static ssize_t show(struct kobject *kobj, struct attribute *attr, char *buf)
 	if (!down_read_trylock(&cpufreq_rwsem))
 		return -EINVAL;
 
+<<<<<<< HEAD
+=======
+	if (!fattr->show)
+		return -EIO;
+
+>>>>>>> common/deprecated/android-3.18
 	down_read(&policy->rwsem);
 
 	if (fattr->show)
@@ -790,6 +889,12 @@ static ssize_t store(struct kobject *kobj, struct attribute *attr,
 	struct freq_attr *fattr = to_attr(attr);
 	ssize_t ret = -EINVAL;
 
+<<<<<<< HEAD
+=======
+	if (!fattr->store)
+		return -EIO;
+
+>>>>>>> common/deprecated/android-3.18
 	get_online_cpus();
 
 	if (!cpu_online(policy->cpu))
@@ -875,6 +980,7 @@ void cpufreq_sysfs_remove_file(const struct attribute *attr)
 }
 EXPORT_SYMBOL(cpufreq_sysfs_remove_file);
 
+<<<<<<< HEAD
 int cpufreq_sysfs_create_group(const struct attribute_group *attr_grp)
 {
 	int ret = cpufreq_get_global_kobject();
@@ -896,6 +1002,8 @@ void cpufreq_sysfs_remove_group(const struct attribute_group *attr_grp)
 }
 EXPORT_SYMBOL(cpufreq_sysfs_remove_group);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /* symlink affected CPUs */
 static int cpufreq_add_dev_symlink(struct cpufreq_policy *policy)
 {
@@ -924,31 +1032,68 @@ static int cpufreq_add_dev_interface(struct cpufreq_policy *policy,
 	struct freq_attr **drv_attr;
 	int ret = 0;
 
+<<<<<<< HEAD
+=======
+	/* prepare interface data */
+	ret = kobject_init_and_add(&policy->kobj, &ktype_cpufreq,
+				   &dev->kobj, "cpufreq");
+	if (ret)
+		return ret;
+
+>>>>>>> common/deprecated/android-3.18
 	/* set up files for this cpu device */
 	drv_attr = cpufreq_driver->attr;
 	while ((drv_attr) && (*drv_attr)) {
 		ret = sysfs_create_file(&policy->kobj, &((*drv_attr)->attr));
 		if (ret)
+<<<<<<< HEAD
 			return ret;
+=======
+			goto err_out_kobj_put;
+>>>>>>> common/deprecated/android-3.18
 		drv_attr++;
 	}
 	if (cpufreq_driver->get) {
 		ret = sysfs_create_file(&policy->kobj, &cpuinfo_cur_freq.attr);
 		if (ret)
+<<<<<<< HEAD
 			return ret;
+=======
+			goto err_out_kobj_put;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	ret = sysfs_create_file(&policy->kobj, &scaling_cur_freq.attr);
 	if (ret)
+<<<<<<< HEAD
 		return ret;
+=======
+		goto err_out_kobj_put;
+>>>>>>> common/deprecated/android-3.18
 
 	if (cpufreq_driver->bios_limit) {
 		ret = sysfs_create_file(&policy->kobj, &bios_limit.attr);
 		if (ret)
+<<<<<<< HEAD
 			return ret;
 	}
 
 	return cpufreq_add_dev_symlink(policy);
+=======
+			goto err_out_kobj_put;
+	}
+
+	ret = cpufreq_add_dev_symlink(policy);
+	if (ret)
+		goto err_out_kobj_put;
+
+	return ret;
+
+err_out_kobj_put:
+	kobject_put(&policy->kobj);
+	wait_for_completion(&policy->kobj_unregister);
+	return ret;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void cpufreq_init_policy(struct cpufreq_policy *policy)
@@ -1207,8 +1352,11 @@ static int __cpufreq_add_dev(struct device *dev, struct subsys_interface *sif)
 		goto err_set_policy_cpu;
 	}
 
+<<<<<<< HEAD
 	down_write(&policy->rwsem);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* related cpus should atleast have policy->cpus */
 	cpumask_or(policy->related_cpus, policy->related_cpus, policy->cpus);
 
@@ -1221,6 +1369,7 @@ static int __cpufreq_add_dev(struct device *dev, struct subsys_interface *sif)
 	if (!recover_policy) {
 		policy->user_policy.min = policy->min;
 		policy->user_policy.max = policy->max;
+<<<<<<< HEAD
 
 		/* prepare interface data */
 		ret = kobject_init_and_add(&policy->kobj, &ktype_cpufreq,
@@ -1232,6 +1381,11 @@ static int __cpufreq_add_dev(struct device *dev, struct subsys_interface *sif)
 		}
 	}
 
+=======
+	}
+
+	down_write(&policy->rwsem);
+>>>>>>> common/deprecated/android-3.18
 	write_lock_irqsave(&cpufreq_driver_lock, flags);
 	for_each_cpu(j, policy->cpus)
 		per_cpu(cpufreq_cpu_data, j) = policy;
@@ -1309,7 +1463,10 @@ static int __cpufreq_add_dev(struct device *dev, struct subsys_interface *sif)
 	up_write(&policy->rwsem);
 
 	kobject_uevent(&policy->kobj, KOBJ_ADD);
+<<<<<<< HEAD
 	kobject_uevent(&dev->kobj, KOBJ_POLICY_INIT);
+=======
+>>>>>>> common/deprecated/android-3.18
 	up_read(&cpufreq_rwsem);
 
 	pr_debug("initialization complete\n");
@@ -1323,11 +1480,14 @@ err_get_freq:
 		per_cpu(cpufreq_cpu_data, j) = NULL;
 	write_unlock_irqrestore(&cpufreq_driver_lock, flags);
 
+<<<<<<< HEAD
 	if (!recover_policy) {
 		kobject_put(&policy->kobj);
 		wait_for_completion(&policy->kobj_unregister);
 	}
 err_init_policy_kobj:
+=======
+>>>>>>> common/deprecated/android-3.18
 	up_write(&policy->rwsem);
 
 	if (cpufreq_driver->exit)
@@ -1613,7 +1773,11 @@ static unsigned int __cpufreq_get(unsigned int cpu)
 
 	ret_freq = cpufreq_driver->get(cpu);
 
+<<<<<<< HEAD
 	if (ret_freq && policy && policy->cur &&
+=======
+	if (ret_freq && policy->cur &&
+>>>>>>> common/deprecated/android-3.18
 		!(cpufreq_driver->flags & CPUFREQ_CONST_LOOPS)) {
 		/* verify no discrepancy between actual and
 					saved value exists */
@@ -1729,6 +1893,12 @@ void cpufreq_resume(void)
 	if (!cpufreq_driver)
 		return;
 
+<<<<<<< HEAD
+=======
+	if (unlikely(!cpufreq_suspended))
+		return;
+
+>>>>>>> common/deprecated/android-3.18
 	cpufreq_suspended = false;
 
 	if (!has_target())
@@ -2202,8 +2372,12 @@ static int cpufreq_set_policy(struct cpufreq_policy *policy,
 
 	memcpy(&new_policy->cpuinfo, &policy->cpuinfo, sizeof(policy->cpuinfo));
 
+<<<<<<< HEAD
 	if ((new_policy->min > policy->max || new_policy->max < policy->min) &&
 		(new_policy->max < new_policy->min))
+=======
+	if (new_policy->min > policy->max || new_policy->max < policy->min)
+>>>>>>> common/deprecated/android-3.18
 		return -EINVAL;
 
 	/* verify the cpu speed can be set within this limit */
@@ -2231,8 +2405,16 @@ static int cpufreq_set_policy(struct cpufreq_policy *policy,
 	blocking_notifier_call_chain(&cpufreq_policy_notifier_list,
 			CPUFREQ_NOTIFY, new_policy);
 
+<<<<<<< HEAD
 	policy->min = new_policy->min;
 	policy->max = new_policy->max;
+=======
+	scale_freq_capacity(new_policy, NULL);
+
+	policy->min = new_policy->min;
+	policy->max = new_policy->max;
+	trace_cpu_frequency_limits(policy->max, policy->min, policy->cpu);
+>>>>>>> common/deprecated/android-3.18
 
 	pr_debug("new min and max freqs are %u - %u kHz\n",
 		 policy->min, policy->max);
@@ -2369,6 +2551,7 @@ static int cpufreq_cpu_callback(struct notifier_block *nfb,
 	return NOTIFY_OK;
 }
 
+<<<<<<< HEAD
 /*
  * This notifier should be perform after
  * exynos_cpufreq_cpu_down_nb performs.
@@ -2376,6 +2559,10 @@ static int cpufreq_cpu_callback(struct notifier_block *nfb,
 static struct notifier_block __refdata cpufreq_cpu_notifier = {
 	.notifier_call = cpufreq_cpu_callback,
 	.priority = INT_MIN + 1,
+=======
+static struct notifier_block __refdata cpufreq_cpu_notifier = {
+	.notifier_call = cpufreq_cpu_callback,
+>>>>>>> common/deprecated/android-3.18
 };
 
 /*********************************************************************
@@ -2467,6 +2654,16 @@ int cpufreq_register_driver(struct cpufreq_driver *driver_data)
 	if (cpufreq_disabled())
 		return -ENODEV;
 
+<<<<<<< HEAD
+=======
+	/*
+	 * The cpufreq core depends heavily on the availability of device
+	 * structure, make sure they are available before proceeding further.
+	 */
+	if (!get_cpu_device(0))
+		return -EPROBE_DEFER;
+
+>>>>>>> common/deprecated/android-3.18
 	if (!driver_data || !driver_data->verify || !driver_data->init ||
 	    !(driver_data->setpolicy || driver_data->target_index ||
 		    driver_data->target) ||

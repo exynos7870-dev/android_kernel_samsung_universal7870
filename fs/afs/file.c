@@ -29,6 +29,10 @@ static int afs_readpages(struct file *filp, struct address_space *mapping,
 
 const struct file_operations afs_file_operations = {
 	.open		= afs_open,
+<<<<<<< HEAD
+=======
+	.flush		= afs_flush,
+>>>>>>> common/deprecated/android-3.18
 	.release	= afs_release,
 	.llseek		= generic_file_llseek,
 	.read		= new_sync_read,

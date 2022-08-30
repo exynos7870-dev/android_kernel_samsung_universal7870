@@ -521,7 +521,11 @@ static int drv260x_probe(struct i2c_client *client,
 	if (!haptics)
 		return -ENOMEM;
 
+<<<<<<< HEAD
 	haptics->rated_voltage = DRV260X_DEF_OD_CLAMP_VOLT;
+=======
+	haptics->overdrive_voltage = DRV260X_DEF_OD_CLAMP_VOLT;
+>>>>>>> common/deprecated/android-3.18
 	haptics->rated_voltage = DRV260X_DEF_RATED_VOLT;
 
 	if (pdata) {
@@ -597,7 +601,10 @@ static int drv260x_probe(struct i2c_client *client,
 	}
 
 	haptics->input_dev->name = "drv260x:haptics";
+<<<<<<< HEAD
 	haptics->input_dev->dev.parent = client->dev.parent;
+=======
+>>>>>>> common/deprecated/android-3.18
 	haptics->input_dev->close = drv260x_close;
 	input_set_drvdata(haptics->input_dev, haptics);
 	input_set_capability(haptics->input_dev, EV_FF, FF_RUMBLE);

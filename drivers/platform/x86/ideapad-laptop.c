@@ -464,8 +464,14 @@ static const struct ideapad_rfk_data ideapad_rfk_data[] = {
 static int ideapad_rfk_set(void *data, bool blocked)
 {
 	struct ideapad_rfk_priv *priv = data;
+<<<<<<< HEAD
 
 	return write_ec_cmd(priv->priv->adev->handle, priv->dev, !blocked);
+=======
+	int opcode = ideapad_rfk_data[priv->dev].opcode;
+
+	return write_ec_cmd(priv->priv->adev->handle, opcode, !blocked);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static struct rfkill_ops ideapad_rfk_ops = {
@@ -800,6 +806,10 @@ static void ideapad_acpi_notify(acpi_handle handle, u32 event, void *data)
 			case 11:
 			case 7:
 			case 6:
+<<<<<<< HEAD
+=======
+			case 1:
+>>>>>>> common/deprecated/android-3.18
 				ideapad_input_report(priv, vpc_bit);
 				break;
 			case 5:
@@ -831,6 +841,37 @@ static void ideapad_acpi_notify(acpi_handle handle, u32 event, void *data)
  */
 static const struct dmi_system_id no_hw_rfkill_list[] = {
 	{
+<<<<<<< HEAD
+=======
+		.ident = "Lenovo G50-30",
+		.matches = {
+			DMI_MATCH(DMI_SYS_VENDOR, "LENOVO"),
+			DMI_MATCH(DMI_PRODUCT_VERSION, "Lenovo G50-30"),
+		},
+	},
+	{
+		.ident = "Lenovo ideapad Y700-15ISK",
+		.matches = {
+			DMI_MATCH(DMI_SYS_VENDOR, "LENOVO"),
+			DMI_MATCH(DMI_PRODUCT_VERSION, "Lenovo ideapad Y700-15ISK"),
+		},
+	},
+	{
+		.ident = "Lenovo ideapad Y700 Touch-15ISK",
+		.matches = {
+			DMI_MATCH(DMI_SYS_VENDOR, "LENOVO"),
+			DMI_MATCH(DMI_PRODUCT_VERSION, "Lenovo ideapad Y700 Touch-15ISK"),
+		},
+	},
+	{
+		.ident = "Lenovo ideapad Y700-17ISK",
+		.matches = {
+			DMI_MATCH(DMI_SYS_VENDOR, "LENOVO"),
+			DMI_MATCH(DMI_PRODUCT_VERSION, "Lenovo ideapad Y700-17ISK"),
+		},
+	},
+	{
+>>>>>>> common/deprecated/android-3.18
 		.ident = "Lenovo Yoga 2 11 / 13 / Pro",
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "LENOVO"),
@@ -844,6 +885,23 @@ static const struct dmi_system_id no_hw_rfkill_list[] = {
 			DMI_MATCH(DMI_PRODUCT_VERSION, "Lenovo YOGA 3 Pro-1370"),
 		},
 	},
+<<<<<<< HEAD
+=======
+	{
+		.ident = "Lenovo Yoga 700",
+		.matches = {
+			DMI_MATCH(DMI_SYS_VENDOR, "LENOVO"),
+			DMI_MATCH(DMI_PRODUCT_VERSION, "Lenovo YOGA 700"),
+		},
+	},
+	{
+		.ident = "Lenovo Yoga 900",
+		.matches = {
+			DMI_MATCH(DMI_SYS_VENDOR, "LENOVO"),
+			DMI_MATCH(DMI_PRODUCT_VERSION, "Lenovo YOGA 900"),
+		},
+	},
+>>>>>>> common/deprecated/android-3.18
 	{}
 };
 

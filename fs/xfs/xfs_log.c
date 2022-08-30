@@ -1472,6 +1472,11 @@ out_free_iclog:
 		if (iclog->ic_bp)
 			xfs_buf_free(iclog->ic_bp);
 		kmem_free(iclog);
+<<<<<<< HEAD
+=======
+		if (prev_iclog == log->l_iclog)
+			break;
+>>>>>>> common/deprecated/android-3.18
 	}
 	spinlock_destroy(&log->l_icloglock);
 	xfs_buf_free(log->l_xbuf);
@@ -3272,8 +3277,11 @@ maybe_sleep:
 		 */
 		if (iclog->ic_state & XLOG_STATE_IOERROR)
 			return -EIO;
+<<<<<<< HEAD
 		if (log_flushed)
 			*log_flushed = 1;
+=======
+>>>>>>> common/deprecated/android-3.18
 	} else {
 
 no_sleep:
@@ -3381,8 +3389,11 @@ try_again:
 
 				xlog_wait(&iclog->ic_prev->ic_write_wait,
 							&log->l_icloglock);
+<<<<<<< HEAD
 				if (log_flushed)
 					*log_flushed = 1;
+=======
+>>>>>>> common/deprecated/android-3.18
 				already_slept = 1;
 				goto try_again;
 			}
@@ -3416,9 +3427,12 @@ try_again:
 			 */
 			if (iclog->ic_state & XLOG_STATE_IOERROR)
 				return -EIO;
+<<<<<<< HEAD
 
 			if (log_flushed)
 				*log_flushed = 1;
+=======
+>>>>>>> common/deprecated/android-3.18
 		} else {		/* just return */
 			spin_unlock(&log->l_icloglock);
 		}

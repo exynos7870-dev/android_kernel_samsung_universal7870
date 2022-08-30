@@ -4,6 +4,10 @@
  *  VMA_VM_FLAGS
  *  VM_EXEC
  */
+<<<<<<< HEAD
+=======
+#include <linux/const.h>
+>>>>>>> common/deprecated/android-3.18
 #include <asm/asm-offsets.h>
 #include <asm/thread_info.h>
 
@@ -30,7 +34,11 @@
  * act_mm - get current->active_mm
  */
 	.macro	act_mm, rd
+<<<<<<< HEAD
 	bic	\rd, sp, #8128
+=======
+	bic	\rd, sp, #(THREAD_SIZE - 1) & ~63
+>>>>>>> common/deprecated/android-3.18
 	bic	\rd, \rd, #63
 	ldr	\rd, [\rd, #TI_TASK]
 	ldr	\rd, [\rd, #TSK_ACTIVE_MM]
@@ -259,6 +267,16 @@
 	.endm
 
 .macro define_processor_functions name:req, dabort:req, pabort:req, nommu=0, suspend=0
+<<<<<<< HEAD
+=======
+/*
+ * If we are building for big.Little with branch predictor hardening,
+ * we need the processor function tables to remain available after boot.
+ */
+#if defined(CONFIG_BIG_LITTLE) && defined(CONFIG_HARDEN_BRANCH_PREDICTOR)
+	.section ".rodata"
+#endif
+>>>>>>> common/deprecated/android-3.18
 	.type	\name\()_processor_functions, #object
 	.align 2
 ENTRY(\name\()_processor_functions)
@@ -293,6 +311,12 @@ ENTRY(\name\()_processor_functions)
 	.endif
 
 	.size	\name\()_processor_functions, . - \name\()_processor_functions
+<<<<<<< HEAD
+=======
+#if defined(CONFIG_BIG_LITTLE) && defined(CONFIG_HARDEN_BRANCH_PREDICTOR)
+	.previous
+#endif
+>>>>>>> common/deprecated/android-3.18
 .endm
 
 .macro define_cache_functions name:req
@@ -331,3 +355,10 @@ ENTRY(\name\()_tlb_fns)
 	.globl	\x
 	.equ	\x, \y
 .endm
+<<<<<<< HEAD
+=======
+
+.macro	initfn, func, base
+	.long	\func - \base
+.endm
+>>>>>>> common/deprecated/android-3.18

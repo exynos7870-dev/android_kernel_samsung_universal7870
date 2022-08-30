@@ -29,6 +29,7 @@
 #include <linux/cpumask.h>
 
 #ifdef CONFIG_CPU_THERMAL
+<<<<<<< HEAD
 
 #ifndef CONFIG_SOC_EXYNOS7580
 /**
@@ -57,6 +58,8 @@ struct cpufreq_cooling_device {
 };
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /**
  * cpufreq_cooling_register - function to create cpufreq cooling device.
  * @clip_cpus: cpumask of cpus where the frequency constraints will happen

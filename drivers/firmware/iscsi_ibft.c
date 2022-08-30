@@ -93,6 +93,13 @@ MODULE_DESCRIPTION("sysfs interface to BIOS iBFT information");
 MODULE_LICENSE("GPL");
 MODULE_VERSION(IBFT_ISCSI_VERSION);
 
+<<<<<<< HEAD
+=======
+#ifndef CONFIG_ISCSI_IBFT_FIND
+struct acpi_table_ibft *ibft_addr;
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 struct ibft_hdr {
 	u8 id;
 	u8 version;
@@ -503,6 +510,10 @@ static umode_t __init ibft_check_tgt_for(void *data, int type)
 	case ISCSI_BOOT_TGT_NIC_ASSOC:
 	case ISCSI_BOOT_TGT_CHAP_TYPE:
 		rc = S_IRUGO;
+<<<<<<< HEAD
+=======
+		break;
+>>>>>>> common/deprecated/android-3.18
 	case ISCSI_BOOT_TGT_NAME:
 		if (tgt->tgt_name_len)
 			rc = S_IRUGO;

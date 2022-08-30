@@ -16,6 +16,10 @@
 #include <linux/kernel.h>
 #include <linux/platform_device.h>
 #include <linux/interrupt.h>
+<<<<<<< HEAD
+=======
+#include <linux/leds.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/export.h>
 #include <linux/sched.h>
 #include <linux/bitops.h>

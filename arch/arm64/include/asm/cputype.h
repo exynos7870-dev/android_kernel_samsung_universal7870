@@ -22,10 +22,13 @@
 #define MPIDR_MT_BITMASK	(0x1 << 24)
 #define MPIDR_HWID_BITMASK	0xff00ffffff
 
+<<<<<<< HEAD
 #define MPIDR_SMP_BITMASK	(0x3 << 30)
 #define MPIDR_SMP_VALUE		(0x2 << 30)
 #define MPIDR_MT_BITMASK	(0x1 << 24)
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #define MPIDR_LEVEL_BITS_SHIFT	3
 #define MPIDR_LEVEL_BITS	(1 << MPIDR_LEVEL_BITS_SHIFT)
 #define MPIDR_LEVEL_MASK	((1 << MPIDR_LEVEL_BITS) - 1)
@@ -36,12 +39,15 @@
 #define MPIDR_AFFINITY_LEVEL(mpidr, level) \
 	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & MPIDR_LEVEL_MASK)
 
+<<<<<<< HEAD
 #define read_cpuid(reg) ({						\
 	u64 __val;							\
 	asm("mrs	%0, " #reg : "=r" (__val));			\
 	__val;								\
 })
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #define MIDR_REVISION_MASK	0xf
 #define MIDR_REVISION(midr)	((midr) & MIDR_REVISION_MASK)
 #define MIDR_PARTNUM_SHIFT	4
@@ -76,6 +82,7 @@
 
 #define APM_CPU_PART_POTENZA	0x000
 
+<<<<<<< HEAD
 #define ID_AA64MMFR0_BIGENDEL0_SHIFT	16
 #define ID_AA64MMFR0_BIGENDEL0_MASK	(0xf << ID_AA64MMFR0_BIGENDEL0_SHIFT)
 #define ID_AA64MMFR0_BIGENDEL0(mmfr0)	\
@@ -90,6 +97,18 @@
 
 #ifndef __ASSEMBLY__
 
+=======
+#ifndef __ASSEMBLY__
+
+#include <asm/sysreg.h>
+
+#define read_cpuid(reg) ({						\
+	u64 __val;							\
+	asm("mrs_s	%0, " __stringify(reg) : "=r" (__val));		\
+	__val;								\
+})
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * The CPU ID never changes at run time, so we might as well tell the
  * compiler that it's constant.  Use this function to read the CPU ID
@@ -97,12 +116,20 @@
  */
 static inline u32 __attribute_const__ read_cpuid_id(void)
 {
+<<<<<<< HEAD
 	return read_cpuid(MIDR_EL1);
+=======
+	return read_cpuid(SYS_MIDR_EL1);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static inline u64 __attribute_const__ read_cpuid_mpidr(void)
 {
+<<<<<<< HEAD
 	return read_cpuid(MPIDR_EL1);
+=======
+	return read_cpuid(SYS_MPIDR_EL1);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static inline unsigned int __attribute_const__ read_cpuid_implementor(void)
@@ -117,6 +144,7 @@ static inline unsigned int __attribute_const__ read_cpuid_part_number(void)
 
 static inline u32 __attribute_const__ read_cpuid_cachetype(void)
 {
+<<<<<<< HEAD
 	return read_cpuid(CTR_EL0);
 }
 
@@ -124,6 +152,9 @@ static inline bool id_aa64mmfr0_mixed_endian_el0(u64 mmfr0)
 {
 	return (ID_AA64MMFR0_BIGEND(mmfr0) == 0x1) ||
 		(ID_AA64MMFR0_BIGENDEL0(mmfr0) == 0x1);
+=======
+	return read_cpuid(SYS_CTR_EL0);
+>>>>>>> common/deprecated/android-3.18
 }
 #endif /* __ASSEMBLY__ */
 

@@ -127,6 +127,10 @@ typedef __u32 int32;
  */
 struct cstate {
 	byte_t	cs_this;	/* connection id number (xmit) */
+<<<<<<< HEAD
+=======
+	bool	initialized;	/* true if initialized */
+>>>>>>> common/deprecated/android-3.18
 	struct cstate *next;	/* next in ring (xmit) */
 	struct iphdr cs_ip;	/* ip/tcp hdr from most recent packet */
 	struct tcphdr cs_tcp;

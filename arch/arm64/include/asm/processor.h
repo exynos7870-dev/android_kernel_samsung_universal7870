@@ -31,6 +31,10 @@
 
 #include <asm/fpsimd.h>
 #include <asm/hw_breakpoint.h>
+<<<<<<< HEAD
+=======
+#include <asm/pgtable-hwdef.h>
+>>>>>>> common/deprecated/android-3.18
 #include <asm/ptrace.h>
 #include <asm/types.h>
 
@@ -78,7 +82,10 @@ struct thread_struct {
 	struct cpu_context	cpu_context;	/* cpu context */
 	unsigned long		tp_value;
 	struct fpsimd_state	fpsimd_state;
+<<<<<<< HEAD
 	struct fpsimd_kernel_state fpsimd_kernel_state;
+=======
+>>>>>>> common/deprecated/android-3.18
 	unsigned long		fault_address;	/* fault info */
 	unsigned long		fault_code;	/* ESR_EL1 value */
 	struct debug_info	debug;		/* debugging */
@@ -167,4 +174,10 @@ static inline void spin_lock_prefetch(const void *x)
 
 #endif
 
+<<<<<<< HEAD
+=======
+int cpu_enable_pan(void *__unused);
+int cpu_enable_uao(void *__unused);
+
+>>>>>>> common/deprecated/android-3.18
 #endif /* __ASM_PROCESSOR_H */

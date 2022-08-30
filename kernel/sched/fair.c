@@ -30,6 +30,7 @@
 #include <linux/mempolicy.h>
 #include <linux/migrate.h>
 #include <linux/task_work.h>
+<<<<<<< HEAD
 #include <linux/of.h>
 
 #include <trace/events/sched.h>
@@ -47,6 +48,15 @@
 
 #include "sched.h"
 
+=======
+#include <linux/module.h>
+
+#include <trace/events/sched.h>
+
+#include "sched.h"
+#include "tune.h"
+#include "walt.h"
+>>>>>>> common/deprecated/android-3.18
 
 /*
  * Targeted preemption latency for CPU-bound tasks:
@@ -63,6 +73,20 @@
 unsigned int sysctl_sched_latency = 6000000ULL;
 unsigned int normalized_sysctl_sched_latency = 6000000ULL;
 
+<<<<<<< HEAD
+=======
+unsigned int sysctl_sched_is_big_little = 0;
+unsigned int sysctl_sched_sync_hint_enable = 1;
+unsigned int sysctl_sched_initial_task_util = 0;
+unsigned int sysctl_sched_cstate_aware = 1;
+
+#ifdef CONFIG_SCHED_WALT
+unsigned int sysctl_sched_use_walt_cpu_util = 1;
+unsigned int sysctl_sched_use_walt_task_util = 1;
+__read_mostly unsigned int sysctl_sched_walt_cpu_high_irqload =
+    (10 * NSEC_PER_MSEC);
+#endif
+>>>>>>> common/deprecated/android-3.18
 /*
  * The initial- and re-scaling of tunables is configurable
  * (default SCHED_TUNABLESCALING_LOG = *(1+ilog(ncpus))
@@ -296,9 +320,12 @@ static inline struct cfs_rq *group_cfs_rq(struct sched_entity *grp)
 	return grp->my_q;
 }
 
+<<<<<<< HEAD
 static void update_cfs_rq_blocked_load(struct cfs_rq *cfs_rq,
 				       int force_update);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static inline void list_add_leaf_cfs_rq(struct cfs_rq *cfs_rq)
 {
 	if (!cfs_rq->on_list) {
@@ -318,8 +345,11 @@ static inline void list_add_leaf_cfs_rq(struct cfs_rq *cfs_rq)
 		}
 
 		cfs_rq->on_list = 1;
+<<<<<<< HEAD
 		/* We should have no load, but we need to update last_decay. */
 		update_cfs_rq_blocked_load(cfs_rq, 0);
+=======
+>>>>>>> common/deprecated/android-3.18
 	}
 }
 
@@ -629,6 +659,7 @@ static inline u64 calc_delta_fair(u64 delta, struct sched_entity *se)
  */
 static u64 __sched_period(unsigned long nr_running)
 {
+<<<<<<< HEAD
 	u64 period = sysctl_sched_latency;
 	unsigned long nr_latency = sched_nr_latency;
 
@@ -638,6 +669,12 @@ static u64 __sched_period(unsigned long nr_running)
 	}
 
 	return period;
+=======
+	if (unlikely(nr_running > sched_nr_latency))
+		return nr_running * sysctl_sched_min_granularity;
+	else
+		return sysctl_sched_latency;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
@@ -682,6 +719,7 @@ static u64 sched_vslice(struct cfs_rq *cfs_rq, struct sched_entity *se)
 static int select_idle_sibling(struct task_struct *p, int cpu);
 static unsigned long task_h_load(struct task_struct *p);
 
+<<<<<<< HEAD
 static inline void __update_task_entity_contrib(struct sched_entity *se);
 
 /* Give new task start runnable values to heavy its load in infant time */
@@ -697,6 +735,39 @@ void init_task_runnable_average(struct task_struct *p)
 }
 #else
 void init_task_runnable_average(struct task_struct *p)
+=======
+/*
+ * We choose a half-life close to 1 scheduling period.
+ * Note: The tables below are dependent on this value.
+ */
+#define LOAD_AVG_PERIOD 32
+#define LOAD_AVG_MAX 47742 /* maximum possible load avg */
+#define LOAD_AVG_MAX_N 345 /* number of full periods to produce LOAD_MAX_AVG */
+
+/* Give new sched_entity start runnable values to heavy its load in infant time */
+void init_entity_runnable_average(struct sched_entity *se)
+{
+	struct sched_avg *sa = &se->avg;
+
+	sa->last_update_time = 0;
+	/*
+	 * sched_avg's period_contrib should be strictly less then 1024, so
+	 * we give it 1023 to make sure it is almost a period (1024us), and
+	 * will definitely be update (after enqueue).
+	 */
+	sa->period_contrib = 1023;
+	sa->load_avg = scale_load_down(se->load.weight);
+	sa->load_sum = sa->load_avg * LOAD_AVG_MAX;
+	sa->util_avg =  sched_freq() ?
+		sysctl_sched_initial_task_util :
+		scale_load_down(SCHED_LOAD_SCALE);
+	sa->util_sum = sa->util_avg * LOAD_AVG_MAX;
+	/* when this task enqueue'ed, it will contribute to its cfs_rq's load_avg */
+}
+
+#else
+void init_entity_runnable_average(struct sched_entity *se)
+>>>>>>> common/deprecated/android-3.18
 {
 }
 #endif
@@ -846,7 +917,11 @@ static unsigned int task_nr_scan_windows(struct task_struct *p)
 
 static unsigned int task_scan_min(struct task_struct *p)
 {
+<<<<<<< HEAD
 	unsigned int scan_size = ACCESS_ONCE(sysctl_numa_balancing_scan_size);
+=======
+	unsigned int scan_size = READ_ONCE(sysctl_numa_balancing_scan_size);
+>>>>>>> common/deprecated/android-3.18
 	unsigned int scan, floor;
 	unsigned int windows = 1;
 
@@ -1113,8 +1188,11 @@ static void task_numa_assign(struct task_numa_env *env,
 {
 	if (env->best_task)
 		put_task_struct(env->best_task);
+<<<<<<< HEAD
 	if (p)
 		get_task_struct(p);
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	env->best_task = p;
 	env->best_imp = imp;
@@ -1181,12 +1259,17 @@ static void task_numa_compare(struct task_numa_env *env,
 	long load;
 	long imp = env->p->numa_group ? groupimp : taskimp;
 	long moveimp = imp;
+<<<<<<< HEAD
+=======
+	bool assigned = false;
+>>>>>>> common/deprecated/android-3.18
 
 	rcu_read_lock();
 
 	raw_spin_lock_irq(&dst_rq->lock);
 	cur = dst_rq->curr;
 	/*
+<<<<<<< HEAD
 	 * No need to move the exiting task, and this ensures that ->curr
 	 * wasn't reaped and thus get_task_struct() in task_numa_assign()
 	 * is safe under RCU read lock.
@@ -1195,6 +1278,25 @@ static void task_numa_compare(struct task_numa_env *env,
 	 */
 	if ((cur->flags & PF_EXITING) || is_idle_task(cur))
 		cur = NULL;
+=======
+	 * No need to move the exiting task or idle task.
+	 */
+	if ((cur->flags & PF_EXITING) || is_idle_task(cur))
+		cur = NULL;
+	else {
+		/*
+		 * The task_struct must be protected here to protect the
+		 * p->numa_faults access in the task_weight since the
+		 * numa_faults could already be freed in the following path:
+		 * finish_task_switch()
+		 *     --> put_task_struct()
+		 *         --> __put_task_struct()
+		 *             --> task_numa_free()
+		 */
+		get_task_struct(cur);
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	raw_spin_unlock_irq(&dst_rq->lock);
 
 	/*
@@ -1278,6 +1380,10 @@ balance:
 		 */
 		if (!load_too_imbalanced(src_load, dst_load, env)) {
 			imp = moveimp - 1;
+<<<<<<< HEAD
+=======
+			put_task_struct(cur);
+>>>>>>> common/deprecated/android-3.18
 			cur = NULL;
 			goto assign;
 		}
@@ -1303,9 +1409,22 @@ balance:
 		env->dst_cpu = select_idle_sibling(env->p, env->dst_cpu);
 
 assign:
+<<<<<<< HEAD
 	task_numa_assign(env, cur, imp);
 unlock:
 	rcu_read_unlock();
+=======
+	assigned = true;
+	task_numa_assign(env, cur, imp);
+unlock:
+	rcu_read_unlock();
+	/*
+	 * The dst_rq->curr isn't assigned. The protection for task_struct is
+	 * finished.
+	 */
+	if (cur && !assigned)
+		put_task_struct(cur);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void task_numa_find_cpu(struct task_numa_env *env,
@@ -1582,9 +1701,19 @@ static u64 numa_get_avg_runtime(struct task_struct *p, u64 *period)
 	if (p->last_task_numa_placement) {
 		delta = runtime - p->last_sum_exec_runtime;
 		*period = now - p->last_task_numa_placement;
+<<<<<<< HEAD
 	} else {
 		delta = p->se.avg.runnable_avg_sum;
 		*period = p->se.avg.runnable_avg_period;
+=======
+
+		/* Avoid time going backwards, prevent potential divide error: */
+		if (unlikely((s64)*period < 0))
+			*period = 0;
+	} else {
+		delta = p->se.avg.load_sum / p->se.load.weight;
+		*period = LOAD_AVG_MAX;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	p->last_sum_exec_runtime = runtime;
@@ -1602,7 +1731,11 @@ static void task_numa_placement(struct task_struct *p)
 	u64 runtime, period;
 	spinlock_t *group_lock = NULL;
 
+<<<<<<< HEAD
 	seq = ACCESS_ONCE(p->mm->numa_scan_seq);
+=======
+	seq = READ_ONCE(p->mm->numa_scan_seq);
+>>>>>>> common/deprecated/android-3.18
 	if (p->numa_scan_seq == seq)
 		return;
 	p->numa_scan_seq = seq;
@@ -1737,7 +1870,11 @@ static void task_numa_group(struct task_struct *p, int cpupid, int flags,
 	}
 
 	rcu_read_lock();
+<<<<<<< HEAD
 	tsk = ACCESS_ONCE(cpu_rq(cpu)->curr);
+=======
+	tsk = READ_ONCE(cpu_rq(cpu)->curr);
+>>>>>>> common/deprecated/android-3.18
 
 	if (!cpupid_match_pid(tsk, cpupid))
 		goto no_join;
@@ -1919,7 +2056,11 @@ void task_numa_fault(int last_cpupid, int mem_node, int pages, int flags)
 
 static void reset_ptenuma_scan(struct task_struct *p)
 {
+<<<<<<< HEAD
 	ACCESS_ONCE(p->mm->numa_scan_seq)++;
+=======
+	WRITE_ONCE(p->mm->numa_scan_seq, READ_ONCE(p->mm->numa_scan_seq) + 1);
+>>>>>>> common/deprecated/android-3.18
 	p->mm->numa_scan_offset = 0;
 }
 
@@ -1984,7 +2125,12 @@ void task_numa_work(struct callback_head *work)
 	if (!pages)
 		return;
 
+<<<<<<< HEAD
 	down_read(&mm->mmap_sem);
+=======
+	if (!down_read_trylock(&mm->mmap_sem))
+		return;
+>>>>>>> common/deprecated/android-3.18
 	vma = find_vma(mm, start);
 	if (!vma) {
 		reset_ptenuma_scan(p);
@@ -1992,8 +2138,15 @@ void task_numa_work(struct callback_head *work)
 		vma = mm->mmap;
 	}
 	for (; vma; vma = vma->vm_next) {
+<<<<<<< HEAD
 		if (!vma_migratable(vma) || !vma_policy_mof(vma))
 			continue;
+=======
+		if (!vma_migratable(vma) || !vma_policy_mof(vma) ||
+		    is_vm_hugetlb_page(vma) || (vma->vm_flags & VM_MIXEDMAP)) {
+			continue;
+		}
+>>>>>>> common/deprecated/android-3.18
 
 		/*
 		 * Shared library pages mapped by multiple processes are not
@@ -2059,7 +2212,11 @@ void task_tick_numa(struct rq *rq, struct task_struct *curr)
 	/*
 	 * We don't care about NUMA placement if we don't have memory.
 	 */
+<<<<<<< HEAD
 	if (!curr->mm || (curr->flags & PF_EXITING) || work->next != work)
+=======
+	if ((curr->flags & (PF_EXITING | PF_KTHREAD)) || work->next != work)
+>>>>>>> common/deprecated/android-3.18
 		return;
 
 	/*
@@ -2128,6 +2285,7 @@ account_entity_dequeue(struct cfs_rq *cfs_rq, struct sched_entity *se)
 
 #ifdef CONFIG_FAIR_GROUP_SCHED
 # ifdef CONFIG_SMP
+<<<<<<< HEAD
 static inline long calc_tg_weight(struct task_group *tg, struct cfs_rq *cfs_rq)
 {
 	long tg_weight;
@@ -2144,12 +2302,29 @@ static inline long calc_tg_weight(struct task_group *tg, struct cfs_rq *cfs_rq)
 	return tg_weight;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static long calc_cfs_shares(struct cfs_rq *cfs_rq, struct task_group *tg)
 {
 	long tg_weight, load, shares;
 
+<<<<<<< HEAD
 	tg_weight = calc_tg_weight(tg, cfs_rq);
 	load = cfs_rq->load.weight;
+=======
+	/*
+	 * This really should be: cfs_rq->avg.load_avg, but instead we use
+	 * cfs_rq->load.weight, which is its upper bound. This helps ramp up
+	 * the shares for small weight interactive tasks.
+	 */
+	load = scale_load_down(cfs_rq->load.weight);
+
+	tg_weight = atomic_long_read(&tg->load_avg);
+
+	/* Ensure tg_weight >= load */
+	tg_weight -= cfs_rq->tg_load_avg_contrib;
+	tg_weight += load;
+>>>>>>> common/deprecated/android-3.18
 
 	shares = (tg->shares * load);
 	if (tg_weight)
@@ -2168,6 +2343,10 @@ static inline long calc_cfs_shares(struct cfs_rq *cfs_rq, struct task_group *tg)
 	return tg->shares;
 }
 # endif /* CONFIG_SMP */
+<<<<<<< HEAD
+=======
+
+>>>>>>> common/deprecated/android-3.18
 static void reweight_entity(struct cfs_rq *cfs_rq, struct sched_entity *se,
 			    unsigned long weight)
 {
@@ -2211,6 +2390,7 @@ static inline void update_cfs_shares(struct cfs_rq *cfs_rq)
 #endif /* CONFIG_FAIR_GROUP_SCHED */
 
 #ifdef CONFIG_SMP
+<<<<<<< HEAD
 /*
  * We choose a half-life close to 1 scheduling period.
  * Note: The tables below are dependent on this value.
@@ -2219,6 +2399,8 @@ static inline void update_cfs_shares(struct cfs_rq *cfs_rq)
 #define LOAD_AVG_MAX 47742 /* maximum possible load avg */
 #define LOAD_AVG_MAX_N 345 /* number of full periods to produce LOAD_MAX_AVG */
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /* Precomputed fixed inverse multiplies for multiplication by y^n */
 static const u32 runnable_avg_yN_inv[] = {
 	0xffffffff, 0xfa83b2da, 0xf5257d14, 0xefe4b99a, 0xeac0c6e6, 0xe5b906e6,
@@ -2267,9 +2449,14 @@ static __always_inline u64 decay_load(u64 val, u64 n)
 		local_n %= LOAD_AVG_PERIOD;
 	}
 
+<<<<<<< HEAD
 	val *= runnable_avg_yN_inv[local_n];
 	/* We don't use SRR here since we always want to round down. */
 	return val >> 32;
+=======
+	val = mul_u64_u32_shr(val, runnable_avg_yN_inv[local_n], 32);
+	return val;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
@@ -2300,6 +2487,7 @@ static u32 __compute_runnable_contrib(u64 n)
 	return contrib + runnable_avg_yN_sum[n];
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_HMP_VARIABLE_SCALE
 
 #define HMP_VARIABLE_SCALE_SHIFT 16ULL
@@ -2395,6 +2583,16 @@ static struct cpufreq_extents freq_scale[CONFIG_NR_CPUS];
 #endif /* CONFIG_HMP_VARIABLE_SCALE */
 
 /* We can represent the historical contribution to runnable average as the
+=======
+#if (SCHED_LOAD_SHIFT - SCHED_LOAD_RESOLUTION) != 10 || SCHED_CAPACITY_SHIFT != 10
+#error "load tracking assumes 2^10 as unit"
+#endif
+
+#define cap_scale(v, s) ((v)*(s) >> SCHED_CAPACITY_SHIFT)
+
+/*
+ * We can represent the historical contribution to runnable average as the
+>>>>>>> common/deprecated/android-3.18
  * coefficients of a geometric series.  To do this we sub-divide our runnable
  * history into segments of approximately 1ms (1024us); label the segment that
  * occurred N-ms ago p_N, with p_0 corresponding to the current period, e.g.
@@ -2421,6 +2619,7 @@ static struct cpufreq_extents freq_scale[CONFIG_NR_CPUS];
  *   load_avg = u_0` + y*(u_0 + u_1*y + u_2*y^2 + ... )
  *            = u_0 + u_1*y + u_2*y^2 + ... [re-labeling u_i --> u_{i+1}]
  */
+<<<<<<< HEAD
 static __always_inline int __update_entity_runnable_avg(u64 now,
 							struct sched_avg *sa,
 							int runnable,
@@ -2441,12 +2640,28 @@ static __always_inline int __update_entity_runnable_avg(u64 now,
 #ifdef CONFIG_HMP_VARIABLE_SCALE
 	delta = hmp_variable_scale_convert(delta);
 #endif
+=======
+static __always_inline int
+__update_load_avg(u64 now, int cpu, struct sched_avg *sa,
+		  unsigned long weight, int running, struct cfs_rq *cfs_rq)
+{
+	u64 delta, scaled_delta, periods;
+	u32 contrib;
+	unsigned int delta_w, scaled_delta_w, decayed = 0;
+	unsigned long scale_freq, scale_cpu;
+
+	delta = now - sa->last_update_time;
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * This should only happen when time goes backwards, which it
 	 * unfortunately does during sched clock init when we swap over to TSC.
 	 */
 	if ((s64)delta < 0) {
+<<<<<<< HEAD
 		sa->last_runnable_update = now;
+=======
+		sa->last_update_time = now;
+>>>>>>> common/deprecated/android-3.18
 		return 0;
 	}
 
@@ -2457,6 +2672,7 @@ static __always_inline int __update_entity_runnable_avg(u64 now,
 	delta >>= 10;
 	if (!delta)
 		return 0;
+<<<<<<< HEAD
 	sa->last_runnable_update = now;
 
 #ifdef CONFIG_HMP_FREQUENCY_INVARIANT_SCALE
@@ -2471,12 +2687,29 @@ static __always_inline int __update_entity_runnable_avg(u64 now,
 		/* period roll-over */
 		decayed = 1;
 
+=======
+	sa->last_update_time = now;
+
+	scale_freq = arch_scale_freq_capacity(NULL, cpu);
+	scale_cpu = arch_scale_cpu_capacity(NULL, cpu);
+	trace_sched_contrib_scale_f(cpu, scale_freq, scale_cpu);
+
+	/* delta_w is the amount already accumulated against our next period */
+	delta_w = sa->period_contrib;
+	if (delta + delta_w >= 1024) {
+		decayed = 1;
+
+		/* how much left for next period will start over, we don't know yet */
+		sa->period_contrib = 0;
+
+>>>>>>> common/deprecated/android-3.18
 		/*
 		 * Now that we know we're crossing a period boundary, figure
 		 * out how much from delta we need to complete the current
 		 * period and accrue it.
 		 */
 		delta_w = 1024 - delta_w;
+<<<<<<< HEAD
 		/* scale runnable time if necessary */
 #ifdef CONFIG_HMP_FREQUENCY_INVARIANT_SCALE
 		scaled_delta_w = (delta_w * curr_scale)
@@ -2492,12 +2725,25 @@ static __always_inline int __update_entity_runnable_avg(u64 now,
 			sa->usage_avg_sum += delta_w;
 #endif /* #ifdef CONFIG_HMP_FREQUENCY_INVARIANT_SCALE */
 		sa->runnable_avg_period += delta_w;
+=======
+		scaled_delta_w = cap_scale(delta_w, scale_freq);
+		if (weight) {
+			sa->load_sum += weight * scaled_delta_w;
+			if (cfs_rq) {
+				cfs_rq->runnable_load_sum +=
+						weight * scaled_delta_w;
+			}
+		}
+		if (running)
+			sa->util_sum += scaled_delta_w * scale_cpu;
+>>>>>>> common/deprecated/android-3.18
 
 		delta -= delta_w;
 
 		/* Figure out how many additional periods this update spans */
 		periods = delta / 1024;
 		delta %= 1024;
+<<<<<<< HEAD
 		/* decay the load we have accumulated so far */
 		sa->runnable_avg_sum = decay_load(sa->runnable_avg_sum,
 						  periods + 1);
@@ -2546,10 +2792,53 @@ static __always_inline int __update_entity_runnable_avg(u64 now,
 		sa->usage_avg_sum += delta;
 #endif /* CONFIG_HMP_FREQUENCY_INVARIANT_SCALE */
 	sa->runnable_avg_period += delta;
+=======
+
+		sa->load_sum = decay_load(sa->load_sum, periods + 1);
+		if (cfs_rq) {
+			cfs_rq->runnable_load_sum =
+				decay_load(cfs_rq->runnable_load_sum, periods + 1);
+		}
+		sa->util_sum = decay_load((u64)(sa->util_sum), periods + 1);
+
+		/* Efficiently calculate \sum (1..n_period) 1024*y^i */
+		contrib = __compute_runnable_contrib(periods);
+		contrib = cap_scale(contrib, scale_freq);
+		if (weight) {
+			sa->load_sum += weight * contrib;
+			if (cfs_rq)
+				cfs_rq->runnable_load_sum += weight * contrib;
+		}
+		if (running)
+			sa->util_sum += contrib * scale_cpu;
+	}
+
+	/* Remainder of delta accrued against u_0` */
+	scaled_delta = cap_scale(delta, scale_freq);
+	if (weight) {
+		sa->load_sum += weight * scaled_delta;
+		if (cfs_rq)
+			cfs_rq->runnable_load_sum += weight * scaled_delta;
+	}
+	if (running)
+		sa->util_sum += scaled_delta * scale_cpu;
+
+	sa->period_contrib += delta;
+
+	if (decayed) {
+		sa->load_avg = div_u64(sa->load_sum, LOAD_AVG_MAX);
+		if (cfs_rq) {
+			cfs_rq->runnable_load_avg =
+				div_u64(cfs_rq->runnable_load_sum, LOAD_AVG_MAX);
+		}
+		sa->util_avg = sa->util_sum / LOAD_AVG_MAX;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	return decayed;
 }
 
+<<<<<<< HEAD
 /* Synchronize an entity's decay with its parenting cfs_rq.*/
 static inline u64 __synchronize_entity_decay(struct sched_entity *se)
 {
@@ -2579,10 +2868,31 @@ static inline void __update_cfs_rq_tg_load_contrib(struct cfs_rq *cfs_rq,
 	if (force_update || abs(tg_contrib) > cfs_rq->tg_load_contrib / 8) {
 		atomic_long_add(tg_contrib, &tg->load_avg);
 		cfs_rq->tg_load_contrib += tg_contrib;
+=======
+#ifdef CONFIG_FAIR_GROUP_SCHED
+/*
+ * Updating tg's load_avg is necessary before update_cfs_share (which is done)
+ * and effective_load (which is not done because it is too costly).
+ */
+static inline void update_tg_load_avg(struct cfs_rq *cfs_rq, int force)
+{
+	long delta = cfs_rq->avg.load_avg - cfs_rq->tg_load_avg_contrib;
+
+	/*
+	 * No need to update load_avg for root_task_group as it is not used.
+	 */
+	if (cfs_rq->tg == &root_task_group)
+		return;
+
+	if (force || abs(delta) > cfs_rq->tg_load_avg_contrib / 64) {
+		atomic_long_add(delta, &cfs_rq->tg->load_avg);
+		cfs_rq->tg_load_avg_contrib = cfs_rq->avg.load_avg;
+>>>>>>> common/deprecated/android-3.18
 	}
 }
 
 /*
+<<<<<<< HEAD
  * Aggregate cfs_rq runnable averages into an equivalent task_group
  * representation for computing load contributions.
  */
@@ -2888,6 +3198,252 @@ static inline void dequeue_entity_load_avg(struct cfs_rq *cfs_rq,
 		cfs_rq->blocked_load_avg += se->avg.load_avg_contrib;
 		se->avg.decay_count = atomic64_read(&cfs_rq->decay_counter);
 	} /* migrations, e.g. sleep=0 leave decay_count == 0 */
+=======
+ * Called within set_task_rq() right before setting a task's cpu. The
+ * caller only guarantees p->pi_lock is held; no other assumptions,
+ * including the state of rq->lock, should be made.
+ */
+void set_task_rq_fair(struct sched_entity *se,
+		      struct cfs_rq *prev, struct cfs_rq *next)
+{
+	if (!sched_feat(ATTACH_AGE_LOAD))
+		return;
+
+	/*
+	 * We are supposed to update the task to "current" time, then its up to
+	 * date and ready to go to new CPU/cfs_rq. But we have difficulty in
+	 * getting what current time is, so simply throw away the out-of-date
+	 * time. This will result in the wakee task is less decayed, but giving
+	 * the wakee more load sounds not bad.
+	 */
+	if (se->avg.last_update_time && prev) {
+		u64 p_last_update_time;
+		u64 n_last_update_time;
+
+#ifndef CONFIG_64BIT
+		u64 p_last_update_time_copy;
+		u64 n_last_update_time_copy;
+
+		do {
+			p_last_update_time_copy = prev->load_last_update_time_copy;
+			n_last_update_time_copy = next->load_last_update_time_copy;
+
+			smp_rmb();
+
+			p_last_update_time = prev->avg.last_update_time;
+			n_last_update_time = next->avg.last_update_time;
+
+		} while (p_last_update_time != p_last_update_time_copy ||
+			 n_last_update_time != n_last_update_time_copy);
+#else
+		p_last_update_time = prev->avg.last_update_time;
+		n_last_update_time = next->avg.last_update_time;
+#endif
+		__update_load_avg(p_last_update_time, cpu_of(rq_of(prev)),
+				  &se->avg, 0, 0, NULL);
+		se->avg.last_update_time = n_last_update_time;
+	}
+}
+#else /* CONFIG_FAIR_GROUP_SCHED */
+static inline void update_tg_load_avg(struct cfs_rq *cfs_rq, int force) {}
+#endif /* CONFIG_FAIR_GROUP_SCHED */
+
+static inline u64 cfs_rq_clock_task(struct cfs_rq *cfs_rq);
+
+/*
+ * Unsigned subtract and clamp on underflow.
+ *
+ * Explicitly do a load-store to ensure the intermediate value never hits
+ * memory. This allows lockless observations without ever seeing the negative
+ * values.
+ */
+#define sub_positive(_ptr, _val) do {				\
+	typeof(_ptr) ptr = (_ptr);				\
+	typeof(*ptr) val = (_val);				\
+	typeof(*ptr) res, var = READ_ONCE(*ptr);		\
+	res = var - val;					\
+	if (res > var)						\
+		res = 0;					\
+	WRITE_ONCE(*ptr, res);					\
+} while (0)
+
+/* Group cfs_rq's load_avg is used for task_h_load and update_cfs_share */
+static inline int update_cfs_rq_load_avg(u64 now, struct cfs_rq *cfs_rq)
+{
+	struct sched_avg *sa = &cfs_rq->avg;
+	int decayed, removed = 0;
+
+	if (atomic_long_read(&cfs_rq->removed_load_avg)) {
+		long r = atomic_long_xchg(&cfs_rq->removed_load_avg, 0);
+		sub_positive(&sa->load_avg, r);
+		sub_positive(&sa->load_sum, r * LOAD_AVG_MAX);
+		removed = 1;
+	}
+
+	if (atomic_long_read(&cfs_rq->removed_util_avg)) {
+		long r = atomic_long_xchg(&cfs_rq->removed_util_avg, 0);
+		sub_positive(&sa->util_avg, r);
+		sub_positive(&sa->util_sum, r * LOAD_AVG_MAX);
+	}
+
+	decayed = __update_load_avg(now, cpu_of(rq_of(cfs_rq)), sa,
+		scale_load_down(cfs_rq->load.weight), cfs_rq->curr != NULL, cfs_rq);
+
+#ifndef CONFIG_64BIT
+	smp_wmb();
+	cfs_rq->load_last_update_time_copy = sa->last_update_time;
+#endif
+
+	/* Trace CPU load, unless cfs_rq belongs to a non-root task_group */
+	if (cfs_rq == &rq_of(cfs_rq)->cfs)
+		trace_sched_load_avg_cpu(cpu_of(rq_of(cfs_rq)), cfs_rq);
+
+	return decayed || removed;
+}
+
+/* Update task and its cfs_rq load average */
+static inline void update_load_avg(struct sched_entity *se, int update_tg)
+{
+	struct cfs_rq *cfs_rq = cfs_rq_of(se);
+	u64 now = cfs_rq_clock_task(cfs_rq);
+	int cpu = cpu_of(rq_of(cfs_rq));
+
+	/*
+	 * Track task load average for carrying it to new CPU after migrated, and
+	 * track group sched_entity load average for task_h_load calc in migration
+	 */
+	__update_load_avg(now, cpu, &se->avg,
+			  se->on_rq * scale_load_down(se->load.weight),
+			  cfs_rq->curr == se, NULL);
+
+	if (update_cfs_rq_load_avg(now, cfs_rq) && update_tg)
+		update_tg_load_avg(cfs_rq, 0);
+
+	if (entity_is_task(se))
+		trace_sched_load_avg_task(task_of(se), &se->avg);
+}
+
+static void attach_entity_load_avg(struct cfs_rq *cfs_rq, struct sched_entity *se)
+{
+	if (!sched_feat(ATTACH_AGE_LOAD))
+		goto skip_aging;
+
+	/*
+	 * If we got migrated (either between CPUs or between cgroups) we'll
+	 * have aged the average right before clearing @last_update_time.
+	 */
+	if (se->avg.last_update_time) {
+		__update_load_avg(cfs_rq->avg.last_update_time, cpu_of(rq_of(cfs_rq)),
+				  &se->avg, 0, 0, NULL);
+
+		/*
+		 * XXX: we could have just aged the entire load away if we've been
+		 * absent from the fair class for too long.
+		 */
+	}
+
+skip_aging:
+	se->avg.last_update_time = cfs_rq->avg.last_update_time;
+	cfs_rq->avg.load_avg += se->avg.load_avg;
+	cfs_rq->avg.load_sum += se->avg.load_sum;
+	cfs_rq->avg.util_avg += se->avg.util_avg;
+	cfs_rq->avg.util_sum += se->avg.util_sum;
+}
+
+static void detach_entity_load_avg(struct cfs_rq *cfs_rq, struct sched_entity *se)
+{
+	__update_load_avg(cfs_rq->avg.last_update_time, cpu_of(rq_of(cfs_rq)),
+			  &se->avg, se->on_rq * scale_load_down(se->load.weight),
+			  cfs_rq->curr == se, NULL);
+
+	sub_positive(&cfs_rq->avg.load_avg, se->avg.load_avg);
+	sub_positive(&cfs_rq->avg.load_sum, se->avg.load_sum);
+	sub_positive(&cfs_rq->avg.util_avg, se->avg.util_avg);
+	sub_positive(&cfs_rq->avg.util_sum, se->avg.util_sum);
+}
+
+/* Add the load generated by se into cfs_rq's load average */
+static inline void
+enqueue_entity_load_avg(struct cfs_rq *cfs_rq, struct sched_entity *se)
+{
+	struct sched_avg *sa = &se->avg;
+	u64 now = cfs_rq_clock_task(cfs_rq);
+	int migrated, decayed;
+
+	migrated = !sa->last_update_time;
+	if (!migrated) {
+		__update_load_avg(now, cpu_of(rq_of(cfs_rq)), sa,
+			se->on_rq * scale_load_down(se->load.weight),
+			cfs_rq->curr == se, NULL);
+	}
+
+	decayed = update_cfs_rq_load_avg(now, cfs_rq);
+
+	cfs_rq->runnable_load_avg += sa->load_avg;
+	cfs_rq->runnable_load_sum += sa->load_sum;
+
+	if (migrated)
+		attach_entity_load_avg(cfs_rq, se);
+
+	if (decayed || migrated)
+		update_tg_load_avg(cfs_rq, 0);
+}
+
+/* Remove the runnable load generated by se from cfs_rq's runnable load average */
+static inline void
+dequeue_entity_load_avg(struct cfs_rq *cfs_rq, struct sched_entity *se)
+{
+	update_load_avg(se, 1);
+
+	cfs_rq->runnable_load_avg =
+		max_t(long, cfs_rq->runnable_load_avg - se->avg.load_avg, 0);
+	cfs_rq->runnable_load_sum =
+		max_t(s64,  cfs_rq->runnable_load_sum - se->avg.load_sum, 0);
+}
+
+#ifndef CONFIG_64BIT
+static inline u64 cfs_rq_last_update_time(struct cfs_rq *cfs_rq)
+{
+	u64 last_update_time_copy;
+	u64 last_update_time;
+
+	do {
+		last_update_time_copy = cfs_rq->load_last_update_time_copy;
+		smp_rmb();
+		last_update_time = cfs_rq->avg.last_update_time;
+	} while (last_update_time != last_update_time_copy);
+
+	return last_update_time;
+}
+#else
+static inline u64 cfs_rq_last_update_time(struct cfs_rq *cfs_rq)
+{
+	return cfs_rq->avg.last_update_time;
+}
+#endif
+
+/*
+ * Task first catches up with cfs_rq, and then subtract
+ * itself from the cfs_rq (task must be off the queue now).
+ */
+void remove_entity_load_avg(struct sched_entity *se)
+{
+	struct cfs_rq *cfs_rq = cfs_rq_of(se);
+	u64 last_update_time;
+
+	/*
+	 * Newly created task or never used group entity should not be removed
+	 * from its (source) cfs_rq
+	 */
+	if (se->avg.last_update_time == 0)
+		return;
+
+	last_update_time = cfs_rq_last_update_time(cfs_rq);
+
+	__update_load_avg(last_update_time, cpu_of(rq_of(cfs_rq)), &se->avg, 0, 0, NULL);
+	atomic_long_add(se->avg.load_avg, &cfs_rq->removed_load_avg);
+	atomic_long_add(se->avg.util_avg, &cfs_rq->removed_util_avg);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
@@ -2897,7 +3453,10 @@ static inline void dequeue_entity_load_avg(struct cfs_rq *cfs_rq,
  */
 void idle_enter_fair(struct rq *this_rq)
 {
+<<<<<<< HEAD
 	update_rq_runnable_avg(this_rq, 1);
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
@@ -2907,13 +3466,27 @@ void idle_enter_fair(struct rq *this_rq)
  */
 void idle_exit_fair(struct rq *this_rq)
 {
+<<<<<<< HEAD
 	update_rq_runnable_avg(this_rq, 0);
+=======
+}
+
+static inline unsigned long cfs_rq_runnable_load_avg(struct cfs_rq *cfs_rq)
+{
+	return cfs_rq->runnable_load_avg;
+}
+
+static inline unsigned long cfs_rq_load_avg(struct cfs_rq *cfs_rq)
+{
+	return cfs_rq->avg.load_avg;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int idle_balance(struct rq *this_rq);
 
 #else /* CONFIG_SMP */
 
+<<<<<<< HEAD
 static inline void update_entity_load_avg(struct sched_entity *se,
 					  int update_cfs_rq) {}
 static inline void update_rq_runnable_avg(struct rq *rq, int runnable) {}
@@ -2925,6 +3498,19 @@ static inline void dequeue_entity_load_avg(struct cfs_rq *cfs_rq,
 					   int sleep) {}
 static inline void update_cfs_rq_blocked_load(struct cfs_rq *cfs_rq,
 					      int force_update) {}
+=======
+static inline void update_load_avg(struct sched_entity *se, int update_tg) {}
+static inline void
+enqueue_entity_load_avg(struct cfs_rq *cfs_rq, struct sched_entity *se) {}
+static inline void
+dequeue_entity_load_avg(struct cfs_rq *cfs_rq, struct sched_entity *se) {}
+static inline void remove_entity_load_avg(struct sched_entity *se) {}
+
+static inline void
+attach_entity_load_avg(struct cfs_rq *cfs_rq, struct sched_entity *se) {}
+static inline void
+detach_entity_load_avg(struct cfs_rq *cfs_rq, struct sched_entity *se) {}
+>>>>>>> common/deprecated/android-3.18
 
 static inline int idle_balance(struct rq *rq)
 {
@@ -2978,6 +3564,10 @@ static void enqueue_sleeper(struct cfs_rq *cfs_rq, struct sched_entity *se)
 			}
 
 			trace_sched_stat_blocked(tsk, delta);
+<<<<<<< HEAD
+=======
+			trace_sched_blocked_reason(tsk);
+>>>>>>> common/deprecated/android-3.18
 
 			/*
 			 * Blocking time is in units of nanosecs, so shift by
@@ -3056,7 +3646,11 @@ enqueue_entity(struct cfs_rq *cfs_rq, struct sched_entity *se, int flags)
 	 * Update run-time statistics of the 'current'.
 	 */
 	update_curr(cfs_rq);
+<<<<<<< HEAD
 	enqueue_entity_load_avg(cfs_rq, se, flags & ENQUEUE_WAKEUP);
+=======
+	enqueue_entity_load_avg(cfs_rq, se);
+>>>>>>> common/deprecated/android-3.18
 	account_entity_enqueue(cfs_rq, se);
 	update_cfs_shares(cfs_rq);
 
@@ -3131,7 +3725,11 @@ dequeue_entity(struct cfs_rq *cfs_rq, struct sched_entity *se, int flags)
 	 * Update run-time statistics of the 'current'.
 	 */
 	update_curr(cfs_rq);
+<<<<<<< HEAD
 	dequeue_entity_load_avg(cfs_rq, se, flags & DEQUEUE_SLEEP);
+=======
+	dequeue_entity_load_avg(cfs_rq, se);
+>>>>>>> common/deprecated/android-3.18
 
 	update_stats_dequeue(cfs_rq, se);
 	if (flags & DEQUEUE_SLEEP) {
@@ -3221,7 +3819,11 @@ set_next_entity(struct cfs_rq *cfs_rq, struct sched_entity *se)
 		 */
 		update_stats_wait_end(cfs_rq, se);
 		__dequeue_entity(cfs_rq, se);
+<<<<<<< HEAD
 		update_entity_load_avg(se, 1);
+=======
+		update_load_avg(se, 1);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	update_stats_curr_start(cfs_rq, se);
@@ -3321,7 +3923,11 @@ static void put_prev_entity(struct cfs_rq *cfs_rq, struct sched_entity *prev)
 		/* Put 'current' back into the tree. */
 		__enqueue_entity(cfs_rq, prev);
 		/* in !on_rq case, update occurred at dequeue */
+<<<<<<< HEAD
 		update_entity_load_avg(prev, 1);
+=======
+		update_load_avg(prev, 0);
+>>>>>>> common/deprecated/android-3.18
 	}
 	cfs_rq->curr = NULL;
 }
@@ -3337,8 +3943,12 @@ entity_tick(struct cfs_rq *cfs_rq, struct sched_entity *curr, int queued)
 	/*
 	 * Ensure that runnable average is periodically updated.
 	 */
+<<<<<<< HEAD
 	update_entity_load_avg(curr, 1);
 	update_cfs_rq_blocked_load(cfs_rq, 1);
+=======
+	update_load_avg(curr, 1);
+>>>>>>> common/deprecated/android-3.18
 	update_cfs_shares(cfs_rq);
 
 #ifdef CONFIG_SCHED_HRTICK
@@ -3646,9 +4256,20 @@ static void throttle_cfs_rq(struct cfs_rq *cfs_rq)
 	raw_spin_lock(&cfs_b->lock);
 	/*
 	 * Add to the _head_ of the list, so that an already-started
+<<<<<<< HEAD
 	 * distribute_cfs_runtime will not see us
 	 */
 	list_add_rcu(&cfs_rq->throttled_list, &cfs_b->throttled_cfs_rq);
+=======
+	 * distribute_cfs_runtime will not see us. If disribute_cfs_runtime is
+	 * not running add to the tail so that later runqueues don't get starved.
+	 */
+	if (cfs_b->distribute_running)
+		list_add_rcu(&cfs_rq->throttled_list, &cfs_b->throttled_cfs_rq);
+	else
+		list_add_tail_rcu(&cfs_rq->throttled_list, &cfs_b->throttled_cfs_rq);
+
+>>>>>>> common/deprecated/android-3.18
 	if (!cfs_b->timer_active)
 		__start_cfs_bandwidth(cfs_b, false);
 	raw_spin_unlock(&cfs_b->lock);
@@ -3792,14 +4413,24 @@ static int do_sched_cfs_period_timer(struct cfs_bandwidth *cfs_b, int overrun)
 	 * in us over-using our runtime if it is all used during this loop, but
 	 * only by limited amounts in that extreme case.
 	 */
+<<<<<<< HEAD
 	while (throttled && cfs_b->runtime > 0) {
 		runtime = cfs_b->runtime;
+=======
+	while (throttled && cfs_b->runtime > 0 && !cfs_b->distribute_running) {
+		runtime = cfs_b->runtime;
+		cfs_b->distribute_running = 1;
+>>>>>>> common/deprecated/android-3.18
 		raw_spin_unlock(&cfs_b->lock);
 		/* we can't nest cfs_b->lock while distributing bandwidth */
 		runtime = distribute_cfs_runtime(cfs_b, runtime,
 						 runtime_expires);
 		raw_spin_lock(&cfs_b->lock);
 
+<<<<<<< HEAD
+=======
+		cfs_b->distribute_running = 0;
+>>>>>>> common/deprecated/android-3.18
 		throttled = !list_empty(&cfs_b->throttled_cfs_rq);
 
 		cfs_b->runtime -= min(runtime, cfs_b->runtime);
@@ -3910,6 +4541,14 @@ static void do_sched_cfs_slack_timer(struct cfs_bandwidth *cfs_b)
 
 	/* confirm we're still not at a refresh boundary */
 	raw_spin_lock(&cfs_b->lock);
+<<<<<<< HEAD
+=======
+	if (cfs_b->distribute_running) {
+		raw_spin_unlock(&cfs_b->lock);
+		return;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	if (runtime_refresh_within(cfs_b, min_bandwidth_expiration)) {
 		raw_spin_unlock(&cfs_b->lock);
 		return;
@@ -3919,6 +4558,12 @@ static void do_sched_cfs_slack_timer(struct cfs_bandwidth *cfs_b)
 		runtime = cfs_b->runtime;
 
 	expires = cfs_b->runtime_expires;
+<<<<<<< HEAD
+=======
+	if (runtime)
+		cfs_b->distribute_running = 1;
+
+>>>>>>> common/deprecated/android-3.18
 	raw_spin_unlock(&cfs_b->lock);
 
 	if (!runtime)
@@ -3929,6 +4574,10 @@ static void do_sched_cfs_slack_timer(struct cfs_bandwidth *cfs_b)
 	raw_spin_lock(&cfs_b->lock);
 	if (expires == cfs_b->runtime_expires)
 		cfs_b->runtime -= min(runtime, cfs_b->runtime);
+<<<<<<< HEAD
+=======
+	cfs_b->distribute_running = 0;
+>>>>>>> common/deprecated/android-3.18
 	raw_spin_unlock(&cfs_b->lock);
 }
 
@@ -3942,6 +4591,29 @@ static void check_enqueue_throttle(struct cfs_rq *cfs_rq)
 	if (!cfs_bandwidth_used())
 		return;
 
+<<<<<<< HEAD
+=======
+	/* Synchronize hierarchical throttle counter: */
+	if (unlikely(!cfs_rq->throttle_uptodate)) {
+		struct rq *rq = rq_of(cfs_rq);
+		struct cfs_rq *pcfs_rq;
+		struct task_group *tg;
+
+		cfs_rq->throttle_uptodate = 1;
+
+		/* Get closest up-to-date node, because leaves go first: */
+		for (tg = cfs_rq->tg->parent; tg; tg = tg->parent) {
+			pcfs_rq = tg->cfs_rq[cpu_of(rq)];
+			if (pcfs_rq->throttle_uptodate)
+				break;
+		}
+		if (tg) {
+			cfs_rq->throttle_count = pcfs_rq->throttle_count;
+			cfs_rq->throttled_clock_task = rq_clock_task(rq);
+		}
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	/* an active group must be handled by the update_curr()->put() path */
 	if (!cfs_rq->runtime_enabled || cfs_rq->curr)
 		return;
@@ -3985,6 +4657,11 @@ static enum hrtimer_restart sched_cfs_slack_timer(struct hrtimer *timer)
 	return HRTIMER_NORESTART;
 }
 
+<<<<<<< HEAD
+=======
+extern const u64 max_cfs_quota_period;
+
+>>>>>>> common/deprecated/android-3.18
 static enum hrtimer_restart sched_cfs_period_timer(struct hrtimer *timer)
 {
 	struct cfs_bandwidth *cfs_b =
@@ -3992,6 +4669,10 @@ static enum hrtimer_restart sched_cfs_period_timer(struct hrtimer *timer)
 	ktime_t now;
 	int overrun;
 	int idle = 0;
+<<<<<<< HEAD
+=======
+	int count = 0;
+>>>>>>> common/deprecated/android-3.18
 
 	raw_spin_lock(&cfs_b->lock);
 	for (;;) {
@@ -4001,6 +4682,39 @@ static enum hrtimer_restart sched_cfs_period_timer(struct hrtimer *timer)
 		if (!overrun)
 			break;
 
+<<<<<<< HEAD
+=======
+		if (++count > 3) {
+			u64 new, old = ktime_to_ns(cfs_b->period);
+
+			/*
+			 * Grow period by a factor of 2 to avoid losing precision.
+			 * Precision loss in the quota/period ratio can cause __cfs_schedulable
+			 * to fail.
+			 */
+			new = old * 2;
+			if (new < max_cfs_quota_period) {
+				cfs_b->period = ns_to_ktime(new);
+				cfs_b->quota *= 2;
+
+				pr_warn_ratelimited(
+	"cfs_period_timer[cpu%d]: period too short, scaling up (new cfs_period_us = %lld, cfs_quota_us = %lld)\n",
+					smp_processor_id(),
+					div_u64(new, NSEC_PER_USEC),
+					div_u64(cfs_b->quota, NSEC_PER_USEC));
+			} else {
+				pr_warn_ratelimited(
+	"cfs_period_timer[cpu%d]: period too short, but cannot scale up without losing precision (cfs_period_us = %lld, cfs_quota_us = %lld)\n",
+					smp_processor_id(),
+					div_u64(old, NSEC_PER_USEC),
+					div_u64(cfs_b->quota, NSEC_PER_USEC));
+			}
+
+			/* reset count so we don't come right back in here */
+			count = 0;
+		}
+
+>>>>>>> common/deprecated/android-3.18
 		idle = do_sched_cfs_period_timer(cfs_b, overrun);
 	}
 	raw_spin_unlock(&cfs_b->lock);
@@ -4020,6 +4734,10 @@ void init_cfs_bandwidth(struct cfs_bandwidth *cfs_b)
 	cfs_b->period_timer.function = sched_cfs_period_timer;
 	hrtimer_init(&cfs_b->slack_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 	cfs_b->slack_timer.function = sched_cfs_slack_timer;
+<<<<<<< HEAD
+=======
+	cfs_b->distribute_running = 0;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void init_cfs_rq_runtime(struct cfs_rq *cfs_rq)
@@ -4190,6 +4908,31 @@ static inline void hrtick_update(struct rq *rq)
 }
 #endif
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_SMP
+static bool cpu_overutilized(int cpu);
+static inline unsigned long boosted_cpu_util(int cpu);
+#else
+#define boosted_cpu_util(cpu) cpu_util(cpu)
+#endif
+
+#ifdef CONFIG_SMP
+static void update_capacity_of(int cpu)
+{
+	unsigned long req_cap;
+
+	if (!sched_freq())
+		return;
+
+	/* Convert scale-invariant capacity to cpu. */
+	req_cap = boosted_cpu_util(cpu);
+	req_cap = req_cap * SCHED_CAPACITY_SCALE / capacity_orig_of(cpu);
+	set_cfs_cpu_capacity(cpu, true, req_cap);
+}
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * The enqueue_task method is called before nr_running is
  * increased. Here we update the fair scheduling stats and
@@ -4200,6 +4943,13 @@ enqueue_task_fair(struct rq *rq, struct task_struct *p, int flags)
 {
 	struct cfs_rq *cfs_rq;
 	struct sched_entity *se = &p->se;
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_SMP
+	int task_new = flags & ENQUEUE_WAKEUP_NEW;
+	int task_wakeup = flags & ENQUEUE_WAKEUP;
+#endif
+>>>>>>> common/deprecated/android-3.18
 
 	for_each_sched_entity(se) {
 		if (se->on_rq)
@@ -4216,6 +4966,10 @@ enqueue_task_fair(struct rq *rq, struct task_struct *p, int flags)
 		if (cfs_rq_throttled(cfs_rq))
 			break;
 		cfs_rq->h_nr_running++;
+<<<<<<< HEAD
+=======
+		walt_inc_cfs_cumulative_runnable_avg(cfs_rq, p);
+>>>>>>> common/deprecated/android-3.18
 
 		flags = ENQUEUE_WAKEUP;
 	}
@@ -4223,10 +4977,15 @@ enqueue_task_fair(struct rq *rq, struct task_struct *p, int flags)
 	for_each_sched_entity(se) {
 		cfs_rq = cfs_rq_of(se);
 		cfs_rq->h_nr_running++;
+<<<<<<< HEAD
+=======
+		walt_inc_cfs_cumulative_runnable_avg(cfs_rq, p);
+>>>>>>> common/deprecated/android-3.18
 
 		if (cfs_rq_throttled(cfs_rq))
 			break;
 
+<<<<<<< HEAD
 		update_cfs_shares(cfs_rq);
 		update_entity_load_avg(se, 1);
 	}
@@ -4235,6 +4994,56 @@ enqueue_task_fair(struct rq *rq, struct task_struct *p, int flags)
 		update_rq_runnable_avg(rq, rq->nr_running);
 		add_nr_running(rq, 1);
 	}
+=======
+		update_load_avg(se, 1);
+		update_cfs_shares(cfs_rq);
+	}
+
+	if (!se)
+		add_nr_running(rq, 1);
+
+#ifdef CONFIG_SMP
+
+	/*
+	 * Update SchedTune accounting.
+	 *
+	 * We do it before updating the CPU capacity to ensure the
+	 * boost value of the current task is accounted for in the
+	 * selection of the OPP.
+	 *
+	 * We do it also in the case where we enqueue a throttled task;
+	 * we could argue that a throttled task should not boost a CPU,
+	 * however:
+	 * a) properly implementing CPU boosting considering throttled
+	 *    tasks will increase a lot the complexity of the solution
+	 * b) it's not easy to quantify the benefits introduced by
+	 *    such a more complex solution.
+	 * Thus, for the time being we go for the simple solution and boost
+	 * also for throttled RQs.
+	 */
+	schedtune_enqueue_task(p, cpu_of(rq));
+
+	if (!se) {
+		walt_inc_cumulative_runnable_avg(rq, p);
+		if (!task_new && !rq->rd->overutilized &&
+		    cpu_overutilized(rq->cpu)) {
+			rq->rd->overutilized = true;
+			trace_sched_overutilized(true);
+		}
+
+		/*
+		 * We want to potentially trigger a freq switch
+		 * request only for tasks that are waking up; this is
+		 * because we get here also during load balancing, but
+		 * in these cases it seems wise to trigger as single
+		 * request after load balancing is done.
+		 */
+		if (task_new || task_wakeup)
+			update_capacity_of(cpu_of(rq));
+	}
+
+#endif /* CONFIG_SMP */
+>>>>>>> common/deprecated/android-3.18
 	hrtick_update(rq);
 }
 
@@ -4264,18 +5073,32 @@ static void dequeue_task_fair(struct rq *rq, struct task_struct *p, int flags)
 		if (cfs_rq_throttled(cfs_rq))
 			break;
 		cfs_rq->h_nr_running--;
+<<<<<<< HEAD
 
 		/* Don't dequeue parent if it has other entities besides us */
 		if (cfs_rq->load.weight) {
+=======
+		walt_dec_cfs_cumulative_runnable_avg(cfs_rq, p);
+
+		/* Don't dequeue parent if it has other entities besides us */
+		if (cfs_rq->load.weight) {
+			/* Avoid re-evaluating load for this entity: */
+			se = parent_entity(se);
+>>>>>>> common/deprecated/android-3.18
 			/*
 			 * Bias pick_next to pick a task from this cfs_rq, as
 			 * p is sleeping when it is within its sched_slice.
 			 */
+<<<<<<< HEAD
 			if (task_sleep && parent_entity(se))
 				set_next_buddy(parent_entity(se));
 
 			/* avoid re-evaluating load for this entity */
 			se = parent_entity(se);
+=======
+			if (task_sleep && se && !throttled_hierarchy(cfs_rq))
+				set_next_buddy(se);
+>>>>>>> common/deprecated/android-3.18
 			break;
 		}
 		flags |= DEQUEUE_SLEEP;
@@ -4284,10 +5107,15 @@ static void dequeue_task_fair(struct rq *rq, struct task_struct *p, int flags)
 	for_each_sched_entity(se) {
 		cfs_rq = cfs_rq_of(se);
 		cfs_rq->h_nr_running--;
+<<<<<<< HEAD
+=======
+		walt_dec_cfs_cumulative_runnable_avg(cfs_rq, p);
+>>>>>>> common/deprecated/android-3.18
 
 		if (cfs_rq_throttled(cfs_rq))
 			break;
 
+<<<<<<< HEAD
 		update_cfs_shares(cfs_rq);
 		update_entity_load_avg(se, 1);
 	}
@@ -4296,14 +5124,240 @@ static void dequeue_task_fair(struct rq *rq, struct task_struct *p, int flags)
 		sub_nr_running(rq, 1);
 		update_rq_runnable_avg(rq, 1);
 	}
+=======
+		update_load_avg(se, 1);
+		update_cfs_shares(cfs_rq);
+	}
+
+	if (!se)
+		sub_nr_running(rq, 1);
+
+#ifdef CONFIG_SMP
+
+	/*
+	 * Update SchedTune accounting
+	 *
+	 * We do it before updating the CPU capacity to ensure the
+	 * boost value of the current task is accounted for in the
+	 * selection of the OPP.
+	 */
+	schedtune_dequeue_task(p, cpu_of(rq));
+
+	if (!se) {
+		walt_dec_cumulative_runnable_avg(rq, p);
+
+		/*
+		 * We want to potentially trigger a freq switch
+		 * request only for tasks that are going to sleep;
+		 * this is because we get here also during load
+		 * balancing, but in these cases it seems wise to
+		 * trigger as single request after load balancing is
+		 * done.
+		 */
+		if (task_sleep) {
+			if (rq->cfs.nr_running)
+				update_capacity_of(cpu_of(rq));
+			else if (sched_freq())
+				set_cfs_cpu_capacity(cpu_of(rq), false, 0);
+		}
+	}
+
+#endif /* CONFIG_SMP */
+
+>>>>>>> common/deprecated/android-3.18
 	hrtick_update(rq);
 }
 
 #ifdef CONFIG_SMP
+<<<<<<< HEAD
 /* Used instead of source_load when we know the type == 0 */
 static unsigned long weighted_cpuload(const int cpu)
 {
 	return cpu_rq(cpu)->cfs.runnable_load_avg;
+=======
+
+/*
+ * per rq 'load' arrray crap; XXX kill this.
+ */
+
+/*
+ * The exact cpuload calculated at every tick would be:
+ *
+ *   load' = (1 - 1/2^i) * load + (1/2^i) * cur_load
+ *
+ * If a cpu misses updates for n ticks (as it was idle) and update gets
+ * called on the n+1-th tick when cpu may be busy, then we have:
+ *
+ *   load_n   = (1 - 1/2^i)^n * load_0
+ *   load_n+1 = (1 - 1/2^i)   * load_n + (1/2^i) * cur_load
+ *
+ * decay_load_missed() below does efficient calculation of
+ *
+ *   load' = (1 - 1/2^i)^n * load
+ *
+ * Because x^(n+m) := x^n * x^m we can decompose any x^n in power-of-2 factors.
+ * This allows us to precompute the above in said factors, thereby allowing the
+ * reduction of an arbitrary n in O(log_2 n) steps. (See also
+ * fixed_power_int())
+ *
+ * The calculation is approximated on a 128 point scale.
+ */
+#define DEGRADE_SHIFT		7
+
+static const u8 degrade_zero_ticks[CPU_LOAD_IDX_MAX] = {0, 8, 32, 64, 128};
+static const u8 degrade_factor[CPU_LOAD_IDX_MAX][DEGRADE_SHIFT + 1] = {
+	{   0,   0,  0,  0,  0,  0, 0, 0 },
+	{  64,  32,  8,  0,  0,  0, 0, 0 },
+	{  96,  72, 40, 12,  1,  0, 0, 0 },
+	{ 112,  98, 75, 43, 15,  1, 0, 0 },
+	{ 120, 112, 98, 76, 45, 16, 2, 0 }
+};
+
+/*
+ * Update cpu_load for any missed ticks, due to tickless idle. The backlog
+ * would be when CPU is idle and so we just decay the old load without
+ * adding any new load.
+ */
+static unsigned long
+decay_load_missed(unsigned long load, unsigned long missed_updates, int idx)
+{
+	int j = 0;
+
+	if (!missed_updates)
+		return load;
+
+	if (missed_updates >= degrade_zero_ticks[idx])
+		return 0;
+
+	if (idx == 1)
+		return load >> missed_updates;
+
+	while (missed_updates) {
+		if (missed_updates % 2)
+			load = (load * degrade_factor[idx][j]) >> DEGRADE_SHIFT;
+
+		missed_updates >>= 1;
+		j++;
+	}
+	return load;
+}
+
+/*
+ * Update rq->cpu_load[] statistics. This function is usually called every
+ * scheduler tick (TICK_NSEC). With tickless idle this will not be called
+ * every tick. We fix it up based on jiffies.
+ */
+static void __update_cpu_load(struct rq *this_rq, unsigned long this_load,
+			      unsigned long pending_updates)
+{
+	int i, scale;
+
+	this_rq->nr_load_updates++;
+
+	/* Update our load: */
+	this_rq->cpu_load[0] = this_load; /* Fasttrack for idx 0 */
+	for (i = 1, scale = 2; i < CPU_LOAD_IDX_MAX; i++, scale += scale) {
+		unsigned long old_load, new_load;
+
+		/* scale is effectively 1 << i now, and >> i divides by scale */
+
+		old_load = this_rq->cpu_load[i];
+		old_load = decay_load_missed(old_load, pending_updates - 1, i);
+		new_load = this_load;
+		/*
+		 * Round up the averaging division if load is increasing. This
+		 * prevents us from getting stuck on 9 if the load is 10, for
+		 * example.
+		 */
+		if (new_load > old_load)
+			new_load += scale - 1;
+
+		this_rq->cpu_load[i] = (old_load * (scale - 1) + new_load) >> i;
+	}
+
+	sched_avg_update(this_rq);
+}
+
+/* Used instead of source_load when we know the type == 0 */
+static unsigned long weighted_cpuload(const int cpu)
+{
+	return cfs_rq_runnable_load_avg(&cpu_rq(cpu)->cfs);
+}
+
+#ifdef CONFIG_NO_HZ_COMMON
+/*
+ * There is no sane way to deal with nohz on smp when using jiffies because the
+ * cpu doing the jiffies update might drift wrt the cpu doing the jiffy reading
+ * causing off-by-one errors in observed deltas; {0,2} instead of {1,1}.
+ *
+ * Therefore we cannot use the delta approach from the regular tick since that
+ * would seriously skew the load calculation. However we'll make do for those
+ * updates happening while idle (nohz_idle_balance) or coming out of idle
+ * (tick_nohz_idle_exit).
+ *
+ * This means we might still be one tick off for nohz periods.
+ */
+
+/*
+ * Called from nohz_idle_balance() to update the load ratings before doing the
+ * idle balance.
+ */
+static void update_idle_cpu_load(struct rq *this_rq)
+{
+	unsigned long curr_jiffies = READ_ONCE(jiffies);
+	unsigned long load = weighted_cpuload(cpu_of(this_rq));
+	unsigned long pending_updates;
+
+	/*
+	 * bail if there's load or we're actually up-to-date.
+	 */
+	if (load || curr_jiffies == this_rq->last_load_update_tick)
+		return;
+
+	pending_updates = curr_jiffies - this_rq->last_load_update_tick;
+	this_rq->last_load_update_tick = curr_jiffies;
+
+	__update_cpu_load(this_rq, load, pending_updates);
+}
+
+/*
+ * Called from tick_nohz_idle_exit() -- try and fix up the ticks we missed.
+ */
+void update_cpu_load_nohz(void)
+{
+	struct rq *this_rq = this_rq();
+	unsigned long curr_jiffies = READ_ONCE(jiffies);
+	unsigned long pending_updates;
+
+	if (curr_jiffies == this_rq->last_load_update_tick)
+		return;
+
+	raw_spin_lock(&this_rq->lock);
+	pending_updates = curr_jiffies - this_rq->last_load_update_tick;
+	if (pending_updates) {
+		this_rq->last_load_update_tick = curr_jiffies;
+		/*
+		 * We were idle, this means load 0, the current load might be
+		 * !0 due to remote wakeups and the sort.
+		 */
+		__update_cpu_load(this_rq, 0, pending_updates);
+	}
+	raw_spin_unlock(&this_rq->lock);
+}
+#endif /* CONFIG_NO_HZ */
+
+/*
+ * Called from scheduler_tick()
+ */
+void update_cpu_load_active(struct rq *this_rq)
+{
+	unsigned long load = weighted_cpuload(cpu_of(this_rq));
+	/*
+	 * See the mess around update_idle_cpu_load() / update_cpu_load_nohz().
+	 */
+	this_rq->last_load_update_tick = jiffies;
+	__update_cpu_load(this_rq, load, 1);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
@@ -4339,16 +5393,24 @@ static unsigned long target_load(int cpu, int type)
 	return max(rq->cpu_load[type-1], total);
 }
 
+<<<<<<< HEAD
 static unsigned long capacity_of(int cpu)
 {
 	return cpu_rq(cpu)->cpu_capacity;
 }
+=======
+>>>>>>> common/deprecated/android-3.18
 
 static unsigned long cpu_avg_load_per_task(int cpu)
 {
 	struct rq *rq = cpu_rq(cpu);
+<<<<<<< HEAD
 	unsigned long nr_running = ACCESS_ONCE(rq->cfs.h_nr_running);
 	unsigned long load_avg = rq->cfs.runnable_load_avg;
+=======
+	unsigned long nr_running = READ_ONCE(rq->cfs.h_nr_running);
+	unsigned long load_avg = weighted_cpuload(cpu);
+>>>>>>> common/deprecated/android-3.18
 
 	if (nr_running)
 		return load_avg / nr_running;
@@ -4455,19 +5517,38 @@ static long effective_load(struct task_group *tg, int cpu, long wl, long wg)
 		return wl;
 
 	for_each_sched_entity(se) {
+<<<<<<< HEAD
 		long w, W;
 
 		tg = se->my_q->tg;
+=======
+		struct cfs_rq *cfs_rq = se->my_q;
+		long W, w = cfs_rq_load_avg(cfs_rq);
+
+		tg = cfs_rq->tg;
+>>>>>>> common/deprecated/android-3.18
 
 		/*
 		 * W = @wg + \Sum rw_j
 		 */
+<<<<<<< HEAD
 		W = wg + calc_tg_weight(tg, se->my_q);
+=======
+		W = wg + atomic_long_read(&tg->load_avg);
+
+		/* Ensure \Sum rw_j >= rw_i */
+		W -= cfs_rq->tg_load_avg_contrib;
+		W += w;
+>>>>>>> common/deprecated/android-3.18
 
 		/*
 		 * w = rw_i + @wl
 		 */
+<<<<<<< HEAD
 		w = se->my_q->load.weight + wl;
+=======
+		w += wl;
+>>>>>>> common/deprecated/android-3.18
 
 		/*
 		 * wl = S * s'_i; see (2)
@@ -4488,7 +5569,11 @@ static long effective_load(struct task_group *tg, int cpu, long wl, long wg)
 		/*
 		 * wl = dw_i = S * (s'_i - s_i); see (3)
 		 */
+<<<<<<< HEAD
 		wl -= se->load.weight;
+=======
+		wl -= se->avg.load_avg;
+>>>>>>> common/deprecated/android-3.18
 
 		/*
 		 * Recursively apply this logic to all parent groups to compute
@@ -4511,6 +5596,7 @@ static long effective_load(struct task_group *tg, int cpu, long wl, long wg)
 
 #endif
 
+<<<<<<< HEAD
 static int wake_wide(struct task_struct *p)
 {
 	int factor = this_cpu_read(sd_llc_size);
@@ -4533,6 +5619,422 @@ static int wake_wide(struct task_struct *p)
 	return 0;
 }
 
+=======
+/*
+ * Returns the current capacity of cpu after applying both
+ * cpu and freq scaling.
+ */
+unsigned long capacity_curr_of(int cpu)
+{
+	return cpu_rq(cpu)->cpu_capacity_orig *
+	       arch_scale_freq_capacity(NULL, cpu)
+	       >> SCHED_CAPACITY_SHIFT;
+}
+
+static inline bool energy_aware(void)
+{
+	return sched_feat(ENERGY_AWARE);
+}
+
+struct energy_env {
+	struct sched_group	*sg_top;
+	struct sched_group	*sg_cap;
+	int			cap_idx;
+	int			util_delta;
+	int			src_cpu;
+	int			dst_cpu;
+	int			energy;
+	int			payoff;
+	struct task_struct	*task;
+	struct {
+		int before;
+		int after;
+		int delta;
+		int diff;
+	} nrg;
+	struct {
+		int before;
+		int after;
+		int delta;
+	} cap;
+};
+
+/*
+ * __cpu_norm_util() returns the cpu util relative to a specific capacity,
+ * i.e. it's busy ratio, in the range [0..SCHED_LOAD_SCALE] which is useful for
+ * energy calculations. Using the scale-invariant util returned by
+ * cpu_util() and approximating scale-invariant util by:
+ *
+ *   util ~ (curr_freq/max_freq)*1024 * capacity_orig/1024 * running_time/time
+ *
+ * the normalized util can be found using the specific capacity.
+ *
+ *   capacity = capacity_orig * curr_freq/max_freq
+ *
+ *   norm_util = running_time/time ~ util/capacity
+ */
+static unsigned long __cpu_norm_util(int cpu, unsigned long capacity, int delta)
+{
+	int util = __cpu_util(cpu, delta);
+
+	if (util >= capacity)
+		return SCHED_CAPACITY_SCALE;
+
+	return (util << SCHED_CAPACITY_SHIFT)/capacity;
+}
+
+static int calc_util_delta(struct energy_env *eenv, int cpu)
+{
+	if (cpu == eenv->src_cpu)
+		return -eenv->util_delta;
+	if (cpu == eenv->dst_cpu)
+		return eenv->util_delta;
+	return 0;
+}
+
+static
+unsigned long group_max_util(struct energy_env *eenv)
+{
+	int i, delta;
+	unsigned long max_util = 0;
+
+	for_each_cpu(i, sched_group_cpus(eenv->sg_cap)) {
+		delta = calc_util_delta(eenv, i);
+		max_util = max(max_util, __cpu_util(i, delta));
+	}
+
+	return max_util;
+}
+
+/*
+ * group_norm_util() returns the approximated group util relative to it's
+ * current capacity (busy ratio) in the range [0..SCHED_LOAD_SCALE] for use in
+ * energy calculations. Since task executions may or may not overlap in time in
+ * the group the true normalized util is between max(cpu_norm_util(i)) and
+ * sum(cpu_norm_util(i)) when iterating over all cpus in the group, i. The
+ * latter is used as the estimate as it leads to a more pessimistic energy
+ * estimate (more busy).
+ */
+static unsigned
+long group_norm_util(struct energy_env *eenv, struct sched_group *sg)
+{
+	int i, delta;
+	unsigned long util_sum = 0;
+	unsigned long capacity = sg->sge->cap_states[eenv->cap_idx].cap;
+
+	for_each_cpu(i, sched_group_cpus(sg)) {
+		delta = calc_util_delta(eenv, i);
+		util_sum += __cpu_norm_util(i, capacity, delta);
+	}
+
+	if (util_sum > SCHED_CAPACITY_SCALE)
+		return SCHED_CAPACITY_SCALE;
+	return util_sum;
+}
+
+static int find_new_capacity(struct energy_env *eenv,
+	const struct sched_group_energy * const sge)
+{
+	int idx, max_idx = sge->nr_cap_states - 1;
+	unsigned long util = group_max_util(eenv);
+
+	/* default is max_cap if we don't find a match */
+	eenv->cap_idx = max_idx;
+
+	for (idx = 0; idx < sge->nr_cap_states; idx++) {
+		if (sge->cap_states[idx].cap >= util) {
+			eenv->cap_idx = idx;
+			break;
+		}
+	}
+
+	return eenv->cap_idx;
+}
+
+static int group_idle_state(struct sched_group *sg)
+{
+	int i, state = INT_MAX;
+
+	/* Find the shallowest idle state in the sched group. */
+	for_each_cpu(i, sched_group_cpus(sg))
+		state = min(state, idle_get_state_idx(cpu_rq(i)));
+
+	/* Take non-cpuidle idling into account (active idle/arch_cpu_idle()) */
+	state++;
+
+	return state;
+}
+
+/*
+ * sched_group_energy(): Computes the absolute energy consumption of cpus
+ * belonging to the sched_group including shared resources shared only by
+ * members of the group. Iterates over all cpus in the hierarchy below the
+ * sched_group starting from the bottom working it's way up before going to
+ * the next cpu until all cpus are covered at all levels. The current
+ * implementation is likely to gather the same util statistics multiple times.
+ * This can probably be done in a faster but more complex way.
+ * Note: sched_group_energy() may fail when racing with sched_domain updates.
+ */
+static int sched_group_energy(struct energy_env *eenv)
+{
+	struct sched_domain *sd;
+	int cpu, total_energy = 0;
+	struct cpumask visit_cpus;
+	struct sched_group *sg;
+
+	WARN_ON(!eenv->sg_top->sge);
+
+	cpumask_copy(&visit_cpus, sched_group_cpus(eenv->sg_top));
+
+	while (!cpumask_empty(&visit_cpus)) {
+		struct sched_group *sg_shared_cap = NULL;
+
+		cpu = cpumask_first(&visit_cpus);
+
+		/*
+		 * Is the group utilization affected by cpus outside this
+		 * sched_group?
+		 */
+		sd = rcu_dereference(per_cpu(sd_scs, cpu));
+
+		if (!sd)
+			/*
+			 * We most probably raced with hotplug; returning a
+			 * wrong energy estimation is better than entering an
+			 * infinite loop.
+			 */
+			return -EINVAL;
+
+		if (sd->parent)
+			sg_shared_cap = sd->parent->groups;
+
+		for_each_domain(cpu, sd) {
+			sg = sd->groups;
+
+			/* Has this sched_domain already been visited? */
+			if (sd->child && group_first_cpu(sg) != cpu)
+				break;
+
+			do {
+				unsigned long group_util;
+				int sg_busy_energy, sg_idle_energy;
+				int cap_idx, idle_idx;
+
+				if (sg_shared_cap && sg_shared_cap->group_weight >= sg->group_weight)
+					eenv->sg_cap = sg_shared_cap;
+				else
+					eenv->sg_cap = sg;
+
+				cap_idx = find_new_capacity(eenv, sg->sge);
+
+				if (sg->group_weight == 1) {
+					/* Remove capacity of src CPU (before task move) */
+					if (eenv->util_delta == 0 &&
+					    cpumask_test_cpu(eenv->src_cpu, sched_group_cpus(sg))) {
+						eenv->cap.before = sg->sge->cap_states[cap_idx].cap;
+						eenv->cap.delta -= eenv->cap.before;
+					}
+					/* Add capacity of dst CPU  (after task move) */
+					if (eenv->util_delta != 0 &&
+					    cpumask_test_cpu(eenv->dst_cpu, sched_group_cpus(sg))) {
+						eenv->cap.after = sg->sge->cap_states[cap_idx].cap;
+						eenv->cap.delta += eenv->cap.after;
+					}
+				}
+
+				idle_idx = group_idle_state(sg);
+				group_util = group_norm_util(eenv, sg);
+				sg_busy_energy = (group_util * sg->sge->cap_states[cap_idx].power)
+								>> SCHED_CAPACITY_SHIFT;
+				sg_idle_energy = ((SCHED_LOAD_SCALE-group_util)
+								* sg->sge->idle_states[idle_idx].power)
+								>> SCHED_CAPACITY_SHIFT;
+
+				total_energy += sg_busy_energy + sg_idle_energy;
+
+				if (!sd->child)
+					cpumask_xor(&visit_cpus, &visit_cpus, sched_group_cpus(sg));
+
+				if (cpumask_equal(sched_group_cpus(sg), sched_group_cpus(eenv->sg_top)))
+					goto next_cpu;
+
+			} while (sg = sg->next, sg != sd->groups);
+		}
+next_cpu:
+		cpumask_clear_cpu(cpu, &visit_cpus);
+		continue;
+	}
+
+	eenv->energy = total_energy;
+	return 0;
+}
+
+static inline bool cpu_in_sg(struct sched_group *sg, int cpu)
+{
+	return cpu != -1 && cpumask_test_cpu(cpu, sched_group_cpus(sg));
+}
+
+/*
+ * energy_diff(): Estimate the energy impact of changing the utilization
+ * distribution. eenv specifies the change: utilisation amount, source, and
+ * destination cpu. Source or destination cpu may be -1 in which case the
+ * utilization is removed from or added to the system (e.g. task wake-up). If
+ * both are specified, the utilization is migrated.
+ */
+static inline int __energy_diff(struct energy_env *eenv)
+{
+	struct sched_domain *sd;
+	struct sched_group *sg;
+	int sd_cpu = -1, energy_before = 0, energy_after = 0;
+
+	struct energy_env eenv_before = {
+		.util_delta	= 0,
+		.src_cpu	= eenv->src_cpu,
+		.dst_cpu	= eenv->dst_cpu,
+		.nrg		= { 0, 0, 0, 0},
+		.cap		= { 0, 0, 0 },
+	};
+
+	if (eenv->src_cpu == eenv->dst_cpu)
+		return 0;
+
+	sd_cpu = (eenv->src_cpu != -1) ? eenv->src_cpu : eenv->dst_cpu;
+	sd = rcu_dereference(per_cpu(sd_ea, sd_cpu));
+
+	if (!sd)
+		return 0; /* Error */
+
+	sg = sd->groups;
+
+	do {
+		if (cpu_in_sg(sg, eenv->src_cpu) || cpu_in_sg(sg, eenv->dst_cpu)) {
+			eenv_before.sg_top = eenv->sg_top = sg;
+
+			if (sched_group_energy(&eenv_before))
+				return 0; /* Invalid result abort */
+			energy_before += eenv_before.energy;
+
+			/* Keep track of SRC cpu (before) capacity */
+			eenv->cap.before = eenv_before.cap.before;
+			eenv->cap.delta = eenv_before.cap.delta;
+
+			if (sched_group_energy(eenv))
+				return 0; /* Invalid result abort */
+			energy_after += eenv->energy;
+		}
+	} while (sg = sg->next, sg != sd->groups);
+
+	eenv->nrg.before = energy_before;
+	eenv->nrg.after = energy_after;
+	eenv->nrg.diff = eenv->nrg.after - eenv->nrg.before;
+	eenv->payoff = 0;
+
+	trace_sched_energy_diff(eenv->task,
+			eenv->src_cpu, eenv->dst_cpu, eenv->util_delta,
+			eenv->nrg.before, eenv->nrg.after, eenv->nrg.diff,
+			eenv->cap.before, eenv->cap.after, eenv->cap.delta,
+			eenv->nrg.delta, eenv->payoff);
+
+	return eenv->nrg.diff;
+}
+
+#ifdef CONFIG_SCHED_TUNE
+
+struct target_nrg schedtune_target_nrg;
+
+/*
+ * System energy normalization
+ * Returns the normalized value, in the range [0..SCHED_LOAD_SCALE],
+ * corresponding to the specified energy variation.
+ */
+static inline int
+normalize_energy(int energy_diff)
+{
+	u32 normalized_nrg;
+#ifdef CONFIG_SCHED_DEBUG
+	int max_delta;
+
+	/* Check for boundaries */
+	max_delta  = schedtune_target_nrg.max_power;
+	max_delta -= schedtune_target_nrg.min_power;
+	WARN_ON(abs(energy_diff) >= max_delta);
+#endif
+
+	/* Do scaling using positive numbers to increase the range */
+	normalized_nrg = (energy_diff < 0) ? -energy_diff : energy_diff;
+
+	/* Scale by energy magnitude */
+	normalized_nrg <<= SCHED_LOAD_SHIFT;
+
+	/* Normalize on max energy for target platform */
+	normalized_nrg = reciprocal_divide(
+			normalized_nrg, schedtune_target_nrg.rdiv);
+
+	return (energy_diff < 0) ? -normalized_nrg : normalized_nrg;
+}
+
+static inline int
+energy_diff(struct energy_env *eenv)
+{
+	int boost = schedtune_task_boost(eenv->task);
+	int nrg_delta;
+
+	/* Conpute "absolute" energy diff */
+	__energy_diff(eenv);
+
+	/* Return energy diff when boost margin is 0 */
+	if (boost == 0)
+		return eenv->nrg.diff;
+
+	/* Compute normalized energy diff */
+	nrg_delta = normalize_energy(eenv->nrg.diff);
+	eenv->nrg.delta = nrg_delta;
+
+	eenv->payoff = schedtune_accept_deltas(
+			eenv->nrg.delta,
+			eenv->cap.delta,
+			eenv->task);
+
+	/*
+	 * When SchedTune is enabled, the energy_diff() function will return
+	 * the computed energy payoff value. Since the energy_diff() return
+	 * value is expected to be negative by its callers, this evaluation
+	 * function return a negative value each time the evaluation return a
+	 * positive payoff, which is the condition for the acceptance of
+	 * a scheduling decision
+	 */
+	return -eenv->payoff;
+}
+#else /* CONFIG_SCHED_TUNE */
+#define energy_diff(eenv) __energy_diff(eenv)
+#endif
+
+/*
+ * Detect M:N waker/wakee relationships via a switching-frequency heuristic.
+ * A waker of many should wake a different task than the one last awakened
+ * at a frequency roughly N times higher than one of its wakees.  In order
+ * to determine whether we should let the load spread vs consolodating to
+ * shared cache, we look for a minimum 'flip' frequency of llc_size in one
+ * partner, and a factor of lls_size higher frequency in the other.  With
+ * both conditions met, we can be relatively sure that the relationship is
+ * non-monogamous, with partner count exceeding socket size.  Waker/wakee
+ * being client/server, worker/dispatcher, interrupt source or whatever is
+ * irrelevant, spread criteria is apparent partner count exceeds socket size.
+ */
+static int wake_wide(struct task_struct *p)
+{
+	unsigned int master = current->wakee_flips;
+	unsigned int slave = p->wakee_flips;
+	int factor = this_cpu_read(sd_llc_size);
+
+	if (master < slave)
+		swap(master, slave);
+	if (slave < factor || master < slave * factor)
+		return 0;
+	return 1;
+}
+
+>>>>>>> common/deprecated/android-3.18
 static int wake_affine(struct sched_domain *sd, struct task_struct *p, int sync)
 {
 	s64 this_load, load;
@@ -4542,6 +6044,7 @@ static int wake_affine(struct sched_domain *sd, struct task_struct *p, int sync)
 	unsigned long weight;
 	int balanced;
 
+<<<<<<< HEAD
 	/*
 	 * If we wake multiple tasks be careful to not bounce
 	 * ourselves around too much.
@@ -4549,6 +6052,8 @@ static int wake_affine(struct sched_domain *sd, struct task_struct *p, int sync)
 	if (wake_wide(p))
 		return 0;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	idx	  = sd->wake_idx;
 	this_cpu  = smp_processor_id();
 	prev_cpu  = task_cpu(p);
@@ -4562,14 +6067,22 @@ static int wake_affine(struct sched_domain *sd, struct task_struct *p, int sync)
 	 */
 	if (sync) {
 		tg = task_group(current);
+<<<<<<< HEAD
 		weight = current->se.load.weight;
+=======
+		weight = current->se.avg.load_avg;
+>>>>>>> common/deprecated/android-3.18
 
 		this_load += effective_load(tg, this_cpu, -weight, -weight);
 		load += effective_load(tg, prev_cpu, 0, -weight);
 	}
 
 	tg = task_group(p);
+<<<<<<< HEAD
 	weight = p->se.load.weight;
+=======
+	weight = p->se.avg.load_avg;
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * In low-load situations, where prev_cpu is idle and this_cpu is idle
@@ -4606,6 +6119,163 @@ static int wake_affine(struct sched_domain *sd, struct task_struct *p, int sync)
 	return 1;
 }
 
+<<<<<<< HEAD
+=======
+static inline unsigned long task_util(struct task_struct *p)
+{
+#ifdef CONFIG_SCHED_WALT
+	if (!walt_disabled && sysctl_sched_use_walt_task_util) {
+		unsigned long demand = p->ravg.demand;
+		return (demand << 10) / walt_ravg_window;
+	}
+#endif
+	return p->se.avg.util_avg;
+}
+
+unsigned int capacity_margin = 1280; /* ~20% margin */
+
+static inline unsigned long boosted_task_util(struct task_struct *task);
+
+static inline bool __task_fits(struct task_struct *p, int cpu, int util)
+{
+	unsigned long capacity = capacity_of(cpu);
+
+	util += boosted_task_util(p);
+
+	return (capacity * 1024) > (util * capacity_margin);
+}
+
+static inline bool task_fits_max(struct task_struct *p, int cpu)
+{
+	unsigned long capacity = capacity_of(cpu);
+	unsigned long max_capacity = cpu_rq(cpu)->rd->max_cpu_capacity.val;
+
+	if (capacity == max_capacity)
+		return true;
+
+	if (capacity * capacity_margin > max_capacity * 1024)
+		return true;
+
+	return __task_fits(p, cpu, 0);
+}
+
+static inline bool task_fits_spare(struct task_struct *p, int cpu)
+{
+	return __task_fits(p, cpu, cpu_util(cpu));
+}
+
+static bool cpu_overutilized(int cpu)
+{
+	return (capacity_of(cpu) * 1024) < (cpu_util(cpu) * capacity_margin);
+}
+
+#ifdef CONFIG_SCHED_TUNE
+
+static long
+schedtune_margin(unsigned long signal, long boost)
+{
+	long long margin = 0;
+
+	/*
+	 * Signal proportional compensation (SPC)
+	 *
+	 * The Boost (B) value is used to compute a Margin (M) which is
+	 * proportional to the complement of the original Signal (S):
+	 *   M = B * (SCHED_LOAD_SCALE - S), if B is positive
+	 *   M = B * S, if B is negative
+	 * The obtained M could be used by the caller to "boost" S.
+	 */
+	if (boost >= 0) {
+		margin  = SCHED_LOAD_SCALE - signal;
+		margin *= boost;
+	} else
+		margin = -signal * boost;
+	/*
+	 * Fast integer division by constant:
+	 *  Constant   :                 (C) = 100
+	 *  Precision  : 0.1%            (P) = 0.1
+	 *  Reference  : C * 100 / P     (R) = 100000
+	 *
+	 * Thus:
+	 *  Shift bits : ceil(log(R,2))  (S) = 17
+	 *  Mult const : round(2^S/C)    (M) = 1311
+	 *
+	 *
+	 */
+	margin  *= 1311;
+	margin >>= 17;
+
+	if (boost < 0)
+		margin *= -1;
+	return margin;
+}
+
+static inline int
+schedtune_cpu_margin(unsigned long util, int cpu)
+{
+	int boost = schedtune_cpu_boost(cpu);
+
+	if (boost == 0)
+		return 0;
+
+	return schedtune_margin(util, boost);
+}
+
+static inline long
+schedtune_task_margin(struct task_struct *task)
+{
+	int boost = schedtune_task_boost(task);
+	unsigned long util;
+	long margin;
+
+	if (boost == 0)
+		return 0;
+
+	util = task_util(task);
+	margin = schedtune_margin(util, boost);
+
+	return margin;
+}
+
+#else /* CONFIG_SCHED_TUNE */
+
+static inline int
+schedtune_cpu_margin(unsigned long util, int cpu)
+{
+	return 0;
+}
+
+static inline int
+schedtune_task_margin(struct task_struct *task)
+{
+	return 0;
+}
+
+#endif /* CONFIG_SCHED_TUNE */
+
+static inline unsigned long
+boosted_cpu_util(int cpu)
+{
+	unsigned long util = cpu_util(cpu);
+	long margin = schedtune_cpu_margin(util, cpu);
+
+	trace_sched_boost_cpu(cpu, util, margin);
+
+	return util + margin;
+}
+
+static inline unsigned long
+boosted_task_util(struct task_struct *task)
+{
+	unsigned long util = task_util(task);
+	long margin = schedtune_task_margin(task);
+
+	trace_sched_boost_task(task, util, margin);
+
+	return util + margin;
+}
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * find_idlest_group finds and returns the least busy CPU group within the
  * domain.
@@ -4615,7 +6285,14 @@ find_idlest_group(struct sched_domain *sd, struct task_struct *p,
 		  int this_cpu, int sd_flag)
 {
 	struct sched_group *idlest = NULL, *group = sd->groups;
+<<<<<<< HEAD
 	unsigned long min_load = ULONG_MAX, this_load = 0;
+=======
+	struct sched_group *fit_group = NULL, *spare_group = NULL;
+	unsigned long min_load = ULONG_MAX, this_load = 0;
+	unsigned long fit_capacity = ULONG_MAX;
+	unsigned long max_spare_capacity = capacity_margin - SCHED_LOAD_SCALE;
+>>>>>>> common/deprecated/android-3.18
 	int load_idx = sd->forkexec_idx;
 	int imbalance = 100 + (sd->imbalance_pct-100)/2;
 
@@ -4623,7 +6300,11 @@ find_idlest_group(struct sched_domain *sd, struct task_struct *p,
 		load_idx = sd->wake_idx;
 
 	do {
+<<<<<<< HEAD
 		unsigned long load, avg_load;
+=======
+		unsigned long load, avg_load, spare_capacity;
+>>>>>>> common/deprecated/android-3.18
 		int local_group;
 		int i;
 
@@ -4646,6 +6327,28 @@ find_idlest_group(struct sched_domain *sd, struct task_struct *p,
 				load = target_load(i, load_idx);
 
 			avg_load += load;
+<<<<<<< HEAD
+=======
+
+			/*
+			 * Look for most energy-efficient group that can fit
+			 * that can fit the task.
+			 */
+			if (capacity_of(i) < fit_capacity && task_fits_spare(p, i)) {
+				fit_capacity = capacity_of(i);
+				fit_group = group;
+			}
+
+			/*
+			 * Look for group which has most spare capacity on a
+			 * single cpu.
+			 */
+			spare_capacity = capacity_of(i) - cpu_util(i);
+			if (spare_capacity > max_spare_capacity) {
+				max_spare_capacity = spare_capacity;
+				spare_group = group;
+			}
+>>>>>>> common/deprecated/android-3.18
 		}
 
 		/* Adjust by relative CPU capacity of the group */
@@ -4659,6 +6362,15 @@ find_idlest_group(struct sched_domain *sd, struct task_struct *p,
 		}
 	} while (group = group->next, group != sd->groups);
 
+<<<<<<< HEAD
+=======
+	if (fit_group)
+		return fit_group;
+
+	if (spare_group)
+		return spare_group;
+
+>>>>>>> common/deprecated/android-3.18
 	if (!idlest || 100*this_load < imbalance*min_load)
 		return NULL;
 	return idlest;
@@ -4679,7 +6391,11 @@ find_idlest_cpu(struct sched_group *group, struct task_struct *p, int this_cpu)
 
 	/* Traverse only the allowed CPUs */
 	for_each_cpu_and(i, sched_group_cpus(group), tsk_cpus_allowed(p)) {
+<<<<<<< HEAD
 		if (idle_cpu(i)) {
+=======
+		if (task_fits_spare(p, i)) {
+>>>>>>> common/deprecated/android-3.18
 			struct rq *rq = cpu_rq(i);
 			struct cpuidle_state *idle = idle_get_state(rq);
 			if (idle && idle->exit_latency < min_exit_latency) {
@@ -4691,7 +6407,12 @@ find_idlest_cpu(struct sched_group *group, struct task_struct *p, int this_cpu)
 				min_exit_latency = idle->exit_latency;
 				latest_idle_timestamp = rq->idle_stamp;
 				shallowest_idle_cpu = i;
+<<<<<<< HEAD
 			} else if ((!idle || idle->exit_latency == min_exit_latency) &&
+=======
+			} else if (idle_cpu(i) &&
+				   (!idle || idle->exit_latency == min_exit_latency) &&
+>>>>>>> common/deprecated/android-3.18
 				   rq->idle_stamp > latest_idle_timestamp) {
 				/*
 				 * If equal or no active idle state, then
@@ -4700,6 +6421,16 @@ find_idlest_cpu(struct sched_group *group, struct task_struct *p, int this_cpu)
 				 */
 				latest_idle_timestamp = rq->idle_stamp;
 				shallowest_idle_cpu = i;
+<<<<<<< HEAD
+=======
+			} else if (shallowest_idle_cpu == -1) {
+				/*
+				 * If we haven't found an idle CPU yet
+				 * pick a non-idle one that can fit the task as
+				 * fallback.
+				 */
+				shallowest_idle_cpu = i;
+>>>>>>> common/deprecated/android-3.18
 			}
 		} else {
 			load = weighted_cpuload(i);
@@ -4721,6 +6452,7 @@ static int select_idle_sibling(struct task_struct *p, int target)
 	struct sched_domain *sd;
 	struct sched_group *sg;
 	int i = task_cpu(p);
+<<<<<<< HEAD
 
 	if (idle_cpu(target))
 		return target;
@@ -4730,6 +6462,22 @@ static int select_idle_sibling(struct task_struct *p, int target)
 	 */
 	if (i != target && cpus_share_cache(i, target) && idle_cpu(i))
 		return i;
+=======
+	int best_idle = -1;
+	int best_idle_cstate = -1;
+	int best_idle_capacity = INT_MAX;
+
+	if (!sysctl_sched_cstate_aware) {
+		if (idle_cpu(target))
+			return target;
+
+		/*
+		 * If the prevous cpu is cache affine and idle, don't be stupid.
+		 */
+		if (i != target && cpus_share_cache(i, target) && idle_cpu(i))
+			return i;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * Otherwise, iterate the domains and find an elegible idle cpu.
@@ -4742,6 +6490,7 @@ static int select_idle_sibling(struct task_struct *p, int target)
 						tsk_cpus_allowed(p)))
 				goto next;
 
+<<<<<<< HEAD
 			for_each_cpu(i, sched_group_cpus(sg)) {
 				if (i == target || !idle_cpu(i))
 					goto next;
@@ -4750,14 +6499,51 @@ static int select_idle_sibling(struct task_struct *p, int target)
 			target = cpumask_first_and(sched_group_cpus(sg),
 					tsk_cpus_allowed(p));
 			goto done;
+=======
+			if (sysctl_sched_cstate_aware) {
+				for_each_cpu_and(i, tsk_cpus_allowed(p), sched_group_cpus(sg)) {
+					struct rq *rq = cpu_rq(i);
+					int idle_idx = idle_get_state_idx(rq);
+					unsigned long new_usage = boosted_task_util(p);
+					unsigned long capacity_orig = capacity_orig_of(i);
+					if (new_usage > capacity_orig || !idle_cpu(i))
+						goto next;
+
+					if (i == target && new_usage <= capacity_curr_of(target))
+						return target;
+
+					if (best_idle < 0 || (idle_idx < best_idle_cstate && capacity_orig <= best_idle_capacity)) {
+						best_idle = i;
+						best_idle_cstate = idle_idx;
+						best_idle_capacity = capacity_orig;
+					}
+				}
+			} else {
+				for_each_cpu(i, sched_group_cpus(sg)) {
+					if (i == target || !idle_cpu(i))
+						goto next;
+				}
+
+				target = cpumask_first_and(sched_group_cpus(sg),
+					tsk_cpus_allowed(p));
+				goto done;
+			}
+>>>>>>> common/deprecated/android-3.18
 next:
 			sg = sg->next;
 		} while (sg != sd->groups);
 	}
+<<<<<<< HEAD
+=======
+	if (best_idle > 0)
+		target = best_idle;
+
+>>>>>>> common/deprecated/android-3.18
 done:
 	return target;
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_SCHED_HMP
 /*
  * Heterogenous multiprocessor (HMP) optimizations
@@ -5625,6 +7411,228 @@ static inline unsigned int hmp_offload_down(int cpu, struct sched_entity *se)
 #endif /* CONFIG_SCHED_HMP */
 
 /*
+=======
+static inline int find_best_target(struct task_struct *p, bool boosted, bool prefer_idle)
+{
+	int iter_cpu;
+	int target_cpu = -1;
+	int target_util = 0;
+	int backup_capacity = 0;
+	int best_idle_cpu = -1;
+	int best_idle_cstate = INT_MAX;
+	int backup_cpu = -1;
+	unsigned long task_util_boosted, new_util;
+
+	task_util_boosted = boosted_task_util(p);
+	for (iter_cpu = 0; iter_cpu < NR_CPUS; iter_cpu++) {
+		int cur_capacity;
+		struct rq *rq;
+		int idle_idx;
+
+		/*
+		 * Iterate from higher cpus for boosted tasks.
+		 */
+		int i = boosted ? NR_CPUS-iter_cpu-1 : iter_cpu;
+
+		if (!cpu_online(i) || !cpumask_test_cpu(i, tsk_cpus_allowed(p)))
+			continue;
+
+		/*
+		 * p's blocked utilization is still accounted for on prev_cpu
+		 * so prev_cpu will receive a negative bias due to the double
+		 * accounting. However, the blocked utilization may be zero.
+		 */
+		new_util = cpu_util(i) + task_util_boosted;
+
+		/*
+		 * Ensure minimum capacity to grant the required boost.
+		 * The target CPU can be already at a capacity level higher
+		 * than the one required to boost the task.
+		 */
+		if (new_util > capacity_orig_of(i))
+			continue;
+
+#ifdef CONFIG_SCHED_WALT
+		if (walt_cpu_high_irqload(i))
+			continue;
+#endif
+		/*
+		 * Unconditionally favoring tasks that prefer idle cpus to
+		 * improve latency.
+		 */
+		if (idle_cpu(i) && prefer_idle) {
+			if (best_idle_cpu < 0)
+				best_idle_cpu = i;
+			continue;
+		}
+
+		cur_capacity = capacity_curr_of(i);
+		rq = cpu_rq(i);
+		idle_idx = idle_get_state_idx(rq);
+
+		if (new_util < cur_capacity) {
+			if (cpu_rq(i)->nr_running) {
+				if (prefer_idle) {
+					/* Find a target cpu with highest
+					 * utilization.
+					 */
+					if (target_util == 0 ||
+						target_util < new_util) {
+						target_cpu = i;
+						target_util = new_util;
+					}
+				} else {
+					/* Find a target cpu with lowest
+					 * utilization.
+					 */
+					if (target_util == 0 ||
+						target_util > new_util) {
+						target_cpu = i;
+						target_util = new_util;
+					}
+				}
+			} else if (!prefer_idle) {
+				if (best_idle_cpu < 0 ||
+					(sysctl_sched_cstate_aware &&
+						best_idle_cstate > idle_idx)) {
+					best_idle_cstate = idle_idx;
+					best_idle_cpu = i;
+				}
+			}
+		} else if (backup_capacity == 0 ||
+				backup_capacity > cur_capacity) {
+			// Find a backup cpu with least capacity.
+			backup_capacity = cur_capacity;
+			backup_cpu = i;
+		}
+	}
+
+	if (prefer_idle && best_idle_cpu >= 0)
+		target_cpu = best_idle_cpu;
+	else if (target_cpu < 0)
+		target_cpu = best_idle_cpu >= 0 ? best_idle_cpu : backup_cpu;
+
+	return target_cpu;
+}
+
+static int energy_aware_wake_cpu(struct task_struct *p, int target, int sync)
+{
+	struct sched_domain *sd;
+	struct sched_group *sg, *sg_target;
+	int target_max_cap = INT_MAX;
+	int target_cpu = task_cpu(p);
+	unsigned long task_util_boosted, new_util;
+	int i;
+
+	if (sysctl_sched_sync_hint_enable && sync) {
+		int cpu = smp_processor_id();
+		cpumask_t search_cpus;
+		cpumask_and(&search_cpus, tsk_cpus_allowed(p), cpu_online_mask);
+		if (cpumask_test_cpu(cpu, &search_cpus))
+			return cpu;
+	}
+
+	sd = rcu_dereference(per_cpu(sd_ea, task_cpu(p)));
+
+	if (!sd)
+		return target;
+
+	sg = sd->groups;
+	sg_target = sg;
+
+	if (sysctl_sched_is_big_little) {
+
+		/*
+		 * Find group with sufficient capacity. We only get here if no cpu is
+		 * overutilized. We may end up overutilizing a cpu by adding the task,
+		 * but that should not be any worse than select_idle_sibling().
+		 * load_balance() should sort it out later as we get above the tipping
+		 * point.
+		 */
+		do {
+			/* Assuming all cpus are the same in group */
+			int max_cap_cpu = group_first_cpu(sg);
+
+			/*
+			 * Assume smaller max capacity means more energy-efficient.
+			 * Ideally we should query the energy model for the right
+			 * answer but it easily ends up in an exhaustive search.
+			 */
+			if (capacity_of(max_cap_cpu) < target_max_cap &&
+			    task_fits_max(p, max_cap_cpu)) {
+				sg_target = sg;
+				target_max_cap = capacity_of(max_cap_cpu);
+			}
+		} while (sg = sg->next, sg != sd->groups);
+
+		task_util_boosted = boosted_task_util(p);
+		/* Find cpu with sufficient capacity */
+		for_each_cpu_and(i, tsk_cpus_allowed(p), sched_group_cpus(sg_target)) {
+			/*
+			 * p's blocked utilization is still accounted for on prev_cpu
+			 * so prev_cpu will receive a negative bias due to the double
+			 * accounting. However, the blocked utilization may be zero.
+			 */
+			new_util = cpu_util(i) + task_util_boosted;
+
+			/*
+			 * Ensure minimum capacity to grant the required boost.
+			 * The target CPU can be already at a capacity level higher
+			 * than the one required to boost the task.
+			 */
+			if (new_util > capacity_orig_of(i))
+				continue;
+
+			if (new_util < capacity_curr_of(i)) {
+				target_cpu = i;
+				if (cpu_rq(i)->nr_running)
+					break;
+			}
+
+			/* cpu has capacity at higher OPP, keep it as fallback */
+			if (target_cpu == task_cpu(p))
+				target_cpu = i;
+		}
+	} else {
+		/*
+		 * Find a cpu with sufficient capacity
+		 */
+#ifdef CONFIG_CGROUP_SCHEDTUNE
+		bool boosted = schedtune_task_boost(p) > 0;
+		bool prefer_idle = schedtune_prefer_idle(p) > 0;
+#else
+		bool boosted = 0;
+		bool prefer_idle = 0;
+#endif
+		int tmp_target = find_best_target(p, boosted, prefer_idle);
+		if (tmp_target >= 0) {
+			target_cpu = tmp_target;
+			if ((boosted || prefer_idle) && idle_cpu(target_cpu))
+				return target_cpu;
+		}
+	}
+
+	if (target_cpu != task_cpu(p)) {
+		struct energy_env eenv = {
+			.util_delta	= task_util(p),
+			.src_cpu	= task_cpu(p),
+			.dst_cpu	= target_cpu,
+			.task		= p,
+		};
+
+		/* Not enough spare capacity on previous cpu */
+		if (cpu_overutilized(task_cpu(p)))
+			return target_cpu;
+
+		if (energy_diff(&eenv) >= 0)
+			return task_cpu(p);
+	}
+
+	return target_cpu;
+}
+
+/*
+>>>>>>> common/deprecated/android-3.18
  * select_task_rq_fair: Select target runqueue for the waking task in domains
  * that have the 'sd_flag' flag set. In practice, this is SD_BALANCE_WAKE,
  * SD_BALANCE_FORK, or SD_BALANCE_EXEC.
@@ -5641,7 +7649,11 @@ select_task_rq_fair(struct task_struct *p, int prev_cpu, int sd_flag, int wake_f
 {
 	struct sched_domain *tmp, *affine_sd = NULL, *sd = NULL;
 	int cpu = smp_processor_id();
+<<<<<<< HEAD
 	int new_cpu = cpu;
+=======
+	int new_cpu = prev_cpu;
+>>>>>>> common/deprecated/android-3.18
 	int want_affine = 0;
 	int sync = wake_flags & WF_SYNC;
 
@@ -5649,12 +7661,22 @@ select_task_rq_fair(struct task_struct *p, int prev_cpu, int sd_flag, int wake_f
 		return prev_cpu;
 
 	if (sd_flag & SD_BALANCE_WAKE)
+<<<<<<< HEAD
 		want_affine = cpumask_test_cpu(cpu, tsk_cpus_allowed(p));
+=======
+		want_affine = (!wake_wide(p) && task_fits_max(p, cpu) &&
+			      cpumask_test_cpu(cpu, tsk_cpus_allowed(p))) ||
+			      energy_aware();
+>>>>>>> common/deprecated/android-3.18
 
 	rcu_read_lock();
 	for_each_domain(cpu, tmp) {
 		if (!(tmp->flags & SD_LOAD_BALANCE))
+<<<<<<< HEAD
 			continue;
+=======
+			break;
+>>>>>>> common/deprecated/android-3.18
 
 		/*
 		 * If both cpu and prev_cpu are part of this domain,
@@ -5668,6 +7690,7 @@ select_task_rq_fair(struct task_struct *p, int prev_cpu, int sd_flag, int wake_f
 
 		if (tmp->flags & sd_flag)
 			sd = tmp;
+<<<<<<< HEAD
 	}
 
 	if (affine_sd && cpu != prev_cpu && wake_affine(affine_sd, p, sync))
@@ -5679,6 +7702,25 @@ select_task_rq_fair(struct task_struct *p, int prev_cpu, int sd_flag, int wake_f
 	}
 
 	while (sd) {
+=======
+		else if (!want_affine)
+			break;
+	}
+
+	if (affine_sd) {
+		sd = NULL; /* Prefer wake_affine over balance flags */
+		if (cpu != prev_cpu && wake_affine(affine_sd, p, sync))
+			new_cpu = cpu;
+	}
+
+	if (!sd) {
+		if (energy_aware() && !cpu_rq(cpu)->rd->overutilized)
+			new_cpu = energy_aware_wake_cpu(p, prev_cpu, sync);
+		else if (sd_flag & SD_BALANCE_WAKE) /* XXX always ? */
+			new_cpu = select_idle_sibling(p, new_cpu);
+
+	} else while (sd) {
+>>>>>>> common/deprecated/android-3.18
 		struct sched_group *group;
 		int weight;
 
@@ -5712,6 +7754,7 @@ select_task_rq_fair(struct task_struct *p, int prev_cpu, int sd_flag, int wake_f
 		}
 		/* while loop will break here if sd == NULL */
 	}
+<<<<<<< HEAD
 unlock:
 	rcu_read_unlock();
 
@@ -5790,6 +7833,42 @@ migrate_task_rq_fair(struct task_struct *p, int next_cpu)
 	/* We have migrated, no longer consider this task hot */
 	se->exec_start = 0;
 }
+=======
+	rcu_read_unlock();
+
+	return new_cpu;
+}
+
+/*
+ * Called immediately before a task is migrated to a new cpu; task_cpu(p) and
+ * cfs_rq_of(p) references at time of call are still valid and identify the
+ * previous cpu. The caller guarantees p->pi_lock or task_rq(p)->lock is held.
+ */
+static void migrate_task_rq_fair(struct task_struct *p, int next_cpu)
+{
+	/*
+	 * We are supposed to update the task to "current" time, then its up to date
+	 * and ready to go to new CPU/cfs_rq. But we have difficulty in getting
+	 * what current time is, so simply throw away the out-of-date time. This
+	 * will result in the wakee task is less decayed, but giving the wakee more
+	 * load sounds not bad.
+	 */
+	remove_entity_load_avg(&p->se);
+
+	/* Tell new CPU we are migrated */
+	p->se.avg.last_update_time = 0;
+
+	/* We have migrated, no longer consider this task hot */
+	p->se.exec_start = 0;
+}
+
+static void task_dead_fair(struct task_struct *p)
+{
+	remove_entity_load_avg(&p->se);
+}
+#else
+#define task_fits_max(p, cpu) true
+>>>>>>> common/deprecated/android-3.18
 #endif /* CONFIG_SMP */
 
 static unsigned long
@@ -5985,6 +8064,7 @@ again:
 		 * entity, update_curr() will update its vruntime, otherwise
 		 * forget we've ever seen it.
 		 */
+<<<<<<< HEAD
 		if (curr && curr->on_rq)
 			update_curr(cfs_rq);
 		else
@@ -5997,6 +8077,23 @@ again:
 		 */
 		if (unlikely(check_cfs_rq_runtime(cfs_rq)))
 			goto simple;
+=======
+		if (curr) {
+			if (curr->on_rq)
+				update_curr(cfs_rq);
+			else
+				curr = NULL;
+
+			/*
+			 * This call to check_cfs_rq_runtime() will do the
+			 * throttle and dequeue its entity in the parent(s).
+			 * Therefore the 'simple' nr_running test will indeed
+			 * be correct.
+			 */
+			if (unlikely(check_cfs_rq_runtime(cfs_rq)))
+				goto simple;
+		}
+>>>>>>> common/deprecated/android-3.18
 
 		se = pick_next_entity(cfs_rq, curr);
 		cfs_rq = group_cfs_rq(se);
@@ -6033,6 +8130,11 @@ again:
 	if (hrtick_enabled(rq))
 		hrtick_start_fair(rq, p);
 
+<<<<<<< HEAD
+=======
+	rq->misfit_task = !task_fits_max(p, rq->cpu);
+
+>>>>>>> common/deprecated/android-3.18
 	return p;
 simple:
 	cfs_rq = &rq->cfs;
@@ -6054,9 +8156,19 @@ simple:
 	if (hrtick_enabled(rq))
 		hrtick_start_fair(rq, p);
 
+<<<<<<< HEAD
 	return p;
 
 idle:
+=======
+	rq->misfit_task = !task_fits_max(p, rq->cpu);
+
+	return p;
+
+idle:
+	rq->misfit_task = 0;
+
+>>>>>>> common/deprecated/android-3.18
 	new_tasks = idle_balance(rq);
 	/*
 	 * Because idle_balance() releases (and re-acquires) rq->lock, it is
@@ -6107,11 +8219,14 @@ static void yield_task_fair(struct rq *rq)
 
 	if (curr->policy != SCHED_BATCH) {
 		update_rq_clock(rq);
+<<<<<<< HEAD
 
 #ifdef CONFIG_SCHED_HMP
 		if (hmp_aggressive_yield && cfs_rq->curr)
 			cfs_rq->curr->exec_start -= YIELD_CORRECTION_TIME;
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 		/*
 		 * Update run-time statistics of the 'current'.
 		 */
@@ -6266,6 +8381,16 @@ static unsigned long __read_mostly max_load_balance_interval = HZ/10;
 
 enum fbq_type { regular, remote, all };
 
+<<<<<<< HEAD
+=======
+enum group_type {
+	group_other = 0,
+	group_misfit_task,
+	group_imbalanced,
+	group_overloaded,
+};
+
+>>>>>>> common/deprecated/android-3.18
 #define LBF_ALL_PINNED	0x01
 #define LBF_NEED_BREAK	0x02
 #define LBF_DST_PINNED  0x04
@@ -6284,6 +8409,10 @@ struct lb_env {
 	int			new_dst_cpu;
 	enum cpu_idle_type	idle;
 	long			imbalance;
+<<<<<<< HEAD
+=======
+	unsigned int		src_grp_nr_running;
+>>>>>>> common/deprecated/android-3.18
 	/* The set of CPUs under consideration for load-balancing */
 	struct cpumask		*cpus;
 
@@ -6294,6 +8423,7 @@ struct lb_env {
 	unsigned int		loop_max;
 
 	enum fbq_type		fbq_type;
+<<<<<<< HEAD
 	struct list_head	tasks;
 };
 
@@ -6311,6 +8441,12 @@ static void __maybe_unused move_task(struct task_struct *p, struct lb_env *env)
 }
 #endif
 
+=======
+	enum group_type		busiest_group_type;
+	struct list_head	tasks;
+};
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Is this task likely cache-hot:
  */
@@ -6522,7 +8658,13 @@ static void detach_task(struct task_struct *p, struct lb_env *env)
 
 	deactivate_task(env->src_rq, p, 0);
 	p->on_rq = TASK_ON_RQ_MIGRATING;
+<<<<<<< HEAD
 	set_task_cpu(p, env->dst_cpu);
+=======
+	double_lock_balance(env->src_rq, env->dst_rq);
+	set_task_cpu(p, env->dst_cpu);
+	double_unlock_balance(env->src_rq, env->dst_rq);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
@@ -6576,6 +8718,16 @@ static int detach_tasks(struct lb_env *env)
 		return 0;
 
 	while (!list_empty(tasks)) {
+<<<<<<< HEAD
+=======
+		/*
+		 * We don't want to steal all, otherwise we may be treated likewise,
+		 * which could at worst lead to a livelock crash.
+		 */
+		if (env->idle != CPU_NOT_IDLE && env->src_rq->nr_running <= 1)
+			break;
+
+>>>>>>> common/deprecated/android-3.18
 		p = list_first_entry(tasks, struct task_struct, se.group_node);
 
 		env->loop++;
@@ -6593,7 +8745,19 @@ static int detach_tasks(struct lb_env *env)
 		if (!can_migrate_task(p, env))
 			goto next;
 
+<<<<<<< HEAD
 		load = task_h_load(p);
+=======
+		/*
+		 * Depending of the number of CPUs and tasks and the
+		 * cgroup hierarchy, task_h_load() can return a null
+		 * value. Make sure that env->imbalance decreases
+		 * otherwise detach_tasks() will stop only after
+		 * detaching up to loop_max tasks.
+		 */
+		load = max_t(unsigned long, task_h_load(p), 1);
+
+>>>>>>> common/deprecated/android-3.18
 
 		if (sched_feat(LB_MIN) && load < 16 && !env->sd->nr_balance_failed)
 			goto next;
@@ -6660,6 +8824,13 @@ static void attach_one_task(struct rq *rq, struct task_struct *p)
 {
 	raw_spin_lock(&rq->lock);
 	attach_task(rq, p);
+<<<<<<< HEAD
+=======
+	/*
+	 * We want to potentially raise target_cpu's OPP.
+	 */
+	update_capacity_of(cpu_of(rq));
+>>>>>>> common/deprecated/android-3.18
 	raw_spin_unlock(&rq->lock);
 }
 
@@ -6681,10 +8852,19 @@ static void attach_tasks(struct lb_env *env)
 		attach_task(env->dst_rq, p);
 	}
 
+<<<<<<< HEAD
+=======
+	/*
+	 * We want to potentially raise env.dst_cpu's OPP.
+	 */
+	update_capacity_of(env->dst_cpu);
+
+>>>>>>> common/deprecated/android-3.18
 	raw_spin_unlock(&env->dst_rq->lock);
 }
 
 #ifdef CONFIG_FAIR_GROUP_SCHED
+<<<<<<< HEAD
 /*
  * update tg->load_weight by folding this cpu's load_avg
  */
@@ -6718,6 +8898,8 @@ static void __update_blocked_averages_cpu(struct task_group *tg, int cpu)
 	}
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static void update_blocked_averages(int cpu)
 {
 	struct rq *rq = cpu_rq(cpu);
@@ -6726,11 +8908,16 @@ static void update_blocked_averages(int cpu)
 
 	raw_spin_lock_irqsave(&rq->lock, flags);
 	update_rq_clock(rq);
+<<<<<<< HEAD
+=======
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Iterates the task_group tree in a bottom up fashion, see
 	 * list_add_leaf_cfs_rq() for details.
 	 */
 	for_each_leaf_cfs_rq(rq, cfs_rq) {
+<<<<<<< HEAD
 		/*
 		 * Note: We may want to consider periodically releasing
 		 * rq->lock about these updates so that creating many task
@@ -6739,6 +8926,15 @@ static void update_blocked_averages(int cpu)
 		__update_blocked_averages_cpu(cfs_rq->tg, rq->cpu);
 	}
 
+=======
+		/* throttled entities do not contribute to load */
+		if (throttled_hierarchy(cfs_rq))
+			continue;
+
+		if (update_cfs_rq_load_avg(cfs_rq_clock_task(cfs_rq), cfs_rq))
+			update_tg_load_avg(cfs_rq, 0);
+	}
+>>>>>>> common/deprecated/android-3.18
 	raw_spin_unlock_irqrestore(&rq->lock, flags);
 }
 
@@ -6757,15 +8953,23 @@ static void update_cfs_rq_h_load(struct cfs_rq *cfs_rq)
 	if (cfs_rq->last_h_load_update == now)
 		return;
 
+<<<<<<< HEAD
 	cfs_rq->h_load_next = NULL;
 	for_each_sched_entity(se) {
 		cfs_rq = cfs_rq_of(se);
 		cfs_rq->h_load_next = se;
+=======
+	WRITE_ONCE(cfs_rq->h_load_next, NULL);
+	for_each_sched_entity(se) {
+		cfs_rq = cfs_rq_of(se);
+		WRITE_ONCE(cfs_rq->h_load_next, se);
+>>>>>>> common/deprecated/android-3.18
 		if (cfs_rq->last_h_load_update == now)
 			break;
 	}
 
 	if (!se) {
+<<<<<<< HEAD
 		cfs_rq->h_load = cfs_rq->runnable_load_avg;
 		cfs_rq->last_h_load_update = now;
 	}
@@ -6774,6 +8978,16 @@ static void update_cfs_rq_h_load(struct cfs_rq *cfs_rq)
 		load = cfs_rq->h_load;
 		load = div64_ul(load * se->avg.load_avg_contrib,
 				cfs_rq->runnable_load_avg + 1);
+=======
+		cfs_rq->h_load = cfs_rq_load_avg(cfs_rq);
+		cfs_rq->last_h_load_update = now;
+	}
+
+	while ((se = READ_ONCE(cfs_rq->h_load_next)) != NULL) {
+		load = cfs_rq->h_load;
+		load = div64_ul(load * se->avg.load_avg,
+			cfs_rq_load_avg(cfs_rq) + 1);
+>>>>>>> common/deprecated/android-3.18
 		cfs_rq = group_cfs_rq(se);
 		cfs_rq->h_load = load;
 		cfs_rq->last_h_load_update = now;
@@ -6785,28 +8999,51 @@ static unsigned long task_h_load(struct task_struct *p)
 	struct cfs_rq *cfs_rq = task_cfs_rq(p);
 
 	update_cfs_rq_h_load(cfs_rq);
+<<<<<<< HEAD
 	return div64_ul(p->se.avg.load_avg_contrib * cfs_rq->h_load,
 			cfs_rq->runnable_load_avg + 1);
+=======
+	return div64_ul(p->se.avg.load_avg * cfs_rq->h_load,
+			cfs_rq_load_avg(cfs_rq) + 1);
+>>>>>>> common/deprecated/android-3.18
 }
 #else
 static inline void update_blocked_averages(int cpu)
 {
+<<<<<<< HEAD
+=======
+	struct rq *rq = cpu_rq(cpu);
+	struct cfs_rq *cfs_rq = &rq->cfs;
+	unsigned long flags;
+
+	raw_spin_lock_irqsave(&rq->lock, flags);
+	update_rq_clock(rq);
+	update_cfs_rq_load_avg(cfs_rq_clock_task(cfs_rq), cfs_rq);
+	raw_spin_unlock_irqrestore(&rq->lock, flags);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static unsigned long task_h_load(struct task_struct *p)
 {
+<<<<<<< HEAD
 	return p->se.avg.load_avg_contrib;
+=======
+	return p->se.avg.load_avg;
+>>>>>>> common/deprecated/android-3.18
 }
 #endif
 
 /********** Helpers for find_busiest_group ************************/
 
+<<<<<<< HEAD
 enum group_type {
 	group_other = 0,
 	group_imbalanced,
 	group_overloaded,
 };
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * sg_lb_stats - stats of a sched_group required for load_balancing
  */
@@ -6816,12 +9053,22 @@ struct sg_lb_stats {
 	unsigned long sum_weighted_load; /* Weighted load of group's tasks */
 	unsigned long load_per_task;
 	unsigned long group_capacity;
+<<<<<<< HEAD
 	unsigned int sum_nr_running; /* Nr tasks running in the group */
 	unsigned int group_capacity_factor;
 	unsigned int idle_cpus;
 	unsigned int group_weight;
 	enum group_type group_type;
 	int group_has_free_capacity;
+=======
+	unsigned long group_util; /* Total utilization of the group */
+	unsigned int sum_nr_running; /* Nr tasks running in the group */
+	unsigned int idle_cpus;
+	unsigned int group_weight;
+	enum group_type group_type;
+	int group_no_capacity;
+	int group_misfit_task; /* A cpu has a task too big for its capacity */
+>>>>>>> common/deprecated/android-3.18
 #ifdef CONFIG_NUMA_BALANCING
 	unsigned int nr_numa_running;
 	unsigned int nr_preferred_running;
@@ -6892,6 +9139,7 @@ static inline int get_sd_load_idx(struct sched_domain *sd,
 	return load_idx;
 }
 
+<<<<<<< HEAD
 static unsigned long default_scale_capacity(struct sched_domain *sd, int cpu)
 {
 	return SCHED_CAPACITY_SCALE;
@@ -6919,21 +9167,35 @@ static unsigned long scale_rt_capacity(int cpu)
 {
 	struct rq *rq = cpu_rq(cpu);
 	u64 total, available, age_stamp, avg;
+=======
+static unsigned long scale_rt_capacity(int cpu)
+{
+	struct rq *rq = cpu_rq(cpu);
+	u64 total, used, age_stamp, avg;
+>>>>>>> common/deprecated/android-3.18
 	s64 delta;
 
 	/*
 	 * Since we're reading these variables without serialization make sure
 	 * we read them once before doing sanity checks on them.
 	 */
+<<<<<<< HEAD
 	age_stamp = ACCESS_ONCE(rq->age_stamp);
 	avg = ACCESS_ONCE(rq->rt_avg);
 
 	delta = rq_clock(rq) - age_stamp;
+=======
+	age_stamp = READ_ONCE(rq->age_stamp);
+	avg = READ_ONCE(rq->rt_avg);
+	delta = __rq_clock_broken(rq) - age_stamp;
+
+>>>>>>> common/deprecated/android-3.18
 	if (unlikely(delta < 0))
 		delta = 0;
 
 	total = sched_avg_period() + delta;
 
+<<<<<<< HEAD
 	if (unlikely(total < avg)) {
 		/* Ensures that capacity won't end up being negative */
 		available = 0;
@@ -6947,10 +9209,34 @@ static unsigned long scale_rt_capacity(int cpu)
 	total >>= SCHED_CAPACITY_SHIFT;
 
 	return div_u64(available, total);
+=======
+	used = div_u64(avg, total);
+
+	/*
+	 * deadline bandwidth is defined at system level so we must
+	 * weight this bandwidth with the max capacity of the system.
+	 * As a reminder, avg_bw is 20bits width and
+	 * scale_cpu_capacity is 10 bits width
+	 */
+	used += div_u64(rq->dl.avg_bw, arch_scale_cpu_capacity(NULL, cpu));
+
+	if (likely(used < SCHED_CAPACITY_SCALE))
+		return SCHED_CAPACITY_SCALE - used;
+
+	return 1;
+}
+
+void init_max_cpu_capacity(struct max_cpu_capacity *mcc)
+{
+	raw_spin_lock_init(&mcc->lock);
+	mcc->val = 0;
+	mcc->cpu = -1;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void update_cpu_capacity(struct sched_domain *sd, int cpu)
 {
+<<<<<<< HEAD
 	unsigned long capacity = SCHED_CAPACITY_SCALE;
 	struct sched_group *sdg = sd->groups;
 
@@ -6970,6 +9256,36 @@ static void update_cpu_capacity(struct sched_domain *sd, int cpu)
 
 	capacity >>= SCHED_CAPACITY_SHIFT;
 
+=======
+	unsigned long capacity = arch_scale_cpu_capacity(sd, cpu);
+	struct sched_group *sdg = sd->groups;
+	struct max_cpu_capacity *mcc;
+	unsigned long max_capacity;
+	int max_cap_cpu;
+	unsigned long flags;
+
+	cpu_rq(cpu)->cpu_capacity_orig = capacity;
+
+	mcc = &cpu_rq(cpu)->rd->max_cpu_capacity;
+
+	raw_spin_lock_irqsave(&mcc->lock, flags);
+	max_capacity = mcc->val;
+	max_cap_cpu = mcc->cpu;
+
+	if ((max_capacity > capacity && max_cap_cpu == cpu) ||
+	    (max_capacity < capacity)) {
+		mcc->val = capacity;
+		mcc->cpu = cpu;
+#ifdef CONFIG_SCHED_DEBUG
+		raw_spin_unlock_irqrestore(&mcc->lock, flags);
+		pr_info("CPU%d: update max cpu_capacity %lu\n", cpu, capacity);
+		goto skip_unlock;
+#endif
+	}
+	raw_spin_unlock_irqrestore(&mcc->lock, flags);
+
+skip_unlock: __attribute__ ((unused));
+>>>>>>> common/deprecated/android-3.18
 	capacity *= scale_rt_capacity(cpu);
 	capacity >>= SCHED_CAPACITY_SHIFT;
 
@@ -6978,13 +9294,21 @@ static void update_cpu_capacity(struct sched_domain *sd, int cpu)
 
 	cpu_rq(cpu)->cpu_capacity = capacity;
 	sdg->sgc->capacity = capacity;
+<<<<<<< HEAD
+=======
+	sdg->sgc->max_capacity = capacity;
+>>>>>>> common/deprecated/android-3.18
 }
 
 void update_group_capacity(struct sched_domain *sd, int cpu)
 {
 	struct sched_domain *child = sd->child;
 	struct sched_group *group, *sdg = sd->groups;
+<<<<<<< HEAD
 	unsigned long capacity, capacity_orig;
+=======
+	unsigned long capacity, max_capacity;
+>>>>>>> common/deprecated/android-3.18
 	unsigned long interval;
 
 	interval = msecs_to_jiffies(sd->balance_interval);
@@ -6996,7 +9320,12 @@ void update_group_capacity(struct sched_domain *sd, int cpu)
 		return;
 	}
 
+<<<<<<< HEAD
 	capacity_orig = capacity = 0;
+=======
+	capacity = 0;
+	max_capacity = 0;
+>>>>>>> common/deprecated/android-3.18
 
 	if (child->flags & SD_OVERLAP) {
 		/*
@@ -7016,6 +9345,7 @@ void update_group_capacity(struct sched_domain *sd, int cpu)
 			 * Use capacity_of(), which is set irrespective of domains
 			 * in update_cpu_capacity().
 			 *
+<<<<<<< HEAD
 			 * This avoids capacity/capacity_orig from being 0 and
 			 * causing divide-by-zero issues on boot.
 			 *
@@ -7030,6 +9360,19 @@ void update_group_capacity(struct sched_domain *sd, int cpu)
 			sgc = rq->sd->groups->sgc;
 			capacity_orig += sgc->capacity_orig;
 			capacity += sgc->capacity;
+=======
+			 * This avoids capacity from being 0 and
+			 * causing divide-by-zero issues on boot.
+			 */
+			if (unlikely(!rq->sd)) {
+				capacity += capacity_of(cpu);
+			} else {
+				sgc = rq->sd->groups->sgc;
+				capacity += sgc->capacity;
+			}
+
+			max_capacity = max(capacity, max_capacity);
+>>>>>>> common/deprecated/android-3.18
 		}
 	} else  {
 		/*
@@ -7039,12 +9382,20 @@ void update_group_capacity(struct sched_domain *sd, int cpu)
 
 		group = child->groups;
 		do {
+<<<<<<< HEAD
 			capacity_orig += group->sgc->capacity_orig;
 			capacity += group->sgc->capacity;
+=======
+			struct sched_group_capacity *sgc = group->sgc;
+
+			capacity += sgc->capacity;
+			max_capacity = max(sgc->max_capacity, max_capacity);
+>>>>>>> common/deprecated/android-3.18
 			group = group->next;
 		} while (group != child->groups);
 	}
 
+<<<<<<< HEAD
 	sdg->sgc->capacity_orig = capacity_orig;
 	sdg->sgc->capacity = capacity;
 }
@@ -7072,6 +9423,22 @@ fix_small_capacity(struct sched_domain *sd, struct sched_group *group)
 		return 1;
 
 	return 0;
+=======
+	sdg->sgc->capacity = capacity;
+	sdg->sgc->max_capacity = max_capacity;
+}
+
+/*
+ * Check whether the capacity of the rq has been noticeably reduced by side
+ * activity. The imbalance_pct is used for the threshold.
+ * Return true is the capacity is reduced
+ */
+static inline int
+check_cpu_capacity(struct rq *rq, struct sched_domain *sd)
+{
+	return ((rq->cpu_capacity * sd->imbalance_pct) <
+				(rq->cpu_capacity_orig * 100));
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
@@ -7109,6 +9476,7 @@ static inline int sg_imbalanced(struct sched_group *group)
 }
 
 /*
+<<<<<<< HEAD
  * Compute the group capacity factor.
  *
  * Avoid the issue where N*frac(smt_capacity) >= 1 creates 'phantom' cores by
@@ -7140,11 +9508,81 @@ static enum group_type
 group_classify(struct sched_group *group, struct sg_lb_stats *sgs)
 {
 	if (sgs->sum_nr_running > sgs->group_capacity_factor)
+=======
+ * group_has_capacity returns true if the group has spare capacity that could
+ * be used by some tasks.
+ * We consider that a group has spare capacity if the  * number of task is
+ * smaller than the number of CPUs or if the utilization is lower than the
+ * available capacity for CFS tasks.
+ * For the latter, we use a threshold to stabilize the state, to take into
+ * account the variance of the tasks' load and to return true if the available
+ * capacity in meaningful for the load balancer.
+ * As an example, an available capacity of 1% can appear but it doesn't make
+ * any benefit for the load balance.
+ */
+static inline bool
+group_has_capacity(struct lb_env *env, struct sg_lb_stats *sgs)
+{
+	if (sgs->sum_nr_running < sgs->group_weight)
+		return true;
+
+	if ((sgs->group_capacity * 100) >
+			(sgs->group_util * env->sd->imbalance_pct))
+		return true;
+
+	return false;
+}
+
+/*
+ *  group_is_overloaded returns true if the group has more tasks than it can
+ *  handle.
+ *  group_is_overloaded is not equals to !group_has_capacity because a group
+ *  with the exact right number of tasks, has no more spare capacity but is not
+ *  overloaded so both group_has_capacity and group_is_overloaded return
+ *  false.
+ */
+static inline bool
+group_is_overloaded(struct lb_env *env, struct sg_lb_stats *sgs)
+{
+	if (sgs->sum_nr_running <= sgs->group_weight)
+		return false;
+
+	if ((sgs->group_capacity * 100) <
+			(sgs->group_util * env->sd->imbalance_pct))
+		return true;
+
+	return false;
+}
+
+
+/*
+ * group_smaller_cpu_capacity: Returns true if sched_group sg has smaller
+ * per-cpu capacity than sched_group ref.
+ */
+static inline bool
+group_smaller_cpu_capacity(struct sched_group *sg, struct sched_group *ref)
+{
+	return sg->sgc->max_capacity + capacity_margin - SCHED_LOAD_SCALE <
+							ref->sgc->max_capacity;
+}
+
+static enum group_type group_classify(struct lb_env *env,
+		struct sched_group *group,
+		struct sg_lb_stats *sgs)
+{
+	if (sgs->group_no_capacity)
+>>>>>>> common/deprecated/android-3.18
 		return group_overloaded;
 
 	if (sg_imbalanced(group))
 		return group_imbalanced;
 
+<<<<<<< HEAD
+=======
+	if (sgs->group_misfit_task)
+		return group_misfit_task;
+
+>>>>>>> common/deprecated/android-3.18
 	return group_other;
 }
 
@@ -7156,14 +9594,25 @@ group_classify(struct sched_group *group, struct sg_lb_stats *sgs)
  * @local_group: Does group contain this_cpu.
  * @sgs: variable to hold the statistics for this group.
  * @overload: Indicate more than one runnable task for any CPU.
+<<<<<<< HEAD
+=======
+ * @overutilized: Indicate overutilization for any CPU.
+>>>>>>> common/deprecated/android-3.18
  */
 static inline void update_sg_lb_stats(struct lb_env *env,
 			struct sched_group *group, int load_idx,
 			int local_group, struct sg_lb_stats *sgs,
+<<<<<<< HEAD
 			bool *overload)
 {
 	unsigned long load;
 	int i;
+=======
+			bool *overload, bool *overutilized)
+{
+	unsigned long load;
+	int i, nr_running;
+>>>>>>> common/deprecated/android-3.18
 
 	memset(sgs, 0, sizeof(*sgs));
 
@@ -7177,9 +9626,17 @@ static inline void update_sg_lb_stats(struct lb_env *env,
 			load = source_load(i, load_idx);
 
 		sgs->group_load += load;
+<<<<<<< HEAD
 		sgs->sum_nr_running += rq->cfs.h_nr_running;
 
 		if (rq->nr_running > 1)
+=======
+		sgs->group_util += cpu_util(i);
+		sgs->sum_nr_running += rq->cfs.h_nr_running;
+
+		nr_running = rq->nr_running;
+		if (nr_running > 1)
+>>>>>>> common/deprecated/android-3.18
 			*overload = true;
 
 #ifdef CONFIG_NUMA_BALANCING
@@ -7187,8 +9644,22 @@ static inline void update_sg_lb_stats(struct lb_env *env,
 		sgs->nr_preferred_running += rq->nr_preferred_running;
 #endif
 		sgs->sum_weighted_load += weighted_cpuload(i);
+<<<<<<< HEAD
 		if (idle_cpu(i))
 			sgs->idle_cpus++;
+=======
+		/*
+		 * No need to call idle_cpu() if nr_running is not 0
+		 */
+		if (!nr_running && idle_cpu(i))
+			sgs->idle_cpus++;
+
+		if (cpu_overutilized(i)) {
+			*overutilized = true;
+			if (!sgs->group_misfit_task && rq->misfit_task)
+				sgs->group_misfit_task = capacity_of(i);
+		}
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/* Adjust by relative CPU capacity of the group */
@@ -7199,11 +9670,17 @@ static inline void update_sg_lb_stats(struct lb_env *env,
 		sgs->load_per_task = sgs->sum_weighted_load / sgs->sum_nr_running;
 
 	sgs->group_weight = group->group_weight;
+<<<<<<< HEAD
 	sgs->group_capacity_factor = sg_capacity_factor(env, group);
 	sgs->group_type = group_classify(group, sgs);
 
 	if (sgs->group_capacity_factor > sgs->sum_nr_running)
 		sgs->group_has_free_capacity = 1;
+=======
+
+	sgs->group_no_capacity = group_is_overloaded(env, sgs);
+	sgs->group_type = group_classify(env, group, sgs);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -7232,9 +9709,31 @@ static bool update_sd_pick_busiest(struct lb_env *env,
 	if (sgs->group_type < busiest->group_type)
 		return false;
 
+<<<<<<< HEAD
 	if (sgs->avg_load <= busiest->avg_load)
 		return false;
 
+=======
+	/*
+	 * Candidate sg doesn't face any serious load-balance problems
+	 * so don't pick it if the local sg is already filled up.
+	 */
+	if (sgs->group_type == group_other &&
+	    !group_has_capacity(env, &sds->local_stat))
+		return false;
+
+	if (sgs->avg_load <= busiest->avg_load)
+		return false;
+
+	/*
+	 * Candiate sg has no more than one task per cpu and has higher
+	 * per-cpu capacity. No reason to pull tasks to less capable cpus.
+	 */
+	if (sgs->sum_nr_running <= sgs->group_weight &&
+	    group_smaller_cpu_capacity(sds->local, sg))
+		return false;
+
+>>>>>>> common/deprecated/android-3.18
 	/* This is the busiest node in its class. */
 	if (!(env->sd->flags & SD_ASYM_PACKING))
 		return true;
@@ -7296,7 +9795,11 @@ static inline void update_sd_lb_stats(struct lb_env *env, struct sd_lb_stats *sd
 	struct sched_group *sg = env->sd->groups;
 	struct sg_lb_stats tmp_sgs;
 	int load_idx, prefer_sibling = 0;
+<<<<<<< HEAD
 	bool overload = false;
+=======
+	bool overload = false, overutilized = false;
+>>>>>>> common/deprecated/android-3.18
 
 	if (child && child->flags & SD_PREFER_SIBLING)
 		prefer_sibling = 1;
@@ -7318,13 +9821,18 @@ static inline void update_sd_lb_stats(struct lb_env *env, struct sd_lb_stats *sd
 		}
 
 		update_sg_lb_stats(env, sg, load_idx, local_group, sgs,
+<<<<<<< HEAD
 						&overload);
+=======
+						&overload, &overutilized);
+>>>>>>> common/deprecated/android-3.18
 
 		if (local_group)
 			goto next_group;
 
 		/*
 		 * In case the child domain prefers tasks go to siblings
+<<<<<<< HEAD
 		 * first, lower the sg capacity factor to one so that we'll try
 		 * and move all the excess tasks away. We lower the capacity
 		 * of a group only if the local group has the capacity to fit
@@ -7336,6 +9844,31 @@ static inline void update_sd_lb_stats(struct lb_env *env, struct sd_lb_stats *sd
 		if (prefer_sibling && sds->local &&
 		    sds->local_stat.group_has_free_capacity)
 			sgs->group_capacity_factor = min(sgs->group_capacity_factor, 1U);
+=======
+		 * first, lower the sg capacity so that we'll try
+		 * and move all the excess tasks away. We lower the capacity
+		 * of a group only if the local group has the capacity to fit
+		 * these excess tasks. The extra check prevents the case where
+		 * you always pull from the heaviest group when it is already
+		 * under-utilized (possible with a large weight task outweighs
+		 * the tasks on the system).
+		 */
+		if (prefer_sibling && sds->local &&
+		    group_has_capacity(env, &sds->local_stat) &&
+		    (sgs->sum_nr_running > 1)) {
+			sgs->group_no_capacity = 1;
+			sgs->group_type = group_overloaded;
+		}
+
+		/*
+		 * Ignore task groups with misfit tasks if local group has no
+		 * capacity or if per-cpu capacity isn't higher.
+		 */
+		if (sgs->group_type == group_misfit_task &&
+		    (!group_has_capacity(env, &sds->local_stat) ||
+		     !group_smaller_cpu_capacity(sg, sds->local)))
+			sgs->group_type = group_other;
+>>>>>>> common/deprecated/android-3.18
 
 		if (update_sd_pick_busiest(env, sds, sg, sgs)) {
 			sds->busiest = sg;
@@ -7353,10 +9886,29 @@ next_group:
 	if (env->sd->flags & SD_NUMA)
 		env->fbq_type = fbq_classify_group(&sds->busiest_stat);
 
+<<<<<<< HEAD
+=======
+	env->src_grp_nr_running = sds->busiest_stat.sum_nr_running;
+
+>>>>>>> common/deprecated/android-3.18
 	if (!env->sd->parent) {
 		/* update overload indicator if we are at root domain */
 		if (env->dst_rq->rd->overload != overload)
 			env->dst_rq->rd->overload = overload;
+<<<<<<< HEAD
+=======
+
+		/* Update over-utilization (tipping point, U >= 0) indicator */
+		if (env->dst_rq->rd->overutilized != overutilized) {
+			env->dst_rq->rd->overutilized = overutilized;
+			trace_sched_overutilized(overutilized);
+		}
+	} else {
+		if (!env->dst_rq->rd->overutilized && overutilized) {
+			env->dst_rq->rd->overutilized = true;
+			trace_sched_overutilized(true);
+		}
+>>>>>>> common/deprecated/android-3.18
 	}
 
 }
@@ -7505,6 +10057,25 @@ static inline void calculate_imbalance(struct lb_env *env, struct sd_lb_stats *s
 	 */
 	if (busiest->avg_load <= sds->avg_load ||
 	    local->avg_load >= sds->avg_load) {
+<<<<<<< HEAD
+=======
+		/* Misfitting tasks should be migrated in any case */
+		if (busiest->group_type == group_misfit_task) {
+			env->imbalance = busiest->group_misfit_task;
+			return;
+		}
+
+		/*
+		 * Busiest group is overloaded, local is not, use the spare
+		 * cycles to maximize throughput
+		 */
+		if (busiest->group_type == group_overloaded &&
+		    local->group_type <= group_misfit_task) {
+			env->imbalance = busiest->load_per_task;
+			return;
+		}
+
+>>>>>>> common/deprecated/android-3.18
 		env->imbalance = 0;
 		return fix_small_imbalance(env, sds);
 	}
@@ -7514,11 +10085,20 @@ static inline void calculate_imbalance(struct lb_env *env, struct sd_lb_stats *s
 	 */
 	if (busiest->group_type == group_overloaded &&
 	    local->group_type   == group_overloaded) {
+<<<<<<< HEAD
 		load_above_capacity =
 			(busiest->sum_nr_running - busiest->group_capacity_factor);
 
 		load_above_capacity *= (SCHED_LOAD_SCALE * SCHED_CAPACITY_SCALE);
 		load_above_capacity /= busiest->group_capacity;
+=======
+		load_above_capacity = busiest->sum_nr_running *
+					SCHED_LOAD_SCALE;
+		if (load_above_capacity > busiest->group_capacity)
+			load_above_capacity -= busiest->group_capacity;
+		else
+			load_above_capacity = ~0UL;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/*
@@ -7537,6 +10117,14 @@ static inline void calculate_imbalance(struct lb_env *env, struct sd_lb_stats *s
 		(sds->avg_load - local->avg_load) * local->group_capacity
 	) / SCHED_CAPACITY_SCALE;
 
+<<<<<<< HEAD
+=======
+	/* Boost imbalance to allow misfit task to be balanced. */
+	if (busiest->group_type == group_misfit_task)
+		env->imbalance = max_t(long, env->imbalance,
+				     busiest->group_misfit_task);
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * if *imbalance is less than the average load per runnable task
 	 * there is no guarantee that any tasks will be moved so we'll have
@@ -7578,9 +10166,20 @@ static struct sched_group *find_busiest_group(struct lb_env *env)
 	 * this level.
 	 */
 	update_sd_lb_stats(env, &sds);
+<<<<<<< HEAD
 	local = &sds.local_stat;
 	busiest = &sds.busiest_stat;
 
+=======
+
+	if (energy_aware() && !env->dst_rq->rd->overutilized)
+		goto out_balanced;
+
+	local = &sds.local_stat;
+	busiest = &sds.busiest_stat;
+
+	/* ASYM feature bypasses nice load balance check */
+>>>>>>> common/deprecated/android-3.18
 	if ((env->idle == CPU_IDLE || env->idle == CPU_NEWLY_IDLE) &&
 	    check_asym_packing(env, &sds))
 		return sds.busiest;
@@ -7601,10 +10200,22 @@ static struct sched_group *find_busiest_group(struct lb_env *env)
 		goto force_balance;
 
 	/* SD_BALANCE_NEWIDLE trumps SMP nice when underutilized */
+<<<<<<< HEAD
 	if (env->idle == CPU_NEWLY_IDLE && local->group_has_free_capacity &&
 	    !busiest->group_has_free_capacity)
 		goto force_balance;
 
+=======
+	if (env->idle == CPU_NEWLY_IDLE && group_has_capacity(env, local) &&
+	    busiest->group_no_capacity)
+		goto force_balance;
+
+	/* Misfitting tasks should be dealt with regardless of the avg load */
+	if (busiest->group_type == group_misfit_task) {
+		goto force_balance;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * If the local group is busier than the selected busiest group
 	 * don't try and pull any tasks.
@@ -7628,7 +10239,12 @@ static struct sched_group *find_busiest_group(struct lb_env *env)
 		 * might end up to just move the imbalance on another group
 		 */
 		if ((busiest->group_type != group_overloaded) &&
+<<<<<<< HEAD
 				(local->idle_cpus <= (busiest->idle_cpus + 1)))
+=======
+		    (local->idle_cpus <= (busiest->idle_cpus + 1)) &&
+		    !group_smaller_cpu_capacity(sds.busiest, sds.local))
+>>>>>>> common/deprecated/android-3.18
 			goto out_balanced;
 	} else {
 		/*
@@ -7641,6 +10257,10 @@ static struct sched_group *find_busiest_group(struct lb_env *env)
 	}
 
 force_balance:
+<<<<<<< HEAD
+=======
+	env->busiest_group_type = busiest->group_type;
+>>>>>>> common/deprecated/android-3.18
 	/* Looks like there is an imbalance. Compute it */
 	calculate_imbalance(env, &sds);
 	return sds.busiest;
@@ -7661,7 +10281,11 @@ static struct rq *find_busiest_queue(struct lb_env *env,
 	int i;
 
 	for_each_cpu_and(i, sched_group_cpus(group), env->cpus) {
+<<<<<<< HEAD
 		unsigned long capacity, capacity_factor, wl;
+=======
+		unsigned long capacity, wl;
+>>>>>>> common/deprecated/android-3.18
 		enum fbq_type rt;
 
 		rq = cpu_rq(i);
@@ -7690,9 +10314,12 @@ static struct rq *find_busiest_queue(struct lb_env *env,
 			continue;
 
 		capacity = capacity_of(i);
+<<<<<<< HEAD
 		capacity_factor = DIV_ROUND_CLOSEST(capacity, SCHED_CAPACITY_SCALE);
 		if (!capacity_factor)
 			capacity_factor = fix_small_capacity(env->sd, group);
+=======
+>>>>>>> common/deprecated/android-3.18
 
 		wl = weighted_cpuload(i);
 
@@ -7700,7 +10327,14 @@ static struct rq *find_busiest_queue(struct lb_env *env,
 		 * When comparing with imbalance, use weighted_cpuload()
 		 * which is not scaled with the cpu capacity.
 		 */
+<<<<<<< HEAD
 		if (capacity_factor && rq->nr_running == 1 && wl > env->imbalance)
+=======
+
+		if (rq->nr_running == 1 && wl > env->imbalance &&
+		    !check_cpu_capacity(rq, env->sd) &&
+		    env->busiest_group_type != group_misfit_task)
+>>>>>>> common/deprecated/android-3.18
 			continue;
 
 		/*
@@ -7748,6 +10382,29 @@ static int need_active_balance(struct lb_env *env)
 			return 1;
 	}
 
+<<<<<<< HEAD
+=======
+	/*
+	 * The dst_cpu is idle and the src_cpu CPU has only 1 CFS task.
+	 * It's worth migrating the task if the src_cpu's capacity is reduced
+	 * because of other sched_class or IRQs if more capacity stays
+	 * available on dst_cpu.
+	 */
+	if ((env->idle != CPU_NOT_IDLE) &&
+	    (env->src_rq->cfs.h_nr_running == 1)) {
+		if ((check_cpu_capacity(env->src_rq, sd)) &&
+		    (capacity_of(env->src_cpu)*sd->imbalance_pct < capacity_of(env->dst_cpu)*100))
+			return 1;
+	}
+
+	if ((capacity_of(env->src_cpu) < capacity_of(env->dst_cpu)) &&
+				env->src_rq->cfs.h_nr_running == 1 &&
+				cpu_overutilized(env->src_cpu) &&
+				!cpu_overutilized(env->dst_cpu)) {
+			return 1;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	return unlikely(sd->nr_balance_failed > sd->cache_nice_tries+2);
 }
 
@@ -7847,6 +10504,12 @@ redo:
 
 	schedstat_add(sd, lb_imbalance[idle], env.imbalance);
 
+<<<<<<< HEAD
+=======
+	env.src_cpu = busiest->cpu;
+	env.src_rq = busiest;
+
+>>>>>>> common/deprecated/android-3.18
 	ld_moved = 0;
 	if (busiest->nr_running > 1) {
 		/*
@@ -7856,8 +10519,11 @@ redo:
 		 * correctly treated as an imbalance.
 		 */
 		env.flags |= LBF_ALL_PINNED;
+<<<<<<< HEAD
 		env.src_cpu   = busiest->cpu;
 		env.src_rq    = busiest;
+=======
+>>>>>>> common/deprecated/android-3.18
 		env.loop_max  = min(sysctl_sched_nr_migrate, busiest->nr_running);
 
 more_balance:
@@ -7868,6 +10534,14 @@ more_balance:
 		 * ld_moved     - cumulative load moved across iterations
 		 */
 		cur_ld_moved = detach_tasks(&env);
+<<<<<<< HEAD
+=======
+		/*
+		 * We want to potentially lower env.src_cpu's OPP.
+		 */
+		if (cur_ld_moved)
+			update_capacity_of(env.src_cpu);
+>>>>>>> common/deprecated/android-3.18
 
 		/*
 		 * We've detached some tasks from busiest_rq. Every
@@ -7959,7 +10633,12 @@ more_balance:
 		 * excessive cache_hot migrations and active balances.
 		 */
 		if (idle != CPU_NEWLY_IDLE)
+<<<<<<< HEAD
 			sd->nr_balance_failed++;
+=======
+			if (env.src_grp_nr_running > 1)
+				sd->nr_balance_failed++;
+>>>>>>> common/deprecated/android-3.18
 
 		if (need_active_balance(&env)) {
 			raw_spin_lock_irqsave(&busiest->lock, flags);
@@ -8022,9 +10701,16 @@ more_balance:
 out_balanced:
 	/*
 	 * We reach balance although we may have faced some affinity
+<<<<<<< HEAD
 	 * constraints. Clear the imbalance flag if it was set.
 	 */
 	if (sd_parent) {
+=======
+	 * constraints. Clear the imbalance flag only if other tasks got
+	 * a chance to move and fix the imbalance.
+	 */
+	if (sd_parent && !(env.flags & LBF_ALL_PINNED)) {
+>>>>>>> common/deprecated/android-3.18
 		int *group_imbalance = &sd_parent->groups->sgc->imbalance;
 
 		if (*group_imbalance)
@@ -8042,13 +10728,30 @@ out_all_pinned:
 	sd->nr_balance_failed = 0;
 
 out_one_pinned:
+<<<<<<< HEAD
+=======
+	ld_moved = 0;
+
+	/*
+	 * idle_balance() disregards balance intervals, so we could repeatedly
+	 * reach this code, which would lead to balance_interval skyrocketting
+	 * in a short amount of time. Skip the balance_interval increase logic
+	 * to avoid that.
+	 */
+	if (env.idle == CPU_NEWLY_IDLE)
+		goto out;
+
+>>>>>>> common/deprecated/android-3.18
 	/* tune up the balancing interval */
 	if (((env.flags & LBF_ALL_PINNED) &&
 			sd->balance_interval < MAX_PINNED_INTERVAL) ||
 			(sd->balance_interval < sd->max_interval))
 		sd->balance_interval *= 2;
+<<<<<<< HEAD
 
 	ld_moved = 0;
+=======
+>>>>>>> common/deprecated/android-3.18
 out:
 	return ld_moved;
 }
@@ -8080,8 +10783,11 @@ update_next_balance(struct sched_domain *sd, int cpu_busy, unsigned long *next_b
 		*next_balance = next;
 }
 
+<<<<<<< HEAD
 static unsigned int hmp_idle_pull(int this_cpu);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * idle_balance is called by schedule() if this_cpu is about to become
  * idle. Attempts to pull tasks from other CPUs.
@@ -8093,6 +10799,10 @@ static int idle_balance(struct rq *this_rq)
 	struct sched_domain *sd;
 	int pulled_task = 0;
 	u64 curr_cost = 0;
+<<<<<<< HEAD
+=======
+	long removed_util=0;
+>>>>>>> common/deprecated/android-3.18
 
 	idle_enter_fair(this_rq);
 
@@ -8102,8 +10812,14 @@ static int idle_balance(struct rq *this_rq)
 	 */
 	this_rq->idle_stamp = rq_clock(this_rq);
 
+<<<<<<< HEAD
 	if (this_rq->avg_idle < sysctl_sched_migration_cost ||
 	    !this_rq->rd->overload) {
+=======
+	if (!energy_aware() &&
+	    (this_rq->avg_idle < sysctl_sched_migration_cost ||
+	     !this_rq->rd->overload)) {
+>>>>>>> common/deprecated/android-3.18
 		rcu_read_lock();
 		sd = rcu_dereference_check_sched_domain(this_rq->sd);
 		if (sd)
@@ -8118,6 +10834,20 @@ static int idle_balance(struct rq *this_rq)
 	 */
 	raw_spin_unlock(&this_rq->lock);
 
+<<<<<<< HEAD
+=======
+	/*
+	 * If removed_util_avg is !0 we most probably migrated some task away
+	 * from this_cpu. In this case we might be willing to trigger an OPP
+	 * update, but we want to do so if we don't find anybody else to pull
+	 * here (we will trigger an OPP update with the pulled task's enqueue
+	 * anyway).
+	 *
+	 * Record removed_util before calling update_blocked_averages, and use
+	 * it below (before returning) to see if an OPP update is required.
+	 */
+	removed_util = atomic_long_read(&(this_rq->cfs).removed_util_avg);
+>>>>>>> common/deprecated/android-3.18
 	update_blocked_averages(this_cpu);
 	rcu_read_lock();
 	for_each_domain(this_cpu, sd) {
@@ -8157,11 +10887,14 @@ static int idle_balance(struct rq *this_rq)
 	}
 	rcu_read_unlock();
 
+<<<<<<< HEAD
 	// implement idle pull for HMP
 	if (!pulled_task) {
 		pulled_task = hmp_idle_pull(this_cpu);
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	raw_spin_lock(&this_rq->lock);
 
 	if (curr_cost > this_rq->max_idle_balance_cost)
@@ -8187,6 +10920,15 @@ out:
 	if (pulled_task) {
 		idle_exit_fair(this_rq);
 		this_rq->idle_stamp = 0;
+<<<<<<< HEAD
+=======
+	} else if (removed_util) {
+		/*
+		 * No task pulled and someone has been migrated away.
+		 * Good case to trigger an OPP update.
+		 */
+		update_capacity_of(this_cpu);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	return pulled_task;
@@ -8246,8 +10988,18 @@ static int active_load_balance_cpu_stop(void *data)
 		schedstat_inc(sd, alb_count);
 
 		p = detach_one_task(&env);
+<<<<<<< HEAD
 		if (p)
 			schedstat_inc(sd, alb_pushed);
+=======
+		if (p) {
+			schedstat_inc(sd, alb_pushed);
+			/*
+			 * We want to potentially lower env.src_cpu's OPP.
+			 */
+			update_capacity_of(env.src_cpu);
+		}
+>>>>>>> common/deprecated/android-3.18
 		else
 			schedstat_inc(sd, alb_failed);
 	}
@@ -8281,6 +11033,7 @@ static struct {
 	atomic_t nr_cpus;
 	unsigned long next_balance;     /* in jiffy units */
 } nohz ____cacheline_aligned;
+<<<<<<< HEAD
 /*
  * nohz_test_cpu used when load tracking is enabled. FAIR_GROUP_SCHED
  * dependency below may be removed when load tracking guards are
@@ -8301,6 +11054,13 @@ static inline int find_new_ilb(int call_cpu)
 	ilb = cpumask_first_and(nohz.idle_cpus_mask,
 			&((struct hmp_domain *)hmp_cpu_domain(call_cpu))->cpus);
 #endif
+=======
+
+static inline int find_new_ilb(void)
+{
+	int ilb = cpumask_first(nohz.idle_cpus_mask);
+
+>>>>>>> common/deprecated/android-3.18
 	if (ilb < nr_cpu_ids && idle_cpu(ilb))
 		return ilb;
 
@@ -8312,13 +11072,21 @@ static inline int find_new_ilb(int call_cpu)
  * nohz_load_balancer CPU (if there is one) otherwise fallback to any idle
  * CPU (if there is one).
  */
+<<<<<<< HEAD
 static void nohz_balancer_kick(int cpu)
+=======
+static void nohz_balancer_kick(void)
+>>>>>>> common/deprecated/android-3.18
 {
 	int ilb_cpu;
 
 	nohz.next_balance++;
 
+<<<<<<< HEAD
 	ilb_cpu = find_new_ilb(cpu);
+=======
+	ilb_cpu = find_new_ilb();
+>>>>>>> common/deprecated/android-3.18
 
 	if (ilb_cpu >= nr_cpu_ids)
 		return;
@@ -8420,6 +11188,7 @@ static int sched_ilb_notifier(struct notifier_block *nfb,
 		return NOTIFY_DONE;
 	}
 }
+<<<<<<< HEAD
 #else
 /*
  * nohz_test_cpu used when load tracking is enabled. FAIR_GROUP_SCHED
@@ -8432,6 +11201,8 @@ static int nohz_test_cpu(int cpu)
 	return 0;
 }
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 #endif
 
 static DEFINE_SPINLOCK(balancing);
@@ -8536,8 +11307,27 @@ out:
 	 * When the cpu is attached to null domain for ex, it will not be
 	 * updated.
 	 */
+<<<<<<< HEAD
 	if (likely(update_next_balance))
 		rq->next_balance = next_balance;
+=======
+	if (likely(update_next_balance)) {
+		rq->next_balance = next_balance;
+
+#ifdef CONFIG_NO_HZ_COMMON
+		/*
+		 * If this CPU has been elected to perform the nohz idle
+		 * balance. Other idle CPUs have already rebalanced with
+		 * nohz_idle_balance() and nohz.next_balance has been
+		 * updated accordingly. This CPU is now running the idle load
+		 * balance for itself and we need to update the
+		 * nohz.next_balance accordingly.
+		 */
+		if ((idle == CPU_IDLE) && time_after(nohz.next_balance, rq->next_balance))
+			nohz.next_balance = rq->next_balance;
+#endif
+	}
+>>>>>>> common/deprecated/android-3.18
 }
 
 #ifdef CONFIG_NO_HZ_COMMON
@@ -8550,6 +11340,12 @@ static void nohz_idle_balance(struct rq *this_rq, enum cpu_idle_type idle)
 	int this_cpu = this_rq->cpu;
 	struct rq *rq;
 	int balance_cpu;
+<<<<<<< HEAD
+=======
+	/* Earliest time when we have to do rebalance again */
+	unsigned long next_balance = jiffies + 60*HZ;
+	int update_next_balance = 0;
+>>>>>>> common/deprecated/android-3.18
 
 	if (idle != CPU_IDLE ||
 	    !test_bit(NOHZ_BALANCE_KICK, nohz_flags(this_cpu)))
@@ -8581,16 +11377,33 @@ static void nohz_idle_balance(struct rq *this_rq, enum cpu_idle_type idle)
 			rebalance_domains(rq, CPU_IDLE);
 		}
 
+<<<<<<< HEAD
 		if (time_after(this_rq->next_balance, rq->next_balance))
 			this_rq->next_balance = rq->next_balance;
 	}
 	nohz.next_balance = this_rq->next_balance;
+=======
+		if (time_after(next_balance, rq->next_balance)) {
+			next_balance = rq->next_balance;
+			update_next_balance = 1;
+		}
+	}
+
+	/*
+	 * next_balance will be updated only when there is a need.
+	 * When the CPU is attached to null domain for ex, it will not be
+	 * updated.
+	 */
+	if (likely(update_next_balance))
+		nohz.next_balance = next_balance;
+>>>>>>> common/deprecated/android-3.18
 end:
 	clear_bit(NOHZ_BALANCE_KICK, nohz_flags(this_cpu));
 }
 
 /*
  * Current heuristic for kicking the idle load balancer in the presence
+<<<<<<< HEAD
  * of an idle cpu is the system.
  *   - This rq has more than one task.
  *   - At any scheduler domain level, this cpu's scheduler group has multiple
@@ -8599,14 +11412,33 @@ end:
  *     domain span are idle.
  */
 static inline int nohz_kick_needed(struct rq *rq)
+=======
+ * of an idle cpu in the system.
+ *   - This rq has more than one task.
+ *   - This rq has at least one CFS task and the capacity of the CPU is
+ *     significantly reduced because of RT tasks or IRQs.
+ *   - At parent of LLC scheduler domain level, this cpu's scheduler group has
+ *     multiple busy cpu.
+ *   - For SD_ASYM_PACKING, if the lower numbered cpu's in the scheduler
+ *     domain span are idle.
+ */
+static inline bool nohz_kick_needed(struct rq *rq)
+>>>>>>> common/deprecated/android-3.18
 {
 	unsigned long now = jiffies;
 	struct sched_domain *sd;
 	struct sched_group_capacity *sgc;
 	int nr_busy, cpu = rq->cpu;
+<<<<<<< HEAD
 
 	if (unlikely(rq->idle_balance))
 		return 0;
+=======
+	bool kick = false;
+
+	if (unlikely(rq->idle_balance))
+		return false;
+>>>>>>> common/deprecated/android-3.18
 
        /*
 	* We may be recently in ticked or tickless idle mode. At the first
@@ -8620,6 +11452,7 @@ static inline int nohz_kick_needed(struct rq *rq)
 	 * balancing.
 	 */
 	if (likely(!atomic_read(&nohz.nr_cpus)))
+<<<<<<< HEAD
 		return 0;
 
 	if (time_before(now, nohz.next_balance))
@@ -8664,11 +11497,55 @@ need_kick_unlock:
 	rcu_read_unlock();
 need_kick:
 	return 1;
+=======
+		return false;
+
+	if (time_before(now, nohz.next_balance))
+		return false;
+
+	if (rq->nr_running >= 2 &&
+	    (!energy_aware() || cpu_overutilized(cpu)))
+		return true;
+
+	rcu_read_lock();
+	sd = rcu_dereference(per_cpu(sd_busy, cpu));
+	if (sd && !energy_aware()) {
+		sgc = sd->groups->sgc;
+		nr_busy = atomic_read(&sgc->nr_busy_cpus);
+
+		if (nr_busy > 1) {
+			kick = true;
+			goto unlock;
+		}
+
+	}
+
+	sd = rcu_dereference(rq->sd);
+	if (sd) {
+		if ((rq->cfs.h_nr_running >= 1) &&
+				check_cpu_capacity(rq, sd)) {
+			kick = true;
+			goto unlock;
+		}
+	}
+
+	sd = rcu_dereference(per_cpu(sd_asym, cpu));
+	if (sd && (cpumask_first_and(nohz.idle_cpus_mask,
+				  sched_domain_span(sd)) < cpu)) {
+		kick = true;
+		goto unlock;
+	}
+
+unlock:
+	rcu_read_unlock();
+	return kick;
+>>>>>>> common/deprecated/android-3.18
 }
 #else
 static void nohz_idle_balance(struct rq *this_rq, enum cpu_idle_type idle) { }
 #endif
 
+<<<<<<< HEAD
 #ifdef CONFIG_SCHED_HMP
 /* Check if task should migrate to a faster cpu */
 static unsigned int hmp_up_migration(int cpu, int *target_cpu, struct sched_entity *se)
@@ -9209,6 +12086,8 @@ done:
 static unsigned int hmp_idle_pull(int this_cpu) { return 0; }
 #endif /* CONFIG_SCHED_HMP */
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * run_rebalance_domains is triggered when needed from the scheduler tick.
  * Also triggered for nohz idle balancing (with nohz_balancing_kick set).
@@ -9219,6 +12098,7 @@ static void run_rebalance_domains(struct softirq_action *h)
 	enum cpu_idle_type idle = this_rq->idle_balance ?
 						CPU_IDLE : CPU_NOT_IDLE;
 
+<<<<<<< HEAD
 	rebalance_domains(this_rq, idle);
 
 	hmp_force_up_migration(this_rq->cpu);
@@ -9229,12 +12109,28 @@ static void run_rebalance_domains(struct softirq_action *h)
 	 * stopped.
 	 */
 	nohz_idle_balance(this_rq, idle);
+=======
+	/*
+	 * If this cpu has a pending nohz_balance_kick, then do the
+	 * balancing on behalf of the other idle cpus whose ticks are
+	 * stopped. Do nohz_idle_balance *before* rebalance_domains to
+	 * give the idle cpus a chance to load balance. Else we may
+	 * load balance only within the local sched_domain hierarchy
+	 * and abort nohz_idle_balance altogether if we pull some load.
+	 */
+	nohz_idle_balance(this_rq, idle);
+	rebalance_domains(this_rq, idle);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
  * Trigger the SCHED_SOFTIRQ if it is time to do periodic load balancing.
  */
+<<<<<<< HEAD
 void trigger_load_balance(struct rq *rq, int cpu)
+=======
+void trigger_load_balance(struct rq *rq)
+>>>>>>> common/deprecated/android-3.18
 {
 	/* Don't need to rebalance while attached to NULL domain */
 	if (unlikely(on_null_domain(rq)))
@@ -9244,15 +12140,22 @@ void trigger_load_balance(struct rq *rq, int cpu)
 		raise_softirq(SCHED_SOFTIRQ);
 #ifdef CONFIG_NO_HZ_COMMON
 	if (nohz_kick_needed(rq))
+<<<<<<< HEAD
 		nohz_balancer_kick(cpu);
+=======
+		nohz_balancer_kick();
+>>>>>>> common/deprecated/android-3.18
 #endif
 }
 
 static void rq_online_fair(struct rq *rq)
 {
+<<<<<<< HEAD
 #ifdef CONFIG_SCHED_HMP
 	hmp_online_cpu(rq->cpu);
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	update_sysctl();
 
 	update_runtime_enabled(rq);
@@ -9260,9 +12163,12 @@ static void rq_online_fair(struct rq *rq)
 
 static void rq_offline_fair(struct rq *rq)
 {
+<<<<<<< HEAD
 #ifdef CONFIG_SCHED_HMP
 	hmp_offline_cpu(rq->cpu);
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	update_sysctl();
 
 	/* Ensure any throttled groups are reachable by pick_next_task */
@@ -9287,7 +12193,19 @@ static void task_tick_fair(struct rq *rq, struct task_struct *curr, int queued)
 	if (numabalancing_enabled)
 		task_tick_numa(rq, curr);
 
+<<<<<<< HEAD
 	update_rq_runnable_avg(rq, 1);
+=======
+#ifdef CONFIG_SMP
+	if (!rq->rd->overutilized && cpu_overutilized(task_cpu(curr))) {
+		rq->rd->overutilized = true;
+		trace_sched_overutilized(true);
+	}
+
+	rq->misfit_task = !task_fits_max(curr, rq->cpu);
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
@@ -9362,11 +12280,43 @@ prio_changed_fair(struct rq *rq, struct task_struct *p, int oldprio)
 		check_preempt_curr(rq, p, 0);
 }
 
+<<<<<<< HEAD
 static void switched_from_fair(struct rq *rq, struct task_struct *p)
+=======
+static inline bool vruntime_normalized(struct task_struct *p)
+{
+	struct sched_entity *se = &p->se;
+
+	/*
+	 * In both the TASK_ON_RQ_QUEUED and TASK_ON_RQ_MIGRATING cases,
+	 * the dequeue_entity(.flags=0) will already have normalized the
+	 * vruntime.
+	 */
+	if (p->on_rq)
+		return true;
+
+	/*
+	 * When !on_rq, vruntime of the task has usually NOT been normalized.
+	 * But there are some cases where it has already been normalized:
+	 *
+	 * - A forked child which is waiting for being woken up by
+	 *   wake_up_new_task().
+	 * - A task which has been woken up by try_to_wake_up() and
+	 *   waiting for actually being woken up by sched_ttwu_pending().
+	 */
+	if (!se->sum_exec_runtime || p->state == TASK_WAKING)
+		return true;
+
+	return false;
+}
+
+static void detach_task_cfs_rq(struct task_struct *p)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct sched_entity *se = &p->se;
 	struct cfs_rq *cfs_rq = cfs_rq_of(se);
 
+<<<<<<< HEAD
 	/*
 	 * Ensure the task's vruntime is normalized, so that when it's
 	 * switched back to the fair class the enqueue_entity(.flags=0) will
@@ -9377,6 +12327,9 @@ static void switched_from_fair(struct rq *rq, struct task_struct *p)
 	 * the task is sleeping will it still have non-normalized vruntime.
 	 */
 	if (!task_on_rq_queued(p) && p->state != TASK_RUNNING) {
+=======
+	if (!vruntime_normalized(p)) {
+>>>>>>> common/deprecated/android-3.18
 		/*
 		 * Fix up our vruntime so that the current sleep doesn't
 		 * cause 'unlimited' sleep bonus.
@@ -9385,6 +12338,7 @@ static void switched_from_fair(struct rq *rq, struct task_struct *p)
 		se->vruntime -= cfs_rq->min_vruntime;
 	}
 
+<<<<<<< HEAD
 #ifdef CONFIG_SMP
 	/*
 	* Remove our load from contribution when we leave sched_fair
@@ -9405,12 +12359,25 @@ static void switched_to_fair(struct rq *rq, struct task_struct *p)
 {
 #ifdef CONFIG_FAIR_GROUP_SCHED
 	struct sched_entity *se = &p->se;
+=======
+	/* Catch up with the cfs_rq and remove our load when we leave */
+	detach_entity_load_avg(cfs_rq, se);
+}
+
+static void attach_task_cfs_rq(struct task_struct *p)
+{
+	struct sched_entity *se = &p->se;
+	struct cfs_rq *cfs_rq = cfs_rq_of(se);
+
+#ifdef CONFIG_FAIR_GROUP_SCHED
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Since the real-depth could have been changed (only FAIR
 	 * class maintain depth value), reset depth properly.
 	 */
 	se->depth = se->parent ? se->parent->depth + 1 : 0;
 #endif
+<<<<<<< HEAD
 	if (!task_on_rq_queued(p))
 		return;
 
@@ -9423,6 +12390,36 @@ static void switched_to_fair(struct rq *rq, struct task_struct *p)
 		resched_curr(rq);
 	else
 		check_preempt_curr(rq, p, 0);
+=======
+
+	/* Synchronize task with its cfs_rq */
+	attach_entity_load_avg(cfs_rq, se);
+
+	if (!vruntime_normalized(p))
+		se->vruntime += cfs_rq->min_vruntime;
+}
+
+static void switched_from_fair(struct rq *rq, struct task_struct *p)
+{
+	detach_task_cfs_rq(p);
+}
+
+static void switched_to_fair(struct rq *rq, struct task_struct *p)
+{
+	attach_task_cfs_rq(p);
+
+	if (task_on_rq_queued(p)) {
+		/*
+		 * We were most likely switched from sched_rt, so
+		 * kick off the schedule if running, otherwise just see
+		 * if we can still preempt the current task.
+		 */
+		if (rq->curr == p)
+			resched_curr(rq);
+		else
+			check_preempt_curr(rq, p, 0);
+	}
+>>>>>>> common/deprecated/android-3.18
 }
 
 /* Account for a task changing its policy or group.
@@ -9451,12 +12448,18 @@ void init_cfs_rq(struct cfs_rq *cfs_rq)
 	cfs_rq->min_vruntime_copy = cfs_rq->min_vruntime;
 #endif
 #ifdef CONFIG_SMP
+<<<<<<< HEAD
 	atomic64_set(&cfs_rq->decay_counter, 1);
 	atomic_long_set(&cfs_rq->removed_load, 0);
+=======
+	atomic_long_set(&cfs_rq->removed_load_avg, 0);
+	atomic_long_set(&cfs_rq->removed_util_avg, 0);
+>>>>>>> common/deprecated/android-3.18
 #endif
 }
 
 #ifdef CONFIG_FAIR_GROUP_SCHED
+<<<<<<< HEAD
 static void task_move_group_fair(struct task_struct *p, int queued)
 {
 	struct sched_entity *se = &p->se;
@@ -9507,6 +12510,18 @@ static void task_move_group_fair(struct task_struct *p, int queued)
 		cfs_rq->blocked_load_avg += se->avg.load_avg_contrib;
 #endif
 	}
+=======
+static void task_move_group_fair(struct task_struct *p)
+{
+	detach_task_cfs_rq(p);
+	set_task_rq(p, task_cpu(p));
+
+#ifdef CONFIG_SMP
+	/* Tell se's cfs_rq has been changed -- migrated */
+	p->se.avg.last_update_time = 0;
+#endif
+	attach_task_cfs_rq(p);
+>>>>>>> common/deprecated/android-3.18
 }
 
 void free_fair_sched_group(struct task_group *tg)
@@ -9556,6 +12571,10 @@ int alloc_fair_sched_group(struct task_group *tg, struct task_group *parent)
 
 		init_cfs_rq(cfs_rq);
 		init_tg_cfs_entry(tg, cfs_rq, se, i, parent->se[i]);
+<<<<<<< HEAD
+=======
+		init_entity_runnable_average(se);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	return 1;
@@ -9566,6 +12585,7 @@ err:
 	return 0;
 }
 
+<<<<<<< HEAD
 void unregister_fair_sched_group(struct task_group *tg, int cpu)
 {
 	struct rq *rq = cpu_rq(cpu);
@@ -9581,6 +12601,31 @@ void unregister_fair_sched_group(struct task_group *tg, int cpu)
 	raw_spin_lock_irqsave(&rq->lock, flags);
 	list_del_leaf_cfs_rq(tg->cfs_rq[cpu]);
 	raw_spin_unlock_irqrestore(&rq->lock, flags);
+=======
+void unregister_fair_sched_group(struct task_group *tg)
+{
+	unsigned long flags;
+	struct rq *rq;
+	int cpu;
+
+	for_each_possible_cpu(cpu) {
+		if (tg->se[cpu])
+			remove_entity_load_avg(tg->se[cpu]);
+
+		/*
+		 * Only empty task groups can be destroyed; so we can speculatively
+		 * check on_list without danger of it being re-added.
+		 */
+		if (!tg->cfs_rq[cpu]->on_list)
+			continue;
+
+		rq = cpu_rq(cpu);
+
+		raw_spin_lock_irqsave(&rq->lock, flags);
+		list_del_leaf_cfs_rq(tg->cfs_rq[cpu]);
+		raw_spin_unlock_irqrestore(&rq->lock, flags);
+	}
+>>>>>>> common/deprecated/android-3.18
 }
 
 void init_tg_cfs_entry(struct task_group *tg, struct cfs_rq *cfs_rq,
@@ -9662,7 +12707,11 @@ int alloc_fair_sched_group(struct task_group *tg, struct task_group *parent)
 	return 1;
 }
 
+<<<<<<< HEAD
 void unregister_fair_sched_group(struct task_group *tg, int cpu) { }
+=======
+void unregister_fair_sched_group(struct task_group *tg) { }
+>>>>>>> common/deprecated/android-3.18
 
 #endif /* CONFIG_FAIR_GROUP_SCHED */
 
@@ -9705,6 +12754,10 @@ const struct sched_class fair_sched_class = {
 	.rq_offline		= rq_offline_fair,
 
 	.task_waking		= task_waking_fair,
+<<<<<<< HEAD
+=======
+	.task_dead		= task_dead_fair,
+>>>>>>> common/deprecated/android-3.18
 #endif
 
 	.set_curr_task          = set_curr_task_fair,
@@ -9746,6 +12799,7 @@ __init void init_sched_fair_class(void)
 	zalloc_cpumask_var(&nohz.idle_cpus_mask, GFP_NOWAIT);
 	cpu_notifier(sched_ilb_notifier, 0);
 #endif
+<<<<<<< HEAD
 
 #ifdef CONFIG_SCHED_HMP
 	hmp_cpu_mask_setup();
@@ -9973,3 +13027,8 @@ static int __init hmp_param_init(void)
 }
 pure_initcall(hmp_param_init);
 #endif
+=======
+#endif /* SMP */
+
+}
+>>>>>>> common/deprecated/android-3.18

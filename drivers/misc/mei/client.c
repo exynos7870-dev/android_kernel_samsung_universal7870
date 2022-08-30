@@ -478,7 +478,11 @@ void mei_host_client_init(struct work_struct *work)
 bool mei_hbuf_acquire(struct mei_device *dev)
 {
 	if (mei_pg_state(dev) == MEI_PG_ON ||
+<<<<<<< HEAD
 	    dev->pg_event == MEI_PG_EVENT_WAIT) {
+=======
+	    mei_pg_in_transition(dev)) {
+>>>>>>> common/deprecated/android-3.18
 		dev_dbg(dev->dev, "device is in pg\n");
 		return false;
 	}
@@ -625,6 +629,12 @@ int mei_cl_connect(struct mei_cl *cl, struct file *file)
 
 	dev = cl->dev;
 
+<<<<<<< HEAD
+=======
+	if (!mei_cl_is_connected(cl))
+		return -ENODEV;
+
+>>>>>>> common/deprecated/android-3.18
 	rets = pm_runtime_get(dev->dev);
 	if (rets < 0 && rets != -EINPROGRESS) {
 		pm_runtime_put_noidle(dev->dev);

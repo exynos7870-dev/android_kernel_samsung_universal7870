@@ -20,7 +20,11 @@
 #include <net/route.h>
 #include <net/tcp_states.h>
 
+<<<<<<< HEAD
 int ip4_datagram_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
+=======
+int __ip4_datagram_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct inet_sock *inet = inet_sk(sk);
 	struct sockaddr_in *usin = (struct sockaddr_in *) uaddr;
@@ -39,8 +43,11 @@ int ip4_datagram_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
 
 	sk_dst_reset(sk);
 
+<<<<<<< HEAD
 	lock_sock(sk);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	oif = sk->sk_bound_dev_if;
 	saddr = inet->inet_saddr;
 	if (ipv4_is_multicast(usin->sin_addr.s_addr)) {
@@ -77,14 +84,34 @@ int ip4_datagram_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
 	inet->inet_dport = usin->sin_port;
 	sk->sk_state = TCP_ESTABLISHED;
 	inet_set_txhash(sk);
+<<<<<<< HEAD
 	inet->inet_id = jiffies;
+=======
+	inet->inet_id = prandom_u32();
+>>>>>>> common/deprecated/android-3.18
 
 	sk_dst_set(sk, &rt->dst);
 	err = 0;
 out:
+<<<<<<< HEAD
 	release_sock(sk);
 	return err;
 }
+=======
+	return err;
+}
+EXPORT_SYMBOL(__ip4_datagram_connect);
+
+int ip4_datagram_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
+{
+	int res;
+
+	lock_sock(sk);
+	res = __ip4_datagram_connect(sk, uaddr, addr_len);
+	release_sock(sk);
+	return res;
+}
+>>>>>>> common/deprecated/android-3.18
 EXPORT_SYMBOL(ip4_datagram_connect);
 
 /* Because UDP xmit path can manipulate sk_dst_cache without holding

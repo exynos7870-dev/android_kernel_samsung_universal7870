@@ -19,6 +19,11 @@
 #include "video.h"
 #include "vesa.h"
 
+<<<<<<< HEAD
+=======
+#include <uapi/asm/boot.h>
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Common variables
  */

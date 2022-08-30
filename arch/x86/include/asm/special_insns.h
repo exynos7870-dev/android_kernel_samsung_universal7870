@@ -137,17 +137,29 @@ static inline void write_cr3(unsigned long x)
 	native_write_cr3(x);
 }
 
+<<<<<<< HEAD
 static inline unsigned long read_cr4(void)
+=======
+static inline unsigned long __read_cr4(void)
+>>>>>>> common/deprecated/android-3.18
 {
 	return native_read_cr4();
 }
 
+<<<<<<< HEAD
 static inline unsigned long read_cr4_safe(void)
+=======
+static inline unsigned long __read_cr4_safe(void)
+>>>>>>> common/deprecated/android-3.18
 {
 	return native_read_cr4_safe();
 }
 
+<<<<<<< HEAD
 static inline void write_cr4(unsigned long x)
+=======
+static inline void __write_cr4(unsigned long x)
+>>>>>>> common/deprecated/android-3.18
 {
 	native_write_cr4(x);
 }

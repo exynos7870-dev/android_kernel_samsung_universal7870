@@ -165,6 +165,11 @@ ssize_t ovl_getxattr(struct dentry *dentry, const char *name,
 		     void *value, size_t size);
 ssize_t ovl_listxattr(struct dentry *dentry, char *list, size_t size);
 int ovl_removexattr(struct dentry *dentry, const char *name);
+<<<<<<< HEAD
+=======
+struct inode *ovl_d_select_inode(struct dentry *dentry, unsigned file_flags);
+bool ovl_is_private_xattr(const char *name);
+>>>>>>> common/deprecated/android-3.18
 
 struct inode *ovl_new_inode(struct super_block *sb, umode_t mode,
 			    struct ovl_entry *oe);
@@ -172,6 +177,10 @@ static inline void ovl_copyattr(struct inode *from, struct inode *to)
 {
 	to->i_uid = from->i_uid;
 	to->i_gid = from->i_gid;
+<<<<<<< HEAD
+=======
+	to->i_mode = from->i_mode;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /* dir.c */

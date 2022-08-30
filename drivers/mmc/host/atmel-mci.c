@@ -1295,7 +1295,11 @@ static void atmci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 
 	if (ios->clock) {
 		unsigned int clock_min = ~0U;
+<<<<<<< HEAD
 		u32 clkdiv;
+=======
+		int clkdiv;
+>>>>>>> common/deprecated/android-3.18
 
 		clk_prepare(host->mck);
 		unprepare_clk = true;
@@ -1324,7 +1328,16 @@ static void atmci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 		/* Calculate clock divider */
 		if (host->caps.has_odd_clk_div) {
 			clkdiv = DIV_ROUND_UP(host->bus_hz, clock_min) - 2;
+<<<<<<< HEAD
 			if (clkdiv > 511) {
+=======
+			if (clkdiv < 0) {
+				dev_warn(&mmc->class_dev,
+					 "clock %u too fast; using %lu\n",
+					 clock_min, host->bus_hz / 2);
+				clkdiv = 0;
+			} else if (clkdiv > 511) {
+>>>>>>> common/deprecated/android-3.18
 				dev_warn(&mmc->class_dev,
 				         "clock %u too slow; using %lu\n",
 				         clock_min, host->bus_hz / (511 + 2));
@@ -1833,13 +1846,21 @@ static void atmci_tasklet_func(unsigned long priv)
 			}
 
 			atmci_request_end(host, host->mrq);
+<<<<<<< HEAD
 			state = STATE_IDLE;
+=======
+			goto unlock; /* atmci_request_end() sets host->state */
+>>>>>>> common/deprecated/android-3.18
 			break;
 		}
 	} while (state != prev_state);
 
 	host->state = state;
 
+<<<<<<< HEAD
+=======
+unlock:
+>>>>>>> common/deprecated/android-3.18
 	spin_unlock(&host->lock);
 }
 

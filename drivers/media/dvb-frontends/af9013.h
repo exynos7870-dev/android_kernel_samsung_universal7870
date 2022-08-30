@@ -103,7 +103,11 @@ struct af9013_config {
 	u8 gpio[4];
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_AF9013)
+=======
+#if IS_REACHABLE(CONFIG_DVB_AF9013)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend *af9013_attach(const struct af9013_config *config,
 	struct i2c_adapter *i2c);
 #else

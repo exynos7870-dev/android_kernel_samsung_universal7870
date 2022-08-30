@@ -1996,6 +1996,10 @@ static int tipc_accept(struct socket *sock, struct socket *new_sock, int flags)
 	res = tipc_sk_create(sock_net(sock->sk), new_sock, 0, 1);
 	if (res)
 		goto exit;
+<<<<<<< HEAD
+=======
+	security_sk_clone(sock->sk, new_sock->sk);
+>>>>>>> common/deprecated/android-3.18
 
 	new_sk = new_sock->sk;
 	new_tsock = tipc_sk(new_sk);

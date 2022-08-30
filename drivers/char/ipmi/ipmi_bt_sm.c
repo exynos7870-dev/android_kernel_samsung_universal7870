@@ -522,11 +522,19 @@ static enum si_sm_result bt_event(struct si_sm_data *bt, long time)
 		if (status & BT_H_BUSY)		/* clear a leftover H_BUSY */
 			BT_CONTROL(BT_H_BUSY);
 
+<<<<<<< HEAD
+=======
+		bt->timeout = bt->BT_CAP_req2rsp;
+
+>>>>>>> common/deprecated/android-3.18
 		/* Read BT capabilities if it hasn't been done yet */
 		if (!bt->BT_CAP_outreqs)
 			BT_STATE_CHANGE(BT_STATE_CAPABILITIES_BEGIN,
 					SI_SM_CALL_WITHOUT_DELAY);
+<<<<<<< HEAD
 		bt->timeout = bt->BT_CAP_req2rsp;
+=======
+>>>>>>> common/deprecated/android-3.18
 		BT_SI_SM_RETURN(SI_SM_IDLE);
 
 	case BT_STATE_XACTION_START:

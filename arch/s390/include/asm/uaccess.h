@@ -148,7 +148,11 @@ unsigned long __must_check __copy_to_user(void __user *to, const void *from,
 		"	jg	2b\n"				\
 		".popsection\n"					\
 		EX_TABLE(0b,3b) EX_TABLE(1b,3b)			\
+<<<<<<< HEAD
 		: "=d" (__rc), "=Q" (*(to))			\
+=======
+		: "=d" (__rc), "+Q" (*(to))			\
+>>>>>>> common/deprecated/android-3.18
 		: "d" (size), "Q" (*(from)),			\
 		  "d" (__reg0), "K" (-EFAULT)			\
 		: "cc");					\
@@ -213,28 +217,44 @@ int __put_user_bad(void) __attribute__((noreturn));
 	__chk_user_ptr(ptr);					\
 	switch (sizeof(*(ptr))) {				\
 	case 1: {						\
+<<<<<<< HEAD
 		unsigned char __x;				\
+=======
+		unsigned char __x = 0;				\
+>>>>>>> common/deprecated/android-3.18
 		__gu_err = __get_user_fn(&__x, ptr,		\
 					 sizeof(*(ptr)));	\
 		(x) = *(__force __typeof__(*(ptr)) *) &__x;	\
 		break;						\
 	};							\
 	case 2: {						\
+<<<<<<< HEAD
 		unsigned short __x;				\
+=======
+		unsigned short __x = 0;				\
+>>>>>>> common/deprecated/android-3.18
 		__gu_err = __get_user_fn(&__x, ptr,		\
 					 sizeof(*(ptr)));	\
 		(x) = *(__force __typeof__(*(ptr)) *) &__x;	\
 		break;						\
 	};							\
 	case 4: {						\
+<<<<<<< HEAD
 		unsigned int __x;				\
+=======
+		unsigned int __x = 0;				\
+>>>>>>> common/deprecated/android-3.18
 		__gu_err = __get_user_fn(&__x, ptr,		\
 					 sizeof(*(ptr)));	\
 		(x) = *(__force __typeof__(*(ptr)) *) &__x;	\
 		break;						\
 	};							\
 	case 8: {						\
+<<<<<<< HEAD
 		unsigned long long __x;				\
+=======
+		unsigned long long __x = 0;			\
+>>>>>>> common/deprecated/android-3.18
 		__gu_err = __get_user_fn(&__x, ptr,		\
 					 sizeof(*(ptr)));	\
 		(x) = *(__force __typeof__(*(ptr)) *) &__x;	\

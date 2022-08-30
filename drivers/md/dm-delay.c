@@ -215,7 +215,12 @@ static void delay_dtr(struct dm_target *ti)
 {
 	struct delay_c *dc = ti->private;
 
+<<<<<<< HEAD
 	destroy_workqueue(dc->kdelayd_wq);
+=======
+	if (dc->kdelayd_wq)
+		destroy_workqueue(dc->kdelayd_wq);
+>>>>>>> common/deprecated/android-3.18
 
 	dm_put_device(ti, dc->dev_read);
 

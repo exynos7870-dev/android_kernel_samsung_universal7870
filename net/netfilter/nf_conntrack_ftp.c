@@ -334,7 +334,11 @@ static int find_pattern(const char *data, size_t dlen,
 		i++;
 	}
 
+<<<<<<< HEAD
 	pr_debug("Skipped up to `%c'!\n", skip);
+=======
+	pr_debug("Skipped up to 0x%hhx delimiter!\n", skip);
+>>>>>>> common/deprecated/android-3.18
 
 	*numoff = i;
 	*numlen = getnum(data + i, dlen - i, cmd, term, numoff);

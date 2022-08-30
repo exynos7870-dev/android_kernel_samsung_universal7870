@@ -74,3 +74,7 @@ module_exit(libcrc32c_mod_fini);
 MODULE_AUTHOR("Clay Haapala <chaapala@cisco.com>");
 MODULE_DESCRIPTION("CRC32c (Castagnoli) calculations");
 MODULE_LICENSE("GPL");
+<<<<<<< HEAD
+=======
+MODULE_SOFTDEP("pre: crc32c");
+>>>>>>> common/deprecated/android-3.18

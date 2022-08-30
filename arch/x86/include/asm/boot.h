@@ -27,7 +27,11 @@
 #define BOOT_HEAP_SIZE             0x400000
 #else /* !CONFIG_KERNEL_BZIP2 */
 
+<<<<<<< HEAD
 #define BOOT_HEAP_SIZE	0x8000
+=======
+#define BOOT_HEAP_SIZE	0x10000
+>>>>>>> common/deprecated/android-3.18
 
 #endif /* !CONFIG_KERNEL_BZIP2 */
 

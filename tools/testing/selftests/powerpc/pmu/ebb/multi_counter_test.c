@@ -68,6 +68,7 @@ int multi_counter(void)
 	ebb_global_disable();
 	ebb_freeze_pmcs();
 
+<<<<<<< HEAD
 	count_pmc(1, sample_period);
 	count_pmc(2, sample_period);
 	count_pmc(3, sample_period);
@@ -75,6 +76,8 @@ int multi_counter(void)
 	count_pmc(5, sample_period);
 	count_pmc(6, sample_period);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	dump_ebb_state();
 
 	for (i = 0; i < 6; i++)

@@ -82,5 +82,8 @@
 
 #define SO_BPF_EXTENSIONS	48
 
+<<<<<<< HEAD
 #define SO_SET_DOMAIN_NAME 51
+=======
+>>>>>>> common/deprecated/android-3.18
 #endif /* __ASM_GENERIC_SOCKET_H */

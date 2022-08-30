@@ -4,7 +4,10 @@
 
 obj-y				+= firmware.o
 
+<<<<<<< HEAD
 obj-$(CONFIG_FIQ_GLUE)		+= fiq_glue.o fiq_glue_setup.o
+=======
+>>>>>>> common/deprecated/android-3.18
 obj-$(CONFIG_ICST)		+= icst.o
 obj-$(CONFIG_SA1111)		+= sa1111.o
 obj-$(CONFIG_DMABOUNCE)		+= dmabounce.o

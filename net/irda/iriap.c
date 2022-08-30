@@ -191,8 +191,17 @@ struct iriap_cb *iriap_open(__u8 slsap_sel, int mode, void *priv,
 
 	self->magic = IAS_MAGIC;
 	self->mode = mode;
+<<<<<<< HEAD
 	if (mode == IAS_CLIENT)
 		iriap_register_lsap(self, slsap_sel, mode);
+=======
+	if (mode == IAS_CLIENT) {
+		if (iriap_register_lsap(self, slsap_sel, mode)) {
+			kfree(self);
+			return NULL;
+		}
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	self->confirm = callback;
 	self->priv = priv;

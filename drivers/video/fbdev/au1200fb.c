@@ -1680,8 +1680,15 @@ static int au1200fb_drv_probe(struct platform_device *dev)
 
 		fbi = framebuffer_alloc(sizeof(struct au1200fb_device),
 					&dev->dev);
+<<<<<<< HEAD
 		if (!fbi)
 			goto failed;
+=======
+		if (!fbi) {
+			ret = -ENOMEM;
+			goto failed;
+		}
+>>>>>>> common/deprecated/android-3.18
 
 		_au1200fb_infos[plane] = fbi;
 		fbdev = fbi->par;
@@ -1699,7 +1706,12 @@ static int au1200fb_drv_probe(struct platform_device *dev)
 		if (!fbdev->fb_mem) {
 			print_err("fail to allocate frambuffer (size: %dK))",
 				  fbdev->fb_len / 1024);
+<<<<<<< HEAD
 			return -ENOMEM;
+=======
+			ret = -ENOMEM;
+			goto failed;
+>>>>>>> common/deprecated/android-3.18
 		}
 
 		/*

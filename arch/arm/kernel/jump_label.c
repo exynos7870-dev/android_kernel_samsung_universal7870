@@ -19,7 +19,11 @@ static void __arch_jump_label_transform(struct jump_entry *entry,
 		insn = arm_gen_nop();
 
 	if (is_static)
+<<<<<<< HEAD
 		__patch_text(addr, insn);
+=======
+		__patch_text_early(addr, insn);
+>>>>>>> common/deprecated/android-3.18
 	else
 		patch_text(addr, insn);
 }

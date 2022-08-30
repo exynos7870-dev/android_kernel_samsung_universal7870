@@ -652,6 +652,12 @@ static int ti_hecc_rx_poll(struct napi_struct *napi, int quota)
 		mbx_mask = hecc_read(priv, HECC_CANMIM);
 		mbx_mask |= HECC_TX_MBOX_MASK;
 		hecc_write(priv, HECC_CANMIM, mbx_mask);
+<<<<<<< HEAD
+=======
+	} else {
+		/* repoll is done only if whole budget is used */
+		num_pkts = quota;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	return num_pkts;
@@ -950,7 +956,16 @@ static int ti_hecc_probe(struct platform_device *pdev)
 	netif_napi_add(ndev, &priv->napi, ti_hecc_rx_poll,
 		HECC_DEF_NAPI_WEIGHT);
 
+<<<<<<< HEAD
 	clk_enable(priv->clk);
+=======
+	err = clk_prepare_enable(priv->clk);
+	if (err) {
+		dev_err(&pdev->dev, "clk_prepare_enable() failed\n");
+		goto probe_exit_clk;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	err = register_candev(ndev);
 	if (err) {
 		dev_err(&pdev->dev, "register_candev() failed\n");
@@ -983,7 +998,11 @@ static int ti_hecc_remove(struct platform_device *pdev)
 	struct ti_hecc_priv *priv = netdev_priv(ndev);
 
 	unregister_candev(ndev);
+<<<<<<< HEAD
 	clk_disable(priv->clk);
+=======
+	clk_disable_unprepare(priv->clk);
+>>>>>>> common/deprecated/android-3.18
 	clk_put(priv->clk);
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	iounmap(priv->base);
@@ -1008,7 +1027,11 @@ static int ti_hecc_suspend(struct platform_device *pdev, pm_message_t state)
 	hecc_set_bit(priv, HECC_CANMC, HECC_CANMC_PDR);
 	priv->can.state = CAN_STATE_SLEEPING;
 
+<<<<<<< HEAD
 	clk_disable(priv->clk);
+=======
+	clk_disable_unprepare(priv->clk);
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }
@@ -1017,8 +1040,16 @@ static int ti_hecc_resume(struct platform_device *pdev)
 {
 	struct net_device *dev = platform_get_drvdata(pdev);
 	struct ti_hecc_priv *priv = netdev_priv(dev);
+<<<<<<< HEAD
 
 	clk_enable(priv->clk);
+=======
+	int err;
+
+	err = clk_prepare_enable(priv->clk);
+	if (err)
+		return err;
+>>>>>>> common/deprecated/android-3.18
 
 	hecc_clear_bit(priv, HECC_CANMC, HECC_CANMC_PDR);
 	priv->can.state = CAN_STATE_ERROR_ACTIVE;

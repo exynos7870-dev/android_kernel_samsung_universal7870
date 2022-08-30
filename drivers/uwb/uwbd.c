@@ -303,18 +303,35 @@ static int uwbd(void *param)
 /** Start the UWB daemon */
 void uwbd_start(struct uwb_rc *rc)
 {
+<<<<<<< HEAD
 	rc->uwbd.task = kthread_run(uwbd, rc, "uwbd");
 	if (rc->uwbd.task == NULL)
 		printk(KERN_ERR "UWB: Cannot start management daemon; "
 		       "UWB won't work\n");
 	else
 		rc->uwbd.pid = rc->uwbd.task->pid;
+=======
+	struct task_struct *task = kthread_run(uwbd, rc, "uwbd");
+	if (IS_ERR(task)) {
+		rc->uwbd.task = NULL;
+		printk(KERN_ERR "UWB: Cannot start management daemon; "
+		       "UWB won't work\n");
+	} else {
+		rc->uwbd.task = task;
+		rc->uwbd.pid = rc->uwbd.task->pid;
+	}
+>>>>>>> common/deprecated/android-3.18
 }
 
 /* Stop the UWB daemon and free any unprocessed events */
 void uwbd_stop(struct uwb_rc *rc)
 {
+<<<<<<< HEAD
 	kthread_stop(rc->uwbd.task);
+=======
+	if (rc->uwbd.task)
+		kthread_stop(rc->uwbd.task);
+>>>>>>> common/deprecated/android-3.18
 	uwbd_flush(rc);
 }
 

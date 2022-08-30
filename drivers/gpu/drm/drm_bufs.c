@@ -36,6 +36,11 @@
 #include <drm/drmP.h>
 #include "drm_legacy.h"
 
+<<<<<<< HEAD
+=======
+#include <linux/nospec.h>
+
+>>>>>>> common/deprecated/android-3.18
 static struct drm_map_list *drm_find_matching_map(struct drm_device *dev,
 						  struct drm_local_map *map)
 {
@@ -1332,6 +1337,10 @@ int drm_legacy_freebufs(struct drm_device *dev, void *data,
 				  idx, dma->buf_count - 1);
 			return -EINVAL;
 		}
+<<<<<<< HEAD
+=======
+		idx = array_index_nospec(idx, dma->buf_count);
+>>>>>>> common/deprecated/android-3.18
 		buf = dma->buflist[idx];
 		if (buf->file_priv != file_priv) {
 			DRM_ERROR("Process %d freeing buffer not owned\n",

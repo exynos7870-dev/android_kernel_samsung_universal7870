@@ -1,5 +1,6 @@
 #include <asm/ia32.h>
 
+<<<<<<< HEAD
 #define __SYSCALL_64(nr, sym, compat) [nr] = 1,
 #define __SYSCALL_COMMON(nr, sym, compat) [nr] = 1,
 #ifdef CONFIG_X86_X32_ABI
@@ -11,6 +12,13 @@ static char syscalls_64[] = {
 #include <asm/syscalls_64.h>
 };
 #define __SYSCALL_I386(nr, sym, compat) [nr] = 1,
+=======
+#define __SYSCALL_64(nr, sym, qual) [nr] = 1,
+static char syscalls_64[] = {
+#include <asm/syscalls_64.h>
+};
+#define __SYSCALL_I386(nr, sym, qual) [nr] = 1,
+>>>>>>> common/deprecated/android-3.18
 static char syscalls_ia32[] = {
 #include <asm/syscalls_32.h>
 };

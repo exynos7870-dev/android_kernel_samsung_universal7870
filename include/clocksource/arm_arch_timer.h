@@ -16,7 +16,11 @@
 #ifndef __CLKSOURCE_ARM_ARCH_TIMER_H
 #define __CLKSOURCE_ARM_ARCH_TIMER_H
 
+<<<<<<< HEAD
 #include <linux/clocksource.h>
+=======
+#include <linux/timecounter.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/types.h>
 
 #define ARCH_TIMER_CTRL_ENABLE		(1 << 0)

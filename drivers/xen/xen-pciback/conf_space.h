@@ -64,7 +64,11 @@ struct config_field_entry {
 	void *data;
 };
 
+<<<<<<< HEAD
 extern bool permissive;
+=======
+extern bool xen_pcibk_permissive;
+>>>>>>> common/deprecated/android-3.18
 
 #define OFFSET(cfg_entry) ((cfg_entry)->base_offset+(cfg_entry)->field->offset)
 

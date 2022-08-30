@@ -487,7 +487,11 @@ static void pcan_free_channels(struct pcan_pccard *card)
 		if (!netdev)
 			continue;
 
+<<<<<<< HEAD
 		strncpy(name, netdev->name, IFNAMSIZ);
+=======
+		strlcpy(name, netdev->name, IFNAMSIZ);
+>>>>>>> common/deprecated/android-3.18
 
 		unregister_sja1000dev(netdev);
 

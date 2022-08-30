@@ -273,6 +273,12 @@ static int regex_match_full(char *str, struct regex *r, int len)
 
 static int regex_match_front(char *str, struct regex *r, int len)
 {
+<<<<<<< HEAD
+=======
+	if (len < r->len)
+		return 0;
+
+>>>>>>> common/deprecated/android-3.18
 	if (strncmp(str, r->pattern, r->len) == 0)
 		return 1;
 	return 0;
@@ -1050,6 +1056,12 @@ static void parse_init(struct filter_parse_state *ps,
 
 static char infix_next(struct filter_parse_state *ps)
 {
+<<<<<<< HEAD
+=======
+	if (!ps->infix.cnt)
+		return 0;
+
+>>>>>>> common/deprecated/android-3.18
 	ps->infix.cnt--;
 
 	return ps->infix.string[ps->infix.tail++];
@@ -1065,6 +1077,12 @@ static char infix_peek(struct filter_parse_state *ps)
 
 static void infix_advance(struct filter_parse_state *ps)
 {
+<<<<<<< HEAD
+=======
+	if (!ps->infix.cnt)
+		return;
+
+>>>>>>> common/deprecated/android-3.18
 	ps->infix.cnt--;
 	ps->infix.tail++;
 }
@@ -1363,19 +1381,40 @@ static int check_preds(struct filter_parse_state *ps)
 {
 	int n_normal_preds = 0, n_logical_preds = 0;
 	struct postfix_elt *elt;
+<<<<<<< HEAD
 
 	list_for_each_entry(elt, &ps->postfix, list) {
 		if (elt->op == OP_NONE)
 			continue;
 
+=======
+	int cnt = 0;
+
+	list_for_each_entry(elt, &ps->postfix, list) {
+		if (elt->op == OP_NONE) {
+			cnt++;
+			continue;
+		}
+
+		cnt--;
+>>>>>>> common/deprecated/android-3.18
 		if (elt->op == OP_AND || elt->op == OP_OR) {
 			n_logical_preds++;
 			continue;
 		}
 		n_normal_preds++;
+<<<<<<< HEAD
 	}
 
 	if (!n_normal_preds || n_logical_preds >= n_normal_preds) {
+=======
+		/* all ops should have operands */
+		if (cnt < 0)
+			break;
+	}
+
+	if (cnt != 1 || !n_normal_preds || n_logical_preds >= n_normal_preds) {
+>>>>>>> common/deprecated/android-3.18
 		parse_error(ps, FILT_ERR_INVALID_FILTER, 0);
 		return -EINVAL;
 	}
@@ -1896,6 +1935,13 @@ static int create_filter(struct ftrace_event_call *call,
 		if (err && set_str)
 			append_filter_err(ps, filter);
 	}
+<<<<<<< HEAD
+=======
+	if (err && !set_str) {
+		free_event_filter(filter);
+		filter = NULL;
+	}
+>>>>>>> common/deprecated/android-3.18
 	create_filter_finish(ps);
 
 	*filterp = filter;

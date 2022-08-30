@@ -73,7 +73,11 @@ struct tda10048_config {
 	u8 pll_n;
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_TDA10048)
+=======
+#if IS_REACHABLE(CONFIG_DVB_TDA10048)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend *tda10048_attach(
 	const struct tda10048_config *config,
 	struct i2c_adapter *i2c);

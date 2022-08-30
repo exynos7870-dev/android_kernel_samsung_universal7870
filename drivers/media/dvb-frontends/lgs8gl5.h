@@ -31,7 +31,11 @@ struct lgs8gl5_config {
 	u8 demod_address;
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_LGS8GL5)
+=======
+#if IS_REACHABLE(CONFIG_DVB_LGS8GL5)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend *lgs8gl5_attach(
 	const struct lgs8gl5_config *config, struct i2c_adapter *i2c);
 #else

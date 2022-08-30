@@ -14,6 +14,9 @@ st_magn-$(CONFIG_IIO_BUFFER) += st_magn_buffer.o
 
 obj-$(CONFIG_IIO_ST_MAGN_I2C_3AXIS) += st_magn_i2c.o
 obj-$(CONFIG_IIO_ST_MAGN_SPI_3AXIS) += st_magn_spi.o
+<<<<<<< HEAD
 
 obj-y += yas537/
 CFLAGS_yas_mag_kernel.o += -Idrivers/iio
+=======
+>>>>>>> common/deprecated/android-3.18

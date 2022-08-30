@@ -472,6 +472,12 @@ const char *perf_evsel__name(struct perf_evsel *evsel)
 {
 	char bf[128];
 
+<<<<<<< HEAD
+=======
+	if (!evsel)
+		goto out_unknown;
+
+>>>>>>> common/deprecated/android-3.18
 	if (evsel->name)
 		return evsel->name;
 
@@ -508,7 +514,14 @@ const char *perf_evsel__name(struct perf_evsel *evsel)
 
 	evsel->name = strdup(bf);
 
+<<<<<<< HEAD
 	return evsel->name ?: "unknown";
+=======
+	if (evsel->name)
+		return evsel->name;
+out_unknown:
+	return "unknown";
+>>>>>>> common/deprecated/android-3.18
 }
 
 const char *perf_evsel__group_name(struct perf_evsel *evsel)

@@ -6,7 +6,11 @@
  */
 
 /dts-v1/;
+<<<<<<< HEAD
 /include/ "moxart.dtsi"
+=======
+#include "moxart.dtsi"
+>>>>>>> common/deprecated/android-3.18
 
 / {
 	model = "MOXA UC-7112-LX";

@@ -61,6 +61,11 @@ static int
 isert_rdma_accept(struct isert_conn *isert_conn);
 struct rdma_cm_id *isert_setup_id(struct isert_np *isert_np);
 
+<<<<<<< HEAD
+=======
+static void isert_release_work(struct work_struct *work);
+
+>>>>>>> common/deprecated/android-3.18
 static inline bool
 isert_prot_cmd(struct isert_conn *conn, struct se_cmd *cmd)
 {
@@ -218,7 +223,11 @@ fail:
 static void
 isert_free_rx_descriptors(struct isert_conn *isert_conn)
 {
+<<<<<<< HEAD
 	struct ib_device *ib_dev = isert_conn->conn_cm_id->device;
+=======
+	struct ib_device *ib_dev = isert_conn->conn_device->ib_device;
+>>>>>>> common/deprecated/android-3.18
 	struct iser_rx_desc *rx_desc;
 	int i;
 
@@ -624,6 +633,10 @@ isert_connect_request(struct rdma_cm_id *cma_id, struct rdma_cm_event *event)
 	mutex_init(&isert_conn->conn_mutex);
 	spin_lock_init(&isert_conn->conn_lock);
 	INIT_LIST_HEAD(&isert_conn->conn_fr_pool);
+<<<<<<< HEAD
+=======
+	INIT_WORK(&isert_conn->release_work, isert_release_work);
+>>>>>>> common/deprecated/android-3.18
 
 	isert_conn->conn_cm_id = cma_id;
 
@@ -739,9 +752,15 @@ out:
 static void
 isert_connect_release(struct isert_conn *isert_conn)
 {
+<<<<<<< HEAD
 	struct ib_device *ib_dev = isert_conn->conn_cm_id->device;
 	struct isert_device *device = isert_conn->conn_device;
 	int cq_index;
+=======
+	struct isert_device *device = isert_conn->conn_device;
+	int cq_index;
+	struct ib_device *ib_dev = device->ib_device;
+>>>>>>> common/deprecated/android-3.18
 
 	pr_debug("Entering isert_connect_release(): >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
@@ -749,7 +768,12 @@ isert_connect_release(struct isert_conn *isert_conn)
 		isert_conn_free_fastreg_pool(isert_conn);
 
 	isert_free_rx_descriptors(isert_conn);
+<<<<<<< HEAD
 	rdma_destroy_id(isert_conn->conn_cm_id);
+=======
+	if (isert_conn->conn_cm_id)
+		rdma_destroy_id(isert_conn->conn_cm_id);
+>>>>>>> common/deprecated/android-3.18
 
 	if (isert_conn->conn_qp) {
 		cq_index = ((struct isert_cq_desc *)
@@ -890,6 +914,7 @@ isert_disconnected_handler(struct rdma_cm_id *cma_id,
 			   enum rdma_cm_event_type event)
 {
 	struct isert_np *isert_np = cma_id->context;
+<<<<<<< HEAD
 	struct isert_conn *isert_conn;
 
 	if (isert_np->np_cm_id == cma_id)
@@ -898,31 +923,75 @@ isert_disconnected_handler(struct rdma_cm_id *cma_id,
 	isert_conn = cma_id->qp->qp_context;
 
 	mutex_lock(&isert_conn->conn_mutex);
+=======
+	struct isert_conn *isert_conn = cma_id->qp->qp_context;
+	bool terminating = false;
+
+
+	mutex_lock(&isert_conn->conn_mutex);
+	terminating = (isert_conn->state == ISER_CONN_TERMINATING);
+>>>>>>> common/deprecated/android-3.18
 	isert_conn_terminate(isert_conn);
 	mutex_unlock(&isert_conn->conn_mutex);
 
 	pr_info("conn %p completing conn_wait\n", isert_conn);
 	complete(&isert_conn->conn_wait);
 
+<<<<<<< HEAD
 	return 0;
 }
 
 static void
+=======
+	if (terminating)
+		goto out;
+
+	mutex_lock(&isert_np->np_accept_mutex);
+	if (!list_empty(&isert_conn->conn_accept_node)) {
+		list_del_init(&isert_conn->conn_accept_node);
+		isert_put_conn(isert_conn);
+		queue_work(isert_release_wq, &isert_conn->release_work);
+	}
+	mutex_unlock(&isert_np->np_accept_mutex);
+
+out:
+	return 0;
+}
+
+static int
+>>>>>>> common/deprecated/android-3.18
 isert_connect_error(struct rdma_cm_id *cma_id)
 {
 	struct isert_conn *isert_conn = cma_id->qp->qp_context;
 
+<<<<<<< HEAD
 	isert_put_conn(isert_conn);
+=======
+	isert_conn->conn_cm_id = NULL;
+	isert_put_conn(isert_conn);
+
+	return -1;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int
 isert_cma_handler(struct rdma_cm_id *cma_id, struct rdma_cm_event *event)
 {
+<<<<<<< HEAD
+=======
+	struct isert_np *isert_np = cma_id->context;
+>>>>>>> common/deprecated/android-3.18
 	int ret = 0;
 
 	pr_debug("isert_cma_handler: event %d status %d conn %p id %p\n",
 		 event->event, event->status, cma_id->context, cma_id);
 
+<<<<<<< HEAD
+=======
+	if (isert_np->np_cm_id == cma_id)
+		return isert_np_cma_handler(cma_id->context, event->event);
+
+>>>>>>> common/deprecated/android-3.18
 	switch (event->event) {
 	case RDMA_CM_EVENT_CONNECT_REQUEST:
 		ret = isert_connect_request(cma_id, event);
@@ -942,7 +1011,11 @@ isert_cma_handler(struct rdma_cm_id *cma_id, struct rdma_cm_event *event)
 	case RDMA_CM_EVENT_REJECTED:       /* FALLTHRU */
 	case RDMA_CM_EVENT_UNREACHABLE:    /* FALLTHRU */
 	case RDMA_CM_EVENT_CONNECT_ERROR:
+<<<<<<< HEAD
 		isert_connect_error(cma_id);
+=======
+		ret = isert_connect_error(cma_id);
+>>>>>>> common/deprecated/android-3.18
 		break;
 	default:
 		pr_err("Unhandled RDMA CMA event: %d\n", event->event);
@@ -1313,7 +1386,11 @@ sequence_cmd:
 	if (!rc && dump_payload == false && unsol_data)
 		iscsit_set_unsoliticed_dataout(cmd);
 	else if (dump_payload && imm_data)
+<<<<<<< HEAD
 		target_put_sess_cmd(conn->sess->se_sess, &cmd->se_cmd);
+=======
+		target_put_sess_cmd(&cmd->se_cmd);
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }
@@ -1543,7 +1620,11 @@ static void
 isert_rx_completion(struct iser_rx_desc *desc, struct isert_conn *isert_conn,
 		    unsigned long xfer_len)
 {
+<<<<<<< HEAD
 	struct ib_device *ib_dev = isert_conn->conn_cm_id->device;
+=======
+	struct ib_device *ib_dev = isert_conn->conn_device->ib_device;
+>>>>>>> common/deprecated/android-3.18
 	struct iscsi_hdr *hdr;
 	u64 rx_dma;
 	int rx_buflen, outstanding;
@@ -1732,7 +1813,11 @@ isert_put_cmd(struct isert_cmd *isert_cmd, bool comp_err)
 			    cmd->se_cmd.t_state == TRANSPORT_WRITE_PENDING) {
 				struct se_cmd *se_cmd = &cmd->se_cmd;
 
+<<<<<<< HEAD
 				target_put_sess_cmd(se_cmd->se_sess, se_cmd);
+=======
+				target_put_sess_cmd(se_cmd);
+>>>>>>> common/deprecated/android-3.18
 			}
 		}
 
@@ -1901,7 +1986,11 @@ isert_completion_rdma_read(struct iser_tx_desc *tx_desc,
 	spin_unlock_bh(&cmd->istate_lock);
 
 	if (ret) {
+<<<<<<< HEAD
 		target_put_sess_cmd(se_cmd->se_sess, se_cmd);
+=======
+		target_put_sess_cmd(se_cmd);
+>>>>>>> common/deprecated/android-3.18
 		transport_send_check_condition_and_sense(se_cmd,
 							 se_cmd->pi_err, 0);
 	} else {
@@ -2485,7 +2574,10 @@ isert_build_rdma_wr(struct isert_conn *isert_conn, struct isert_cmd *isert_cmd,
 	page_off = offset % PAGE_SIZE;
 
 	send_wr->sg_list = ib_sge;
+<<<<<<< HEAD
 	send_wr->num_sge = sg_nents;
+=======
+>>>>>>> common/deprecated/android-3.18
 	send_wr->wr_id = (unsigned long)&isert_cmd->tx_desc;
 	/*
 	 * Perform mapping of TCM scatterlist memory ib_sge dma_addr.
@@ -2504,14 +2596,27 @@ isert_build_rdma_wr(struct isert_conn *isert_conn, struct isert_cmd *isert_cmd,
 			 ib_sge->addr, ib_sge->length, ib_sge->lkey);
 		page_off = 0;
 		data_left -= ib_sge->length;
+<<<<<<< HEAD
+=======
+		if (!data_left)
+			break;
+>>>>>>> common/deprecated/android-3.18
 		ib_sge++;
 		pr_debug("Incrementing ib_sge pointer to %p\n", ib_sge);
 	}
 
+<<<<<<< HEAD
 	pr_debug("Set outgoing sg_list: %p num_sg: %u from TCM SGLs\n",
 		 send_wr->sg_list, send_wr->num_sge);
 
 	return sg_nents;
+=======
+	send_wr->num_sge = ++i;
+	pr_debug("Set outgoing sg_list: %p num_sg: %u from TCM SGLs\n",
+		 send_wr->sg_list, send_wr->num_sge);
+
+	return send_wr->num_sge;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int
@@ -3087,9 +3192,22 @@ isert_get_dataout(struct iscsi_conn *conn, struct iscsi_cmd *cmd, bool recovery)
 static int
 isert_immediate_queue(struct iscsi_conn *conn, struct iscsi_cmd *cmd, int state)
 {
+<<<<<<< HEAD
 	int ret;
 
 	switch (state) {
+=======
+	struct isert_cmd *isert_cmd = iscsit_priv_cmd(cmd);
+	int ret = 0;
+
+	switch (state) {
+	case ISTATE_REMOVE:
+		spin_lock_bh(&conn->cmd_lock);
+		list_del_init(&cmd->i_conn_node);
+		spin_unlock_bh(&conn->cmd_lock);
+		isert_put_cmd(isert_cmd, true);
+		break;
+>>>>>>> common/deprecated/android-3.18
 	case ISTATE_SEND_NOPIN_WANT_RESPONSE:
 		ret = isert_put_nopin(cmd, conn, false);
 		break;
@@ -3417,7 +3535,10 @@ static void isert_wait_conn(struct iscsi_conn *conn)
 
 	wait_for_completion(&isert_conn->conn_wait_comp_err);
 
+<<<<<<< HEAD
 	INIT_WORK(&isert_conn->release_work, isert_release_work);
+=======
+>>>>>>> common/deprecated/android-3.18
 	queue_work(isert_release_wq, &isert_conn->release_work);
 }
 

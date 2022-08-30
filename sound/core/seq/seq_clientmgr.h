@@ -59,6 +59,10 @@ struct snd_seq_client {
 	struct list_head ports_list_head;
 	rwlock_t ports_lock;
 	struct mutex ports_mutex;
+<<<<<<< HEAD
+=======
+	struct mutex ioctl_mutex;
+>>>>>>> common/deprecated/android-3.18
 	int convert32;		/* convert 32->64bit */
 
 	/* output pool */

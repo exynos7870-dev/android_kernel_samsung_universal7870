@@ -191,7 +191,11 @@ void symbols__fixup_end(struct rb_root *symbols)
 
 	/* Last entry */
 	if (curr->end == curr->start)
+<<<<<<< HEAD
 		curr->end = roundup(curr->start, 4096);
+=======
+		curr->end = roundup(curr->start, 4096) + 4096;
+>>>>>>> common/deprecated/android-3.18
 }
 
 void __map_groups__fixup_end(struct map_groups *mg, enum map_type type)

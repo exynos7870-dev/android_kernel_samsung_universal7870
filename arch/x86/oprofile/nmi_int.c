@@ -471,7 +471,11 @@ static int nmi_setup(void)
 		goto fail;
 
 	for_each_possible_cpu(cpu) {
+<<<<<<< HEAD
 		if (!cpu)
+=======
+		if (!IS_ENABLED(CONFIG_SMP) || !cpu)
+>>>>>>> common/deprecated/android-3.18
 			continue;
 
 		memcpy(per_cpu(cpu_msrs, cpu).counters,

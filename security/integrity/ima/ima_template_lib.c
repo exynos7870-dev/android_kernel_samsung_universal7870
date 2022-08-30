@@ -70,7 +70,12 @@ static void ima_show_template_data_ascii(struct seq_file *m,
 					 enum data_formats datafmt,
 					 struct ima_field_data *field_data)
 {
+<<<<<<< HEAD
 	u8 *buf_ptr = field_data->data, buflen = field_data->len;
+=======
+	u8 *buf_ptr = field_data->data;
+	u32 buflen = field_data->len;
+>>>>>>> common/deprecated/android-3.18
 
 	switch (datafmt) {
 	case DATA_FMT_DIGEST_WITH_ALGO:

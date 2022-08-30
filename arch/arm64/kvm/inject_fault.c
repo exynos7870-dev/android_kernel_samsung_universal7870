@@ -168,8 +168,13 @@ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
 {
 	if (!(vcpu->arch.hcr_el2 & HCR_RW))
 		inject_abt32(vcpu, false, addr);
+<<<<<<< HEAD
 
 	inject_abt64(vcpu, false, addr);
+=======
+	else
+		inject_abt64(vcpu, false, addr);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -184,8 +189,13 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
 {
 	if (!(vcpu->arch.hcr_el2 & HCR_RW))
 		inject_abt32(vcpu, true, addr);
+<<<<<<< HEAD
 
 	inject_abt64(vcpu, true, addr);
+=======
+	else
+		inject_abt64(vcpu, true, addr);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -198,6 +208,11 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
 {
 	if (!(vcpu->arch.hcr_el2 & HCR_RW))
 		inject_undef32(vcpu);
+<<<<<<< HEAD
 
 	inject_undef64(vcpu);
+=======
+	else
+		inject_undef64(vcpu);
+>>>>>>> common/deprecated/android-3.18
 }

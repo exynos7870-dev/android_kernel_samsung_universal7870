@@ -26,7 +26,10 @@ struct task_struct;
 struct exec_domain;
 
 #include <asm/types.h>
+<<<<<<< HEAD
 #include <asm/domain.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 
 typedef unsigned long mm_segment_t;
 
@@ -68,7 +71,10 @@ struct thread_info {
 #ifdef CONFIG_ARM_THUMBEE
 	unsigned long		thumbee_state;	/* ThumbEE Handler Base register */
 #endif
+<<<<<<< HEAD
 	struct restart_block	restart_block;
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 #define INIT_THREAD_INFO(tsk)						\
@@ -78,18 +84,29 @@ struct thread_info {
 	.flags		= 0,						\
 	.preempt_count	= INIT_PREEMPT_COUNT,				\
 	.addr_limit	= KERNEL_DS,					\
+<<<<<<< HEAD
 	.cpu_domain	= domain_val(DOMAIN_USER, DOMAIN_MANAGER) |	\
 			  domain_val(DOMAIN_KERNEL, DOMAIN_MANAGER) |	\
 			  domain_val(DOMAIN_IO, DOMAIN_CLIENT),		\
 	.restart_block	= {						\
 		.fn	= do_no_restart_syscall,			\
 	},								\
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 
 #define init_thread_info	(init_thread_union.thread_info)
 #define init_stack		(init_thread_union.stack)
 
 /*
+<<<<<<< HEAD
+=======
+ * how to get the current stack pointer in C
+ */
+register unsigned long current_stack_pointer asm ("sp");
+
+/*
+>>>>>>> common/deprecated/android-3.18
  * how to get the thread information struct from C
  */
 static inline struct thread_info *current_thread_info(void) __attribute_const__;
@@ -158,7 +175,10 @@ extern int vfp_restore_user_hwstate(struct user_vfp __user *,
 #define TIF_USING_IWMMXT	17
 #define TIF_MEMDIE		18	/* is terminating due to OOM killer */
 #define TIF_RESTORE_SIGMASK	20
+<<<<<<< HEAD
 #define TIF_MEMALLOC		29	/* allocating pages now */
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #define _TIF_SIGPENDING		(1 << TIF_SIGPENDING)
 #define _TIF_NEED_RESCHED	(1 << TIF_NEED_RESCHED)

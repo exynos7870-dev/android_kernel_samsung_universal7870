@@ -25,9 +25,12 @@ enum mapping_flags {
 	AS_MM_ALL_LOCKS	= __GFP_BITS_SHIFT + 2,	/* under mm_take_all_locks() */
 	AS_UNEVICTABLE	= __GFP_BITS_SHIFT + 3,	/* e.g., ramdisk, SHM_LOCK */
 	AS_EXITING	= __GFP_BITS_SHIFT + 4, /* final truncate in progress */
+<<<<<<< HEAD
 #ifdef CONFIG_SDP
 	AS_SENSITIVE = __GFP_BITS_SHIFT + 5, /* Group of sensitive pages to be cleaned up */
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 static inline void mapping_set_error(struct address_space *mapping, int error)
@@ -82,6 +85,7 @@ static inline void mapping_set_gfp_mask(struct address_space *m, gfp_t mask)
 				(__force unsigned long)mask;
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_SDP
 static inline void mapping_set_sensitive(struct address_space *mapping)
 {
@@ -101,6 +105,8 @@ static inline int mapping_sensitive(struct address_space *mapping)
 }
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * The page cache can be done in larger chunks than
  * one page, because it allows for more efficient
@@ -168,7 +174,11 @@ static inline int page_cache_get_speculative(struct page *page)
 
 #ifdef CONFIG_TINY_RCU
 # ifdef CONFIG_PREEMPT_COUNT
+<<<<<<< HEAD
 	VM_BUG_ON(!in_atomic());
+=======
+	VM_BUG_ON(!in_atomic() && !irqs_disabled());
+>>>>>>> common/deprecated/android-3.18
 # endif
 	/*
 	 * Preempt must be disabled here - we rely on rcu_read_lock doing
@@ -206,7 +216,11 @@ static inline int page_cache_add_speculative(struct page *page, int count)
 
 #if !defined(CONFIG_SMP) && defined(CONFIG_TREE_RCU)
 # ifdef CONFIG_PREEMPT_COUNT
+<<<<<<< HEAD
 	VM_BUG_ON(!in_atomic());
+=======
+	VM_BUG_ON(!in_atomic() && !irqs_disabled());
+>>>>>>> common/deprecated/android-3.18
 # endif
 	VM_BUG_ON_PAGE(page_count(page) == 0, page);
 	atomic_add(count, &page->_count);
@@ -238,6 +252,7 @@ extern struct page *__page_cache_alloc(gfp_t gfp);
 #else
 static inline struct page *__page_cache_alloc(gfp_t gfp)
 {
+<<<<<<< HEAD
 	struct page *page = alloc_pages(gfp, 0);
 
 	if (page && is_cma_pageblock(page)) {
@@ -246,6 +261,9 @@ static inline struct page *__page_cache_alloc(gfp_t gfp)
 	}
 
 	return page;
+=======
+	return alloc_pages(gfp, 0);
+>>>>>>> common/deprecated/android-3.18
 }
 #endif
 
@@ -381,8 +399,21 @@ unsigned find_get_pages(struct address_space *mapping, pgoff_t start,
 			unsigned int nr_pages, struct page **pages);
 unsigned find_get_pages_contig(struct address_space *mapping, pgoff_t start,
 			       unsigned int nr_pages, struct page **pages);
+<<<<<<< HEAD
 unsigned find_get_pages_tag(struct address_space *mapping, pgoff_t *index,
 			int tag, unsigned int nr_pages, struct page **pages);
+=======
+unsigned find_get_pages_range_tag(struct address_space *mapping, pgoff_t *index,
+			pgoff_t end, int tag, unsigned int nr_pages,
+			struct page **pages);
+static inline unsigned find_get_pages_tag(struct address_space *mapping,
+			pgoff_t *index, int tag, unsigned int nr_pages,
+			struct page **pages)
+{
+	return find_get_pages_range_tag(mapping, index, (pgoff_t)-1, tag,
+					nr_pages, pages);
+}
+>>>>>>> common/deprecated/android-3.18
 
 struct page *grab_cache_page_write_begin(struct address_space *mapping,
 			pgoff_t index, unsigned flags);
@@ -623,35 +654,60 @@ static inline int fault_in_pages_readable(const char __user *uaddr, int size)
  */
 static inline int fault_in_multipages_writeable(char __user *uaddr, int size)
 {
+<<<<<<< HEAD
 	int ret = 0;
 	char __user *end = uaddr + size - 1;
 
 	if (unlikely(size == 0))
 		return ret;
 
+=======
+	char __user *end = uaddr + size - 1;
+
+	if (unlikely(size == 0))
+		return 0;
+
+	if (unlikely(uaddr > end))
+		return -EFAULT;
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Writing zeroes into userspace here is OK, because we know that if
 	 * the zero gets there, we'll be overwriting it.
 	 */
+<<<<<<< HEAD
 	while (uaddr <= end) {
 		ret = __put_user(0, uaddr);
 		if (ret != 0)
 			return ret;
 		uaddr += PAGE_SIZE;
 	}
+=======
+	do {
+		if (unlikely(__put_user(0, uaddr) != 0))
+			return -EFAULT;
+		uaddr += PAGE_SIZE;
+	} while (uaddr <= end);
+>>>>>>> common/deprecated/android-3.18
 
 	/* Check whether the range spilled into the next page. */
 	if (((unsigned long)uaddr & PAGE_MASK) ==
 			((unsigned long)end & PAGE_MASK))
+<<<<<<< HEAD
 		ret = __put_user(0, end);
 
 	return ret;
+=======
+		return __put_user(0, end);
+
+	return 0;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static inline int fault_in_multipages_readable(const char __user *uaddr,
 					       int size)
 {
 	volatile char c;
+<<<<<<< HEAD
 	int ret = 0;
 	const char __user *end = uaddr + size - 1;
 
@@ -664,15 +720,37 @@ static inline int fault_in_multipages_readable(const char __user *uaddr,
 			return ret;
 		uaddr += PAGE_SIZE;
 	}
+=======
+	const char __user *end = uaddr + size - 1;
+
+	if (unlikely(size == 0))
+		return 0;
+
+	if (unlikely(uaddr > end))
+		return -EFAULT;
+
+	do {
+		if (unlikely(__get_user(c, uaddr) != 0))
+			return -EFAULT;
+		uaddr += PAGE_SIZE;
+	} while (uaddr <= end);
+>>>>>>> common/deprecated/android-3.18
 
 	/* Check whether the range spilled into the next page. */
 	if (((unsigned long)uaddr & PAGE_MASK) ==
 			((unsigned long)end & PAGE_MASK)) {
+<<<<<<< HEAD
 		ret = __get_user(c, end);
 		(void)c;
 	}
 
 	return ret;
+=======
+		return __get_user(c, end);
+	}
+
+	return 0;
+>>>>>>> common/deprecated/android-3.18
 }
 
 int add_to_page_cache_locked(struct page *page, struct address_space *mapping,

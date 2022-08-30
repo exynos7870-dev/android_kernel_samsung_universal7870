@@ -319,7 +319,11 @@ static unsigned long pnv_get_proc_freq(unsigned int cpu)
 {
 	unsigned long ret_freq;
 
+<<<<<<< HEAD
 	ret_freq = cpufreq_quick_get(cpu) * 1000ul;
+=======
+	ret_freq = cpufreq_get(cpu) * 1000ul;
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * If the backend cpufreq driver does not exist,

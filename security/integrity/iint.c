@@ -70,12 +70,15 @@ struct integrity_iint_cache *integrity_iint_find(struct inode *inode)
 
 static void iint_free(struct integrity_iint_cache *iint)
 {
+<<<<<<< HEAD
 #ifdef CONFIG_FIVE
 	kfree(iint->five_label);
 	iint->five_label = NULL;
 	iint->five_flags = 0UL;
 	iint->five_status = FIVE_FILE_UNKNOWN;
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	kfree(iint->ima_hash);
 	iint->ima_hash = NULL;
 	iint->version = 0;
@@ -159,10 +162,13 @@ static void init_once(void *foo)
 
 	memset(iint, 0, sizeof(*iint));
 	iint->version = 0;
+<<<<<<< HEAD
 #ifdef CONFIG_FIVE
 	iint->five_flags = 0UL;
 	iint->five_status = FIVE_FILE_UNKNOWN;
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	iint->flags = 0UL;
 	iint->ima_file_status = INTEGRITY_UNKNOWN;
 	iint->ima_mmap_status = INTEGRITY_UNKNOWN;

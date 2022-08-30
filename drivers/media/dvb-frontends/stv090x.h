@@ -103,7 +103,11 @@ struct stv090x_config {
 	void (*tuner_i2c_lock) (struct dvb_frontend *fe, int lock);
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_STV090x)
+=======
+#if IS_REACHABLE(CONFIG_DVB_STV090x)
+>>>>>>> common/deprecated/android-3.18
 
 extern struct dvb_frontend *stv090x_attach(const struct stv090x_config *config,
 					   struct i2c_adapter *i2c,

@@ -17,7 +17,11 @@
  *	U	- upper subcluster; U0 - subcluster U0; U1 - subcluster U1
  *	L	- lower subcluster; L0 - subcluster L0; L1 - subcluster L1
  */
+<<<<<<< HEAD
 
+=======
+#include <asm/export.h>
+>>>>>>> common/deprecated/android-3.18
 	.set noreorder
 	.set noat
 
@@ -47,3 +51,7 @@ $found:
 	ret	$31, ($26)	# L0 :
 
 	.end	strlen
+<<<<<<< HEAD
+=======
+	EXPORT_SYMBOL(strlen)
+>>>>>>> common/deprecated/android-3.18

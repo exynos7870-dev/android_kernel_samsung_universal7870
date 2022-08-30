@@ -3286,7 +3286,11 @@ static void __init nbu2ss_drv_set_ep_info(
 }
 
 /*-------------------------------------------------------------------------*/
+<<<<<<< HEAD
 static void __init nbu2ss_drv_ep_init(struct nbu2ss_udc *udc)
+=======
+static void nbu2ss_drv_ep_init(struct nbu2ss_udc *udc)
+>>>>>>> common/deprecated/android-3.18
 {
 	int	i;
 
@@ -3302,7 +3306,11 @@ static void __init nbu2ss_drv_ep_init(struct nbu2ss_udc *udc)
 
 /*-------------------------------------------------------------------------*/
 /* platform_driver */
+<<<<<<< HEAD
 static int __init nbu2ss_drv_contest_init(
+=======
+static int nbu2ss_drv_contest_init(
+>>>>>>> common/deprecated/android-3.18
 	struct platform_device *pdev,
 	struct nbu2ss_udc *udc)
 {

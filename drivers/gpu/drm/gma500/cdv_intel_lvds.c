@@ -620,6 +620,12 @@ void cdv_intel_lvds_init(struct drm_device *dev,
 	int pipe;
 	u8 pin;
 
+<<<<<<< HEAD
+=======
+	if (!dev_priv->lvds_enabled_in_vbt)
+		return;
+
+>>>>>>> common/deprecated/android-3.18
 	pin = GMBUS_PORT_PANEL;
 	if (!lvds_is_present_in_vbt(dev, &pin)) {
 		DRM_DEBUG_KMS("LVDS is not present in VBT\n");

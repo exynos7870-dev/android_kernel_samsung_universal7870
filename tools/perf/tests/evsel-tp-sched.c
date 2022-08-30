@@ -15,7 +15,11 @@ static int perf_evsel__test_field(struct perf_evsel *evsel, const char *name,
 		return -1;
 	}
 
+<<<<<<< HEAD
 	is_signed = !!(field->flags | FIELD_IS_SIGNED);
+=======
+	is_signed = !!(field->flags & FIELD_IS_SIGNED);
+>>>>>>> common/deprecated/android-3.18
 	if (should_be_signed && !is_signed) {
 		pr_debug("%s: \"%s\" signedness(%d) is wrong, should be %d\n",
 			 evsel->name, name, is_signed, should_be_signed);
@@ -78,5 +82,9 @@ int test__perf_evsel__tp_sched_test(void)
 	if (perf_evsel__test_field(evsel, "target_cpu", 4, true))
 		ret = -1;
 
+<<<<<<< HEAD
+=======
+	perf_evsel__delete(evsel);
+>>>>>>> common/deprecated/android-3.18
 	return ret;
 }

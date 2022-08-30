@@ -1,4 +1,11 @@
 
+<<<<<<< HEAD
+=======
+# We are fully aware of the dangers of __builtin_return_address()
+FRAME_CFLAGS := $(call cc-disable-warning,frame-address)
+KBUILD_CFLAGS += $(FRAME_CFLAGS)
+
+>>>>>>> common/deprecated/android-3.18
 # Do not instrument the tracer itself:
 
 ifdef CONFIG_FUNCTION_TRACER

@@ -7078,7 +7078,11 @@ static void qib_7322_txchk_change(struct qib_devdata *dd, u32 start,
 	unsigned long flags;
 
 	while (wait) {
+<<<<<<< HEAD
 		unsigned long shadow;
+=======
+		unsigned long shadow = 0;
+>>>>>>> common/deprecated/android-3.18
 		int cstart, previ = -1;
 
 		/*

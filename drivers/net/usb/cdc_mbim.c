@@ -550,7 +550,11 @@ err:
 
 static const struct driver_info cdc_mbim_info = {
 	.description = "CDC MBIM",
+<<<<<<< HEAD
 	.flags = FLAG_NO_SETINT | FLAG_MULTI_PACKET | FLAG_WWAN,
+=======
+	.flags = FLAG_NO_SETINT | FLAG_MULTI_PACKET | FLAG_WWAN | FLAG_SEND_ZLP,
+>>>>>>> common/deprecated/android-3.18
 	.bind = cdc_mbim_bind,
 	.unbind = cdc_mbim_unbind,
 	.manage_power = cdc_mbim_manage_power,

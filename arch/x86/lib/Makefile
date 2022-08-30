@@ -2,9 +2,12 @@
 # Makefile for x86 specific library files.
 #
 
+<<<<<<< HEAD
 # Produces uninteresting flaky coverage.
 KCOV_INSTRUMENT_delay.o	:= n
 
+=======
+>>>>>>> common/deprecated/android-3.18
 inat_tables_script = $(srctree)/arch/x86/tools/gen-insn-attr-x86.awk
 inat_tables_maps = $(srctree)/arch/x86/lib/x86-opcode-map.txt
 quiet_cmd_inat_tables = GEN     $@
@@ -25,6 +28,10 @@ lib-y += usercopy_$(BITS).o usercopy.o getuser.o putuser.o
 lib-y += memcpy_$(BITS).o
 lib-$(CONFIG_RWSEM_XCHGADD_ALGORITHM) += rwsem.o
 lib-$(CONFIG_INSTRUCTION_DECODER) += insn.o inat.o
+<<<<<<< HEAD
+=======
+lib-$(CONFIG_RETPOLINE) += retpoline.o
+>>>>>>> common/deprecated/android-3.18
 
 obj-y += msr.o msr-reg.o msr-reg-export.o hash.o
 

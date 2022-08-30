@@ -88,8 +88,15 @@ static struct device_node *get_gpio(char *name,
 	}
 
 	reg = of_get_property(np, "reg", NULL);
+<<<<<<< HEAD
 	if (!reg)
 		return NULL;
+=======
+	if (!reg) {
+		of_node_put(np);
+		return NULL;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	*gpioptr = *reg;
 

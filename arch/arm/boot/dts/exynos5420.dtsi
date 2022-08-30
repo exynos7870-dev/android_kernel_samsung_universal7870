@@ -120,7 +120,11 @@
 		};
 	};
 
+<<<<<<< HEAD
 	cci@10d20000 {
+=======
+	cci: cci@10d20000 {
+>>>>>>> common/deprecated/android-3.18
 		compatible = "arm,cci-400";
 		#address-cells = <1>;
 		#size-cells = <1>;
@@ -503,8 +507,13 @@
 	};
 
 	dp_phy: video-phy@10040728 {
+<<<<<<< HEAD
 		compatible = "samsung,exynos5250-dp-video-phy";
 		reg = <0x10040728 4>;
+=======
+		compatible = "samsung,exynos5420-dp-video-phy";
+		samsung,pmu-syscon = <&pmu_system_controller>;
+>>>>>>> common/deprecated/android-3.18
 		#phy-cells = <0>;
 	};
 

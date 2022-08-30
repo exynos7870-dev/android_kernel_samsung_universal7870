@@ -524,6 +524,11 @@ struct esp {
 
 	void			*dma;
 	int			dmarev;
+<<<<<<< HEAD
+=======
+
+	u32			send_cmd_residual;
+>>>>>>> common/deprecated/android-3.18
 };
 
 /* A front-end driver for the ESP chip should do the following in

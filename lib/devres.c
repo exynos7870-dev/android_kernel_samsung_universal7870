@@ -104,7 +104,12 @@ EXPORT_SYMBOL(devm_iounmap);
  *	if (IS_ERR(base))
  *		return PTR_ERR(base);
  */
+<<<<<<< HEAD
 void __iomem *devm_ioremap_resource(struct device *dev, struct resource *res)
+=======
+void __iomem *devm_ioremap_resource(struct device *dev,
+				    const struct resource *res)
+>>>>>>> common/deprecated/android-3.18
 {
 	resource_size_t size;
 	const char *name;

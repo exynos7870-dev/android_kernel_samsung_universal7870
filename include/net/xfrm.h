@@ -161,6 +161,10 @@ struct xfrm_state {
 		int		header_len;
 		int		trailer_len;
 		u32		extra_flags;
+<<<<<<< HEAD
+=======
+		u32		output_mark;
+>>>>>>> common/deprecated/android-3.18
 	} props;
 
 	struct xfrm_lifetime_cfg lft;
@@ -288,8 +292,17 @@ struct xfrm_policy_afinfo {
 	void			(*garbage_collect)(struct net *net);
 	struct dst_entry	*(*dst_lookup)(struct net *net, int tos,
 					       const xfrm_address_t *saddr,
+<<<<<<< HEAD
 					       const xfrm_address_t *daddr);
 	int			(*get_saddr)(struct net *net, xfrm_address_t *saddr, xfrm_address_t *daddr);
+=======
+					       const xfrm_address_t *daddr,
+					       u32 mark);
+	int			(*get_saddr)(struct net *net,
+					     xfrm_address_t *saddr,
+					     xfrm_address_t *daddr,
+					     u32 mark);
+>>>>>>> common/deprecated/android-3.18
 	void			(*decode_session)(struct sk_buff *skb,
 						  struct flowi *fl,
 						  int reverse);
@@ -691,8 +704,12 @@ struct xfrm_spi_skb_cb {
 
 #define XFRM_SPI_SKB_CB(__skb) ((struct xfrm_spi_skb_cb *)&((__skb)->cb[0]))
 
+<<<<<<< HEAD
 // [ SEC_SELINUX_PORTING_COMMON - remove AUDIT_MAC_IPSEC_EVENT audit log, it conflict with security notification
 #if 0 // #ifdef CONFIG_AUDITSYSCALL
+=======
+#ifdef CONFIG_AUDITSYSCALL
+>>>>>>> common/deprecated/android-3.18
 static inline struct audit_buffer *xfrm_audit_start(const char *op)
 {
 	struct audit_buffer *audit_buf = NULL;
@@ -781,7 +798,10 @@ static inline void xfrm_audit_state_icvfail(struct xfrm_state *x,
 {
 }
 #endif /* CONFIG_AUDITSYSCALL */
+<<<<<<< HEAD
 // ] SEC_SELINUX_PORTING_COMMON - remove AUDIT_MAC_IPSEC_EVENT audit log, it conflict with security notification
+=======
+>>>>>>> common/deprecated/android-3.18
 
 static inline void xfrm_pol_hold(struct xfrm_policy *policy)
 {
@@ -951,10 +971,13 @@ struct xfrm_dst {
 	struct flow_cache_object flo;
 	struct xfrm_policy *pols[XFRM_POLICY_TYPE_MAX];
 	int num_pols, num_xfrms;
+<<<<<<< HEAD
 #ifdef CONFIG_XFRM_SUB_POLICY
 	struct flowi *origin;
 	struct xfrm_selector *partner;
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	u32 xfrm_genid;
 	u32 policy_genid;
 	u32 route_mtu_cached;
@@ -970,12 +993,15 @@ static inline void xfrm_dst_destroy(struct xfrm_dst *xdst)
 	dst_release(xdst->route);
 	if (likely(xdst->u.dst.xfrm))
 		xfrm_state_put(xdst->u.dst.xfrm);
+<<<<<<< HEAD
 #ifdef CONFIG_XFRM_SUB_POLICY
 	kfree(xdst->origin);
 	xdst->origin = NULL;
 	kfree(xdst->partner);
 	xdst->partner = NULL;
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 #endif
 
@@ -1308,6 +1334,26 @@ static inline int xfrm_state_kern(const struct xfrm_state *x)
 	return atomic_read(&x->tunnel_users);
 }
 
+<<<<<<< HEAD
+=======
+static inline bool xfrm_id_proto_valid(u8 proto)
+{
+	switch (proto) {
+	case IPPROTO_AH:
+	case IPPROTO_ESP:
+	case IPPROTO_COMP:
+#if IS_ENABLED(CONFIG_IPV6)
+	case IPPROTO_ROUTING:
+	case IPPROTO_DSTOPTS:
+#endif
+		return true;
+	default:
+		return false;
+	}
+}
+
+/* IPSEC_PROTO_ANY only matches 3 IPsec protocols, 0 could match all. */
+>>>>>>> common/deprecated/android-3.18
 static inline int xfrm_id_proto_match(u8 proto, u8 userproto)
 {
 	return (!userproto || proto == userproto ||
@@ -1539,8 +1585,15 @@ int xfrm4_tunnel_deregister(struct xfrm_tunnel *handler, unsigned short family);
 void xfrm4_local_error(struct sk_buff *skb, u32 mtu);
 int xfrm6_extract_header(struct sk_buff *skb);
 int xfrm6_extract_input(struct xfrm_state *x, struct sk_buff *skb);
+<<<<<<< HEAD
 int xfrm6_rcv_spi(struct sk_buff *skb, int nexthdr, __be32 spi);
 int xfrm6_transport_finish(struct sk_buff *skb, int async);
+=======
+int xfrm6_rcv_spi(struct sk_buff *skb, int nexthdr, __be32 spi,
+		  struct ip6_tnl *t);
+int xfrm6_transport_finish(struct sk_buff *skb, int async);
+int xfrm6_rcv_tnl(struct sk_buff *skb, struct ip6_tnl *t);
+>>>>>>> common/deprecated/android-3.18
 int xfrm6_rcv(struct sk_buff *skb);
 int xfrm6_input_addr(struct sk_buff *skb, xfrm_address_t *daddr,
 		     xfrm_address_t *saddr, u8 proto);
@@ -1716,6 +1769,7 @@ static inline int xfrm_replay_state_esn_len(struct xfrm_replay_state_esn *replay
 static inline int xfrm_replay_clone(struct xfrm_state *x,
 				     struct xfrm_state *orig)
 {
+<<<<<<< HEAD
 	x->replay_esn = kzalloc(xfrm_replay_state_esn_len(orig->replay_esn),
 				GFP_KERNEL);
 	if (!x->replay_esn)
@@ -1731,6 +1785,19 @@ static inline int xfrm_replay_clone(struct xfrm_state *x,
 		kfree(x->replay_esn);
 		return -ENOMEM;
 	}
+=======
+
+	x->replay_esn = kmemdup(orig->replay_esn,
+				xfrm_replay_state_esn_len(orig->replay_esn),
+				GFP_KERNEL);
+	if (!x->replay_esn)
+		return -ENOMEM;
+	x->preplay_esn = kmemdup(orig->preplay_esn,
+				 xfrm_replay_state_esn_len(orig->preplay_esn),
+				 GFP_KERNEL);
+	if (!x->preplay_esn)
+		return -ENOMEM;
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }

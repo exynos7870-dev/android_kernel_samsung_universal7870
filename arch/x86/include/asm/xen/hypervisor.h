@@ -57,4 +57,9 @@ static inline bool xen_x2apic_para_available(void)
 }
 #endif
 
+<<<<<<< HEAD
+=======
+extern void xen_set_iopl_mask(unsigned mask);
+
+>>>>>>> common/deprecated/android-3.18
 #endif /* _ASM_X86_XEN_HYPERVISOR_H */

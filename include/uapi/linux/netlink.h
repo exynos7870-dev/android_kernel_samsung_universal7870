@@ -106,8 +106,15 @@ struct nlmsgerr {
 #define NETLINK_PKTINFO		3
 #define NETLINK_BROADCAST_ERROR	4
 #define NETLINK_NO_ENOBUFS	5
+<<<<<<< HEAD
 #define NETLINK_RX_RING		6
 #define NETLINK_TX_RING		7
+=======
+#ifndef __KERNEL__
+#define NETLINK_RX_RING		6
+#define NETLINK_TX_RING		7
+#endif
+>>>>>>> common/deprecated/android-3.18
 
 struct nl_pktinfo {
 	__u32	group;
@@ -130,6 +137,10 @@ struct nl_mmap_hdr {
 	__u32		nm_gid;
 };
 
+<<<<<<< HEAD
+=======
+#ifndef __KERNEL__
+>>>>>>> common/deprecated/android-3.18
 enum nl_mmap_status {
 	NL_MMAP_STATUS_UNUSED,
 	NL_MMAP_STATUS_RESERVED,
@@ -141,6 +152,10 @@ enum nl_mmap_status {
 #define NL_MMAP_MSG_ALIGNMENT		NLMSG_ALIGNTO
 #define NL_MMAP_MSG_ALIGN(sz)		__ALIGN_KERNEL(sz, NL_MMAP_MSG_ALIGNMENT)
 #define NL_MMAP_HDRLEN			NL_MMAP_MSG_ALIGN(sizeof(struct nl_mmap_hdr))
+<<<<<<< HEAD
+=======
+#endif
+>>>>>>> common/deprecated/android-3.18
 
 #define NET_MAJOR 36		/* Major 36 is reserved for networking 						*/
 

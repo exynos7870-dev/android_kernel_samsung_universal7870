@@ -63,7 +63,11 @@ static int ioctl_send_fib(struct aac_dev * dev, void __user *arg)
 	struct fib *fibptr;
 	struct hw_fib * hw_fib = (struct hw_fib *)0;
 	dma_addr_t hw_fib_pa = (dma_addr_t)0LL;
+<<<<<<< HEAD
 	unsigned size;
+=======
+	unsigned int size, osize;
+>>>>>>> common/deprecated/android-3.18
 	int retval;
 
 	if (dev->in_reset) {
@@ -87,7 +91,12 @@ static int ioctl_send_fib(struct aac_dev * dev, void __user *arg)
 	 *	will not overrun the buffer when we copy the memory. Return
 	 *	an error if we would.
 	 */
+<<<<<<< HEAD
 	size = le16_to_cpu(kfib->header.Size) + sizeof(struct aac_fibhdr);
+=======
+	osize = size = le16_to_cpu(kfib->header.Size) +
+		sizeof(struct aac_fibhdr);
+>>>>>>> common/deprecated/android-3.18
 	if (size < le16_to_cpu(kfib->header.SenderSize))
 		size = le16_to_cpu(kfib->header.SenderSize);
 	if (size > dev->max_fib_size) {
@@ -118,6 +127,17 @@ static int ioctl_send_fib(struct aac_dev * dev, void __user *arg)
 		goto cleanup;
 	}
 
+<<<<<<< HEAD
+=======
+	/* Sanity check the second copy */
+	if ((osize != le16_to_cpu(kfib->header.Size) +
+		sizeof(struct aac_fibhdr))
+		|| (size < le16_to_cpu(kfib->header.SenderSize))) {
+		retval = -EINVAL;
+		goto cleanup;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	if (kfib->header.Command == cpu_to_le16(TakeABreakPt)) {
 		aac_adapter_interrupt(dev);
 		/*

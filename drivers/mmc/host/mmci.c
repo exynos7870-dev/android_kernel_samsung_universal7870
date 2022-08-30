@@ -1881,7 +1881,11 @@ static struct amba_id mmci_ids[] = {
 	{
 		.id     = 0x00280180,
 		.mask   = 0x00ffffff,
+<<<<<<< HEAD
 		.data	= &variant_u300,
+=======
+		.data	= &variant_nomadik,
+>>>>>>> common/deprecated/android-3.18
 	},
 	{
 		.id     = 0x00480180,

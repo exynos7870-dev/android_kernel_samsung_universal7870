@@ -261,6 +261,12 @@ void udf_truncate_extents(struct inode *inode)
 			epos.block = eloc;
 			epos.bh = udf_tread(sb,
 					udf_get_lb_pblock(sb, &eloc, 0));
+<<<<<<< HEAD
+=======
+			/* Error reading indirect block? */
+			if (!epos.bh)
+				return;
+>>>>>>> common/deprecated/android-3.18
 			if (elen)
 				indirect_ext_len =
 					(elen + sb->s_blocksize - 1) >>

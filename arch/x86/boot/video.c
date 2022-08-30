@@ -13,6 +13,11 @@
  * Select video mode
  */
 
+<<<<<<< HEAD
+=======
+#include <uapi/asm/boot.h>
+
+>>>>>>> common/deprecated/android-3.18
 #include "boot.h"
 #include "video.h"
 #include "vesa.h"

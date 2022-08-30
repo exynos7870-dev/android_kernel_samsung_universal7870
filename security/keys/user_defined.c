@@ -120,7 +120,14 @@ int user_update(struct key *key, struct key_preparsed_payload *prep)
 
 	if (ret == 0) {
 		/* attach the new data, displacing the old */
+<<<<<<< HEAD
 		zap = key->payload.data;
+=======
+		if (key_is_positive(key))
+			zap = key->payload.data;
+		else
+			zap = NULL;
+>>>>>>> common/deprecated/android-3.18
 		rcu_assign_keypointer(key, upayload);
 		key->expiry = 0;
 	}
@@ -160,12 +167,15 @@ void user_destroy(struct key *key)
 {
 	struct user_key_payload *upayload = key->payload.data;
 
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 	if(upayload)
 	{
 		memset(upayload->data, 0, upayload->datalen);
 	}
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	kfree(upayload);
 }
 
@@ -177,7 +187,11 @@ EXPORT_SYMBOL_GPL(user_destroy);
 void user_describe(const struct key *key, struct seq_file *m)
 {
 	seq_puts(m, key->description);
+<<<<<<< HEAD
 	if (key_is_instantiated(key))
+=======
+	if (key_is_positive(key))
+>>>>>>> common/deprecated/android-3.18
 		seq_printf(m, ": %u", key->datalen);
 }
 

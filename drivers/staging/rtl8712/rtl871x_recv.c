@@ -639,11 +639,24 @@ sint r8712_wlanhdr_to_ethhdr(union recv_frame *precvframe)
 		/* append rx status for mp test packets */
 		ptr = recvframe_pull(precvframe, (rmv_len -
 		      sizeof(struct ethhdr) + 2) - 24);
+<<<<<<< HEAD
 		memcpy(ptr, get_rxmem(precvframe), 24);
 		ptr += 24;
 	} else
 		ptr = recvframe_pull(precvframe, (rmv_len -
 		      sizeof(struct ethhdr) + (bsnaphdr ? 2 : 0)));
+=======
+		if (!ptr)
+			return _FAIL;
+		memcpy(ptr, get_rxmem(precvframe), 24);
+		ptr += 24;
+	} else {
+		ptr = recvframe_pull(precvframe, (rmv_len -
+		      sizeof(struct ethhdr) + (bsnaphdr ? 2 : 0)));
+		if (!ptr)
+			return _FAIL;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	memcpy(ptr, pattrib->dst, ETH_ALEN);
 	memcpy(ptr+ETH_ALEN, pattrib->src, ETH_ALEN);

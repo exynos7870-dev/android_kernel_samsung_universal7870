@@ -146,7 +146,11 @@
 
 	sound {
 		compatible = "simple-audio-card";
+<<<<<<< HEAD
 		simple-audio-card,name = "DA850/OMAP-L138 EVM";
+=======
+		simple-audio-card,name = "DA850-OMAPL138 EVM";
+>>>>>>> common/deprecated/android-3.18
 		simple-audio-card,widgets =
 			"Line", "Line In",
 			"Line", "Line Out";

@@ -71,10 +71,26 @@ static int sig_task_ignored(struct task_struct *t, int sig, bool force)
 
 	handler = sig_handler(t, sig);
 
+<<<<<<< HEAD
 	if (unlikely(t->signal->flags & SIGNAL_UNKILLABLE) &&
 			handler == SIG_DFL && !force)
 		return 1;
 
+=======
+	/* SIGKILL and SIGSTOP may not be sent to the global init */
+	if (unlikely(is_global_init(t) && sig_kernel_only(sig)))
+		return true;
+
+	if (unlikely(t->signal->flags & SIGNAL_UNKILLABLE) &&
+	    handler == SIG_DFL && !(force && sig_kernel_only(sig)))
+		return 1;
+
+	/* Only allow kernel generated signals to this kthread */
+	if (unlikely((t->flags & PF_KTHREAD) &&
+		     (handler == SIG_KTHREAD_KERNEL) && !force))
+		return true;
+
+>>>>>>> common/deprecated/android-3.18
 	return sig_handler_ignored(handler, sig);
 }
 
@@ -88,6 +104,7 @@ static int sig_ignored(struct task_struct *t, int sig, bool force)
 	if (sigismember(&t->blocked, sig) || sigismember(&t->real_blocked, sig))
 		return 0;
 
+<<<<<<< HEAD
 	if (!sig_task_ignored(t, sig, force))
 		return 0;
 
@@ -95,6 +112,17 @@ static int sig_ignored(struct task_struct *t, int sig, bool force)
 	 * Tracers may want to know about even ignored signals.
 	 */
 	return !t->ptrace;
+=======
+	/*
+	 * Tracers may want to know about even ignored signal unless it
+	 * is SIGKILL which can't be reported anyway but can be ignored
+	 * by SIGNAL_UNKILLABLE task.
+	 */
+	if (t->ptrace && sig != SIGKILL)
+		return 0;
+
+	return sig_task_ignored(t, sig, force);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
@@ -346,7 +374,11 @@ static bool task_participate_group_stop(struct task_struct *task)
 	 * fresh group stop.  Read comment in do_signal_stop() for details.
 	 */
 	if (!sig->group_stop_count && !(sig->flags & SIGNAL_STOP_STOPPED)) {
+<<<<<<< HEAD
 		sig->flags = SIGNAL_STOP_STOPPED;
+=======
+		signal_set_stop_flags(sig, SIGNAL_STOP_STOPPED);
+>>>>>>> common/deprecated/android-3.18
 		return true;
 	}
 	return false;
@@ -362,10 +394,15 @@ __sigqueue_alloc(int sig, struct task_struct *t, gfp_t flags, int override_rlimi
 {
 	struct sigqueue *q = NULL;
 	struct user_struct *user;
+<<<<<<< HEAD
+=======
+	int sigpending;
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * Protect access to @t credentials. This can go away when all
 	 * callers hold rcu read lock.
+<<<<<<< HEAD
 	 */
 	rcu_read_lock();
 	user = get_uid(__task_cred(t)->user);
@@ -375,14 +412,34 @@ __sigqueue_alloc(int sig, struct task_struct *t, gfp_t flags, int override_rlimi
 	if (override_rlimit ||
 	    atomic_read(&user->sigpending) <=
 			task_rlimit(t, RLIMIT_SIGPENDING)) {
+=======
+	 *
+	 * NOTE! A pending signal will hold on to the user refcount,
+	 * and we get/put the refcount only when the sigpending count
+	 * changes from/to zero.
+	 */
+	rcu_read_lock();
+	user = __task_cred(t)->user;
+	sigpending = atomic_inc_return(&user->sigpending);
+	if (sigpending == 1)
+		get_uid(user);
+	rcu_read_unlock();
+
+	if (override_rlimit || likely(sigpending <= task_rlimit(t, RLIMIT_SIGPENDING))) {
+>>>>>>> common/deprecated/android-3.18
 		q = kmem_cache_alloc(sigqueue_cachep, flags);
 	} else {
 		print_dropped_signal(sig);
 	}
 
 	if (unlikely(q == NULL)) {
+<<<<<<< HEAD
 		atomic_dec(&user->sigpending);
 		free_uid(user);
+=======
+		if (atomic_dec_and_test(&user->sigpending))
+			free_uid(user);
+>>>>>>> common/deprecated/android-3.18
 	} else {
 		INIT_LIST_HEAD(&q->list);
 		q->flags = 0;
@@ -396,8 +453,13 @@ static void __sigqueue_free(struct sigqueue *q)
 {
 	if (q->flags & SIGQUEUE_PREALLOC)
 		return;
+<<<<<<< HEAD
 	atomic_dec(&q->user->sigpending);
 	free_uid(q->user);
+=======
+	if (atomic_dec_and_test(&q->user->sigpending))
+		free_uid(q->user);
+>>>>>>> common/deprecated/android-3.18
 	kmem_cache_free(sigqueue_cachep, q);
 }
 
@@ -543,7 +605,12 @@ unblock_all_signals(void)
 	spin_unlock_irqrestore(&current->sighand->siglock, flags);
 }
 
+<<<<<<< HEAD
 static void collect_signal(int sig, struct sigpending *list, siginfo_t *info)
+=======
+static void collect_signal(int sig, struct sigpending *list, siginfo_t *info,
+			   bool *resched_timer)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct sigqueue *q, *first = NULL;
 
@@ -565,6 +632,15 @@ static void collect_signal(int sig, struct sigpending *list, siginfo_t *info)
 still_pending:
 		list_del_init(&first->list);
 		copy_siginfo(info, &first->info);
+<<<<<<< HEAD
+=======
+
+		*resched_timer =
+			(first->flags & SIGQUEUE_PREALLOC) &&
+			(info->si_code == SI_TIMER) &&
+			(info->si_sys_private);
+
+>>>>>>> common/deprecated/android-3.18
 		__sigqueue_free(first);
 	} else {
 		/*
@@ -581,7 +657,11 @@ still_pending:
 }
 
 static int __dequeue_signal(struct sigpending *pending, sigset_t *mask,
+<<<<<<< HEAD
 			siginfo_t *info)
+=======
+			siginfo_t *info, bool *resched_timer)
+>>>>>>> common/deprecated/android-3.18
 {
 	int sig = next_signal(pending, mask);
 
@@ -595,7 +675,11 @@ static int __dequeue_signal(struct sigpending *pending, sigset_t *mask,
 			}
 		}
 
+<<<<<<< HEAD
 		collect_signal(sig, pending, info);
+=======
+		collect_signal(sig, pending, info, resched_timer);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	return sig;
@@ -609,15 +693,26 @@ static int __dequeue_signal(struct sigpending *pending, sigset_t *mask,
  */
 int dequeue_signal(struct task_struct *tsk, sigset_t *mask, siginfo_t *info)
 {
+<<<<<<< HEAD
+=======
+	bool resched_timer = false;
+>>>>>>> common/deprecated/android-3.18
 	int signr;
 
 	/* We only dequeue private signals from ourselves, we don't let
 	 * signalfd steal them
 	 */
+<<<<<<< HEAD
 	signr = __dequeue_signal(&tsk->pending, mask, info);
 	if (!signr) {
 		signr = __dequeue_signal(&tsk->signal->shared_pending,
 					 mask, info);
+=======
+	signr = __dequeue_signal(&tsk->pending, mask, info, &resched_timer);
+	if (!signr) {
+		signr = __dequeue_signal(&tsk->signal->shared_pending,
+					 mask, info, &resched_timer);
+>>>>>>> common/deprecated/android-3.18
 		/*
 		 * itimer signal ?
 		 *
@@ -662,7 +757,11 @@ int dequeue_signal(struct task_struct *tsk, sigset_t *mask, siginfo_t *info)
 		 */
 		current->jobctl |= JOBCTL_STOP_DEQUEUED;
 	}
+<<<<<<< HEAD
 	if ((info->si_code & __SI_MASK) == __SI_TIMER && info->si_sys_private) {
+=======
+	if (resched_timer) {
+>>>>>>> common/deprecated/android-3.18
 		/*
 		 * Release the siglock to ensure proper locking order
 		 * of timer locks outside of siglocks.  Note, we leave
@@ -676,6 +775,51 @@ int dequeue_signal(struct task_struct *tsk, sigset_t *mask, siginfo_t *info)
 	return signr;
 }
 
+<<<<<<< HEAD
+=======
+static int dequeue_synchronous_signal(siginfo_t *info)
+{
+	struct task_struct *tsk = current;
+	struct sigpending *pending = &tsk->pending;
+	struct sigqueue *q, *sync = NULL;
+
+	/*
+	 * Might a synchronous signal be in the queue?
+	 */
+	if (!((pending->signal.sig[0] & ~tsk->blocked.sig[0]) & SYNCHRONOUS_MASK))
+		return 0;
+
+	/*
+	 * Return the first synchronous signal in the queue.
+	 */
+	list_for_each_entry(q, &pending->list, list) {
+		/* Synchronous signals have a postive si_code */
+		if ((q->info.si_code > SI_USER) &&
+		    (sigmask(q->info.si_signo) & SYNCHRONOUS_MASK)) {
+			sync = q;
+			goto next;
+		}
+	}
+	return 0;
+next:
+	/*
+	 * Check if there is another siginfo for the same signal.
+	 */
+	list_for_each_entry_continue(q, &pending->list, list) {
+		if (q->info.si_signo == sync->info.si_signo)
+			goto still_pending;
+	}
+
+	sigdelset(&pending->signal, sync->info.si_signo);
+	recalc_sigpending();
+still_pending:
+	list_del_init(&sync->list);
+	copy_siginfo(info, &sync->info);
+	__sigqueue_free(sync);
+	return info->si_signo;
+}
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Tell a process that it has a new active signal..
  *
@@ -888,7 +1032,11 @@ static bool prepare_signal(int sig, struct task_struct *p, bool force)
 			 * will take ->siglock, notice SIGNAL_CLD_MASK, and
 			 * notify its parent. See get_signal_to_deliver().
 			 */
+<<<<<<< HEAD
 			signal->flags = why | SIGNAL_STOP_CONTINUED;
+=======
+			signal_set_stop_flags(signal, why | SIGNAL_STOP_CONTINUED);
+>>>>>>> common/deprecated/android-3.18
 			signal->group_stop_count = 0;
 			signal->group_exit_code = 0;
 		}
@@ -960,9 +1108,15 @@ static void complete_signal(int sig, struct task_struct *p, int group)
 	 * then start taking the whole group down immediately.
 	 */
 	if (sig_fatal(p, sig) &&
+<<<<<<< HEAD
 	    !(signal->flags & (SIGNAL_UNKILLABLE | SIGNAL_GROUP_EXIT)) &&
 	    !sigismember(&t->real_blocked, sig) &&
 	    (sig == SIGKILL || !t->ptrace)) {
+=======
+	    !(signal->flags & SIGNAL_GROUP_EXIT) &&
+	    !sigismember(&t->real_blocked, sig) &&
+	    (sig == SIGKILL || !p->ptrace)) {
+>>>>>>> common/deprecated/android-3.18
 		/*
 		 * This signal will be fatal to the whole group.
 		 */
@@ -1032,7 +1186,11 @@ static int __send_signal(int sig, struct siginfo *info, struct task_struct *t,
 
 	result = TRACE_SIGNAL_IGNORED;
 	if (!prepare_signal(sig, t,
+<<<<<<< HEAD
 			from_ancestor_ns || (info == SEND_SIG_FORCED)))
+=======
+			from_ancestor_ns || (info == SEND_SIG_PRIV) || (info == SEND_SIG_FORCED)))
+>>>>>>> common/deprecated/android-3.18
 		goto ret;
 
 	pending = group ? &t->signal->shared_pending : &t->pending;
@@ -1425,6 +1583,13 @@ static int kill_something_info(int sig, struct siginfo *info, pid_t pid)
 		return ret;
 	}
 
+<<<<<<< HEAD
+=======
+	/* -INT_MIN is undefined.  Exclude this case to avoid a UBSAN warning */
+	if (pid == INT_MIN)
+		return -ESRCH;
+
+>>>>>>> common/deprecated/android-3.18
 	read_lock(&tasklist_lock);
 	if (pid != -1) {
 		ret = __kill_pgrp_info(sig, info,
@@ -1633,7 +1798,11 @@ bool do_notify_parent(struct task_struct *tsk, int sig)
 		 * This is only possible if parent == real_parent.
 		 * Check if it has changed security domain.
 		 */
+<<<<<<< HEAD
 		if (tsk->parent_exec_id != tsk->parent->self_exec_id)
+=======
+		if (tsk->parent_exec_id != READ_ONCE(tsk->parent->self_exec_id))
+>>>>>>> common/deprecated/android-3.18
 			sig = SIGCHLD;
 	}
 
@@ -2227,6 +2396,19 @@ relock:
 		goto relock;
 	}
 
+<<<<<<< HEAD
+=======
+	/* Has this task already been marked for death? */
+	if (signal_group_exit(signal)) {
+		ksig->info.si_signo = signr = SIGKILL;
+		sigdelset(&current->pending.signal, SIGKILL);
+		trace_signal_deliver(SIGKILL, SEND_SIG_NOINFO,
+				&sighand->action[SIGKILL - 1]);
+		recalc_sigpending();
+		goto fatal;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	for (;;) {
 		struct k_sigaction *ka;
 
@@ -2240,7 +2422,19 @@ relock:
 			goto relock;
 		}
 
+<<<<<<< HEAD
 		signr = dequeue_signal(current, &current->blocked, &ksig->info);
+=======
+		/*
+		 * Signals generated by the execution of an instruction
+		 * need to be delivered before any other pending signals
+		 * so that the instruction pointer in the signal stack
+		 * frame points to the faulting instruction.
+		 */
+		signr = dequeue_synchronous_signal(&ksig->info);
+		if (!signr)
+			signr = dequeue_signal(current, &current->blocked, &ksig->info);
+>>>>>>> common/deprecated/android-3.18
 
 		if (!signr)
 			break; /* will return 0 */
@@ -2322,6 +2516,10 @@ relock:
 			continue;
 		}
 
+<<<<<<< HEAD
+=======
+	fatal:
+>>>>>>> common/deprecated/android-3.18
 		spin_unlock_irq(&sighand->siglock);
 
 		/*
@@ -2493,7 +2691,11 @@ EXPORT_SYMBOL(unblock_all_signals);
  */
 SYSCALL_DEFINE0(restart_syscall)
 {
+<<<<<<< HEAD
 	struct restart_block *restart = &current_thread_info()->restart_block;
+=======
+	struct restart_block *restart = &current->restart_block;
+>>>>>>> common/deprecated/android-3.18
 	return restart->fn(restart);
 }
 
@@ -2531,6 +2733,16 @@ void __set_current_blocked(const sigset_t *newset)
 {
 	struct task_struct *tsk = current;
 
+<<<<<<< HEAD
+=======
+	/*
+	 * In case the signal mask hasn't changed, there is nothing we need
+	 * to do. The current->blocked shouldn't be modified by other task.
+	 */
+	if (sigequalsets(&tsk->blocked, newset))
+		return;
+
+>>>>>>> common/deprecated/android-3.18
 	spin_lock_irq(&tsk->sighand->siglock);
 	__set_task_blocked(tsk, newset);
 	spin_unlock_irq(&tsk->sighand->siglock);
@@ -2745,7 +2957,12 @@ int copy_siginfo_to_user(siginfo_t __user *to, const siginfo_t *from)
 		 * Other callers might not initialize the si_lsb field,
 		 * so check explicitly for the right codes here.
 		 */
+<<<<<<< HEAD
 		if (from->si_code == BUS_MCEERR_AR || from->si_code == BUS_MCEERR_AO)
+=======
+		if (from->si_signo == SIGBUS &&
+		    (from->si_code == BUS_MCEERR_AR || from->si_code == BUS_MCEERR_AO))
+>>>>>>> common/deprecated/android-3.18
 			err |= __put_user(from->si_addr_lsb, &to->si_addr_lsb);
 #endif
 		break;
@@ -3012,7 +3229,11 @@ COMPAT_SYSCALL_DEFINE3(rt_sigqueueinfo,
 			int, sig,
 			struct compat_siginfo __user *, uinfo)
 {
+<<<<<<< HEAD
 	siginfo_t info;
+=======
+	siginfo_t info = {};
+>>>>>>> common/deprecated/android-3.18
 	int ret = copy_siginfo_from_user32(&info, uinfo);
 	if (unlikely(ret))
 		return ret;
@@ -3058,7 +3279,11 @@ COMPAT_SYSCALL_DEFINE4(rt_tgsigqueueinfo,
 			int, sig,
 			struct compat_siginfo __user *, uinfo)
 {
+<<<<<<< HEAD
 	siginfo_t info;
+=======
+	siginfo_t info = {};
+>>>>>>> common/deprecated/android-3.18
 
 	if (copy_siginfo_from_user32(&info, uinfo))
 		return -EFAULT;

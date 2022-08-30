@@ -450,7 +450,11 @@ static bool watchdog_is_running(void)
 
 	is_running = (superio_inb(watchdog.sioaddr, SIO_REG_ENABLE) & BIT(0))
 		&& (superio_inb(watchdog.sioaddr, F71808FG_REG_WDT_CONF)
+<<<<<<< HEAD
 			& F71808FG_FLAG_WD_EN);
+=======
+			& BIT(F71808FG_FLAG_WD_EN));
+>>>>>>> common/deprecated/android-3.18
 
 	superio_exit(watchdog.sioaddr);
 
@@ -520,7 +524,12 @@ static ssize_t watchdog_write(struct file *file, const char __user *buf,
 				char c;
 				if (get_user(c, buf + i))
 					return -EFAULT;
+<<<<<<< HEAD
 				expect_close = (c == 'V');
+=======
+				if (c == 'V')
+					expect_close = true;
+>>>>>>> common/deprecated/android-3.18
 			}
 
 			/* Properly order writes across fork()ed processes */
@@ -641,9 +650,15 @@ static int __init watchdog_init(int sioaddr)
 	 * into the module have been registered yet.
 	 */
 	watchdog.sioaddr = sioaddr;
+<<<<<<< HEAD
 	watchdog.ident.options = WDIOC_SETTIMEOUT
 				| WDIOF_MAGICCLOSE
 				| WDIOF_KEEPALIVEPING;
+=======
+	watchdog.ident.options = WDIOF_MAGICCLOSE
+				| WDIOF_KEEPALIVEPING
+				| WDIOF_CARDRESET;
+>>>>>>> common/deprecated/android-3.18
 
 	snprintf(watchdog.ident.identity,
 		sizeof(watchdog.ident.identity), "%s watchdog",

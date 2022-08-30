@@ -229,6 +229,10 @@ int udp_get_port(struct sock *sk, unsigned short snum,
 		 int (*saddr_cmp)(const struct sock *,
 				  const struct sock *));
 void udp_err(struct sk_buff *, u32);
+<<<<<<< HEAD
+=======
+int udp_abort(struct sock *sk, int err);
+>>>>>>> common/deprecated/android-3.18
 int udp_sendmsg(struct kiocb *iocb, struct sock *sk, struct msghdr *msg,
 		size_t len);
 int udp_push_pending_frames(struct sock *sk);

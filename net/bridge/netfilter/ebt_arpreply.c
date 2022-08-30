@@ -67,6 +67,12 @@ static int ebt_arpreply_tg_check(const struct xt_tgchk_param *par)
 	if (e->ethproto != htons(ETH_P_ARP) ||
 	    e->invflags & EBT_IPROTO)
 		return -EINVAL;
+<<<<<<< HEAD
+=======
+	if (ebt_invalid_target(info->target))
+		return -EINVAL;
+
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 

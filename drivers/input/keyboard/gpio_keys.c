@@ -30,6 +30,7 @@
 #include <linux/of_platform.h>
 #include <linux/of_gpio.h>
 #include <linux/spinlock.h>
+<<<<<<< HEAD
 #include <linux/exynos-ss.h>
 
 #include <linux/sec_sysfs.h>
@@ -60,6 +61,11 @@ extern void vfsspi_fp_homekey_ev(void);
 
 struct gpio_button_data {
 	struct gpio_keys_button *button;
+=======
+
+struct gpio_button_data {
+	const struct gpio_keys_button *button;
+>>>>>>> common/deprecated/android-3.18
 	struct input_dev *input;
 	struct timer_list timer;
 	struct work_struct work;
@@ -68,8 +74,11 @@ struct gpio_button_data {
 	spinlock_t lock;
 	bool disabled;
 	bool key_pressed;
+<<<<<<< HEAD
 	bool key_state;
 	int key_press_count;
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 struct gpio_keys_drvdata {
@@ -120,7 +129,11 @@ struct gpio_keys_drvdata {
  * Return value of this function can be used to allocate bitmap
  * large enough to hold all bits for given type.
  */
+<<<<<<< HEAD
 static inline int get_n_events_by_type(int type)
+=======
+static int get_n_events_by_type(int type)
+>>>>>>> common/deprecated/android-3.18
 {
 	BUG_ON(type != EV_SW && type != EV_KEY);
 
@@ -128,6 +141,25 @@ static inline int get_n_events_by_type(int type)
 }
 
 /**
+<<<<<<< HEAD
+=======
+ * get_bm_events_by_type() - returns bitmap of supported events per @type
+ * @input: input device from which bitmap is retrieved
+ * @type: type of button (%EV_KEY, %EV_SW)
+ *
+ * Return value of this function can be used to allocate bitmap
+ * large enough to hold all bits for given type.
+ */
+static const unsigned long *get_bm_events_by_type(struct input_dev *dev,
+						  int type)
+{
+	BUG_ON(type != EV_SW && type != EV_KEY);
+
+	return (type == EV_KEY) ? dev->keybit : dev->swbit;
+}
+
+/**
+>>>>>>> common/deprecated/android-3.18
  * gpio_keys_disable_button() - disables given GPIO button
  * @bdata: button data for button to be disabled
  *
@@ -234,6 +266,10 @@ static ssize_t gpio_keys_attr_store_helper(struct gpio_keys_drvdata *ddata,
 					   const char *buf, unsigned int type)
 {
 	int n_events = get_n_events_by_type(type);
+<<<<<<< HEAD
+=======
+	const unsigned long *bitmap = get_bm_events_by_type(ddata->input, type);
+>>>>>>> common/deprecated/android-3.18
 	unsigned long *bits;
 	ssize_t error;
 	int i;
@@ -247,6 +283,14 @@ static ssize_t gpio_keys_attr_store_helper(struct gpio_keys_drvdata *ddata,
 		goto out;
 
 	/* First validate */
+<<<<<<< HEAD
+=======
+	if (!bitmap_subset(bits, bitmap, n_events)) {
+		error = -EINVAL;
+		goto out;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	for (i = 0; i < ddata->pdata->nbuttons; i++) {
 		struct gpio_button_data *bdata = &ddata->data[i];
 
@@ -352,6 +396,7 @@ static struct attribute_group gpio_keys_attr_group = {
 	.attrs = gpio_keys_attrs,
 };
 
+<<<<<<< HEAD
 static ssize_t key_pressed_show(struct device *dev,
 				struct device_attribute *attr, char *buf)
 {
@@ -561,12 +606,15 @@ static struct attribute_group sec_key_attr_group = {
 	.attrs = sec_key_attrs,
 };
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static void gpio_keys_gpio_report_event(struct gpio_button_data *bdata)
 {
 	const struct gpio_keys_button *button = bdata->button;
 	struct input_dev *input = bdata->input;
 	unsigned int type = button->type ?: EV_KEY;
 	int state = (gpio_get_value_cansleep(button->gpio) ? 1 : 0) ^ button->active_low;
+<<<<<<< HEAD
 	struct irq_desc *desc = irq_to_desc(gpio_to_irq(button->gpio));
 
 	if (!desc) {
@@ -593,11 +641,14 @@ static void gpio_keys_gpio_report_event(struct gpio_button_data *bdata)
 		printk(KERN_INFO "[sec_input] %d key is %s\n", button->code, !!state ? "pressed" : "released");
 		break;
 	}
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	if (type == EV_ABS) {
 		if (state)
 			input_event(input, type, button->code, button->value);
 	} else {
+<<<<<<< HEAD
 		bdata->key_state = !!state;
 		input_event(input, type, button->code, state);
 
@@ -610,6 +661,10 @@ static void gpio_keys_gpio_report_event(struct gpio_button_data *bdata)
 	if (state)
 		bdata->key_press_count++;
 
+=======
+		input_event(input, type, button->code, !!state);
+	}
+>>>>>>> common/deprecated/android-3.18
 	input_sync(input);
 }
 
@@ -637,12 +692,15 @@ static irqreturn_t gpio_keys_gpio_isr(int irq, void *dev_id)
 
 	BUG_ON(irq != bdata->irq);
 
+<<<<<<< HEAD
 	if (suspend_state) {
 		irq_in_suspend = true;
 		wakeup_reason = bdata->button->code;
 		pr_info("%s before resume by %d\n", __func__, wakeup_reason);
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (bdata->button->wakeup)
 		pm_stay_awake(bdata->input->dev.parent);
 	if (bdata->timer_debounce)
@@ -717,7 +775,11 @@ static void gpio_keys_quiesce_key(void *data)
 static int gpio_keys_setup_key(struct platform_device *pdev,
 				struct input_dev *input,
 				struct gpio_button_data *bdata,
+<<<<<<< HEAD
 				struct gpio_keys_button *button)
+=======
+				const struct gpio_keys_button *button)
+>>>>>>> common/deprecated/android-3.18
 {
 	const char *desc = button->desc ? button->desc : "gpio_keys";
 	struct device *dev = &pdev->dev;
@@ -807,9 +869,12 @@ static int gpio_keys_setup_key(struct platform_device *pdev,
 	if (!button->can_disable)
 		irqflags |= IRQF_SHARED;
 
+<<<<<<< HEAD
 	if (button->wakeup)
 		irqflags |= IRQF_NO_SUSPEND;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	error = devm_request_any_context_irq(&pdev->dev, bdata->irq,
 					     isr, irqflags, desc, bdata);
 	if (error < 0) {
@@ -964,6 +1029,7 @@ gpio_keys_get_devtree_pdata(struct device *dev)
 
 #endif
 
+<<<<<<< HEAD
 static void gpio_remove_key(struct gpio_button_data *bdata)
 {
 	free_irq(bdata->irq, bdata);
@@ -974,6 +1040,8 @@ static void gpio_remove_key(struct gpio_button_data *bdata)
 		gpio_free(bdata->button->gpio);
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static int gpio_keys_probe(struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;
@@ -1021,16 +1089,23 @@ static int gpio_keys_probe(struct platform_device *pdev)
 	input->id.vendor = 0x0001;
 	input->id.product = 0x0001;
 	input->id.version = 0x0100;
+<<<<<<< HEAD
 	wakeup_reason = 0;
 	suspend_state = false;
 	irq_in_suspend = false;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	/* Enable auto repeat feature of Linux input subsystem */
 	if (pdata->rep)
 		__set_bit(EV_REP, input->evbit);
 
 	for (i = 0; i < pdata->nbuttons; i++) {
+<<<<<<< HEAD
 		struct gpio_keys_button *button = &pdata->buttons[i];
+=======
+		const struct gpio_keys_button *button = &pdata->buttons[i];
+>>>>>>> common/deprecated/android-3.18
 		struct gpio_button_data *bdata = &ddata->data[i];
 
 		error = gpio_keys_setup_key(pdev, input, bdata, button);
@@ -1048,6 +1123,7 @@ static int gpio_keys_probe(struct platform_device *pdev)
 		return error;
 	}
 
+<<<<<<< HEAD
 	sec_key = sec_device_create(ddata, "sec_key");
 	if (IS_ERR(sec_key))
 		pr_err("%s failed to create sec_key\n", __func__);
@@ -1059,6 +1135,8 @@ static int gpio_keys_probe(struct platform_device *pdev)
 		goto fail2;
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	error = input_register_device(input);
 	if (error) {
 		dev_err(dev, "Unable to register input device, error: %d\n",
@@ -1072,6 +1150,7 @@ static int gpio_keys_probe(struct platform_device *pdev)
 
 err_remove_group:
 	sysfs_remove_group(&pdev->dev.kobj, &gpio_keys_attr_group);
+<<<<<<< HEAD
 fail2:
 	while (--i >= 0)
 		gpio_remove_key(&ddata->data[i]);
@@ -1084,6 +1163,8 @@ fail2:
 	if (!dev_get_platdata(&pdev->dev))
 		kfree(pdata);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	return error;
 }
 
@@ -1103,10 +1184,13 @@ static int gpio_keys_suspend(struct device *dev)
 	struct input_dev *input = ddata->input;
 	int i;
 
+<<<<<<< HEAD
 	suspend_state = true;
 	irq_in_suspend = false;
 	wakeup_reason = 0;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (device_may_wakeup(dev)) {
 		for (i = 0; i < ddata->pdata->nbuttons; i++) {
 			struct gpio_button_data *bdata = &ddata->data[i];
@@ -1130,7 +1214,10 @@ static int gpio_keys_resume(struct device *dev)
 	int error = 0;
 	int i;
 
+<<<<<<< HEAD
 	suspend_state = false;
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (device_may_wakeup(dev)) {
 		for (i = 0; i < ddata->pdata->nbuttons; i++) {
 			struct gpio_button_data *bdata = &ddata->data[i];

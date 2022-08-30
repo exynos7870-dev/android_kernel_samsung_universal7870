@@ -15,6 +15,7 @@ lib-y		:= backtrace.o changebit.o csumipv6.o csumpartial.o   \
 		   io-readsb.o io-writesb.o io-readsl.o io-writesl.o  \
 		   call_with_stack.o bswapsdi2.o
 
+<<<<<<< HEAD
 mmu-y	:= clear_user.o copy_page.o getuser.o putuser.o
 
 # the code in uaccess.S is not preemption safe and
@@ -28,6 +29,10 @@ else
   mmu-y	+= uaccess.o
 endif
 endif
+=======
+mmu-y		:= clear_user.o copy_page.o getuser.o putuser.o       \
+		   copy_from_user.o copy_to_user.o
+>>>>>>> common/deprecated/android-3.18
 
 # using lib_ here won't override already available weak symbols
 obj-$(CONFIG_UACCESS_WITH_MEMCPY) += uaccess_with_memcpy.o
@@ -46,7 +51,11 @@ $(obj)/csumpartialcopy.o:	$(obj)/csumpartialcopygeneric.S
 $(obj)/csumpartialcopyuser.o:	$(obj)/csumpartialcopygeneric.S
 
 ifeq ($(CONFIG_KERNEL_MODE_NEON),y)
+<<<<<<< HEAD
   NEON_FLAGS			:= -mfloat-abi=softfp -mfpu=neon
+=======
+  NEON_FLAGS			:= -march=armv7-a -mfloat-abi=softfp -mfpu=neon
+>>>>>>> common/deprecated/android-3.18
   CFLAGS_xor-neon.o		+= $(NEON_FLAGS)
   obj-$(CONFIG_XOR_BLOCKS)	+= xor-neon.o
 endif

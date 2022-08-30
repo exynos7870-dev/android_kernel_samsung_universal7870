@@ -73,9 +73,13 @@ int xfrm4_output_finish(struct sk_buff *skb)
 	memset(IPCB(skb), 0, sizeof(*IPCB(skb)));
 	skb->protocol = htons(ETH_P_IP);
 
+<<<<<<< HEAD
 #ifdef CONFIG_NETFILTER
 	IPCB(skb)->flags |= IPSKB_XFRM_TRANSFORMED;
 #endif
+=======
+	IPCB(skb)->flags |= IPSKB_XFRM_TRANSFORMED;
+>>>>>>> common/deprecated/android-3.18
 
 	return xfrm_output(skb);
 }

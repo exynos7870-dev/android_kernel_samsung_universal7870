@@ -71,7 +71,11 @@ static int ahci_scr_write(struct ata_link *link, unsigned int sc_reg, u32 val);
 static bool ahci_qc_fill_rtf(struct ata_queued_cmd *qc);
 static int ahci_port_start(struct ata_port *ap);
 static void ahci_port_stop(struct ata_port *ap);
+<<<<<<< HEAD
 static void ahci_qc_prep(struct ata_queued_cmd *qc);
+=======
+static enum ata_completion_errors ahci_qc_prep(struct ata_queued_cmd *qc);
+>>>>>>> common/deprecated/android-3.18
 static int ahci_pmp_qc_defer(struct ata_queued_cmd *qc);
 static void ahci_freeze(struct ata_port *ap);
 static void ahci_thaw(struct ata_port *ap);
@@ -187,7 +191,10 @@ struct ata_port_operations ahci_pmp_retry_srst_ops = {
 EXPORT_SYMBOL_GPL(ahci_pmp_retry_srst_ops);
 
 static bool ahci_em_messages __read_mostly = true;
+<<<<<<< HEAD
 EXPORT_SYMBOL_GPL(ahci_em_messages);
+=======
+>>>>>>> common/deprecated/android-3.18
 module_param(ahci_em_messages, bool, 0444);
 /* add other LED protocol types when they become supported */
 MODULE_PARM_DESC(ahci_em_messages,
@@ -467,6 +474,10 @@ void ahci_save_initial_config(struct device *dev, struct ahci_host_priv *hpriv)
 		dev_info(dev, "forcing port_map 0x%x -> 0x%x\n",
 			 port_map, hpriv->force_port_map);
 		port_map = hpriv->force_port_map;
+<<<<<<< HEAD
+=======
+		hpriv->saved_port_map = port_map;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (hpriv->mask_port_map) {
@@ -495,8 +506,13 @@ void ahci_save_initial_config(struct device *dev, struct ahci_host_priv *hpriv)
 		}
 	}
 
+<<<<<<< HEAD
 	/* fabricate port_map from cap.nr_ports */
 	if (!port_map) {
+=======
+	/* fabricate port_map from cap.nr_ports for < AHCI 1.3 */
+	if (!port_map && vers < 0x10300) {
+>>>>>>> common/deprecated/android-3.18
 		port_map = (1 << ahci_nr_ports(cap)) - 1;
 		dev_warn(dev, "forcing PORTS_IMPL to 0x%x\n", port_map);
 
@@ -1520,7 +1536,11 @@ static int ahci_pmp_qc_defer(struct ata_queued_cmd *qc)
 		return sata_pmp_qc_defer_cmd_switch(qc);
 }
 
+<<<<<<< HEAD
 static void ahci_qc_prep(struct ata_queued_cmd *qc)
+=======
+static enum ata_completion_errors ahci_qc_prep(struct ata_queued_cmd *qc)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct ata_port *ap = qc->ap;
 	struct ahci_port_priv *pp = ap->private_data;
@@ -1556,6 +1576,11 @@ static void ahci_qc_prep(struct ata_queued_cmd *qc)
 		opts |= AHCI_CMD_ATAPI | AHCI_CMD_PREFETCH;
 
 	ahci_fill_cmd_slot(pp, qc->tag, opts);
+<<<<<<< HEAD
+=======
+
+	return AC_ERR_OK;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void ahci_fbs_dec_intr(struct ata_port *ap)
@@ -1707,8 +1732,12 @@ static void ahci_handle_port_interrupt(struct ata_port *ap,
 	if (unlikely(resetting))
 		status &= ~PORT_IRQ_BAD_PMP;
 
+<<<<<<< HEAD
 	/* if LPM is enabled, PHYRDY doesn't mean anything */
 	if (ap->link.lpm_policy > ATA_LPM_MAX_POWER) {
+=======
+	if (sata_lpm_ignore_phy_events(&ap->link)) {
+>>>>>>> common/deprecated/android-3.18
 		status &= ~PORT_IRQ_PHYRDY;
 		ahci_scr_write(&ap->link, SCR_ERROR, SERR_PHYRDY_CHG);
 	}
@@ -2052,6 +2081,11 @@ static void ahci_set_aggressive_devslp(struct ata_port *ap, bool sleep)
 		deto = 20;
 	}
 
+<<<<<<< HEAD
+=======
+	/* Make dito, mdat, deto bits to 0s */
+	devslp &= ~GENMASK_ULL(24, 2);
+>>>>>>> common/deprecated/android-3.18
 	devslp |= ((dito << PORT_DEVSLP_DITO_OFFSET) |
 		   (mdat << PORT_DEVSLP_MDAT_OFFSET) |
 		   (deto << PORT_DEVSLP_DETO_OFFSET) |

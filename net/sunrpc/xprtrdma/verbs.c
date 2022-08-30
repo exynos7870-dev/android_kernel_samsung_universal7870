@@ -511,8 +511,13 @@ int
 rpcrdma_ia_open(struct rpcrdma_xprt *xprt, struct sockaddr *addr, int memreg)
 {
 	int rc, mem_priv;
+<<<<<<< HEAD
 	struct ib_device_attr devattr;
 	struct rpcrdma_ia *ia = &xprt->rx_ia;
+=======
+	struct rpcrdma_ia *ia = &xprt->rx_ia;
+	struct ib_device_attr *devattr = &ia->ri_devattr;
+>>>>>>> common/deprecated/android-3.18
 
 	ia->ri_id = rpcrdma_create_id(xprt, ia, addr);
 	if (IS_ERR(ia->ri_id)) {
@@ -528,28 +533,43 @@ rpcrdma_ia_open(struct rpcrdma_xprt *xprt, struct sockaddr *addr, int memreg)
 		goto out2;
 	}
 
+<<<<<<< HEAD
 	/*
 	 * Query the device to determine if the requested memory
 	 * registration strategy is supported. If it isn't, set the
 	 * strategy to a globally supported model.
 	 */
 	rc = ib_query_device(ia->ri_id->device, &devattr);
+=======
+	rc = ib_query_device(ia->ri_id->device, devattr);
+>>>>>>> common/deprecated/android-3.18
 	if (rc) {
 		dprintk("RPC:       %s: ib_query_device failed %d\n",
 			__func__, rc);
 		goto out2;
 	}
 
+<<<<<<< HEAD
 	if (devattr.device_cap_flags & IB_DEVICE_LOCAL_DMA_LKEY) {
+=======
+	if (devattr->device_cap_flags & IB_DEVICE_LOCAL_DMA_LKEY) {
+>>>>>>> common/deprecated/android-3.18
 		ia->ri_have_dma_lkey = 1;
 		ia->ri_dma_lkey = ia->ri_id->device->local_dma_lkey;
 	}
 
 	if (memreg == RPCRDMA_FRMR) {
 		/* Requires both frmr reg and local dma lkey */
+<<<<<<< HEAD
 		if ((devattr.device_cap_flags &
 		     (IB_DEVICE_MEM_MGT_EXTENSIONS|IB_DEVICE_LOCAL_DMA_LKEY)) !=
 		    (IB_DEVICE_MEM_MGT_EXTENSIONS|IB_DEVICE_LOCAL_DMA_LKEY)) {
+=======
+		if (((devattr->device_cap_flags &
+		     (IB_DEVICE_MEM_MGT_EXTENSIONS|IB_DEVICE_LOCAL_DMA_LKEY)) !=
+		    (IB_DEVICE_MEM_MGT_EXTENSIONS|IB_DEVICE_LOCAL_DMA_LKEY)) ||
+		      (devattr->max_fast_reg_page_list_len == 0)) {
+>>>>>>> common/deprecated/android-3.18
 			dprintk("RPC:       %s: FRMR registration "
 				"not supported by HCA\n", __func__);
 			memreg = RPCRDMA_MTHCAFMR;
@@ -557,7 +577,11 @@ rpcrdma_ia_open(struct rpcrdma_xprt *xprt, struct sockaddr *addr, int memreg)
 			/* Mind the ia limit on FRMR page list depth */
 			ia->ri_max_frmr_depth = min_t(unsigned int,
 				RPCRDMA_MAX_DATA_SEGS,
+<<<<<<< HEAD
 				devattr.max_fast_reg_page_list_len);
+=======
+				devattr->max_fast_reg_page_list_len);
+>>>>>>> common/deprecated/android-3.18
 		}
 	}
 	if (memreg == RPCRDMA_MTHCAFMR) {
@@ -655,6 +679,7 @@ int
 rpcrdma_ep_create(struct rpcrdma_ep *ep, struct rpcrdma_ia *ia,
 				struct rpcrdma_create_data_internal *cdata)
 {
+<<<<<<< HEAD
 	struct ib_device_attr devattr;
 	struct ib_cq *sendcq, *recvcq;
 	int rc, err;
@@ -669,6 +694,15 @@ rpcrdma_ep_create(struct rpcrdma_ep *ep, struct rpcrdma_ia *ia,
 	/* check provider's send/recv wr limits */
 	if (cdata->max_requests > devattr.max_qp_wr)
 		cdata->max_requests = devattr.max_qp_wr;
+=======
+	struct ib_device_attr *devattr = &ia->ri_devattr;
+	struct ib_cq *sendcq, *recvcq;
+	int rc, err;
+
+	/* check provider's send/recv wr limits */
+	if (cdata->max_requests > devattr->max_qp_wr)
+		cdata->max_requests = devattr->max_qp_wr;
+>>>>>>> common/deprecated/android-3.18
 
 	ep->rep_attr.event_handler = rpcrdma_qp_async_error_upcall;
 	ep->rep_attr.qp_context = ep;
@@ -703,8 +737,13 @@ rpcrdma_ep_create(struct rpcrdma_ep *ep, struct rpcrdma_ia *ia,
 
 		}
 		ep->rep_attr.cap.max_send_wr *= depth;
+<<<<<<< HEAD
 		if (ep->rep_attr.cap.max_send_wr > devattr.max_qp_wr) {
 			cdata->max_requests = devattr.max_qp_wr / depth;
+=======
+		if (ep->rep_attr.cap.max_send_wr > devattr->max_qp_wr) {
+			cdata->max_requests = devattr->max_qp_wr / depth;
+>>>>>>> common/deprecated/android-3.18
 			if (!cdata->max_requests)
 				return -EINVAL;
 			ep->rep_attr.cap.max_send_wr = cdata->max_requests *
@@ -786,10 +825,18 @@ rpcrdma_ep_create(struct rpcrdma_ep *ep, struct rpcrdma_ia *ia,
 
 	/* Client offers RDMA Read but does not initiate */
 	ep->rep_remote_cma.initiator_depth = 0;
+<<<<<<< HEAD
 	if (devattr.max_qp_rd_atom > 32)	/* arbitrary but <= 255 */
 		ep->rep_remote_cma.responder_resources = 32;
 	else
 		ep->rep_remote_cma.responder_resources = devattr.max_qp_rd_atom;
+=======
+	if (devattr->max_qp_rd_atom > 32)	/* arbitrary but <= 255 */
+		ep->rep_remote_cma.responder_resources = 32;
+	else
+		ep->rep_remote_cma.responder_resources =
+						devattr->max_qp_rd_atom;
+>>>>>>> common/deprecated/android-3.18
 
 	ep->rep_remote_cma.retry_count = 7;
 	ep->rep_remote_cma.flow_control = 0;

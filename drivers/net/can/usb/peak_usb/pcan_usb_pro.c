@@ -508,7 +508,11 @@ static int pcan_usb_pro_drv_loaded(struct peak_usb_device *dev, int loaded)
 	u8 *buffer;
 	int err;
 
+<<<<<<< HEAD
 	buffer = kmalloc(PCAN_USBPRO_FCT_DRVLD_REQ_LEN, GFP_KERNEL);
+=======
+	buffer = kzalloc(PCAN_USBPRO_FCT_DRVLD_REQ_LEN, GFP_KERNEL);
+>>>>>>> common/deprecated/android-3.18
 	if (!buffer)
 		return -ENOMEM;
 

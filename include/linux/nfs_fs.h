@@ -538,9 +538,13 @@ extern int  nfs_readpage_async(struct nfs_open_context *, struct inode *,
 
 static inline loff_t nfs_size_to_loff_t(__u64 size)
 {
+<<<<<<< HEAD
 	if (size > (__u64) OFFSET_MAX - 1)
 		return OFFSET_MAX - 1;
 	return (loff_t) size;
+=======
+	return min_t(u64, size, OFFSET_MAX);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static inline ino_t

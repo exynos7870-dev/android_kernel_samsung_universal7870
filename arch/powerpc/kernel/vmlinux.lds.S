@@ -213,6 +213,10 @@ SECTIONS
 		*(.opd)
 	}
 
+<<<<<<< HEAD
+=======
+	. = ALIGN(256);
+>>>>>>> common/deprecated/android-3.18
 	.got : AT(ADDR(.got) - LOAD_OFFSET) {
 		__toc_start = .;
 #ifndef CONFIG_RELOCATABLE

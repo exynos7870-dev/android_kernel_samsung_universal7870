@@ -78,7 +78,11 @@ int rxrpc_recvmsg(struct kiocb *iocb, struct socket *sock,
 				release_sock(&rx->sk);
 				if (continue_call)
 					rxrpc_put_call(continue_call);
+<<<<<<< HEAD
 				return -ENODATA;
+=======
+				return -EAGAIN;
+>>>>>>> common/deprecated/android-3.18
 			}
 		}
 

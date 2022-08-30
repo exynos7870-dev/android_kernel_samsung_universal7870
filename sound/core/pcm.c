@@ -25,9 +25,17 @@
 #include <linux/time.h>
 #include <linux/mutex.h>
 #include <linux/device.h>
+<<<<<<< HEAD
 #include <sound/core.h>
 #include <sound/minors.h>
 #include <sound/pcm.h>
+=======
+#include <linux/nospec.h>
+#include <sound/core.h>
+#include <sound/minors.h>
+#include <sound/pcm.h>
+#include <sound/timer.h>
+>>>>>>> common/deprecated/android-3.18
 #include <sound/control.h>
 #include <sound/info.h>
 
@@ -125,6 +133,10 @@ static int snd_pcm_control_ioctl(struct snd_card *card,
 				return -EFAULT;
 			if (stream < 0 || stream > 1)
 				return -EINVAL;
+<<<<<<< HEAD
+=======
+			stream = array_index_nospec(stream, 2);
+>>>>>>> common/deprecated/android-3.18
 			if (get_user(subdevice, &info->subdevice))
 				return -EFAULT;
 			mutex_lock(&register_mutex);
@@ -222,6 +234,13 @@ static char *snd_pcm_format_names[] = {
 	FORMAT(DSD_U32_BE),
 };
 
+<<<<<<< HEAD
+=======
+/**
+ * snd_pcm_format_name - Return a name string for the given PCM format
+ * @format: PCM format
+ */
+>>>>>>> common/deprecated/android-3.18
 const char *snd_pcm_format_name(snd_pcm_format_t format)
 {
 	if ((__force unsigned int)format >= ARRAY_SIZE(snd_pcm_format_names))
@@ -711,7 +730,10 @@ int snd_pcm_new_stream(struct snd_pcm *pcm, int stream, int substream_count)
 	}
 	return 0;
 }				
+<<<<<<< HEAD
 
+=======
+>>>>>>> common/deprecated/android-3.18
 EXPORT_SYMBOL(snd_pcm_new_stream);
 
 static int _snd_pcm_new(struct snd_card *card, const char *id, int device,
@@ -812,6 +834,17 @@ int snd_pcm_new_internal(struct snd_card *card, const char *id, int device,
 }
 EXPORT_SYMBOL(snd_pcm_new_internal);
 
+<<<<<<< HEAD
+=======
+static void free_chmap(struct snd_pcm_str *pstr)
+{
+	if (pstr->chmap_kctl) {
+		snd_ctl_remove(pstr->pcm->card, pstr->chmap_kctl);
+		pstr->chmap_kctl = NULL;
+	}
+}
+
+>>>>>>> common/deprecated/android-3.18
 static void snd_pcm_free_stream(struct snd_pcm_str * pstr)
 {
 	struct snd_pcm_substream *substream, *substream_next;
@@ -834,6 +867,10 @@ static void snd_pcm_free_stream(struct snd_pcm_str * pstr)
 		kfree(setup);
 	}
 #endif
+<<<<<<< HEAD
+=======
+	free_chmap(pstr);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int snd_pcm_free(struct snd_pcm *pcm)
@@ -997,8 +1034,18 @@ void snd_pcm_detach_substream(struct snd_pcm_substream *substream)
 #ifdef CONFIG_SND_PCM_XRUN_DEBUG
 	kfree(runtime->hwptr_log);
 #endif
+<<<<<<< HEAD
 	kfree(runtime);
 	substream->runtime = NULL;
+=======
+	/* Avoid concurrent access to runtime via PCM timer interface */
+	if (substream->timer)
+		spin_lock_irq(&substream->timer->lock);
+	substream->runtime = NULL;
+	if (substream->timer)
+		spin_unlock_irq(&substream->timer->lock);
+	kfree(runtime);
+>>>>>>> common/deprecated/android-3.18
 	put_pid(substream->pid);
 	substream->pid = NULL;
 	substream->pstr->substream_opened--;
@@ -1148,10 +1195,14 @@ static int snd_pcm_dev_disconnect(struct snd_device *device)
 			break;
 		}
 		snd_unregister_device(devtype, pcm->card, pcm->device);
+<<<<<<< HEAD
 		if (pcm->streams[cidx].chmap_kctl) {
 			snd_ctl_remove(pcm->card, pcm->streams[cidx].chmap_kctl);
 			pcm->streams[cidx].chmap_kctl = NULL;
 		}
+=======
+		free_chmap(&pcm->streams[cidx]);
+>>>>>>> common/deprecated/android-3.18
 	}
 	mutex_unlock(&pcm->open_mutex);
  unlock:
@@ -1159,6 +1210,18 @@ static int snd_pcm_dev_disconnect(struct snd_device *device)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+/**
+ * snd_pcm_notify - Add/remove the notify list
+ * @notify: PCM notify list
+ * @nfree: 0 = register, 1 = unregister
+ *
+ * This adds the given notifier to the global list so that the callback is
+ * called for each registered PCM devices.  This exists only for PCM OSS
+ * emulation, so far.
+ */
+>>>>>>> common/deprecated/android-3.18
 int snd_pcm_notify(struct snd_pcm_notify *notify, int nfree)
 {
 	struct snd_pcm *pcm;
@@ -1181,7 +1244,10 @@ int snd_pcm_notify(struct snd_pcm_notify *notify, int nfree)
 	mutex_unlock(&register_mutex);
 	return 0;
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> common/deprecated/android-3.18
 EXPORT_SYMBOL(snd_pcm_notify);
 
 #ifdef CONFIG_PROC_FS

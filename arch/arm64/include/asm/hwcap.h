@@ -52,6 +52,17 @@
 extern unsigned int compat_elf_hwcap, compat_elf_hwcap2;
 #endif
 
+<<<<<<< HEAD
+=======
+enum {
+	CAP_HWCAP = 1,
+#ifdef CONFIG_COMPAT
+	CAP_COMPAT_HWCAP,
+	CAP_COMPAT_HWCAP2,
+#endif
+};
+
+>>>>>>> common/deprecated/android-3.18
 extern unsigned long elf_hwcap;
 #endif
 #endif

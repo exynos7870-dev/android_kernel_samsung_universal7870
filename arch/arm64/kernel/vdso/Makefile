@@ -15,8 +15,20 @@ ccflags-y := -shared -fno-common -fno-builtin
 ccflags-y += -nostdlib -Wl,-soname=linux-vdso.so.1 \
 		$(call cc-ldoption, -Wl$(comma)--hash-style=sysv)
 
+<<<<<<< HEAD
 obj-y += vdso.o
 extra-y += vdso.lds vdso-offsets.h
+=======
+# Disable gcov profiling for VDSO code
+GCOV_PROFILE := n
+
+# Workaround for bare-metal (ELF) toolchains that neglect to pass -shared
+# down to collect2, resulting in silent corruption of the vDSO image.
+ccflags-y += -Wl,-shared
+
+obj-y += vdso.o
+extra-y += vdso.lds
+>>>>>>> common/deprecated/android-3.18
 CPPFLAGS_vdso.lds += -P -C -U$(ARCH)
 
 # Force dependency (incbin is bad)
@@ -35,11 +47,18 @@ $(obj)/%.so: $(obj)/%.so.dbg FORCE
 gen-vdsosym := $(srctree)/$(src)/gen_vdso_offsets.sh
 quiet_cmd_vdsosym = VDSOSYM $@
 define cmd_vdsosym
+<<<<<<< HEAD
 	$(NM) $< | $(gen-vdsosym) | LC_ALL=C sort > $@ && \
 	cp $@ include/generated/
 endef
 
 $(obj)/vdso-offsets.h: $(obj)/vdso.so.dbg FORCE
+=======
+	$(NM) $< | $(gen-vdsosym) | LC_ALL=C sort > $@
+endef
+
+include/generated/vdso-offsets.h: $(obj)/vdso.so.dbg FORCE
+>>>>>>> common/deprecated/android-3.18
 	$(call if_changed,vdsosym)
 
 # Assembly rules for the .S files

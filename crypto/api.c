@@ -24,6 +24,10 @@
 #include <linux/sched.h>
 #include <linux/slab.h>
 #include <linux/string.h>
+<<<<<<< HEAD
+=======
+#include <linux/completion.h>
+>>>>>>> common/deprecated/android-3.18
 #include "internal.h"
 
 LIST_HEAD(crypto_alg_list);
@@ -172,7 +176,11 @@ static struct crypto_alg *crypto_larval_wait(struct crypto_alg *alg)
 	struct crypto_larval *larval = (void *)alg;
 	long timeout;
 
+<<<<<<< HEAD
 	timeout = wait_for_completion_interruptible_timeout(
+=======
+	timeout = wait_for_completion_killable_timeout(
+>>>>>>> common/deprecated/android-3.18
 		&larval->completion, 60 * HZ);
 
 	alg = larval->adult;
@@ -345,17 +353,25 @@ static unsigned int crypto_ctxsize(struct crypto_alg *alg, u32 type, u32 mask)
 	return len;
 }
 
+<<<<<<< HEAD
 void crypto_shoot_alg(struct crypto_alg *alg)
+=======
+static void crypto_shoot_alg(struct crypto_alg *alg)
+>>>>>>> common/deprecated/android-3.18
 {
 	down_write(&crypto_alg_sem);
 	alg->cra_flags |= CRYPTO_ALG_DYING;
 	up_write(&crypto_alg_sem);
 }
+<<<<<<< HEAD
 EXPORT_SYMBOL_GPL(crypto_shoot_alg);
 
 #if FIPS_FUNC_TEST == 4
 int g_tfm_sz = 0;
 #endif
+=======
+
+>>>>>>> common/deprecated/android-3.18
 struct crypto_tfm *__crypto_alloc_tfm(struct crypto_alg *alg, u32 type,
 				      u32 mask)
 {
@@ -363,19 +379,25 @@ struct crypto_tfm *__crypto_alloc_tfm(struct crypto_alg *alg, u32 type,
 	unsigned int tfm_size;
 	int err = -ENOMEM;
 
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 	if (unlikely(in_fips_err()))
 		return ERR_PTR(-EACCES);
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	tfm_size = sizeof(*tfm) + crypto_ctxsize(alg, type, mask);
 	tfm = kzalloc(tfm_size, GFP_KERNEL);
 	if (tfm == NULL)
 		goto out_err;
 
+<<<<<<< HEAD
 #if FIPS_FUNC_TEST == 4
 	g_tfm_sz = tfm_size;
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	tfm->__crt_alg = alg;
 
 	err = crypto_init_ops(tfm, type, mask);
@@ -427,11 +449,14 @@ struct crypto_tfm *crypto_alloc_base(const char *alg_name, u32 type, u32 mask)
 	struct crypto_tfm *tfm;
 	int err;
 
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 	if (unlikely(in_fips_err()))
 		return ERR_PTR(-EACCES);
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	for (;;) {
 		struct crypto_alg *alg;
 
@@ -451,7 +476,11 @@ struct crypto_tfm *crypto_alloc_base(const char *alg_name, u32 type, u32 mask)
 err:
 		if (err != -EAGAIN)
 			break;
+<<<<<<< HEAD
 		if (signal_pending(current)) {
+=======
+		if (fatal_signal_pending(current)) {
+>>>>>>> common/deprecated/android-3.18
 			err = -EINTR;
 			break;
 		}
@@ -470,6 +499,7 @@ void *crypto_create_tfm(struct crypto_alg *alg,
 	unsigned int total;
 	int err = -ENOMEM;
 
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 	if (unlikely(in_fips_err())) {
 		printk(KERN_ERR
@@ -477,6 +507,8 @@ void *crypto_create_tfm(struct crypto_alg *alg,
 		return ERR_PTR(-EACCES);
 	}
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	tfmsize = frontend->tfmsize;
 	total = tfmsize + sizeof(*tfm) + frontend->extsize(alg);
 
@@ -556,11 +588,14 @@ void *crypto_alloc_tfm(const char *alg_name,
 	void *tfm;
 	int err;
 
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 	if (unlikely(in_fips_err()))
 		return ERR_PTR(-EACCES);
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	for (;;) {
 		struct crypto_alg *alg;
 
@@ -580,7 +615,11 @@ void *crypto_alloc_tfm(const char *alg_name,
 err:
 		if (err != -EAGAIN)
 			break;
+<<<<<<< HEAD
 		if (signal_pending(current)) {
+=======
+		if (fatal_signal_pending(current)) {
+>>>>>>> common/deprecated/android-3.18
 			err = -EINTR;
 			break;
 		}
@@ -611,6 +650,7 @@ void crypto_destroy_tfm(void *mem, struct crypto_tfm *tfm)
 		alg->cra_exit(tfm);
 	crypto_exit_ops(tfm);
 	crypto_mod_put(alg);
+<<<<<<< HEAD
 #if FIPS_FUNC_TEST == 4
     {
         extern void hexdump(unsigned char *, unsigned int);
@@ -624,6 +664,9 @@ void crypto_destroy_tfm(void *mem, struct crypto_tfm *tfm)
         hexdump(mem, t);
     }
 #endif
+=======
+	kzfree(mem);
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL_GPL(crypto_destroy_tfm);
 
@@ -641,5 +684,20 @@ int crypto_has_alg(const char *name, u32 type, u32 mask)
 }
 EXPORT_SYMBOL_GPL(crypto_has_alg);
 
+<<<<<<< HEAD
+=======
+void crypto_req_done(struct crypto_async_request *req, int err)
+{
+	struct crypto_wait *wait = req->data;
+
+	if (err == -EINPROGRESS)
+		return;
+
+	wait->err = err;
+	complete(&wait->completion);
+}
+EXPORT_SYMBOL_GPL(crypto_req_done);
+
+>>>>>>> common/deprecated/android-3.18
 MODULE_DESCRIPTION("Cryptographic core API");
 MODULE_LICENSE("GPL");

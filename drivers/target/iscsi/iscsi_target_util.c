@@ -731,22 +731,39 @@ void iscsit_free_cmd(struct iscsi_cmd *cmd, bool shutdown)
 {
 	struct se_cmd *se_cmd = NULL;
 	int rc;
+<<<<<<< HEAD
+=======
+	bool op_scsi = false;
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Determine if a struct se_cmd is associated with
 	 * this struct iscsi_cmd.
 	 */
 	switch (cmd->iscsi_opcode) {
 	case ISCSI_OP_SCSI_CMD:
+<<<<<<< HEAD
 		se_cmd = &cmd->se_cmd;
 		__iscsit_free_cmd(cmd, true, shutdown);
+=======
+		op_scsi = true;
+>>>>>>> common/deprecated/android-3.18
 		/*
 		 * Fallthrough
 		 */
 	case ISCSI_OP_SCSI_TMFUNC:
+<<<<<<< HEAD
 		rc = transport_generic_free_cmd(&cmd->se_cmd, shutdown);
 		if (!rc && shutdown && se_cmd && se_cmd->se_sess) {
 			__iscsit_free_cmd(cmd, true, shutdown);
 			target_put_sess_cmd(se_cmd->se_sess, se_cmd);
+=======
+		se_cmd = &cmd->se_cmd;
+		__iscsit_free_cmd(cmd, op_scsi, shutdown);
+		rc = transport_generic_free_cmd(se_cmd, shutdown);
+		if (!rc && shutdown && se_cmd->se_sess) {
+			__iscsit_free_cmd(cmd, op_scsi, shutdown);
+			target_put_sess_cmd(se_cmd);
+>>>>>>> common/deprecated/android-3.18
 		}
 		break;
 	case ISCSI_OP_REJECT:
@@ -762,7 +779,11 @@ void iscsit_free_cmd(struct iscsi_cmd *cmd, bool shutdown)
 			rc = transport_generic_free_cmd(&cmd->se_cmd, shutdown);
 			if (!rc && shutdown && se_cmd->se_sess) {
 				__iscsit_free_cmd(cmd, true, shutdown);
+<<<<<<< HEAD
 				target_put_sess_cmd(se_cmd->se_sess, se_cmd);
+=======
+				target_put_sess_cmd(se_cmd);
+>>>>>>> common/deprecated/android-3.18
 			}
 			break;
 		}

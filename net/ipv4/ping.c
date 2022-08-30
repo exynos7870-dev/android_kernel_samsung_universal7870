@@ -645,6 +645,11 @@ static int ping_v4_push_pending_frames(struct sock *sk, struct pingfakehdr *pfh,
 {
 	struct sk_buff *skb = skb_peek(&sk->sk_write_queue);
 
+<<<<<<< HEAD
+=======
+	if (!skb)
+		return 0;
+>>>>>>> common/deprecated/android-3.18
 	pfh->wcheck = csum_partial((char *)&pfh->icmph,
 		sizeof(struct icmphdr), pfh->wcheck);
 	pfh->icmph.checksum = csum_fold(pfh->wcheck);
@@ -657,9 +662,19 @@ int ping_common_sendmsg(int family, struct msghdr *msg, size_t len,
 			void *user_icmph, size_t icmph_len) {
 	u8 type, code;
 
+<<<<<<< HEAD
 	if (len > 0xFFFF || len < icmph_len)
 		return -EMSGSIZE;
 
+=======
+	if (len > 0xFFFF)
+		return -EMSGSIZE;
+
+	/* Must have at least a full ICMP header. */
+	if (len < icmph_len)
+		return -EINVAL;
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 *	Check the flags.
 	 */
@@ -747,8 +762,15 @@ static int ping_v4_sendmsg(struct kiocb *iocb, struct sock *sk, struct msghdr *m
 
 	if (msg->msg_controllen) {
 		err = ip_cmsg_send(sock_net(sk), msg, &ipc, false);
+<<<<<<< HEAD
 		if (err)
 			return err;
+=======
+		if (unlikely(err)) {
+			kfree(ipc.opt);
+			return err;
+		}
+>>>>>>> common/deprecated/android-3.18
 		if (ipc.opt)
 			free = 1;
 	}
@@ -769,8 +791,15 @@ static int ping_v4_sendmsg(struct kiocb *iocb, struct sock *sk, struct msghdr *m
 	ipc.addr = faddr = daddr;
 
 	if (ipc.opt && ipc.opt->opt.srr) {
+<<<<<<< HEAD
 		if (!daddr)
 			return -EINVAL;
+=======
+		if (!daddr) {
+			err = -EINVAL;
+			goto out_free;
+		}
+>>>>>>> common/deprecated/android-3.18
 		faddr = ipc.opt->opt.faddr;
 	}
 	tos = get_rttos(&ipc, inet);
@@ -793,6 +822,12 @@ static int ping_v4_sendmsg(struct kiocb *iocb, struct sock *sk, struct msghdr *m
 			   inet_sk_flowi_flags(sk), faddr, saddr, 0, 0,
 			   sk->sk_uid);
 
+<<<<<<< HEAD
+=======
+	fl4.fl4_icmp_type = user_icmph.type;
+	fl4.fl4_icmp_code = user_icmph.code;
+
+>>>>>>> common/deprecated/android-3.18
 	security_sk_classify_flow(sk, flowi4_to_flowi(&fl4));
 	rt = ip_route_output_flow(net, &fl4, sk);
 	if (IS_ERR(rt)) {
@@ -836,6 +871,10 @@ back_from_confirm:
 
 out:
 	ip_rt_put(rt);
+<<<<<<< HEAD
+=======
+out_free:
+>>>>>>> common/deprecated/android-3.18
 	if (free)
 		kfree(ipc.opt);
 	if (!err) {

@@ -907,7 +907,11 @@ static void init_registers(struct net_device *dev)
 #elif defined(CONFIG_SPARC) || defined (CONFIG_PARISC)
 	i |= 0x4800;
 #else
+<<<<<<< HEAD
 #warning Processor architecture undefined
+=======
+	dev_warn(&dev->dev, "unknown CPU architecture, using default csr0 setting\n");
+>>>>>>> common/deprecated/android-3.18
 	i |= 0x4800;
 #endif
 	iowrite32(i, ioaddr + PCIBusCfg);

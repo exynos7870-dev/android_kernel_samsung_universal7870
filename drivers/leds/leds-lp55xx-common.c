@@ -200,7 +200,11 @@ static void lp55xx_firmware_loaded(const struct firmware *fw, void *context)
 
 	if (!fw) {
 		dev_err(dev, "firmware request failed\n");
+<<<<<<< HEAD
 		goto out;
+=======
+		return;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/* handling firmware data is chip dependent */
@@ -213,9 +217,15 @@ static void lp55xx_firmware_loaded(const struct firmware *fw, void *context)
 
 	mutex_unlock(&chip->lock);
 
+<<<<<<< HEAD
 out:
 	/* firmware should be released for other channel use */
 	release_firmware(chip->fw);
+=======
+	/* firmware should be released for other channel use */
+	release_firmware(chip->fw);
+	chip->fw = NULL;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int lp55xx_request_firmware(struct lp55xx_chip *chip)

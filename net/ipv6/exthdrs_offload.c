@@ -36,6 +36,10 @@ out:
 	return ret;
 
 out_rt:
+<<<<<<< HEAD
 	inet_del_offload(&rthdr_offload, IPPROTO_ROUTING);
+=======
+	inet6_del_offload(&rthdr_offload, IPPROTO_ROUTING);
+>>>>>>> common/deprecated/android-3.18
 	goto out;
 }

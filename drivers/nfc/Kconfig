@@ -2,6 +2,7 @@
 # Near Field Communication (NFC) devices
 #
 
+<<<<<<< HEAD
 config SAMSUNG_NFC
 	bool "Samsung NFC driver"
 	default n
@@ -37,6 +38,10 @@ config ESE_SECURE_SPI_PORT
 config ESE_SECURE_GPIO
         depends on ESE_SECURE
         string "gpio group for ese"
+=======
+menu "Near Field Communication (NFC) devices"
+	depends on NFC
+>>>>>>> common/deprecated/android-3.18
 
 config NFC_PN533
 	tristate "NXP PN533 USB driver"
@@ -101,17 +106,21 @@ config NFC_PORT100
 
 	  If unsure, say N.
 
+<<<<<<< HEAD
 config NFC_FELICA
         bool "NFC Felica support driver"
         default n
         help
           N5 driver can support addtional specification for Felica.
 
+=======
+>>>>>>> common/deprecated/android-3.18
 source "drivers/nfc/pn544/Kconfig"
 source "drivers/nfc/microread/Kconfig"
 source "drivers/nfc/nfcmrvl/Kconfig"
 source "drivers/nfc/st21nfca/Kconfig"
 source "drivers/nfc/st21nfcb/Kconfig"
+<<<<<<< HEAD
 
 config SEC_NFC
 	bool "Samsung NFC driver"
@@ -149,3 +158,6 @@ config SEC_NFC_LDO_CONTROL
 	  Say Y here to compile support for SEC NFC LDO CONTROL feature into the
 	  kernel.
 
+=======
+endmenu
+>>>>>>> common/deprecated/android-3.18

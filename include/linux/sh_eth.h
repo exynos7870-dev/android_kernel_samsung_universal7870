@@ -16,7 +16,10 @@ struct sh_eth_plat_data {
 	unsigned char mac_addr[ETH_ALEN];
 	unsigned no_ether_link:1;
 	unsigned ether_link_active_low:1;
+<<<<<<< HEAD
 	unsigned needs_init:1;
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 #endif

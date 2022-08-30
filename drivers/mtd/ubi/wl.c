@@ -149,6 +149,12 @@ static void update_fastmap_work_fn(struct work_struct *wrk)
 {
 	struct ubi_device *ubi = container_of(wrk, struct ubi_device, fm_work);
 	ubi_update_fastmap(ubi);
+<<<<<<< HEAD
+=======
+	spin_lock(&ubi->wl_lock);
+	ubi->fm_work_scheduled = 0;
+	spin_unlock(&ubi->wl_lock);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -657,7 +663,14 @@ static struct ubi_wl_entry *get_peb_for_wl(struct ubi_device *ubi)
 		/* We cannot update the fastmap here because this
 		 * function is called in atomic context.
 		 * Let's fail here and refill/update it as soon as possible. */
+<<<<<<< HEAD
 		schedule_work(&ubi->fm_work);
+=======
+		if (!ubi->fm_work_scheduled) {
+			ubi->fm_work_scheduled = 1;
+			schedule_work(&ubi->fm_work);
+		}
+>>>>>>> common/deprecated/android-3.18
 		return NULL;
 	} else {
 		pnum = pool->pebs[pool->used++];
@@ -1001,7 +1014,11 @@ static int wear_leveling_worker(struct ubi_device *ubi, struct ubi_work *wrk,
 				int shutdown)
 {
 	int err, scrubbing = 0, torture = 0, protect = 0, erroneous = 0;
+<<<<<<< HEAD
 	int vol_id = -1, lnum = -1;
+=======
+	int erase = 0, keep = 0, vol_id = -1, lnum = -1;
+>>>>>>> common/deprecated/android-3.18
 #ifdef CONFIG_MTD_UBI_FASTMAP
 	int anchor = wrk->anchor;
 #endif
@@ -1135,6 +1152,19 @@ static int wear_leveling_worker(struct ubi_device *ubi, struct ubi_work *wrk,
 			       e1->pnum);
 			scrubbing = 1;
 			goto out_not_moved;
+<<<<<<< HEAD
+=======
+		} else if (ubi->fast_attach && err == UBI_IO_BAD_HDR_EBADMSG) {
+			/*
+			 * While a full scan would detect interrupted erasures
+			 * at attach time we can face them here when attached from
+			 * Fastmap.
+			 */
+			dbg_wl("PEB %d has ECC errors, maybe from an interrupted erasure",
+			       e1->pnum);
+			erase = 1;
+			goto out_not_moved;
+>>>>>>> common/deprecated/android-3.18
 		}
 
 		ubi_err("error %d while reading VID header from PEB %d",
@@ -1168,6 +1198,10 @@ static int wear_leveling_worker(struct ubi_device *ubi, struct ubi_work *wrk,
 			 * Target PEB had bit-flips or write error - torture it.
 			 */
 			torture = 1;
+<<<<<<< HEAD
+=======
+			keep = 1;
+>>>>>>> common/deprecated/android-3.18
 			goto out_not_moved;
 		}
 
@@ -1253,7 +1287,11 @@ out_not_moved:
 		ubi->erroneous_peb_count += 1;
 	} else if (scrubbing)
 		wl_tree_add(e1, &ubi->scrub);
+<<<<<<< HEAD
 	else
+=======
+	else if (keep)
+>>>>>>> common/deprecated/android-3.18
 		wl_tree_add(e1, &ubi->used);
 	ubi_assert(!ubi->move_to_put);
 	ubi->move_from = ubi->move_to = NULL;
@@ -1265,6 +1303,15 @@ out_not_moved:
 	if (err)
 		goto out_ro;
 
+<<<<<<< HEAD
+=======
+	if (erase) {
+		err = do_sync_erase(ubi, e1, vol_id, lnum, 1);
+		if (err)
+			goto out_ro;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	mutex_unlock(&ubi->move_mutex);
 	return 0;
 
@@ -1812,6 +1859,22 @@ int ubi_thread(void *u)
 		    !ubi->thread_enabled || ubi_dbg_is_bgt_disabled(ubi)) {
 			set_current_state(TASK_INTERRUPTIBLE);
 			spin_unlock(&ubi->wl_lock);
+<<<<<<< HEAD
+=======
+
+			/*
+			 * Check kthread_should_stop() after we set the task
+			 * state to guarantee that we either see the stop bit
+			 * and exit or the task state is reset to runnable such
+			 * that it's not scheduled out indefinitely and detects
+			 * the stop bit at kthread_should_stop().
+			 */
+			if (kthread_should_stop()) {
+				set_current_state(TASK_RUNNING);
+				break;
+			}
+
+>>>>>>> common/deprecated/android-3.18
 			schedule();
 			continue;
 		}
@@ -1839,6 +1902,10 @@ int ubi_thread(void *u)
 	}
 
 	dbg_wl("background thread \"%s\" is killed", ubi->bgt_name);
+<<<<<<< HEAD
+=======
+	ubi->thread_enabled = 0;
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -1920,8 +1987,15 @@ int ubi_wl_init(struct ubi_device *ubi, struct ubi_attach_info *ai)
 		cond_resched();
 
 		e = kmem_cache_alloc(ubi_wl_entry_slab, GFP_KERNEL);
+<<<<<<< HEAD
 		if (!e)
 			goto out_free;
+=======
+		if (!e) {
+			err = -ENOMEM;
+			goto out_free;
+		}
+>>>>>>> common/deprecated/android-3.18
 
 		e->pnum = aeb->pnum;
 		e->ec = aeb->ec;
@@ -1941,8 +2015,15 @@ int ubi_wl_init(struct ubi_device *ubi, struct ubi_attach_info *ai)
 			cond_resched();
 
 			e = kmem_cache_alloc(ubi_wl_entry_slab, GFP_KERNEL);
+<<<<<<< HEAD
 			if (!e)
 				goto out_free;
+=======
+			if (!e) {
+				err = -ENOMEM;
+				goto out_free;
+			}
+>>>>>>> common/deprecated/android-3.18
 
 			e->pnum = aeb->pnum;
 			e->ec = aeb->ec;
@@ -1982,6 +2063,10 @@ int ubi_wl_init(struct ubi_device *ubi, struct ubi_attach_info *ai)
 		if (ubi->corr_peb_count)
 			ubi_err("%d PEBs are corrupted and not used",
 				ubi->corr_peb_count);
+<<<<<<< HEAD
+=======
+		err = -ENOSPC;
+>>>>>>> common/deprecated/android-3.18
 		goto out_free;
 	}
 	ubi->avail_pebs -= reserved_pebs;

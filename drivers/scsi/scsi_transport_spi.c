@@ -352,7 +352,11 @@ store_spi_transport_##field(struct device *dev, 			\
 	struct spi_transport_attrs *tp					\
 		= (struct spi_transport_attrs *)&starget->starget_data;	\
 									\
+<<<<<<< HEAD
 	if (i->f->set_##field)						\
+=======
+	if (!i->f->set_##field)						\
+>>>>>>> common/deprecated/android-3.18
 		return -EINVAL;						\
 	val = simple_strtoul(buf, NULL, 0);				\
 	if (val > tp->max_##field)					\

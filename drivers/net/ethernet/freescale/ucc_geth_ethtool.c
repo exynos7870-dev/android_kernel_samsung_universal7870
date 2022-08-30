@@ -253,6 +253,7 @@ uec_set_ringparam(struct net_device *netdev,
 		return -EINVAL;
 	}
 
+<<<<<<< HEAD
 	ug_info->bdRingLenRx[queue] = ring->rx_pending;
 	ug_info->bdRingLenTx[queue] = ring->tx_pending;
 
@@ -261,6 +262,14 @@ uec_set_ringparam(struct net_device *netdev,
 		netdev_info(netdev, "Please re-open the interface\n");
 	}
 
+=======
+	if (netif_running(netdev))
+		return -EBUSY;
+
+	ug_info->bdRingLenRx[queue] = ring->rx_pending;
+	ug_info->bdRingLenTx[queue] = ring->tx_pending;
+
+>>>>>>> common/deprecated/android-3.18
 	return ret;
 }
 

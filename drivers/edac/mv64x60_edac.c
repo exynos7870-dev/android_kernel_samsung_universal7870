@@ -763,7 +763,11 @@ static int mv64x60_mc_err_probe(struct platform_device *pdev)
 		/* Non-ECC RAM? */
 		printk(KERN_WARNING "%s: No ECC DIMMs discovered\n", __func__);
 		res = -ENODEV;
+<<<<<<< HEAD
 		goto err2;
+=======
+		goto err;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	edac_dbg(3, "init mci\n");

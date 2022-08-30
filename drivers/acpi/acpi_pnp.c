@@ -304,6 +304,11 @@ static const struct acpi_device_id acpi_pnp_device_ids[] = {
 	{"PNPb006"},
 	/* cs423x-pnpbios */
 	{"CSC0100"},
+<<<<<<< HEAD
+=======
+	{"CSC0103"},
+	{"CSC0110"},
+>>>>>>> common/deprecated/android-3.18
 	{"CSC0000"},
 	{"GIM0100"},		/* Guillemot Turtlebeach something appears to be cs4232 compatible */
 	/* es18xx-pnpbios */
@@ -319,6 +324,12 @@ static bool matching_id(char *idstr, char *list_id)
 {
 	int i;
 
+<<<<<<< HEAD
+=======
+	if (strlen(idstr) != strlen(list_id))
+		return false;
+
+>>>>>>> common/deprecated/android-3.18
 	if (memcmp(idstr, list_id, 3))
 		return false;
 

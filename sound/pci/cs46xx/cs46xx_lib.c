@@ -781,7 +781,11 @@ static void snd_cs46xx_set_capture_sample_rate(struct snd_cs46xx *chip, unsigned
 		rate = 48000 / 9;
 
 	/*
+<<<<<<< HEAD
 	 *  We can not capture at at rate greater than the Input Rate (48000).
+=======
+	 *  We can not capture at a rate greater than the Input Rate (48000).
+>>>>>>> common/deprecated/android-3.18
 	 *  Return an error if an attempt is made to stray outside that limit.
 	 */
 	if (rate > 48000)

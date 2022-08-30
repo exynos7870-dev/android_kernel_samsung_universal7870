@@ -349,7 +349,11 @@ static inline int pm80x_dev_suspend(struct device *dev)
 	int irq = platform_get_irq(pdev, 0);
 
 	if (device_may_wakeup(dev))
+<<<<<<< HEAD
 		set_bit((1 << irq), &chip->wu_flag);
+=======
+		set_bit(irq, &chip->wu_flag);
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }
@@ -361,7 +365,11 @@ static inline int pm80x_dev_resume(struct device *dev)
 	int irq = platform_get_irq(pdev, 0);
 
 	if (device_may_wakeup(dev))
+<<<<<<< HEAD
 		clear_bit((1 << irq), &chip->wu_flag);
+=======
+		clear_bit(irq, &chip->wu_flag);
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }

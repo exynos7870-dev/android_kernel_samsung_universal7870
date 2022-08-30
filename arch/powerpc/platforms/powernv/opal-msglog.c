@@ -92,7 +92,11 @@ out:
 }
 
 static struct bin_attribute opal_msglog_attr = {
+<<<<<<< HEAD
 	.attr = {.name = "msglog", .mode = 0444},
+=======
+	.attr = {.name = "msglog", .mode = 0400},
+>>>>>>> common/deprecated/android-3.18
 	.read = opal_msglog_read
 };
 

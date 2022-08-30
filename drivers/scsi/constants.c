@@ -1335,9 +1335,16 @@ static const char * const snstext[] = {
 
 /* Get sense key string or NULL if not available */
 const char *
+<<<<<<< HEAD
 scsi_sense_key_string(unsigned char key) {
 #ifdef CONFIG_SCSI_CONSTANTS
 	if (key <= 0xE)
+=======
+scsi_sense_key_string(unsigned char key)
+{
+#ifdef CONFIG_SCSI_CONSTANTS
+	if (key < ARRAY_SIZE(snstext))
+>>>>>>> common/deprecated/android-3.18
 		return snstext[key];
 #endif
 	return NULL;

@@ -7,6 +7,10 @@
 #include <linux/types.h>
 
 #include <asm/processor.h>
+<<<<<<< HEAD
+=======
+#include <asm/tlbflush.h>
+>>>>>>> common/deprecated/android-3.18
 #include <asm/mce.h>
 #include <asm/msr.h>
 
@@ -31,7 +35,11 @@ void winchip_mcheck_init(struct cpuinfo_x86 *c)
 	lo &= ~(1<<4);	/* Enable MCE */
 	wrmsr(MSR_IDT_FCR1, lo, hi);
 
+<<<<<<< HEAD
 	set_in_cr4(X86_CR4_MCE);
+=======
+	cr4_set_bits(X86_CR4_MCE);
+>>>>>>> common/deprecated/android-3.18
 
 	printk(KERN_INFO
 	       "Winchip machine check reporting enabled on CPU#0.\n");

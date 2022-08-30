@@ -2162,6 +2162,10 @@ sub process {
 
 # Check for improperly formed commit descriptions
 		if ($in_commit_log &&
+<<<<<<< HEAD
+=======
+		    $line !~ /^This reverts commit [0-9a-f]{7,40}/ &&
+>>>>>>> common/deprecated/android-3.18
 		    $line =~ /\bcommit\s+[0-9a-f]{5,}/i &&
 		    !($line =~ /\b[Cc]ommit [0-9a-f]{12,40} \("/ ||
 		      ($line =~ /\b[Cc]ommit [0-9a-f]{12,40}\s*$/ &&
@@ -2985,7 +2989,11 @@ sub process {
 				$fixedline =~ s/\s*=\s*$/ = {/;
 				fix_insert_line($fixlinenr, $fixedline);
 				$fixedline = $line;
+<<<<<<< HEAD
 				$fixedline =~ s/^(.\s*){\s*/$1/;
+=======
+				$fixedline =~ s/^(.\s*)\{\s*/$1/;
+>>>>>>> common/deprecated/android-3.18
 				fix_insert_line($fixlinenr, $fixedline);
 			}
 		}
@@ -3279,7 +3287,11 @@ sub process {
 			    $fix) {
 				fix_delete_line($fixlinenr, $rawline);
 				my $fixed_line = $rawline;
+<<<<<<< HEAD
 				$fixed_line =~ /(^..*$Type\s*$Ident\(.*\)\s*){(.*)$/;
+=======
+				$fixed_line =~ /(^..*$Type\s*$Ident\(.*\)\s*)\{(.*)$/;
+>>>>>>> common/deprecated/android-3.18
 				my $line1 = $1;
 				my $line2 = $2;
 				fix_insert_line($fixlinenr, ltrim($line1));
@@ -3301,7 +3313,11 @@ sub process {
 				my $fixedline = rtrim($prevrawline) . " {";
 				fix_insert_line($fixlinenr, $fixedline);
 				$fixedline = $rawline;
+<<<<<<< HEAD
 				$fixedline =~ s/^(.\s*){\s*/$1\t/;
+=======
+				$fixedline =~ s/^(.\s*)\{\s*/$1\t/;
+>>>>>>> common/deprecated/android-3.18
 				if ($fixedline !~ /^\+\s*$/) {
 					fix_insert_line($fixlinenr, $fixedline);
 				}
@@ -3748,7 +3764,11 @@ sub process {
 			if (ERROR("SPACING",
 				  "space required before the open brace '{'\n" . $herecurr) &&
 			    $fix) {
+<<<<<<< HEAD
 				$fixed[$fixlinenr] =~ s/^(\+.*(?:do|\))){/$1 {/;
+=======
+				$fixed[$fixlinenr] =~ s/^(\+.*(?:do|\)))\{/$1 {/;
+>>>>>>> common/deprecated/android-3.18
 			}
 		}
 

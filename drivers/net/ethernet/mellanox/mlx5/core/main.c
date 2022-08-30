@@ -30,7 +30,11 @@
  * SOFTWARE.
  */
 
+<<<<<<< HEAD
 #include <asm-generic/kmap_types.h>
+=======
+#include <linux/highmem.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/errno.h>
@@ -86,7 +90,11 @@ static struct mlx5_profile profile[] = {
 	[2] = {
 		.mask		= MLX5_PROF_MASK_QP_SIZE |
 				  MLX5_PROF_MASK_MR_CACHE,
+<<<<<<< HEAD
 		.log_max_qp	= 17,
+=======
+		.log_max_qp	= 18,
+>>>>>>> common/deprecated/android-3.18
 		.mr_cache[0]	= {
 			.size	= 500,
 			.limit	= 250

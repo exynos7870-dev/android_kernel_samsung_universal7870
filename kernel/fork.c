@@ -74,8 +74,11 @@
 #include <linux/uprobes.h>
 #include <linux/aio.h>
 #include <linux/compiler.h>
+<<<<<<< HEAD
 #include <linux/workqueue.h>
 #include <linux/kcov.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #include <asm/pgtable.h>
 #include <asm/pgalloc.h>
@@ -85,7 +88,10 @@
 #include <asm/tlbflush.h>
 
 #include <trace/events/sched.h>
+<<<<<<< HEAD
 #include <linux/task_integrity.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/task.h>
@@ -321,6 +327,7 @@ void set_task_stack_end_magic(struct task_struct *tsk)
 	*stackend = STACK_END_MAGIC;	/* for overflow detection */
 }
 
+<<<<<<< HEAD
 static struct task_struct *dup_task_struct(struct task_struct *orig)
 {
 	struct task_struct *tsk;
@@ -328,6 +335,16 @@ static struct task_struct *dup_task_struct(struct task_struct *orig)
 	int node = tsk_fork_get_node(orig);
 	int err;
 
+=======
+static struct task_struct *dup_task_struct(struct task_struct *orig, int node)
+{
+	struct task_struct *tsk;
+	struct thread_info *ti;
+	int err;
+
+	if (node == NUMA_NO_NODE)
+		node = tsk_fork_get_node(orig);
+>>>>>>> common/deprecated/android-3.18
 	tsk = alloc_task_struct_node(node);
 	if (!tsk)
 		return NULL;
@@ -357,7 +374,11 @@ static struct task_struct *dup_task_struct(struct task_struct *orig)
 	set_task_stack_end_magic(tsk);
 
 #ifdef CONFIG_CC_STACKPROTECTOR
+<<<<<<< HEAD
 	tsk->stack_canary = get_random_int();
+=======
+	tsk->stack_canary = get_random_long();
+>>>>>>> common/deprecated/android-3.18
 #endif
 
 	/*
@@ -373,8 +394,11 @@ static struct task_struct *dup_task_struct(struct task_struct *orig)
 
 	account_kernel_stack(ti, 1);
 
+<<<<<<< HEAD
 	kcov_task_init(tsk);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	return tsk;
 
 free_ti:
@@ -537,6 +561,7 @@ static inline void mm_free_pgd(struct mm_struct *mm)
 
 __cacheline_aligned_in_smp DEFINE_SPINLOCK(mmlist_lock);
 
+<<<<<<< HEAD
 struct mm_work {
 	struct work_struct work;
 	struct mm_struct *mm;
@@ -568,6 +593,10 @@ static void free_mm(struct mm_struct *mm)
 	kfree(mm->async_put_work);
 	kmem_cache_free(mm_cachep, mm);
 }
+=======
+#define allocate_mm()	(kmem_cache_alloc(mm_cachep, GFP_KERNEL))
+#define free_mm(mm)	(kmem_cache_free(mm_cachep, (mm)))
+>>>>>>> common/deprecated/android-3.18
 
 static unsigned long default_dump_filter = MMF_DUMP_FILTER_DEFAULT;
 
@@ -598,7 +627,12 @@ static void mm_init_owner(struct mm_struct *mm, struct task_struct *p)
 #endif
 }
 
+<<<<<<< HEAD
 static struct mm_struct *mm_init(struct mm_struct *mm, struct task_struct *p)
+=======
+static struct mm_struct *mm_init(struct mm_struct *mm, struct task_struct *p,
+	struct user_namespace *user_ns)
+>>>>>>> common/deprecated/android-3.18
 {
 	mm->mmap = NULL;
 	mm->mm_rb = RB_ROOT;
@@ -637,6 +671,10 @@ static struct mm_struct *mm_init(struct mm_struct *mm, struct task_struct *p)
 	if (init_new_context(p, mm))
 		goto fail_nocontext;
 
+<<<<<<< HEAD
+=======
+	mm->user_ns = get_user_ns(user_ns);
+>>>>>>> common/deprecated/android-3.18
 	return mm;
 
 fail_nocontext:
@@ -674,7 +712,11 @@ struct mm_struct *mm_alloc(void)
 		return NULL;
 
 	memset(mm, 0, sizeof(*mm));
+<<<<<<< HEAD
 	return mm_init(mm, current);
+=======
+	return mm_init(mm, current, current_user_ns());
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
@@ -689,6 +731,10 @@ void __mmdrop(struct mm_struct *mm)
 	destroy_context(mm);
 	mmu_notifier_mm_destroy(mm);
 	check_mm(mm);
+<<<<<<< HEAD
+=======
+	put_user_ns(mm->user_ns);
+>>>>>>> common/deprecated/android-3.18
 	free_mm(mm);
 }
 EXPORT_SYMBOL_GPL(__mmdrop);
@@ -727,17 +773,27 @@ EXPORT_SYMBOL_GPL(mmput);
 
 static void mmput_async_fn(struct work_struct *work)
 {
+<<<<<<< HEAD
 	struct mm_work *mmw = container_of(work, struct mm_work, work);
 	__mmput(mmw->mm);
+=======
+	struct mm_struct *mm = container_of(work, struct mm_struct, async_put_work);
+	__mmput(mm);
+>>>>>>> common/deprecated/android-3.18
 }
 
 void mmput_async(struct mm_struct *mm)
 {
 	if (atomic_dec_and_test(&mm->mm_users)) {
+<<<<<<< HEAD
 		struct mm_work *mmw = mm->async_put_work;
 
 		INIT_WORK(&mmw->work, mmput_async_fn);
 		schedule_work(&mmw->work);
+=======
+		INIT_WORK(&mm->async_put_work, mmput_async_fn);
+		schedule_work(&mm->async_put_work);
+>>>>>>> common/deprecated/android-3.18
 	}
 }
 
@@ -771,6 +827,32 @@ static void dup_mm_exe_file(struct mm_struct *oldmm, struct mm_struct *newmm)
 }
 
 /**
+<<<<<<< HEAD
+=======
+ * get_task_exe_file - acquire a reference to the task's executable file
+ *
+ * Returns %NULL if task's mm (if any) has no associated executable file or
+ * this is a kernel thread with borrowed mm (see the comment above get_task_mm).
+ * User must release file via fput().
+ */
+struct file *get_task_exe_file(struct task_struct *task)
+{
+	struct file *exe_file = NULL;
+	struct mm_struct *mm;
+
+	task_lock(task);
+	mm = task->mm;
+	if (mm) {
+		if (!(task->flags & PF_KTHREAD))
+			exe_file = get_mm_exe_file(mm);
+	}
+	task_unlock(task);
+	return exe_file;
+}
+EXPORT_SYMBOL(get_task_exe_file);
+
+/**
+>>>>>>> common/deprecated/android-3.18
  * get_task_mm - acquire a reference to the task's mm
  *
  * Returns %NULL if the task has no mm.  Checks PF_KTHREAD (meaning
@@ -861,6 +943,7 @@ static int wait_for_vfork_done(struct task_struct *child,
  * restoring the old one. . .
  * Eric Biederman 10 January 1998
  */
+<<<<<<< HEAD
 void mm_release(struct task_struct *tsk, struct mm_struct *mm)
 {
 	/* Get rid of any futexes when releasing the mm */
@@ -879,12 +962,17 @@ void mm_release(struct task_struct *tsk, struct mm_struct *mm)
 		exit_pi_state_list(tsk);
 #endif
 
+=======
+static void mm_release(struct task_struct *tsk, struct mm_struct *mm)
+{
+>>>>>>> common/deprecated/android-3.18
 	uprobe_free_utask(tsk);
 
 	/* Get rid of any cached register state */
 	deactivate_mm(tsk, mm);
 
 	/*
+<<<<<<< HEAD
 	 * If we're exiting normally, clear a user-space tid field if
 	 * requested.  We leave this alone when dying by signal, to leave
 	 * the value intact in a core dump, and to save the unnecessary
@@ -893,6 +981,14 @@ void mm_release(struct task_struct *tsk, struct mm_struct *mm)
 	 */
 	if (tsk->clear_child_tid) {
 		if (!(tsk->flags & PF_SIGNALED) &&
+=======
+	 * Signal userspace if we're not exiting with a core dump
+	 * because we want to leave the value intact for debugging
+	 * purposes.
+	 */
+	if (tsk->clear_child_tid) {
+		if (!(tsk->signal->flags & SIGNAL_GROUP_COREDUMP) &&
+>>>>>>> common/deprecated/android-3.18
 		    atomic_read(&mm->mm_users) > 1) {
 			/*
 			 * We don't check the error code - if userspace has
@@ -913,6 +1009,21 @@ void mm_release(struct task_struct *tsk, struct mm_struct *mm)
 		complete_vfork_done(tsk);
 }
 
+<<<<<<< HEAD
+=======
+void exit_mm_release(struct task_struct *tsk, struct mm_struct *mm)
+{
+	futex_exit_release(tsk);
+	mm_release(tsk, mm);
+}
+
+void exec_mm_release(struct task_struct *tsk, struct mm_struct *mm)
+{
+	futex_exec_release(tsk);
+	mm_release(tsk, mm);
+}
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Allocate a new mm structure and copy contents from the
  * mm structure of the passed in task structure.
@@ -928,7 +1039,11 @@ static struct mm_struct *dup_mm(struct task_struct *tsk)
 
 	memcpy(mm, oldmm, sizeof(*mm));
 
+<<<<<<< HEAD
 	if (!mm_init(mm, tsk))
+=======
+	if (!mm_init(mm, tsk, mm->user_ns))
+>>>>>>> common/deprecated/android-3.18
 		goto fail_nomem;
 
 	dup_mm_exe_file(oldmm, mm);
@@ -1086,7 +1201,13 @@ static int copy_sighand(unsigned long clone_flags, struct task_struct *tsk)
 	if (!sig)
 		return -ENOMEM;
 	atomic_set(&sig->count, 1);
+<<<<<<< HEAD
 	memcpy(sig->action, current->sighand->action, sizeof(sig->action));
+=======
+	spin_lock_irq(&current->sighand->siglock);
+	memcpy(sig->action, current->sighand->action, sizeof(sig->action));
+	spin_unlock_irq(&current->sighand->siglock);
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -1109,7 +1230,11 @@ static void posix_cpu_timers_init_group(struct signal_struct *sig)
 	/* Thread group counters. */
 	thread_group_cputime_init(sig);
 
+<<<<<<< HEAD
 	cpu_limit = ACCESS_ONCE(sig->rlim[RLIMIT_CPU].rlim_cur);
+=======
+	cpu_limit = READ_ONCE(sig->rlim[RLIMIT_CPU].rlim_cur);
+>>>>>>> common/deprecated/android-3.18
 	if (cpu_limit != RLIM_INFINITY) {
 		sig->cputime_expires.prof_exp = secs_to_cputime(cpu_limit);
 		sig->cputimer.running = 1;
@@ -1243,6 +1368,7 @@ init_task_pid(struct task_struct *task, enum pid_type type, struct pid *pid)
 	 task->pids[type].pid = pid;
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_FIVE
 static int dup_task_integrity(unsigned long clone_flags,
 					struct task_struct *tsk)
@@ -1296,6 +1422,8 @@ static inline int task_integrity_apply(unsigned long clone_flags,
 
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * This creates a new process as a copy of the old one,
  * but does not actually start it yet.
@@ -1309,7 +1437,12 @@ static struct task_struct *copy_process(unsigned long clone_flags,
 					unsigned long stack_size,
 					int __user *child_tidptr,
 					struct pid *pid,
+<<<<<<< HEAD
 					int trace)
+=======
+					int trace,
+					int node)
+>>>>>>> common/deprecated/android-3.18
 {
 	int retval;
 	struct task_struct *p;
@@ -1362,10 +1495,29 @@ static struct task_struct *copy_process(unsigned long clone_flags,
 		goto fork_out;
 
 	retval = -ENOMEM;
+<<<<<<< HEAD
 	p = dup_task_struct(current);
 	if (!p)
 		goto fork_out;
 
+=======
+	p = dup_task_struct(current, node);
+	if (!p)
+		goto fork_out;
+
+	/*
+	 * This _must_ happen before we call free_task(), i.e. before we jump
+	 * to any of the bad_fork_* labels. This is to avoid freeing
+	 * p->set_child_tid which is (ab)used as a kthread's data pointer for
+	 * kernel threads (PF_KTHREAD).
+	 */
+	p->set_child_tid = (clone_flags & CLONE_CHILD_SETTID) ? child_tidptr : NULL;
+	/*
+	 * Clear TID on mm_release()?
+	 */
+	p->clear_child_tid = (clone_flags & CLONE_CHILD_CLEARTID) ? child_tidptr : NULL;
+
+>>>>>>> common/deprecated/android-3.18
 	ftrace_graph_init_task(p);
 
 	rt_mutex_init_task(p);
@@ -1433,12 +1585,17 @@ static struct task_struct *copy_process(unsigned long clone_flags,
 
 	posix_cpu_timers_init(p);
 
+<<<<<<< HEAD
 	p->start_time = ktime_get_ns();
 	p->real_start_time = ktime_get_boot_ns();
 	p->io_context = NULL;
 	p->audit_context = NULL;
 	if (clone_flags & CLONE_THREAD)
 		threadgroup_change_begin(current);
+=======
+	p->io_context = NULL;
+	p->audit_context = NULL;
+>>>>>>> common/deprecated/android-3.18
 	cgroup_fork(p);
 #ifdef CONFIG_NUMA
 	p->mempolicy = mpol_dup(p->mempolicy);
@@ -1530,6 +1687,7 @@ static struct task_struct *copy_process(unsigned long clone_flags,
 			goto bad_fork_cleanup_io;
 	}
 
+<<<<<<< HEAD
 	retval = dup_task_integrity(clone_flags, p);
 	if (retval)
 		goto bad_fork_cleanup_io;
@@ -1550,6 +1708,13 @@ static struct task_struct *copy_process(unsigned long clone_flags,
 	INIT_LIST_HEAD(&p->pi_state_list);
 	p->pi_state_cache = NULL;
 #endif
+=======
+#ifdef CONFIG_BLOCK
+	p->plug = NULL;
+#endif
+	futex_init_task(p);
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * sigaltstack should be cleared when sharing the same VM
 	 */
@@ -1570,6 +1735,7 @@ static struct task_struct *copy_process(unsigned long clone_flags,
 	/* ok, now we should be set up.. */
 	p->pid = pid_nr(pid);
 	if (clone_flags & CLONE_THREAD) {
+<<<<<<< HEAD
 		p->exit_signal = -1;
 		p->group_leader = current->group_leader;
 		p->tgid = current->tgid;
@@ -1578,6 +1744,11 @@ static struct task_struct *copy_process(unsigned long clone_flags,
 			p->exit_signal = current->group_leader->exit_signal;
 		else
 			p->exit_signal = (clone_flags & CSIGNAL);
+=======
+		p->group_leader = current->group_leader;
+		p->tgid = current->tgid;
+	} else {
+>>>>>>> common/deprecated/android-3.18
 		p->group_leader = p;
 		p->tgid = p->pid;
 	}
@@ -1590,6 +1761,11 @@ static struct task_struct *copy_process(unsigned long clone_flags,
 	INIT_LIST_HEAD(&p->thread_group);
 	p->task_works = NULL;
 
+<<<<<<< HEAD
+=======
+	if (clone_flags & CLONE_THREAD)
+		threadgroup_change_begin(current);
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Make it visible to the rest of the system, but dont wake it up yet.
 	 * Need tasklist lock for parent etc handling!
@@ -1600,14 +1776,39 @@ static struct task_struct *copy_process(unsigned long clone_flags,
 	if (clone_flags & (CLONE_PARENT|CLONE_THREAD)) {
 		p->real_parent = current->real_parent;
 		p->parent_exec_id = current->parent_exec_id;
+<<<<<<< HEAD
 	} else {
 		p->real_parent = current;
 		p->parent_exec_id = current->self_exec_id;
+=======
+		if (clone_flags & CLONE_THREAD)
+			p->exit_signal = -1;
+		else
+			p->exit_signal = current->group_leader->exit_signal;
+	} else {
+		p->real_parent = current;
+		p->parent_exec_id = current->self_exec_id;
+		p->exit_signal = (clone_flags & CSIGNAL);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	spin_lock(&current->sighand->siglock);
 
 	/*
+<<<<<<< HEAD
+=======
+	 * From this point on we must avoid any synchronous user-space
+	 * communication until we take the tasklist-lock. In particular, we do
+	 * not want user-space to be able to predict the process start-time by
+	 * stalling fork(2) after we recorded the start_time but before it is
+	 * visible to the system.
+	 */
+
+	p->start_time = ktime_get_ns();
+	p->real_start_time = ktime_get_boot_ns();
+
+	/*
+>>>>>>> common/deprecated/android-3.18
 	 * Copy seccomp details explicitly here, in case they were changed
 	 * before holding sighand lock.
 	 */
@@ -1623,6 +1824,7 @@ static struct task_struct *copy_process(unsigned long clone_flags,
 	*/
 	recalc_sigpending();
 	if (signal_pending(current)) {
+<<<<<<< HEAD
 		spin_unlock(&current->sighand->siglock);
 		write_unlock_irq(&tasklist_lock);
 		retval = -ERESTARTNOINTR;
@@ -1632,6 +1834,15 @@ static struct task_struct *copy_process(unsigned long clone_flags,
 	retval = task_integrity_apply(clone_flags, p);
 	if (retval)
 		goto bad_fork_free_pid;
+=======
+		retval = -ERESTARTNOINTR;
+		goto bad_fork_free_pid;
+	}
+	if (unlikely(!(ns_of_pid(pid)->nr_hashed & PIDNS_HASH_ADDING))) {
+		retval = -ENOMEM;
+		goto bad_fork_free_pid;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	if (likely(p->pid)) {
 		ptrace_init_task(p, (clone_flags & CLONE_PTRACE) || trace);
@@ -1683,9 +1894,18 @@ static struct task_struct *copy_process(unsigned long clone_flags,
 	return p;
 
 bad_fork_free_pid:
+<<<<<<< HEAD
 	if (pid != &init_struct_pid)
 		free_pid(pid);
 	task_integrity_cleanup(p);
+=======
+	spin_unlock(&current->sighand->siglock);
+	write_unlock_irq(&tasklist_lock);
+	if (clone_flags & CLONE_THREAD)
+		threadgroup_change_end(current);
+	if (pid != &init_struct_pid)
+		free_pid(pid);
+>>>>>>> common/deprecated/android-3.18
 bad_fork_cleanup_io:
 	if (p->io_context)
 		exit_io_context(p);
@@ -1714,8 +1934,11 @@ bad_fork_cleanup_policy:
 	mpol_put(p->mempolicy);
 bad_fork_cleanup_threadgroup_lock:
 #endif
+<<<<<<< HEAD
 	if (clone_flags & CLONE_THREAD)
 		threadgroup_change_end(current);
+=======
+>>>>>>> common/deprecated/android-3.18
 	delayacct_tsk_free(p);
 	module_put(task_thread_info(p)->exec_domain->module);
 bad_fork_cleanup_count:
@@ -1740,7 +1963,12 @@ static inline void init_idle_pids(struct pid_link *links)
 struct task_struct *fork_idle(int cpu)
 {
 	struct task_struct *task;
+<<<<<<< HEAD
 	task = copy_process(CLONE_VM, 0, 0, NULL, &init_struct_pid, 0);
+=======
+	task = copy_process(CLONE_VM, 0, 0, NULL, &init_struct_pid, 0,
+			    cpu_to_node(cpu));
+>>>>>>> common/deprecated/android-3.18
 	if (!IS_ERR(task)) {
 		init_idle_pids(task->pids);
 		init_idle(task, cpu);
@@ -1784,7 +2012,11 @@ long do_fork(unsigned long clone_flags,
 	}
 
 	p = copy_process(clone_flags, stack_start, stack_size,
+<<<<<<< HEAD
 			 child_tidptr, NULL, trace);
+=======
+			 child_tidptr, NULL, trace, NUMA_NO_NODE);
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Do this prior waking up the new thread - the thread pointer
 	 * might get invalid after that point, if the thread exits quickly.
@@ -1935,6 +2167,7 @@ static int check_unshare_flags(unsigned long unshare_flags)
 				CLONE_NEWUSER|CLONE_NEWPID))
 		return -EINVAL;
 	/*
+<<<<<<< HEAD
 	 * Not implemented, but pretend it works if there is nothing to
 	 * unshare. Note that unsharing CLONE_THREAD or CLONE_SIGHAND
 	 * needs to unshare vm.
@@ -1942,6 +2175,23 @@ static int check_unshare_flags(unsigned long unshare_flags)
 	if (unshare_flags & (CLONE_THREAD | CLONE_SIGHAND | CLONE_VM)) {
 		/* FIXME: get_task_mm() increments ->mm_users */
 		if (atomic_read(&current->mm->mm_users) > 1)
+=======
+	 * Not implemented, but pretend it works if there is nothing
+	 * to unshare.  Note that unsharing the address space or the
+	 * signal handlers also need to unshare the signal queues (aka
+	 * CLONE_THREAD).
+	 */
+	if (unshare_flags & (CLONE_THREAD | CLONE_SIGHAND | CLONE_VM)) {
+		if (!thread_group_empty(current))
+			return -EINVAL;
+	}
+	if (unshare_flags & (CLONE_SIGHAND | CLONE_VM)) {
+		if (atomic_read(&current->sighand->count) > 1)
+			return -EINVAL;
+	}
+	if (unshare_flags & CLONE_VM) {
+		if (!current_is_single_threaded())
+>>>>>>> common/deprecated/android-3.18
 			return -EINVAL;
 	}
 
@@ -2010,16 +2260,27 @@ SYSCALL_DEFINE1(unshare, unsigned long, unshare_flags)
 	if (unshare_flags & CLONE_NEWUSER)
 		unshare_flags |= CLONE_THREAD | CLONE_FS;
 	/*
+<<<<<<< HEAD
 	 * If unsharing a thread from a thread group, must also unshare vm.
 	 */
 	if (unshare_flags & CLONE_THREAD)
 		unshare_flags |= CLONE_VM;
 	/*
+=======
+>>>>>>> common/deprecated/android-3.18
 	 * If unsharing vm, must also unshare signal handlers.
 	 */
 	if (unshare_flags & CLONE_VM)
 		unshare_flags |= CLONE_SIGHAND;
 	/*
+<<<<<<< HEAD
+=======
+	 * If unsharing a signal handlers, must also unshare the signal queues.
+	 */
+	if (unshare_flags & CLONE_SIGHAND)
+		unshare_flags |= CLONE_THREAD;
+	/*
+>>>>>>> common/deprecated/android-3.18
 	 * If unsharing namespace, must also unshare filesystem information.
 	 */
 	if (unshare_flags & CLONE_NEWNS)

@@ -43,7 +43,10 @@ struct thread_info {
 	int		cpu;			/* cpu we're on */
 	int		preempt_count;		/* 0 => preemptable,
 						   <0 => BUG */
+<<<<<<< HEAD
 	struct restart_block restart_block;
+=======
+>>>>>>> common/deprecated/android-3.18
 	unsigned long	local_flags;		/* private flags for thread */
 
 	/* low level flags - has atomic operations done on it */
@@ -59,9 +62,12 @@ struct thread_info {
 	.exec_domain =	&default_exec_domain,	\
 	.cpu =		0,			\
 	.preempt_count = INIT_PREEMPT_COUNT,	\
+<<<<<<< HEAD
 	.restart_block = {			\
 		.fn = do_no_restart_syscall,	\
 	},					\
+=======
+>>>>>>> common/deprecated/android-3.18
 	.flags =	0,			\
 }
 

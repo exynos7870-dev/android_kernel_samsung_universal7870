@@ -21,6 +21,10 @@ struct scm_creds {
 struct scm_fp_list {
 	short			count;
 	short			max;
+<<<<<<< HEAD
+=======
+	struct user_struct	*user;
+>>>>>>> common/deprecated/android-3.18
 	struct file		*fp[SCM_MAX_FD];
 };
 

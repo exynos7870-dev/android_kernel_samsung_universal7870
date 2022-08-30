@@ -372,12 +372,15 @@ static u64 __get_spte_lockless(u64 *sptep)
 {
 	return ACCESS_ONCE(*sptep);
 }
+<<<<<<< HEAD
 
 static bool __check_direct_spte_mmio_pf(u64 spte)
 {
 	/* It is valid if the spte is zapped. */
 	return spte == 0ull;
 }
+=======
+>>>>>>> common/deprecated/android-3.18
 #else
 union split_spte {
 	struct {
@@ -493,6 +496,7 @@ retry:
 
 	return spte.spte;
 }
+<<<<<<< HEAD
 
 static bool __check_direct_spte_mmio_pf(u64 spte)
 {
@@ -510,6 +514,8 @@ static bool __check_direct_spte_mmio_pf(u64 spte)
 
 	return false;
 }
+=======
+>>>>>>> common/deprecated/android-3.18
 #endif
 
 static bool spte_is_locklessly_modifiable(u64 spte)
@@ -3230,6 +3236,7 @@ static bool quickly_check_mmio_pf(struct kvm_vcpu *vcpu, u64 addr, bool direct)
 	return vcpu_match_mmio_gva(vcpu, addr);
 }
 
+<<<<<<< HEAD
 
 /*
  * On direct hosts, the last spte is only allows two states
@@ -3245,6 +3252,8 @@ static bool check_direct_spte_mmio_pf(u64 spte)
 	return __check_direct_spte_mmio_pf(spte);
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static u64 walk_shadow_page_get_mmio_spte(struct kvm_vcpu *vcpu, u64 addr)
 {
 	struct kvm_shadow_walk_iterator iterator;
@@ -3287,6 +3296,7 @@ int handle_mmio_page_fault_common(struct kvm_vcpu *vcpu, u64 addr, bool direct)
 	}
 
 	/*
+<<<<<<< HEAD
 	 * It's ok if the gva is remapped by other cpus on shadow guest,
 	 * it's a BUG if the gfn is not a mmio page.
 	 */
@@ -3294,6 +3304,8 @@ int handle_mmio_page_fault_common(struct kvm_vcpu *vcpu, u64 addr, bool direct)
 		return RET_MMIO_PF_BUG;
 
 	/*
+=======
+>>>>>>> common/deprecated/android-3.18
 	 * If the page table is zapped by other cpus, let CPU fault again on
 	 * the address.
 	 */
@@ -3351,12 +3363,22 @@ static int kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gva_t gva, gfn_t gfn)
 	return kvm_setup_async_pf(vcpu, gva, gfn_to_hva(vcpu->kvm, gfn), &arch);
 }
 
+<<<<<<< HEAD
 static bool can_do_async_pf(struct kvm_vcpu *vcpu)
+=======
+bool kvm_can_do_async_pf(struct kvm_vcpu *vcpu)
+>>>>>>> common/deprecated/android-3.18
 {
 	if (unlikely(!irqchip_in_kernel(vcpu->kvm) ||
 		     kvm_event_needs_reinjection(vcpu)))
 		return false;
 
+<<<<<<< HEAD
+=======
+	if (is_guest_mode(vcpu))
+		return false;
+
+>>>>>>> common/deprecated/android-3.18
 	return kvm_x86_ops->interrupt_allowed(vcpu);
 }
 
@@ -3370,7 +3392,11 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
 	if (!async)
 		return false; /* *pfn has correct page already */
 
+<<<<<<< HEAD
 	if (!prefault && can_do_async_pf(vcpu)) {
+=======
+	if (!prefault && kvm_can_do_async_pf(vcpu)) {
+>>>>>>> common/deprecated/android-3.18
 		trace_kvm_try_async_get_page(gva, gfn);
 		if (kvm_find_async_pf_gfn(vcpu, gfn)) {
 			trace_kvm_async_pf_doublefault(gva, gfn);
@@ -3576,7 +3602,11 @@ static void reset_rsvds_bits_mask(struct kvm_vcpu *vcpu,
 		context->rsvd_bits_mask[0][3] = exb_bit_rsvd |
 			nonleaf_bit8_rsvd | rsvd_bits(7, 7) | rsvd_bits(maxphyaddr, 51);
 		context->rsvd_bits_mask[0][2] = exb_bit_rsvd |
+<<<<<<< HEAD
 			nonleaf_bit8_rsvd | gbpages_bit_rsvd | rsvd_bits(maxphyaddr, 51);
+=======
+			gbpages_bit_rsvd | rsvd_bits(maxphyaddr, 51);
+>>>>>>> common/deprecated/android-3.18
 		context->rsvd_bits_mask[0][1] = exb_bit_rsvd |
 			rsvd_bits(maxphyaddr, 51);
 		context->rsvd_bits_mask[0][0] = exb_bit_rsvd |
@@ -3625,8 +3655,13 @@ static void reset_rsvds_bits_mask_ept(struct kvm_vcpu *vcpu,
 	}
 }
 
+<<<<<<< HEAD
 void update_permission_bitmask(struct kvm_vcpu *vcpu,
 		struct kvm_mmu *mmu, bool ept)
+=======
+static void update_permission_bitmask(struct kvm_vcpu *vcpu,
+				      struct kvm_mmu *mmu, bool ept)
+>>>>>>> common/deprecated/android-3.18
 {
 	unsigned bit, byte, pfec;
 	u8 map;
@@ -3807,6 +3842,10 @@ static void init_kvm_tdp_mmu(struct kvm_vcpu *vcpu)
 void kvm_init_shadow_mmu(struct kvm_vcpu *vcpu, struct kvm_mmu *context)
 {
 	bool smep = kvm_read_cr4_bits(vcpu, X86_CR4_SMEP);
+<<<<<<< HEAD
+=======
+	bool smap = kvm_read_cr4_bits(vcpu, X86_CR4_SMAP);
+>>>>>>> common/deprecated/android-3.18
 	ASSERT(vcpu);
 	ASSERT(!VALID_PAGE(vcpu->arch.mmu.root_hpa));
 
@@ -3824,6 +3863,11 @@ void kvm_init_shadow_mmu(struct kvm_vcpu *vcpu, struct kvm_mmu *context)
 	vcpu->arch.mmu.base_role.cr0_wp  = is_write_protection(vcpu);
 	vcpu->arch.mmu.base_role.smep_andnot_wp
 		= smep && !is_write_protection(vcpu);
+<<<<<<< HEAD
+=======
+	context->base_role.smap_andnot_wp
+		= smap && !is_write_protection(vcpu);
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL_GPL(kvm_init_shadow_mmu);
 
@@ -3981,9 +4025,15 @@ static void mmu_pte_write_flush_tlb(struct kvm_vcpu *vcpu, bool zap_page,
 }
 
 static u64 mmu_pte_write_fetch_gpte(struct kvm_vcpu *vcpu, gpa_t *gpa,
+<<<<<<< HEAD
 				    const u8 *new, int *bytes)
 {
 	u64 gentry;
+=======
+				    int *bytes)
+{
+	u64 gentry = 0;
+>>>>>>> common/deprecated/android-3.18
 	int r;
 
 	/*
@@ -3995,6 +4045,7 @@ static u64 mmu_pte_write_fetch_gpte(struct kvm_vcpu *vcpu, gpa_t *gpa,
 		/* Handle a 32-bit guest writing two halves of a 64-bit gpte */
 		*gpa &= ~(gpa_t)7;
 		*bytes = 8;
+<<<<<<< HEAD
 		r = kvm_read_guest(vcpu->kvm, *gpa, &gentry, 8);
 		if (r)
 			gentry = 0;
@@ -4011,6 +4062,14 @@ static u64 mmu_pte_write_fetch_gpte(struct kvm_vcpu *vcpu, gpa_t *gpa,
 	default:
 		gentry = 0;
 		break;
+=======
+	}
+
+	if (*bytes == 4 || *bytes == 8) {
+		r = kvm_vcpu_read_guest_atomic(vcpu, *gpa, &gentry, *bytes);
+		if (r)
+			gentry = 0;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	return gentry;
@@ -4095,12 +4154,25 @@ void kvm_mmu_pte_write(struct kvm_vcpu *vcpu, gpa_t gpa,
 		       const u8 *new, int bytes)
 {
 	gfn_t gfn = gpa >> PAGE_SHIFT;
+<<<<<<< HEAD
 	union kvm_mmu_page_role mask = { .word = 0 };
+=======
+>>>>>>> common/deprecated/android-3.18
 	struct kvm_mmu_page *sp;
 	LIST_HEAD(invalid_list);
 	u64 entry, gentry, *spte;
 	int npte;
 	bool remote_flush, local_flush, zap_page;
+<<<<<<< HEAD
+=======
+	union kvm_mmu_page_role mask = { };
+
+	mask.cr0_wp = 1;
+	mask.cr4_pae = 1;
+	mask.nxe = 1;
+	mask.smep_andnot_wp = 1;
+	mask.smap_andnot_wp = 1;
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * If we don't have indirect shadow pages, it means no page is
@@ -4113,8 +4185,11 @@ void kvm_mmu_pte_write(struct kvm_vcpu *vcpu, gpa_t gpa,
 
 	pgprintk("%s: gpa %llx bytes %d\n", __func__, gpa, bytes);
 
+<<<<<<< HEAD
 	gentry = mmu_pte_write_fetch_gpte(vcpu, &gpa, new, &bytes);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * No need to care whether allocation memory is successful
 	 * or not since pte prefetch is skiped if it does not have
@@ -4123,10 +4198,19 @@ void kvm_mmu_pte_write(struct kvm_vcpu *vcpu, gpa_t gpa,
 	mmu_topup_memory_caches(vcpu);
 
 	spin_lock(&vcpu->kvm->mmu_lock);
+<<<<<<< HEAD
 	++vcpu->kvm->stat.mmu_pte_write;
 	kvm_mmu_audit(vcpu, AUDIT_PRE_PTE_WRITE);
 
 	mask.cr0_wp = mask.cr4_pae = mask.nxe = 1;
+=======
+
+	gentry = mmu_pte_write_fetch_gpte(vcpu, &gpa, &bytes);
+
+	++vcpu->kvm->stat.mmu_pte_write;
+	kvm_mmu_audit(vcpu, AUDIT_PRE_PTE_WRITE);
+
+>>>>>>> common/deprecated/android-3.18
 	for_each_gfn_indirect_valid_sp(vcpu->kvm, sp, gfn) {
 		if (detect_write_misaligned(sp, gpa, bytes) ||
 		      detect_write_flooding(sp)) {

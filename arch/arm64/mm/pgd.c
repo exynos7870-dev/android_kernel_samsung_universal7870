@@ -28,6 +28,7 @@
 
 #include "mm.h"
 
+<<<<<<< HEAD
 #ifdef CONFIG_TIMA_RKP
 #include <linux/rkp_entry.h>
 extern u8 rkp_started;
@@ -36,6 +37,12 @@ extern u8 rkp_started;
 
 static struct kmem_cache *pgd_cache;
 #ifndef CONFIG_TIMA_RKP
+=======
+#define PGD_SIZE	(PTRS_PER_PGD * sizeof(pgd_t))
+
+static struct kmem_cache *pgd_cache;
+
+>>>>>>> common/deprecated/android-3.18
 pgd_t *pgd_alloc(struct mm_struct *mm)
 {
 	if (PGD_SIZE == PAGE_SIZE)
@@ -43,6 +50,7 @@ pgd_t *pgd_alloc(struct mm_struct *mm)
 	else
 		return kmem_cache_zalloc(pgd_cache, GFP_KERNEL);
 }
+<<<<<<< HEAD
 #else
 pgd_t *pgd_alloc(struct mm_struct *mm)
 {
@@ -72,6 +80,9 @@ pgd_t *pgd_alloc(struct mm_struct *mm)
 #endif
 
 #ifndef  CONFIG_TIMA_RKP
+=======
+
+>>>>>>> common/deprecated/android-3.18
 void pgd_free(struct mm_struct *mm, pgd_t *pgd)
 {
 	if (PGD_SIZE == PAGE_SIZE)
@@ -79,6 +90,7 @@ void pgd_free(struct mm_struct *mm, pgd_t *pgd)
 	else
 		kmem_cache_free(pgd_cache, pgd);
 }
+<<<<<<< HEAD
 #else
 void pgd_free(struct mm_struct *mm, pgd_t *pgd)
 {
@@ -102,6 +114,9 @@ void pgd_free(struct mm_struct *mm, pgd_t *pgd)
 	}
 }
 #endif
+=======
+
+>>>>>>> common/deprecated/android-3.18
 static int __init pgd_cache_init(void)
 {
 	/*

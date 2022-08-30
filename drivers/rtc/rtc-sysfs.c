@@ -122,6 +122,7 @@ hctosys_show(struct device *dev, struct device_attribute *attr, char *buf)
 }
 static DEVICE_ATTR_RO(hctosys);
 
+<<<<<<< HEAD
 #if defined(CONFIG_RTC_ALARM_BOOT)
 static ssize_t
 alarm_boot_show(struct device *dev, struct device_attribute *attr,
@@ -142,6 +143,8 @@ alarm_boot_show(struct device *dev, struct device_attribute *attr,
 static DEVICE_ATTR_RO(alarm_boot);
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static struct attribute *rtc_attrs[] = {
 	&dev_attr_name.attr,
 	&dev_attr_date.attr,
@@ -149,9 +152,12 @@ static struct attribute *rtc_attrs[] = {
 	&dev_attr_since_epoch.attr,
 	&dev_attr_max_user_freq.attr,
 	&dev_attr_hctosys.attr,
+<<<<<<< HEAD
 #if defined(CONFIG_RTC_ALARM_BOOT)
 	&dev_attr_alarm_boot.attr,
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	NULL,
 };
 ATTRIBUTE_GROUPS(rtc);

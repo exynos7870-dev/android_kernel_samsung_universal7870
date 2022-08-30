@@ -198,7 +198,11 @@ static inline const char *__check_heap_object(const void *ptr,
  * (PAGE_SIZE*2).  Larger requests are passed to the page allocator.
  */
 #define KMALLOC_SHIFT_HIGH	(PAGE_SHIFT + 1)
+<<<<<<< HEAD
 #define KMALLOC_SHIFT_MAX	(MAX_ORDER + PAGE_SHIFT)
+=======
+#define KMALLOC_SHIFT_MAX	(MAX_ORDER + PAGE_SHIFT - 1)
+>>>>>>> common/deprecated/android-3.18
 #ifndef KMALLOC_SHIFT_LOW
 #define KMALLOC_SHIFT_LOW	3
 #endif
@@ -211,7 +215,11 @@ static inline const char *__check_heap_object(const void *ptr,
  * be allocated from the same page.
  */
 #define KMALLOC_SHIFT_HIGH	PAGE_SHIFT
+<<<<<<< HEAD
 #define KMALLOC_SHIFT_MAX	30
+=======
+#define KMALLOC_SHIFT_MAX	(MAX_ORDER + PAGE_SHIFT - 1)
+>>>>>>> common/deprecated/android-3.18
 #ifndef KMALLOC_SHIFT_LOW
 #define KMALLOC_SHIFT_LOW	3
 #endif

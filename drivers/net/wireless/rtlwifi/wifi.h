@@ -2212,6 +2212,12 @@ struct rtl_mod_params {
 
 	/* default 0: 1 means disable */
 	bool disable_watchdog;
+<<<<<<< HEAD
+=======
+
+	/* default 0: 1 means do not disable interrupts */
+	bool int_clear;
+>>>>>>> common/deprecated/android-3.18
 };
 
 struct rtl_hal_usbint_cfg {

@@ -14,7 +14,10 @@
 
 #include <linux/types.h>
 #include <linux/list.h>
+<<<<<<< HEAD
 #include <linux/kref.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 
 /**
  * struct hwrng - Hardware Random Number Generator driver
@@ -45,7 +48,10 @@ struct hwrng {
 
 	/* internal. */
 	struct list_head list;
+<<<<<<< HEAD
 	struct kref ref;
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 /** Register a new Hardware Random Number Generator driver. */

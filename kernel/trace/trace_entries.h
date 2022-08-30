@@ -178,7 +178,11 @@ FTRACE_ENTRY(kernel_stack, stack_entry,
 
 	F_STRUCT(
 		__field(	int,		size	)
+<<<<<<< HEAD
 		__dynamic_array(unsigned long,	caller	)
+=======
+		__array(	unsigned long,	caller,	FTRACE_STACK_ENTRIES	)
+>>>>>>> common/deprecated/android-3.18
 	),
 
 	F_printk("\t=> (" IP_FMT ")\n\t=> (" IP_FMT ")\n\t=> (" IP_FMT ")\n"

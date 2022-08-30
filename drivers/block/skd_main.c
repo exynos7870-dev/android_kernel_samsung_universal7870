@@ -2214,6 +2214,12 @@ static void skd_send_fitmsg(struct skd_device *skdev,
 		 */
 		qcmd |= FIT_QCMD_MSGSIZE_64;
 
+<<<<<<< HEAD
+=======
+	/* Make sure skd_msg_buf is written before the doorbell is triggered. */
+	smp_wmb();
+
+>>>>>>> common/deprecated/android-3.18
 	SKD_WRITEQ(skdev, qcmd, FIT_Q_COMMAND);
 
 }
@@ -2260,6 +2266,12 @@ static void skd_send_special_fitmsg(struct skd_device *skdev,
 	qcmd = skspcl->mb_dma_address;
 	qcmd |= FIT_QCMD_QID_NORMAL + FIT_QCMD_MSGSIZE_128;
 
+<<<<<<< HEAD
+=======
+	/* Make sure skd_msg_buf is written before the doorbell is triggered. */
+	smp_wmb();
+
+>>>>>>> common/deprecated/android-3.18
 	SKD_WRITEQ(skdev, qcmd, FIT_Q_COMMAND);
 }
 
@@ -4679,6 +4691,7 @@ static void skd_free_disk(struct skd_device *skdev)
 {
 	struct gendisk *disk = skdev->disk;
 
+<<<<<<< HEAD
 	if (disk != NULL) {
 		struct request_queue *q = disk->queue;
 
@@ -4688,6 +4701,18 @@ static void skd_free_disk(struct skd_device *skdev)
 			blk_cleanup_queue(q);
 		put_disk(disk);
 	}
+=======
+	if (disk && (disk->flags & GENHD_FL_UP))
+		del_gendisk(disk);
+
+	if (skdev->queue) {
+		blk_cleanup_queue(skdev->queue);
+		skdev->queue = NULL;
+		disk->queue = NULL;
+	}
+
+	put_disk(disk);
+>>>>>>> common/deprecated/android-3.18
 	skdev->disk = NULL;
 }
 

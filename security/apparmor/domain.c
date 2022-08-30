@@ -627,8 +627,13 @@ int aa_change_hat(const char *hats[], int count, u64 token, bool permtest)
 	/* released below */
 	cred = get_current_cred();
 	cxt = cred_cxt(cred);
+<<<<<<< HEAD
 	profile = aa_cred_profile(cred);
 	previous_profile = cxt->previous;
+=======
+	profile = aa_get_newest_profile(aa_cred_profile(cred));
+	previous_profile = aa_get_newest_profile(cxt->previous);
+>>>>>>> common/deprecated/android-3.18
 
 	if (unconfined(profile)) {
 		info = "unconfined";
@@ -724,6 +729,11 @@ audit:
 out:
 	aa_put_profile(hat);
 	kfree(name);
+<<<<<<< HEAD
+=======
+	aa_put_profile(profile);
+	aa_put_profile(previous_profile);
+>>>>>>> common/deprecated/android-3.18
 	put_cred(cred);
 
 	return error;

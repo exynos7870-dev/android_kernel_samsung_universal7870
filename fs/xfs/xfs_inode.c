@@ -1894,21 +1894,33 @@ xfs_inactive(
 	/*
 	 * If there are attributes associated with the file then blow them away
 	 * now.  The code calls a routine that recursively deconstructs the
+<<<<<<< HEAD
 	 * attribute fork.  We need to just commit the current transaction
 	 * because we can't use it for xfs_attr_inactive().
 	 */
 	if (ip->i_d.di_anextents > 0) {
 		ASSERT(ip->i_d.di_forkoff != 0);
 
+=======
+	 * attribute fork. If also blows away the in-core attribute fork.
+	 */
+	if (XFS_IFORK_Q(ip)) {
+>>>>>>> common/deprecated/android-3.18
 		error = xfs_attr_inactive(ip);
 		if (error)
 			return;
 	}
 
+<<<<<<< HEAD
 	if (ip->i_afp)
 		xfs_idestroy_fork(ip, XFS_ATTR_FORK);
 
 	ASSERT(ip->i_d.di_anextents == 0);
+=======
+	ASSERT(!ip->i_afp);
+	ASSERT(ip->i_d.di_anextents == 0);
+	ASSERT(ip->i_d.di_forkoff == 0);
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * Free the inode.
@@ -2973,6 +2985,7 @@ xfs_iflush_cluster(
 		 * We need to check under the i_flags_lock for a valid inode
 		 * here. Skip it if it is not valid or the wrong inode.
 		 */
+<<<<<<< HEAD
 		spin_lock(&ip->i_flags_lock);
 		if (!ip->i_ino ||
 		    (XFS_INO_TO_AGINO(mp, iq->i_ino) & mask) != first_index) {
@@ -2980,6 +2993,16 @@ xfs_iflush_cluster(
 			continue;
 		}
 		spin_unlock(&ip->i_flags_lock);
+=======
+		spin_lock(&iq->i_flags_lock);
+		if (!iq->i_ino ||
+		    __xfs_iflags_test(iq, XFS_ISTALE) ||
+		    (XFS_INO_TO_AGINO(mp, iq->i_ino) & mask) != first_index) {
+			spin_unlock(&iq->i_flags_lock);
+			continue;
+		}
+		spin_unlock(&iq->i_flags_lock);
+>>>>>>> common/deprecated/android-3.18
 
 		/*
 		 * Do an un-protected check to see if the inode is dirty and
@@ -3095,7 +3118,11 @@ xfs_iflush(
 	struct xfs_buf		**bpp)
 {
 	struct xfs_mount	*mp = ip->i_mount;
+<<<<<<< HEAD
 	struct xfs_buf		*bp;
+=======
+	struct xfs_buf		*bp = NULL;
+>>>>>>> common/deprecated/android-3.18
 	struct xfs_dinode	*dip;
 	int			error;
 
@@ -3137,6 +3164,7 @@ xfs_iflush(
 	}
 
 	/*
+<<<<<<< HEAD
 	 * Get the buffer containing the on-disk inode.
 	 */
 	error = xfs_imap_to_bp(mp, NULL, &ip->i_imap, &dip, &bp, XBF_TRYLOCK,
@@ -3145,6 +3173,24 @@ xfs_iflush(
 		xfs_ifunlock(ip);
 		return error;
 	}
+=======
+	 * Get the buffer containing the on-disk inode. We are doing a try-lock
+	 * operation here, so we may get  an EAGAIN error. In that case, we
+	 * simply want to return with the inode still dirty.
+	 *
+	 * If we get any other error, we effectively have a corruption situation
+	 * and we cannot flush the inode, so we treat it the same as failing
+	 * xfs_iflush_int().
+	 */
+	error = xfs_imap_to_bp(mp, NULL, &ip->i_imap, &dip, &bp, XBF_TRYLOCK,
+			       0);
+	if (error == -EAGAIN) {
+		xfs_ifunlock(ip);
+		return error;
+	}
+	if (error)
+		goto corrupt_out;
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * First flush out the inode that xfs_iflush was called with.
@@ -3172,7 +3218,12 @@ xfs_iflush(
 	return 0;
 
 corrupt_out:
+<<<<<<< HEAD
 	xfs_buf_relse(bp);
+=======
+	if (bp)
+		xfs_buf_relse(bp);
+>>>>>>> common/deprecated/android-3.18
 	xfs_force_shutdown(mp, SHUTDOWN_CORRUPT_INCORE);
 cluster_corrupt_out:
 	error = -EFSCORRUPTED;

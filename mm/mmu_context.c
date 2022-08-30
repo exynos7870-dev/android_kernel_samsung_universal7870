@@ -4,9 +4,15 @@
  */
 
 #include <linux/mm.h>
+<<<<<<< HEAD
 #include <linux/mmu_context.h>
 #include <linux/export.h>
 #include <linux/sched.h>
+=======
+#include <linux/sched.h>
+#include <linux/mmu_context.h>
+#include <linux/export.h>
+>>>>>>> common/deprecated/android-3.18
 
 #include <asm/mmu_context.h>
 

@@ -66,9 +66,15 @@ struct cs5535audio_dma_ops {
 };
 
 struct cs5535audio_dma_desc {
+<<<<<<< HEAD
 	u32 addr;
 	u16 size;
 	u16 ctlreserved;
+=======
+	__le32 addr;
+	__le16 size;
+	__le16 ctlreserved;
+>>>>>>> common/deprecated/android-3.18
 };
 
 struct cs5535audio_dma {

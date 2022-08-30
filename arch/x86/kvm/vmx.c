@@ -32,6 +32,10 @@
 #include <linux/slab.h>
 #include <linux/tboot.h>
 #include <linux/hrtimer.h>
+<<<<<<< HEAD
+=======
+#include <linux/nospec.h>
+>>>>>>> common/deprecated/android-3.18
 #include "kvm_cache_regs.h"
 #include "x86.h"
 
@@ -45,6 +49,10 @@
 #include <asm/perf_event.h>
 #include <asm/debugreg.h>
 #include <asm/kexec.h>
+<<<<<<< HEAD
+=======
+#include <asm/spec-ctrl.h>
+>>>>>>> common/deprecated/android-3.18
 
 #include "trace.h"
 
@@ -390,6 +398,10 @@ struct nested_vmx {
 	struct list_head vmcs02_pool;
 	int vmcs02_num;
 	u64 vmcs01_tsc_offset;
+<<<<<<< HEAD
+=======
+	bool change_vmcs01_virtual_x2apic_mode;
+>>>>>>> common/deprecated/android-3.18
 	/* L2 must run next, and mustn't decide to exit to L1. */
 	bool nested_run_pending;
 	/*
@@ -724,9 +736,24 @@ static const int max_vmcs_field = ARRAY_SIZE(vmcs_field_to_offset_table);
 
 static inline short vmcs_field_to_offset(unsigned long field)
 {
+<<<<<<< HEAD
 	if (field >= max_vmcs_field || vmcs_field_to_offset_table[field] == 0)
 		return -1;
 	return vmcs_field_to_offset_table[field];
+=======
+	const size_t size = ARRAY_SIZE(vmcs_field_to_offset_table);
+	unsigned short offset;
+
+	BUILD_BUG_ON(size > SHRT_MAX);
+	if (field >= size)
+		return -1;
+
+	field = array_index_nospec(field, size);
+	offset = vmcs_field_to_offset_table[field];
+	if (offset == 0)
+		return -1;
+	return offset;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static inline struct vmcs12 *get_vmcs12(struct kvm_vcpu *vcpu)
@@ -883,6 +910,16 @@ static inline bool is_machine_check(u32 intr_info)
 		(INTR_TYPE_HARD_EXCEPTION | MC_VECTOR | INTR_INFO_VALID_MASK);
 }
 
+<<<<<<< HEAD
+=======
+/* Undocumented: icebp/int1 */
+static inline bool is_icebp(u32 intr_info)
+{
+	return (intr_info & (INTR_INFO_INTR_TYPE_MASK | INTR_INFO_VALID_MASK))
+		== (INTR_TYPE_PRIV_SW_EXCEPTION | INTR_INFO_VALID_MASK);
+}
+
+>>>>>>> common/deprecated/android-3.18
 static inline bool cpu_has_vmx_msr_bitmap(void)
 {
 	return vmcs_config.cpu_based_exec_ctrl & CPU_BASED_USE_MSR_BITMAPS;
@@ -1121,7 +1158,11 @@ static int __find_msr_index(struct vcpu_vmx *vmx, u32 msr)
 	return -1;
 }
 
+<<<<<<< HEAD
 static inline void __invvpid(int ext, u16 vpid, gva_t gva)
+=======
+static inline void __invvpid(unsigned long ext, u16 vpid, gva_t gva)
+>>>>>>> common/deprecated/android-3.18
 {
     struct {
 	u64 vpid : 16;
@@ -1135,7 +1176,11 @@ static inline void __invvpid(int ext, u16 vpid, gva_t gva)
 		  : : "a"(&operand), "c"(ext) : "cc", "memory");
 }
 
+<<<<<<< HEAD
 static inline void __invept(int ext, u64 eptp, gpa_t gpa)
+=======
+static inline void __invept(unsigned long ext, u64 eptp, gpa_t gpa)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct {
 		u64 eptp, gpa;
@@ -1493,7 +1538,11 @@ static void update_exception_bitmap(struct kvm_vcpu *vcpu)
 	u32 eb;
 
 	eb = (1u << PF_VECTOR) | (1u << UD_VECTOR) | (1u << MC_VECTOR) |
+<<<<<<< HEAD
 	     (1u << NM_VECTOR) | (1u << DB_VECTOR);
+=======
+	     (1u << NM_VECTOR) | (1u << DB_VECTOR) | (1u << AC_VECTOR);
+>>>>>>> common/deprecated/android-3.18
 	if ((vcpu->guest_debug &
 	     (KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_USE_SW_BP)) ==
 	    (KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_USE_SW_BP))
@@ -1600,6 +1649,16 @@ static void add_atomic_switch_msr(struct vcpu_vmx *vmx, unsigned msr,
 			return;
 		}
 		break;
+<<<<<<< HEAD
+=======
+	case MSR_IA32_PEBS_ENABLE:
+		/* PEBS needs a quiescent period after being disabled (to write
+		 * a record).  Disabling PEBS through VMX MSR swapping doesn't
+		 * provide that period, so a CPU could write host's record into
+		 * guest's memory.
+		 */
+		wrmsrl(MSR_IA32_PEBS_ENABLE, 0);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	for (i = 0; i < m->nr; ++i)
@@ -1637,6 +1696,7 @@ static void reload_tss(void)
 
 static bool update_transition_efer(struct vcpu_vmx *vmx, int efer_offset)
 {
+<<<<<<< HEAD
 	u64 guest_efer;
 	u64 ignore_bits;
 
@@ -1647,28 +1707,67 @@ static bool update_transition_efer(struct vcpu_vmx *vmx, int efer_offset)
 	 * outside long mode
 	 */
 	ignore_bits = EFER_NX | EFER_SCE;
+=======
+	u64 guest_efer = vmx->vcpu.arch.efer;
+	u64 ignore_bits = 0;
+
+	if (!enable_ept) {
+		/*
+		 * NX is needed to handle CR0.WP=1, CR4.SMEP=1.  Testing
+		 * host CPUID is more efficient than testing guest CPUID
+		 * or CR4.  Host SMEP is anyway a requirement for guest SMEP.
+		 */
+		if (boot_cpu_has(X86_FEATURE_SMEP))
+			guest_efer |= EFER_NX;
+		else if (!(guest_efer & EFER_NX))
+			ignore_bits |= EFER_NX;
+	}
+
+	/*
+	 * LMA and LME handled by hardware; SCE meaningless outside long mode.
+	 */
+	ignore_bits |= EFER_SCE;
+>>>>>>> common/deprecated/android-3.18
 #ifdef CONFIG_X86_64
 	ignore_bits |= EFER_LMA | EFER_LME;
 	/* SCE is meaningful only in long mode on Intel */
 	if (guest_efer & EFER_LMA)
 		ignore_bits &= ~(u64)EFER_SCE;
 #endif
+<<<<<<< HEAD
 	guest_efer &= ~ignore_bits;
 	guest_efer |= host_efer & ignore_bits;
 	vmx->guest_msrs[efer_offset].data = guest_efer;
 	vmx->guest_msrs[efer_offset].mask = ~ignore_bits;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	clear_atomic_switch_msr(vmx, MSR_EFER);
 	/* On ept, can't emulate nx, and must switch nx atomically */
 	if (enable_ept && ((vmx->vcpu.arch.efer ^ host_efer) & EFER_NX)) {
+<<<<<<< HEAD
 		guest_efer = vmx->vcpu.arch.efer;
+=======
+>>>>>>> common/deprecated/android-3.18
 		if (!(guest_efer & EFER_LMA))
 			guest_efer &= ~EFER_LME;
 		add_atomic_switch_msr(vmx, MSR_EFER, guest_efer, host_efer);
 		return false;
+<<<<<<< HEAD
 	}
 
 	return true;
+=======
+	} else {
+		guest_efer &= ~ignore_bits;
+		guest_efer |= host_efer & ignore_bits;
+
+		vmx->guest_msrs[efer_offset].data = guest_efer;
+		vmx->guest_msrs[efer_offset].mask = ~ignore_bits;
+
+		return true;
+	}
+>>>>>>> common/deprecated/android-3.18
 }
 
 static unsigned long segment_base(u16 selector)
@@ -2019,7 +2118,11 @@ static int nested_vmx_check_exception(struct kvm_vcpu *vcpu, unsigned nr)
 	if (!(vmcs12->exception_bitmap & (1u << nr)))
 		return 0;
 
+<<<<<<< HEAD
 	nested_vmx_vmexit(vcpu, to_vmx(vcpu)->exit_reason,
+=======
+	nested_vmx_vmexit(vcpu, EXIT_REASON_EXCEPTION_NMI,
+>>>>>>> common/deprecated/android-3.18
 			  vmcs_read32(VM_EXIT_INTR_INFO),
 			  vmcs_readl(EXIT_QUALIFICATION));
 	return 1;
@@ -2050,6 +2153,11 @@ static void vmx_queue_exception(struct kvm_vcpu *vcpu, unsigned nr,
 		return;
 	}
 
+<<<<<<< HEAD
+=======
+	WARN_ON_ONCE(vmx->emulation_required);
+
+>>>>>>> common/deprecated/android-3.18
 	if (kvm_exception_is_soft(nr)) {
 		vmcs_write32(VM_ENTRY_INSTRUCTION_LEN,
 			     vmx->vcpu.arch.event_exit_inst_len);
@@ -2548,7 +2656,11 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 *pdata)
 		data = vmcs_readl(GUEST_SYSENTER_ESP);
 		break;
 	case MSR_IA32_BNDCFGS:
+<<<<<<< HEAD
 		if (!vmx_mpx_supported())
+=======
+		if (!vmx_mpx_supported() || !guest_cpuid_has_mpx(vcpu))
+>>>>>>> common/deprecated/android-3.18
 			return 1;
 		data = vmcs_read64(GUEST_BNDCFGS);
 		break;
@@ -2621,7 +2733,11 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 		vmcs_writel(GUEST_SYSENTER_ESP, data);
 		break;
 	case MSR_IA32_BNDCFGS:
+<<<<<<< HEAD
 		if (!vmx_mpx_supported())
+=======
+		if (!vmx_mpx_supported() || !guest_cpuid_has_mpx(vcpu))
+>>>>>>> common/deprecated/android-3.18
 			return 1;
 		vmcs_write64(GUEST_BNDCFGS, data);
 		break;
@@ -2744,7 +2860,11 @@ static int hardware_enable(void)
 	u64 phys_addr = __pa(per_cpu(vmxarea, cpu));
 	u64 old, test_bits;
 
+<<<<<<< HEAD
 	if (read_cr4() & X86_CR4_VMXE)
+=======
+	if (cr4_read_shadow() & X86_CR4_VMXE)
+>>>>>>> common/deprecated/android-3.18
 		return -EBUSY;
 
 	INIT_LIST_HEAD(&per_cpu(loaded_vmcss_on_cpu, cpu));
@@ -2771,7 +2891,11 @@ static int hardware_enable(void)
 		/* enable and lock */
 		wrmsrl(MSR_IA32_FEATURE_CONTROL, old | test_bits);
 	}
+<<<<<<< HEAD
 	write_cr4(read_cr4() | X86_CR4_VMXE); /* FIXME: not cpu hotplug safe */
+=======
+	cr4_set_bits(X86_CR4_VMXE);
+>>>>>>> common/deprecated/android-3.18
 
 	if (vmm_exclusive) {
 		kvm_cpu_vmxon(phys_addr);
@@ -2808,7 +2932,11 @@ static void hardware_disable(void)
 		vmclear_local_loaded_vmcss();
 		kvm_cpu_vmxoff();
 	}
+<<<<<<< HEAD
 	write_cr4(read_cr4() & ~X86_CR4_VMXE);
+=======
+	cr4_clear_bits(X86_CR4_VMXE);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static __init int adjust_vmx_controls(u32 ctl_min, u32 ctl_opt,
@@ -3553,8 +3681,21 @@ static void vmx_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
 
 static int vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
 {
+<<<<<<< HEAD
 	unsigned long hw_cr4 = cr4 | (to_vmx(vcpu)->rmode.vm86_active ?
 		    KVM_RMODE_VM_CR4_ALWAYS_ON : KVM_PMODE_VM_CR4_ALWAYS_ON);
+=======
+	/*
+	 * Pass through host's Machine Check Enable value to hw_cr4, which
+	 * is in force while we are in guest mode.  Do not let guests control
+	 * this bit, even if host CR4.MCE == 0.
+	 */
+	unsigned long hw_cr4 =
+		(cr4_read_shadow() & X86_CR4_MCE) |
+		(cr4 & ~X86_CR4_MCE) |
+		(to_vmx(vcpu)->rmode.vm86_active ?
+		 KVM_RMODE_VM_CR4_ALWAYS_ON : KVM_PMODE_VM_CR4_ALWAYS_ON);
+>>>>>>> common/deprecated/android-3.18
 
 	if (cr4 & X86_CR4_VMXE) {
 		/*
@@ -3890,6 +4031,29 @@ static bool cs_ss_rpl_check(struct kvm_vcpu *vcpu)
 		 (ss.selector & SELECTOR_RPL_MASK));
 }
 
+<<<<<<< HEAD
+=======
+static bool nested_vmx_check_io_bitmaps(struct kvm_vcpu *vcpu,
+					unsigned int port, int size);
+static bool nested_vmx_exit_handled_io(struct kvm_vcpu *vcpu,
+				       struct vmcs12 *vmcs12)
+{
+	unsigned long exit_qualification;
+	unsigned int port;
+	int size;
+
+	if (!nested_cpu_has(vmcs12, CPU_BASED_USE_IO_BITMAPS))
+		return nested_cpu_has(vmcs12, CPU_BASED_UNCOND_IO_EXITING);
+
+	exit_qualification = vmcs_readl(EXIT_QUALIFICATION);
+
+	port = exit_qualification >> 16;
+	size = (exit_qualification & 7) + 1;
+
+	return nested_vmx_check_io_bitmaps(vcpu, port, size);
+}
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Check if guest state is valid. Returns true if valid, false if
  * not.
@@ -4280,7 +4444,11 @@ static void vmx_set_constant_host_state(struct vcpu_vmx *vmx)
 	vmcs_writel(HOST_CR3, read_cr3());  /* 22.2.3  FIXME: shadow tables */
 
 	/* Save the most likely value for this task's CR4 in the VMCS. */
+<<<<<<< HEAD
 	cr4 = read_cr4();
+=======
+	cr4 = cr4_read_shadow();
+>>>>>>> common/deprecated/android-3.18
 	vmcs_writel(HOST_CR4, cr4);			/* 22.2.3, 22.2.5 */
 	vmx->host_state.vmcs_host_cr4 = cr4;
 
@@ -4554,7 +4722,11 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu)
 	vmcs_writel(GUEST_SYSENTER_ESP, 0);
 	vmcs_writel(GUEST_SYSENTER_EIP, 0);
 
+<<<<<<< HEAD
 	vmcs_writel(GUEST_RFLAGS, 0x02);
+=======
+	kvm_set_rflags(vcpu, X86_EFLAGS_FIXED);
+>>>>>>> common/deprecated/android-3.18
 	kvm_rip_write(vcpu, 0xfff0);
 
 	vmcs_writel(GUEST_GDTR_BASE, 0);
@@ -4843,7 +5015,11 @@ static int handle_rmode_exception(struct kvm_vcpu *vcpu,
  */
 static void kvm_machine_check(void)
 {
+<<<<<<< HEAD
 #if defined(CONFIG_X86_MCE) && defined(CONFIG_X86_64)
+=======
+#if defined(CONFIG_X86_MCE)
+>>>>>>> common/deprecated/android-3.18
 	struct pt_regs regs = {
 		.cs = 3, /* Fake ring 3 no matter what the guest ran on */
 		.flags = X86_EFLAGS_IF,
@@ -4884,6 +5060,11 @@ static int handle_exception(struct kvm_vcpu *vcpu)
 
 	if (is_invalid_opcode(intr_info)) {
 		er = emulate_instruction(vcpu, EMULTYPE_TRAP_UD);
+<<<<<<< HEAD
+=======
+		if (er == EMULATE_USER_EXIT)
+			return 0;
+>>>>>>> common/deprecated/android-3.18
 		if (er != EMULATE_DONE)
 			kvm_queue_exception(vcpu, UD_VECTOR);
 		return 1;
@@ -4925,13 +5106,23 @@ static int handle_exception(struct kvm_vcpu *vcpu)
 		return handle_rmode_exception(vcpu, ex_no, error_code);
 
 	switch (ex_no) {
+<<<<<<< HEAD
+=======
+	case AC_VECTOR:
+		kvm_queue_exception_e(vcpu, AC_VECTOR, error_code);
+		return 1;
+>>>>>>> common/deprecated/android-3.18
 	case DB_VECTOR:
 		dr6 = vmcs_readl(EXIT_QUALIFICATION);
 		if (!(vcpu->guest_debug &
 		      (KVM_GUESTDBG_SINGLESTEP | KVM_GUESTDBG_USE_HW_BP))) {
 			vcpu->arch.dr6 &= ~15;
 			vcpu->arch.dr6 |= dr6 | DR6_RTM;
+<<<<<<< HEAD
 			if (!(dr6 & ~DR6_RESERVED)) /* icebp */
+=======
+			if (is_icebp(intr_info))
+>>>>>>> common/deprecated/android-3.18
 				skip_emulated_instruction(vcpu);
 
 			kvm_queue_exception(vcpu, DB_VECTOR);
@@ -4971,6 +5162,10 @@ static int handle_external_interrupt(struct kvm_vcpu *vcpu)
 static int handle_triple_fault(struct kvm_vcpu *vcpu)
 {
 	vcpu->run->exit_reason = KVM_EXIT_SHUTDOWN;
+<<<<<<< HEAD
+=======
+	vcpu->mmio_needed = 0;
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -5624,8 +5819,28 @@ static int handle_ept_misconfig(struct kvm_vcpu *vcpu)
 
 	gpa = vmcs_read64(GUEST_PHYSICAL_ADDRESS);
 	if (!kvm_io_bus_write(vcpu->kvm, KVM_FAST_MMIO_BUS, gpa, 0, NULL)) {
+<<<<<<< HEAD
 		skip_emulated_instruction(vcpu);
 		return 1;
+=======
+		/*
+		* Doing kvm_skip_emulated_instruction() depends on undefined
+		* behavior: Intel's manual doesn't mandate
+		* VM_EXIT_INSTRUCTION_LEN to be set in VMCS when EPT MISCONFIG
+		* occurs and while on real hardware it was observed to be set,
+		* other hypervisors (namely Hyper-V) don't set it, we end up
+		* advancing IP with some random value. Disable fast mmio when
+		* running nested and keep it for real hardware in hope that
+		* VM_EXIT_INSTRUCTION_LEN will always be set correctly.
+		*/
+		if (!static_cpu_has(X86_FEATURE_HYPERVISOR)) {
+			skip_emulated_instruction(vcpu);
+			return 1;
+		}
+		else
+			return x86_emulate_instruction(vcpu, gpa, EMULTYPE_SKIP,
+						       NULL, 0) == EMULATE_DONE;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	ret = handle_mmio_page_fault_common(vcpu, gpa, true);
@@ -5687,7 +5902,11 @@ static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
 		if (test_bit(KVM_REQ_EVENT, &vcpu->requests))
 			return 1;
 
+<<<<<<< HEAD
 		err = emulate_instruction(vcpu, EMULTYPE_NO_REEXECUTE);
+=======
+		err = emulate_instruction(vcpu, 0);
+>>>>>>> common/deprecated/android-3.18
 
 		if (err == EMULATE_USER_EXIT) {
 			++vcpu->stat.mmio_exits;
@@ -5695,12 +5914,21 @@ static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
 			goto out;
 		}
 
+<<<<<<< HEAD
 		if (err != EMULATE_DONE) {
 			vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
 			vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
 			vcpu->run->internal.ndata = 0;
 			return 0;
 		}
+=======
+		if (err != EMULATE_DONE)
+			goto emulation_error;
+
+		if (vmx->emulation_required && !vmx->rmode.vm86_active &&
+		    vcpu->arch.exception.pending)
+			goto emulation_error;
+>>>>>>> common/deprecated/android-3.18
 
 		if (vcpu->arch.halt_request) {
 			vcpu->arch.halt_request = 0;
@@ -5716,6 +5944,15 @@ static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
 
 out:
 	return ret;
+<<<<<<< HEAD
+=======
+
+emulation_error:
+	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
+	vcpu->run->internal.ndata = 0;
+	return 0;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int __grow_ple_window(int val)
@@ -5997,6 +6234,13 @@ static int get_vmx_mem_address(struct kvm_vcpu *vcpu,
 	/* Addr = segment_base + offset */
 	/* offset = base + [index * scale] + displacement */
 	*ret = vmx_get_segment_base(vcpu, seg_reg);
+<<<<<<< HEAD
+=======
+	if (addr_size == 1)
+		off = (gva_t)sign_extend64(off, 31);
+	else if (addr_size == 0)
+		off = (gva_t)sign_extend64(off, 15);
+>>>>>>> common/deprecated/android-3.18
 	if (base_is_valid)
 		*ret += kvm_register_read(vcpu, base_reg);
 	if (index_is_valid)
@@ -6061,14 +6305,30 @@ static int nested_vmx_check_vmptr(struct kvm_vcpu *vcpu, int exit_reason,
 		}
 
 		page = nested_get_page(vcpu, vmptr);
+<<<<<<< HEAD
 		if (page == NULL ||
 		    *(u32 *)kmap(page) != VMCS12_REVISION) {
 			nested_vmx_failInvalid(vcpu);
 			kunmap(page);
+=======
+		if (page == NULL) {
+			nested_vmx_failInvalid(vcpu);
+			skip_emulated_instruction(vcpu);
+			return 1;
+		}
+		if (*(u32 *)kmap(page) != VMCS12_REVISION) {
+			kunmap(page);
+			nested_release_page_clean(page);
+			nested_vmx_failInvalid(vcpu);
+>>>>>>> common/deprecated/android-3.18
 			skip_emulated_instruction(vcpu);
 			return 1;
 		}
 		kunmap(page);
+<<<<<<< HEAD
+=======
+		nested_release_page_clean(page);
+>>>>>>> common/deprecated/android-3.18
 		vmx->nested.vmxon_ptr = vmptr;
 		break;
 	case EXIT_REASON_VMCLEAR:
@@ -6254,6 +6514,10 @@ static void free_nested(struct vcpu_vmx *vmx)
 	if (!vmx->nested.vmxon)
 		return;
 
+<<<<<<< HEAD
+=======
+	hrtimer_cancel(&vmx->nested.preemption_timer);
+>>>>>>> common/deprecated/android-3.18
 	vmx->nested.vmxon = false;
 	nested_release_vmcs12(vmx);
 	if (enable_shadow_vmcs)
@@ -6523,6 +6787,10 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
 	unsigned long exit_qualification = vmcs_readl(EXIT_QUALIFICATION);
 	u32 vmx_instruction_info = vmcs_read32(VMX_INSTRUCTION_INFO);
 	gva_t gva = 0;
+<<<<<<< HEAD
+=======
+	struct x86_exception e;
+>>>>>>> common/deprecated/android-3.18
 
 	if (!nested_vmx_check_permission(vcpu) ||
 	    !nested_vmx_check_vmcs12(vcpu))
@@ -6549,8 +6817,18 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
 				vmx_instruction_info, &gva))
 			return 1;
 		/* _system ok, as nested_vmx_check_permission verified cpl=0 */
+<<<<<<< HEAD
 		kvm_write_guest_virt_system(&vcpu->arch.emulate_ctxt, gva,
 			     &field_value, (is_long_mode(vcpu) ? 8 : 4), NULL);
+=======
+		if (kvm_write_guest_virt_system(&vcpu->arch.emulate_ctxt, gva,
+						&field_value,
+						(is_long_mode(vcpu) ? 8 : 4),
+						&e)) {
+			kvm_inject_page_fault(vcpu, &e);
+			return 1;
+		}
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	nested_vmx_succeed(vcpu);
@@ -6719,9 +6997,16 @@ static int handle_invept(struct kvm_vcpu *vcpu)
 
 	types = (nested_vmx_ept_caps >> VMX_EPT_EXTENT_SHIFT) & 6;
 
+<<<<<<< HEAD
 	if (!(types & (1UL << type))) {
 		nested_vmx_failValid(vcpu,
 				VMXERR_INVALID_OPERAND_TO_INVEPT_INVVPID);
+=======
+	if (type >= 32 || !(types & (1 << type))) {
+		nested_vmx_failValid(vcpu,
+				VMXERR_INVALID_OPERAND_TO_INVEPT_INVVPID);
+		skip_emulated_instruction(vcpu);
+>>>>>>> common/deprecated/android-3.18
 		return 1;
 	}
 
@@ -6810,6 +7095,7 @@ static int (*const kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
 static const int kvm_vmx_max_exit_handlers =
 	ARRAY_SIZE(kvm_vmx_exit_handlers);
 
+<<<<<<< HEAD
 static bool nested_vmx_exit_handled_io(struct kvm_vcpu *vcpu,
 				       struct vmcs12 *vmcs12)
 {
@@ -6827,6 +7113,19 @@ static bool nested_vmx_exit_handled_io(struct kvm_vcpu *vcpu,
 	port = exit_qualification >> 16;
 	size = (exit_qualification & 7) + 1;
 
+=======
+/*
+ * Return true if an IO instruction with the specified port and size should cause
+ * a VM-exit into L1.
+ */
+bool nested_vmx_check_io_bitmaps(struct kvm_vcpu *vcpu, unsigned int port,
+				 int size)
+{
+	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
+	gpa_t bitmap, last_bitmap;
+	u8 b;
+
+>>>>>>> common/deprecated/android-3.18
 	last_bitmap = (gpa_t)-1;
 	b = -1;
 
@@ -6901,11 +7200,21 @@ static bool nested_vmx_exit_handled_cr(struct kvm_vcpu *vcpu,
 {
 	unsigned long exit_qualification = vmcs_readl(EXIT_QUALIFICATION);
 	int cr = exit_qualification & 15;
+<<<<<<< HEAD
 	int reg = (exit_qualification >> 8) & 15;
 	unsigned long val = kvm_register_readl(vcpu, reg);
 
 	switch ((exit_qualification >> 4) & 3) {
 	case 0: /* mov to cr */
+=======
+	int reg;
+	unsigned long val;
+
+	switch ((exit_qualification >> 4) & 3) {
+	case 0: /* mov to cr */
+		reg = (exit_qualification >> 8) & 15;
+		val = kvm_register_readl(vcpu, reg);
+>>>>>>> common/deprecated/android-3.18
 		switch (cr) {
 		case 0:
 			if (vmcs12->cr0_guest_host_mask &
@@ -6960,6 +7269,10 @@ static bool nested_vmx_exit_handled_cr(struct kvm_vcpu *vcpu,
 		 * lmsw can change bits 1..3 of cr0, and only set bit 0 of
 		 * cr0. Other attempted changes are ignored, with no exit.
 		 */
+<<<<<<< HEAD
+=======
+		val = (exit_qualification >> LMSW_SOURCE_DATA_SHIFT) & 0x0f;
+>>>>>>> common/deprecated/android-3.18
 		if (vmcs12->cr0_guest_host_mask & 0xe &
 		    (val ^ vmcs12->cr0_read_shadow))
 			return 1;
@@ -7000,7 +7313,11 @@ static bool nested_vmx_exit_handled(struct kvm_vcpu *vcpu)
 		return 1;
 	}
 
+<<<<<<< HEAD
 	switch (exit_reason) {
+=======
+	switch ((u16)exit_reason) {
+>>>>>>> common/deprecated/android-3.18
 	case EXIT_REASON_EXCEPTION_NMI:
 		if (!is_exception(intr_info))
 			return 0;
@@ -7022,8 +7339,11 @@ static bool nested_vmx_exit_handled(struct kvm_vcpu *vcpu)
 	case EXIT_REASON_TASK_SWITCH:
 		return 1;
 	case EXIT_REASON_CPUID:
+<<<<<<< HEAD
 		if (kvm_register_read(vcpu, VCPU_REGS_RAX) == 0xa)
 			return 0;
+=======
+>>>>>>> common/deprecated/android-3.18
 		return 1;
 	case EXIT_REASON_HLT:
 		return nested_cpu_has(vmcs12, CPU_BASED_HLT_EXITING);
@@ -7148,6 +7468,10 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu)
 	if ((vectoring_info & VECTORING_INFO_VALID_MASK) &&
 			(exit_reason != EXIT_REASON_EXCEPTION_NMI &&
 			exit_reason != EXIT_REASON_EPT_VIOLATION &&
+<<<<<<< HEAD
+=======
+			exit_reason != EXIT_REASON_APIC_ACCESS &&
+>>>>>>> common/deprecated/android-3.18
 			exit_reason != EXIT_REASON_TASK_SWITCH)) {
 		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
 		vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_DELIVERY_EV;
@@ -7207,6 +7531,15 @@ static void vmx_set_virtual_x2apic_mode(struct kvm_vcpu *vcpu, bool set)
 {
 	u32 sec_exec_control;
 
+<<<<<<< HEAD
+=======
+	/* Postpone execution until vmcs01 is the current VMCS. */
+	if (is_guest_mode(vcpu)) {
+		to_vmx(vcpu)->nested.change_vmcs01_virtual_x2apic_mode = true;
+		return;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * There is not point to enable virtualize x2apic without enable
 	 * apicv
@@ -7383,13 +7716,21 @@ static void vmx_handle_external_intr(struct kvm_vcpu *vcpu)
 			"pushf\n\t"
 			"orl $0x200, (%%" _ASM_SP ")\n\t"
 			__ASM_SIZE(push) " $%c[cs]\n\t"
+<<<<<<< HEAD
 			"call *%[entry]\n\t"
+=======
+			CALL_NOSPEC
+>>>>>>> common/deprecated/android-3.18
 			:
 #ifdef CONFIG_X86_64
 			[sp]"=&r"(tmp)
 #endif
 			:
+<<<<<<< HEAD
 			[entry]"r"(entry),
+=======
+			THUNK_TARGET(entry),
+>>>>>>> common/deprecated/android-3.18
 			[ss]"i"(__KERNEL_DS),
 			[cs]"i"(__KERNEL_CS)
 			);
@@ -7563,7 +7904,11 @@ static void __noclone vmx_vcpu_run(struct kvm_vcpu *vcpu)
 	if (test_bit(VCPU_REGS_RIP, (unsigned long *)&vcpu->arch.regs_dirty))
 		vmcs_writel(GUEST_RIP, vcpu->arch.regs[VCPU_REGS_RIP]);
 
+<<<<<<< HEAD
 	cr4 = read_cr4();
+=======
+	cr4 = cr4_read_shadow();
+>>>>>>> common/deprecated/android-3.18
 	if (unlikely(cr4 != vmx->host_state.vmcs_host_cr4)) {
 		vmcs_writel(HOST_CR4, cr4);
 		vmx->host_state.vmcs_host_cr4 = cr4;
@@ -7628,6 +7973,10 @@ static void __noclone vmx_vcpu_run(struct kvm_vcpu *vcpu)
 		/* Save guest registers, load host registers, keep flags */
 		"mov %0, %c[wordsize](%%" _ASM_SP ") \n\t"
 		"pop %0 \n\t"
+<<<<<<< HEAD
+=======
+		"setbe %c[fail](%0)\n\t"
+>>>>>>> common/deprecated/android-3.18
 		"mov %%" _ASM_AX ", %c[rax](%0) \n\t"
 		"mov %%" _ASM_BX ", %c[rbx](%0) \n\t"
 		__ASM_SIZE(pop) " %c[rcx](%0) \n\t"
@@ -7644,12 +7993,31 @@ static void __noclone vmx_vcpu_run(struct kvm_vcpu *vcpu)
 		"mov %%r13, %c[r13](%0) \n\t"
 		"mov %%r14, %c[r14](%0) \n\t"
 		"mov %%r15, %c[r15](%0) \n\t"
+<<<<<<< HEAD
+=======
+		"xor %%r8d,  %%r8d \n\t"
+		"xor %%r9d,  %%r9d \n\t"
+		"xor %%r10d, %%r10d \n\t"
+		"xor %%r11d, %%r11d \n\t"
+		"xor %%r12d, %%r12d \n\t"
+		"xor %%r13d, %%r13d \n\t"
+		"xor %%r14d, %%r14d \n\t"
+		"xor %%r15d, %%r15d \n\t"
+>>>>>>> common/deprecated/android-3.18
 #endif
 		"mov %%cr2, %%" _ASM_AX "   \n\t"
 		"mov %%" _ASM_AX ", %c[cr2](%0) \n\t"
 
+<<<<<<< HEAD
 		"pop  %%" _ASM_BP "; pop  %%" _ASM_DX " \n\t"
 		"setbe %c[fail](%0) \n\t"
+=======
+		"xor %%eax, %%eax \n\t"
+		"xor %%ebx, %%ebx \n\t"
+		"xor %%esi, %%esi \n\t"
+		"xor %%edi, %%edi \n\t"
+		"pop  %%" _ASM_BP "; pop  %%" _ASM_DX " \n\t"
+>>>>>>> common/deprecated/android-3.18
 		".pushsection .rodata \n\t"
 		".global vmx_return \n\t"
 		"vmx_return: " _ASM_PTR " 2b \n\t"
@@ -7686,6 +8054,12 @@ static void __noclone vmx_vcpu_run(struct kvm_vcpu *vcpu)
 #endif
 	      );
 
+<<<<<<< HEAD
+=======
+	/* Eliminate branch target predictions from guest mode */
+	vmexit_fill_RSB();
+
+>>>>>>> common/deprecated/android-3.18
 	/* MSR_IA32_DEBUGCTLMSR is zeroed on vmexit. Restore it if needed */
 	if (debugctlmsr)
 		update_debugctlmsr(debugctlmsr);
@@ -7748,14 +8122,37 @@ static void vmx_load_vmcs01(struct kvm_vcpu *vcpu)
 	put_cpu();
 }
 
+<<<<<<< HEAD
+=======
+/*
+ * Ensure that the current vmcs of the logical processor is the
+ * vmcs01 of the vcpu before calling free_nested().
+ */
+static void vmx_free_vcpu_nested(struct kvm_vcpu *vcpu)
+{
+       struct vcpu_vmx *vmx = to_vmx(vcpu);
+       int r;
+
+       r = vcpu_load(vcpu);
+       BUG_ON(r);
+       vmx_load_vmcs01(vcpu);
+       free_nested(vmx);
+       vcpu_put(vcpu);
+}
+
+>>>>>>> common/deprecated/android-3.18
 static void vmx_free_vcpu(struct kvm_vcpu *vcpu)
 {
 	struct vcpu_vmx *vmx = to_vmx(vcpu);
 
 	free_vpid(vmx);
 	leave_guest_mode(vcpu);
+<<<<<<< HEAD
 	vmx_load_vmcs01(vcpu);
 	free_nested(vmx);
+=======
+	vmx_free_vcpu_nested(vcpu);
+>>>>>>> common/deprecated/android-3.18
 	free_loaded_vmcs(vmx->loaded_vmcs);
 	kfree(vmx->guest_msrs);
 	kvm_vcpu_uninit(vcpu);
@@ -8237,6 +8634,14 @@ static void prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
 		vmcs_write64(VIRTUAL_APIC_PAGE_ADDR,
 				page_to_phys(vmx->nested.virtual_apic_page));
 		vmcs_write32(TPR_THRESHOLD, vmcs12->tpr_threshold);
+<<<<<<< HEAD
+=======
+	} else {
+#ifdef CONFIG_X86_64
+		exec_control |= CPU_BASED_CR8_LOAD_EXITING |
+				CPU_BASED_CR8_STORE_EXITING;
+#endif
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/*
@@ -8861,7 +9266,11 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
 	 * (KVM doesn't change it)- no reason to call set_cr4_guest_host_mask();
 	 */
 	vcpu->arch.cr4_guest_owned_bits = ~vmcs_readl(CR4_GUEST_HOST_MASK);
+<<<<<<< HEAD
 	kvm_set_cr4(vcpu, vmcs12->host_cr4);
+=======
+	vmx_set_cr4(vcpu, vmcs12->host_cr4);
+>>>>>>> common/deprecated/android-3.18
 
 	nested_ept_uninit_mmu_context(vcpu);
 
@@ -8886,6 +9295,11 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
 	vmcs_writel(GUEST_SYSENTER_EIP, vmcs12->host_ia32_sysenter_eip);
 	vmcs_writel(GUEST_IDTR_BASE, vmcs12->host_idtr_base);
 	vmcs_writel(GUEST_GDTR_BASE, vmcs12->host_gdtr_base);
+<<<<<<< HEAD
+=======
+	vmcs_write32(GUEST_IDTR_LIMIT, 0xFFFF);
+	vmcs_write32(GUEST_GDTR_LIMIT, 0xFFFF);
+>>>>>>> common/deprecated/android-3.18
 
 	/* If not VM_EXIT_CLEAR_BNDCFGS, the L2 value propagates to L1.  */
 	if (vmcs12->vm_exit_controls & VM_EXIT_CLEAR_BNDCFGS)
@@ -8998,6 +9412,15 @@ static void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 exit_reason,
 	/* Update TSC_OFFSET if TSC was changed while L2 ran */
 	vmcs_write64(TSC_OFFSET, vmx->nested.vmcs01_tsc_offset);
 
+<<<<<<< HEAD
+=======
+	if (vmx->nested.change_vmcs01_virtual_x2apic_mode) {
+		vmx->nested.change_vmcs01_virtual_x2apic_mode = false;
+		vmx_set_virtual_x2apic_mode(vcpu,
+				vcpu->arch.apic_base & X2APIC_ENABLE);
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	/* This is needed for same reason as it was needed in prepare_vmcs02 */
 	vmx->host_rsp = 0;
 
@@ -9039,8 +9462,15 @@ static void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 exit_reason,
  */
 static void vmx_leave_nested(struct kvm_vcpu *vcpu)
 {
+<<<<<<< HEAD
 	if (is_guest_mode(vcpu))
 		nested_vmx_vmexit(vcpu, -1, 0, 0);
+=======
+	if (is_guest_mode(vcpu)) {
+		to_vmx(vcpu)->nested.nested_run_pending = 0;
+		nested_vmx_vmexit(vcpu, -1, 0, 0);
+	}
+>>>>>>> common/deprecated/android-3.18
 	free_nested(to_vmx(vcpu));
 }
 
@@ -9120,6 +9550,10 @@ static struct kvm_x86_ops vmx_x86_ops = {
 	.cache_reg = vmx_cache_reg,
 	.get_rflags = vmx_get_rflags,
 	.set_rflags = vmx_set_rflags,
+<<<<<<< HEAD
+=======
+	.fpu_activate = vmx_fpu_activate,
+>>>>>>> common/deprecated/android-3.18
 	.fpu_deactivate = vmx_fpu_deactivate,
 
 	.tlb_flush = vmx_flush_tlb,
@@ -9232,12 +9666,16 @@ static int __init vmx_init(void)
 	memset(vmx_vmread_bitmap, 0xff, PAGE_SIZE);
 	memset(vmx_vmwrite_bitmap, 0xff, PAGE_SIZE);
 
+<<<<<<< HEAD
 	/*
 	 * Allow direct access to the PC debug port (it is often used for I/O
 	 * delays, but the vmexits simply slow things down).
 	 */
 	memset(vmx_io_bitmap_a, 0xff, PAGE_SIZE);
 	clear_bit(0x80, vmx_io_bitmap_a);
+=======
+	memset(vmx_io_bitmap_a, 0xff, PAGE_SIZE);
+>>>>>>> common/deprecated/android-3.18
 
 	memset(vmx_io_bitmap_b, 0xff, PAGE_SIZE);
 

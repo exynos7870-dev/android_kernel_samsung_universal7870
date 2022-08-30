@@ -139,11 +139,14 @@ struct ehci_regs {
 #define PORT_WKCONN_E	(1<<20)		/* wake on connect (enable) */
 /* 19:16 for port testing */
 #define PORT_TEST(x)	(((x)&0xf)<<16)	/* Port Test Control */
+<<<<<<< HEAD
 #ifdef CONFIG_HOST_COMPLIANT_TEST
 #define PORT_TEST_J			PORT_TEST(0x1)
 #define PORT_TEST_K			PORT_TEST(0x2)
 #define PORT_TEST_SE0_NAK		PORT_TEST(0x3)
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 #define PORT_TEST_PKT	PORT_TEST(0x4)	/* Port Test Control - packet test */
 #define PORT_TEST_FORCE	PORT_TEST(0x5)	/* Port Test Control - force enable */
 #define PORT_LED_OFF	(0<<14)
@@ -183,11 +186,19 @@ struct ehci_regs {
  * PORTSCx
  */
 	/* HOSTPC: offset 0x84 */
+<<<<<<< HEAD
 	u32		hostpc[1];	/* HOSTPC extension */
 #define HOSTPC_PHCD	(1<<22)		/* Phy clock disable */
 #define HOSTPC_PSPD	(3<<25)		/* Port speed detection */
 
 	u32		reserved5[16];
+=======
+	u32		hostpc[0];	/* HOSTPC extension */
+#define HOSTPC_PHCD	(1<<22)		/* Phy clock disable */
+#define HOSTPC_PSPD	(3<<25)		/* Port speed detection */
+
+	u32		reserved5[17];
+>>>>>>> common/deprecated/android-3.18
 
 	/* USBMODE_EX: offset 0xc8 */
 	u32		usbmode_ex;	/* USB Device mode extension */

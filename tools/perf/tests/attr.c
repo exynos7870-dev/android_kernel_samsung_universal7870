@@ -150,7 +150,11 @@ static int run_dir(const char *d, const char *perf)
 	snprintf(cmd, 3*PATH_MAX, PYTHON " %s/attr.py -d %s/attr/ -p %s %.*s",
 		 d, d, perf, vcnt, v);
 
+<<<<<<< HEAD
 	return system(cmd);
+=======
+	return system(cmd) ? TEST_FAIL : TEST_OK;
+>>>>>>> common/deprecated/android-3.18
 }
 
 int test__attr(void)

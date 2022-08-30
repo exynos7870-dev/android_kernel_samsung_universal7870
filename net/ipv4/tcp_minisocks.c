@@ -195,9 +195,16 @@ kill:
 				inet_twsk_put(tw);
 				return TCP_TW_SUCCESS;
 			}
+<<<<<<< HEAD
 		}
 		inet_twsk_schedule(tw, &tcp_death_row, TCP_TIMEWAIT_LEN,
 				   TCP_TIMEWAIT_LEN);
+=======
+		} else {
+			inet_twsk_schedule(tw, &tcp_death_row, TCP_TIMEWAIT_LEN,
+					   TCP_TIMEWAIT_LEN);
+		}
+>>>>>>> common/deprecated/android-3.18
 
 		if (tmp_opt.saw_tstamp) {
 			tcptw->tw_ts_recent	  = tmp_opt.rcv_tsval;
@@ -297,7 +304,11 @@ void tcp_time_wait(struct sock *sk, int state, int timeo)
 			tw->tw_v6_daddr = sk->sk_v6_daddr;
 			tw->tw_v6_rcv_saddr = sk->sk_v6_rcv_saddr;
 			tw->tw_tclass = np->tclass;
+<<<<<<< HEAD
 			tw->tw_flowlabel = np->flow_label >> 12;
+=======
+			tw->tw_flowlabel = be32_to_cpu(np->flow_label & IPV6_FLOWLABEL_MASK);
+>>>>>>> common/deprecated/android-3.18
 			tw->tw_ipv6only = sk->sk_ipv6only;
 		}
 #endif
@@ -432,6 +443,10 @@ struct sock *tcp_create_openreq_child(struct sock *sk, struct request_sock *req,
 		newtp->srtt_us = 0;
 		newtp->mdev_us = jiffies_to_usecs(TCP_TIMEOUT_INIT);
 		newicsk->icsk_rto = TCP_TIMEOUT_INIT;
+<<<<<<< HEAD
+=======
+		newicsk->icsk_ack.lrcvtime = tcp_time_stamp;
+>>>>>>> common/deprecated/android-3.18
 
 		newtp->packets_out = 0;
 		newtp->retrans_out = 0;
@@ -451,12 +466,20 @@ struct sock *tcp_create_openreq_child(struct sock *sk, struct request_sock *req,
 		newtp->snd_cwnd = TCP_INIT_CWND;
 		newtp->snd_cwnd_cnt = 0;
 
+<<<<<<< HEAD
 		if (!try_module_get(newicsk->icsk_ca_ops->owner))
+=======
+		if (!newicsk->icsk_ca_setsockopt ||
+		    !try_module_get(newicsk->icsk_ca_ops->owner))
+>>>>>>> common/deprecated/android-3.18
 			tcp_assign_congestion_control(newsk);
 
 		tcp_set_ca_state(newsk, TCP_CA_Open);
 		tcp_init_xmit_timers(newsk);
+<<<<<<< HEAD
 		__skb_queue_head_init(&newtp->out_of_order_queue);
+=======
+>>>>>>> common/deprecated/android-3.18
 		newtp->write_seq = newtp->pushed_seq = treq->snt_isn + 1;
 
 		newtp->rx_opt.saw_tstamp = 0;
@@ -508,6 +531,10 @@ struct sock *tcp_create_openreq_child(struct sock *sk, struct request_sock *req,
 			newicsk->icsk_ack.last_seg_size = skb->len - newtp->tcp_header_len;
 		newtp->rx_opt.mss_clamp = req->mss;
 		tcp_ecn_openreq_child(newtp, req);
+<<<<<<< HEAD
+=======
+		newtp->fastopen_req = NULL;
+>>>>>>> common/deprecated/android-3.18
 		newtp->fastopen_rsk = NULL;
 		newtp->syn_data_acked = 0;
 

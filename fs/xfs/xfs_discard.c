@@ -51,6 +51,16 @@ xfs_trim_extents(
 
 	pag = xfs_perag_get(mp, agno);
 
+<<<<<<< HEAD
+=======
+	/*
+	 * Force out the log.  This means any transactions that might have freed
+	 * space before we take the AGF buffer lock are now on disk, and the
+	 * volatile disk cache is flushed.
+	 */
+	xfs_log_force(mp, XFS_LOG_SYNC);
+
+>>>>>>> common/deprecated/android-3.18
 	error = xfs_alloc_read_agf(mp, NULL, agno, 0, &agbp);
 	if (error || !agbp)
 		goto out_put_perag;
@@ -58,6 +68,7 @@ xfs_trim_extents(
 	cur = xfs_allocbt_init_cursor(mp, NULL, agbp, agno, XFS_BTNUM_CNT);
 
 	/*
+<<<<<<< HEAD
 	 * Force out the log.  This means any transactions that might have freed
 	 * space before we took the AGF buffer lock are now on disk, and the
 	 * volatile disk cache is flushed.
@@ -65,6 +76,8 @@ xfs_trim_extents(
 	xfs_log_force(mp, XFS_LOG_SYNC);
 
 	/*
+=======
+>>>>>>> common/deprecated/android-3.18
 	 * Look up the longest btree in the AGF and start with it.
 	 */
 	error = xfs_alloc_lookup_ge(cur, 0,

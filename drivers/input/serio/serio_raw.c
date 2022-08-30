@@ -292,7 +292,11 @@ static irqreturn_t serio_raw_interrupt(struct serio *serio, unsigned char data,
 
 static int serio_raw_connect(struct serio *serio, struct serio_driver *drv)
 {
+<<<<<<< HEAD
 	static atomic_t serio_raw_no = ATOMIC_INIT(0);
+=======
+	static atomic_t serio_raw_no = ATOMIC_INIT(-1);
+>>>>>>> common/deprecated/android-3.18
 	struct serio_raw *serio_raw;
 	int err;
 
@@ -303,7 +307,11 @@ static int serio_raw_connect(struct serio *serio, struct serio_driver *drv)
 	}
 
 	snprintf(serio_raw->name, sizeof(serio_raw->name),
+<<<<<<< HEAD
 		 "serio_raw%ld", (long)atomic_inc_return(&serio_raw_no) - 1);
+=======
+		 "serio_raw%ld", (long)atomic_inc_return(&serio_raw_no));
+>>>>>>> common/deprecated/android-3.18
 	kref_init(&serio_raw->kref);
 	INIT_LIST_HEAD(&serio_raw->client_list);
 	init_waitqueue_head(&serio_raw->wait);

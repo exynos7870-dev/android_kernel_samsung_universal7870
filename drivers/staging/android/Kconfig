@@ -20,8 +20,14 @@ config ANDROID_BINDER_IPC
 	  between said processes.
 
 config ANDROID_BINDER_IPC_32BIT
+<<<<<<< HEAD
 	bool "Use old 32-bit binder api"
         default y if ANDROID_MAJOR_VERSION != "o"
+=======
+	bool
+	depends on !64BIT && ANDROID_BINDER_IPC
+	default y
+>>>>>>> common/deprecated/android-3.18
 	---help---
 	  The Binder API has been changed to support both 32 and 64bit
 	  applications in a mixed environment.
@@ -65,6 +71,7 @@ config ASHMEM
 	  It is, in theory, a good memory allocator for low-memory devices,
 	  because it can discard shared memory units when under memory pressure.
 
+<<<<<<< HEAD
 config ANDROID_LOGGER
 	tristate "Android log driver"
 	default n
@@ -83,6 +90,8 @@ config ANDROID_LOGGER
 	  optimized writes. This optimization avoids logging having too
 	  much overhead in the system.
 
+=======
+>>>>>>> common/deprecated/android-3.18
 config ANDROID_TIMED_OUTPUT
 	bool "Timed output class driver"
 	default y
@@ -106,6 +115,7 @@ config ANDROID_LOW_MEMORY_KILLER_AUTODETECT_OOM_ADJ_VALUES
 	  /sys/module/lowmemorykiller/parameters/adj and convert them
 	  to oom_score_adj values.
 
+<<<<<<< HEAD
 config ANDROID_INTF_ALARM_DEV
 	tristate "Android alarm driver"
 	depends on RTC_CLASS
@@ -115,6 +125,8 @@ config ANDROID_INTF_ALARM_DEV
 	  elapsed realtime, and a non-wakeup alarm on the monotonic clock.
 	  Also exports the alarm interface to user-space.
 
+=======
+>>>>>>> common/deprecated/android-3.18
 config SYNC
 	bool "Synchronization framework"
 	default n
@@ -143,9 +155,22 @@ config SW_SYNC_USER
 	  *WARNING* improper use of this can result in deadlocking kernel
 	  drivers from userspace.
 
+<<<<<<< HEAD
 source "drivers/staging/android/ion/Kconfig"
 
 source "drivers/staging/android/fiq_debugger/Kconfig"
+=======
+config ANDROID_VSOC
+	tristate "Android Virtual SoC support"
+	default n
+	depends on PCI_MSI
+	---help---
+	  This option adds support for the Virtual SoC driver needed to boot
+	  a 'cuttlefish' Android image inside QEmu. The driver interacts with
+	  a QEmu ivshmem device. If built as a module, it will be called vsoc.
+
+source "drivers/staging/android/ion/Kconfig"
+>>>>>>> common/deprecated/android-3.18
 
 endif # if ANDROID
 

@@ -3,8 +3,11 @@
 
 #include <linux/sched.h>
 
+<<<<<<< HEAD
 #if defined(CONFIG_SMP) || defined(CONFIG_SND_DEBUG)
 
+=======
+>>>>>>> common/deprecated/android-3.18
 typedef atomic_t snd_use_lock_t;
 
 /* initialize lock */
@@ -20,6 +23,7 @@ typedef atomic_t snd_use_lock_t;
 void snd_use_lock_sync_helper(snd_use_lock_t *lock, const char *file, int line);
 #define snd_use_lock_sync(lockp) snd_use_lock_sync_helper(lockp, __BASE_FILE__, __LINE__)
 
+<<<<<<< HEAD
 #else /* SMP || CONFIG_SND_DEBUG */
 
 typedef spinlock_t snd_use_lock_t;	/* dummy */
@@ -30,4 +34,6 @@ typedef spinlock_t snd_use_lock_t;	/* dummy */
 
 #endif /* SMP || CONFIG_SND_DEBUG */
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #endif /* __SND_SEQ_LOCK_H */

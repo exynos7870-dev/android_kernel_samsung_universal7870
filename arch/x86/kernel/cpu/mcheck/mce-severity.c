@@ -31,6 +31,10 @@
 
 enum context { IN_KERNEL = 1, IN_USER = 2 };
 enum ser { SER_REQUIRED = 1, NO_SER = 2 };
+<<<<<<< HEAD
+=======
+enum exception { EXCP_CONTEXT = 1, NO_EXCP = 2 };
+>>>>>>> common/deprecated/android-3.18
 
 static struct severity {
 	u64 mask;
@@ -40,6 +44,10 @@ static struct severity {
 	unsigned char mcgres;
 	unsigned char ser;
 	unsigned char context;
+<<<<<<< HEAD
+=======
+	unsigned char excp;
+>>>>>>> common/deprecated/android-3.18
 	unsigned char covered;
 	char *msg;
 } severities[] = {
@@ -48,6 +56,11 @@ static struct severity {
 #define  USER		.context = IN_USER
 #define  SER		.ser = SER_REQUIRED
 #define  NOSER		.ser = NO_SER
+<<<<<<< HEAD
+=======
+#define  EXCP		.excp = EXCP_CONTEXT
+#define  NOEXCP		.excp = NO_EXCP
+>>>>>>> common/deprecated/android-3.18
 #define  BITCLR(x)	.mask = x, .result = 0
 #define  BITSET(x)	.mask = x, .result = x
 #define  MCGMASK(x, y)	.mcgmask = x, .mcgres = y
@@ -62,7 +75,11 @@ static struct severity {
 		),
 	MCESEV(
 		NO, "Not enabled",
+<<<<<<< HEAD
 		BITCLR(MCI_STATUS_EN)
+=======
+		EXCP, BITCLR(MCI_STATUS_EN)
+>>>>>>> common/deprecated/android-3.18
 		),
 	MCESEV(
 		PANIC, "Processor context corrupt",
@@ -71,16 +88,32 @@ static struct severity {
 	/* When MCIP is not set something is very confused */
 	MCESEV(
 		PANIC, "MCIP not set in MCA handler",
+<<<<<<< HEAD
 		MCGMASK(MCG_STATUS_MCIP, 0)
+=======
+		EXCP, MCGMASK(MCG_STATUS_MCIP, 0)
+>>>>>>> common/deprecated/android-3.18
 		),
 	/* Neither return not error IP -- no chance to recover -> PANIC */
 	MCESEV(
 		PANIC, "Neither restart nor error IP",
+<<<<<<< HEAD
 		MCGMASK(MCG_STATUS_RIPV|MCG_STATUS_EIPV, 0)
 		),
 	MCESEV(
 		PANIC, "In kernel and no restart IP",
 		KERNEL, MCGMASK(MCG_STATUS_RIPV, 0)
+=======
+		EXCP, MCGMASK(MCG_STATUS_RIPV|MCG_STATUS_EIPV, 0)
+		),
+	MCESEV(
+		PANIC, "In kernel and no restart IP",
+		EXCP, KERNEL, MCGMASK(MCG_STATUS_RIPV, 0)
+		),
+	MCESEV(
+		DEFERRED, "Deferred error",
+		NOSER, MASK(MCI_STATUS_UC|MCI_STATUS_DEFERRED|MCI_STATUS_POISON, MCI_STATUS_DEFERRED)
+>>>>>>> common/deprecated/android-3.18
 		),
 	MCESEV(
 		KEEP, "Corrected error",
@@ -89,7 +122,11 @@ static struct severity {
 
 	/* ignore OVER for UCNA */
 	MCESEV(
+<<<<<<< HEAD
 		KEEP, "Uncorrected no action required",
+=======
+		UCNA, "Uncorrected no action required",
+>>>>>>> common/deprecated/android-3.18
 		SER, MASK(MCI_UC_SAR, MCI_STATUS_UC)
 		),
 	MCESEV(
@@ -124,6 +161,14 @@ static struct severity {
 		SER, MASK(MCI_STATUS_OVER|MCI_UC_SAR|MCI_ADDR|MCACOD, MCI_UC_SAR|MCI_ADDR|MCACOD_INSTR),
 		USER
 		),
+<<<<<<< HEAD
+=======
+	MCESEV(
+		PANIC, "Instruction fetch error in kernel",
+		SER, MASK(MCI_STATUS_OVER|MCI_UC_SAR|MCI_ADDR|MCACOD, MCI_UC_SAR|MCI_ADDR|MCACOD_INSTR),
+		KERNEL
+		),
+>>>>>>> common/deprecated/android-3.18
 #endif
 	MCESEV(
 		PANIC, "Action required: unknown MCACOD",
@@ -178,8 +223,14 @@ static int error_context(struct mce *m)
 	return ((m->cs & 3) == 3) ? IN_USER : IN_KERNEL;
 }
 
+<<<<<<< HEAD
 int mce_severity(struct mce *m, int tolerant, char **msg)
 {
+=======
+int mce_severity(struct mce *m, int tolerant, char **msg, bool is_excp)
+{
+	enum exception excp = (is_excp ? EXCP_CONTEXT : NO_EXCP);
+>>>>>>> common/deprecated/android-3.18
 	enum context ctx = error_context(m);
 	struct severity *s;
 
@@ -194,6 +245,11 @@ int mce_severity(struct mce *m, int tolerant, char **msg)
 			continue;
 		if (s->context && ctx != s->context)
 			continue;
+<<<<<<< HEAD
+=======
+		if (s->excp && excp != s->excp)
+			continue;
+>>>>>>> common/deprecated/android-3.18
 		if (msg)
 			*msg = s->msg;
 		s->covered = 1;

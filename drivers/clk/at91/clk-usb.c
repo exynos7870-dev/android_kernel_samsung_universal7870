@@ -59,7 +59,11 @@ static unsigned long at91sam9x5_clk_usb_recalc_rate(struct clk_hw *hw,
 static long at91sam9x5_clk_usb_determine_rate(struct clk_hw *hw,
 					      unsigned long rate,
 					      unsigned long *best_parent_rate,
+<<<<<<< HEAD
 					      struct clk_hw **best_parent_hw)
+=======
+					      struct clk **best_parent_hw)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct clk *parent = NULL;
 	long best_rate = -EINVAL;
@@ -81,6 +85,12 @@ static long at91sam9x5_clk_usb_determine_rate(struct clk_hw *hw,
 			tmp_parent_rate = rate * div;
 			tmp_parent_rate = __clk_round_rate(parent,
 							   tmp_parent_rate);
+<<<<<<< HEAD
+=======
+			if (!tmp_parent_rate)
+				continue;
+
+>>>>>>> common/deprecated/android-3.18
 			tmp_rate = DIV_ROUND_CLOSEST(tmp_parent_rate, div);
 			if (tmp_rate < rate)
 				tmp_diff = rate - tmp_rate;
@@ -91,7 +101,11 @@ static long at91sam9x5_clk_usb_determine_rate(struct clk_hw *hw,
 				best_rate = tmp_rate;
 				best_diff = tmp_diff;
 				*best_parent_rate = tmp_parent_rate;
+<<<<<<< HEAD
 				*best_parent_hw = __clk_get_hw(parent);
+=======
+				*best_parent_hw = parent;
+>>>>>>> common/deprecated/android-3.18
 			}
 
 			if (!best_diff || tmp_rate < rate)

@@ -43,7 +43,11 @@ static int ext4_journal_check_start(struct super_block *sb)
 	journal_t *journal;
 
 	might_sleep();
+<<<<<<< HEAD
 	if (sb->s_flags & MS_RDONLY && !ext4_journal_current_handle())
+=======
+	if (sb->s_flags & MS_RDONLY)
+>>>>>>> common/deprecated/android-3.18
 		return -EROFS;
 	WARN_ON(sb->s_writers.frozen == SB_FREEZE_COMPLETE);
 	journal = EXT4_SB(sb)->s_journal;
@@ -87,8 +91,19 @@ int __ext4_journal_stop(const char *where, unsigned int line, handle_t *handle)
 		ext4_put_nojournal(handle);
 		return 0;
 	}
+<<<<<<< HEAD
 	sb = handle->h_transaction->t_journal->j_private;
 	err = handle->h_err;
+=======
+
+	err = handle->h_err;
+	if (!handle->h_transaction) {
+		rc = jbd2_journal_stop(handle);
+		return err ? err : rc;
+	}
+
+	sb = handle->h_transaction->t_journal->j_private;
+>>>>>>> common/deprecated/android-3.18
 	rc = jbd2_journal_stop(handle);
 
 	if (!err)
@@ -252,9 +267,13 @@ int __ext4_handle_dirty_metadata(const char *where, unsigned int line,
 
 	might_sleep();
 
+<<<<<<< HEAD
 #ifndef CONFIG_JOURNAL_DATA_TAG
 	set_buffer_meta(bh);
 #endif
+=======
+	set_buffer_meta(bh);
+>>>>>>> common/deprecated/android-3.18
 	set_buffer_prio(bh);
 	if (ext4_handle_valid(handle)) {
 		err = jbd2_journal_dirty_metadata(handle, bh);
@@ -311,6 +330,7 @@ int __ext4_handle_dirty_super(const char *where, unsigned int line,
 	struct buffer_head *bh = EXT4_SB(sb)->s_sbh;
 	int err = 0;
 
+<<<<<<< HEAD
 	if (unlikely(le16_to_cpu(EXT4_SB(sb)->s_es->s_magic) !=
 			EXT4_SUPER_MAGIC)) {
 		print_bh(sb, bh, 0, EXT4_BLOCK_SIZE(sb));
@@ -319,6 +339,8 @@ int __ext4_handle_dirty_super(const char *where, unsigned int line,
 		return -EIO;
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	ext4_superblock_csum_set(sb);
 	if (ext4_handle_valid(handle)) {
 		err = jbd2_journal_dirty_metadata(handle, bh);

@@ -246,6 +246,12 @@ void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
 	struct hci_cp_read_local_amp_assoc cp;
 	struct amp_mgr *mgr = hcon->amp_mgr;
 
+<<<<<<< HEAD
+=======
+	if (!mgr)
+		return;
+
+>>>>>>> common/deprecated/android-3.18
 	cp.phy_handle = hcon->handle;
 	cp.len_so_far = cpu_to_le16(0);
 	cp.max_len = cpu_to_le16(hdev->amp_assoc_size);

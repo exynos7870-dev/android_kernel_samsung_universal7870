@@ -327,7 +327,11 @@ speed_t tty_termios_baud_rate(struct ktermios *termios)
 		else
 			cbaud += 15;
 	}
+<<<<<<< HEAD
 	return baud_table[cbaud];
+=======
+	return cbaud >= n_baud_table ? 0 : baud_table[cbaud];
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL(tty_termios_baud_rate);
 
@@ -363,7 +367,11 @@ speed_t tty_termios_input_baud_rate(struct ktermios *termios)
 		else
 			cbaud += 15;
 	}
+<<<<<<< HEAD
 	return baud_table[cbaud];
+=======
+	return cbaud >= n_baud_table ? 0 : baud_table[cbaud];
+>>>>>>> common/deprecated/android-3.18
 #else
 	return tty_termios_baud_rate(termios);
 #endif

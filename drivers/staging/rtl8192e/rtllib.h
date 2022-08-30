@@ -1614,7 +1614,11 @@ struct rtllib_network {
 	bool	bWithAironetIE;
 	bool	bCkipSupported;
 	bool	bCcxRmEnable;
+<<<<<<< HEAD
 	u16	CcxRmState[2];
+=======
+	u8	CcxRmState[2];
+>>>>>>> common/deprecated/android-3.18
 	bool	bMBssidValid;
 	u8	MBssidMask;
 	u8	MBssid[6];

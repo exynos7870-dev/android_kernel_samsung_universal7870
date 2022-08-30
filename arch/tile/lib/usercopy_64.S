@@ -20,6 +20,7 @@
 /* Access user memory, but use MMU to avoid propagating kernel exceptions. */
 
 /*
+<<<<<<< HEAD
  * strnlen_user_asm takes the pointer in r0, and the length bound in r1.
  * It returns the length, including the terminating NUL, or zero on exception.
  * If length is greater than the bound, returns one plus the bound.
@@ -66,6 +67,8 @@ strncpy_from_user_fault:
 	.popsection
 
 /*
+=======
+>>>>>>> common/deprecated/android-3.18
  * clear_user_asm takes the user target address in r0 and the
  * number of bytes to zero in r1.
  * It returns the number of uncopiable bytes (hopefully zero) in r0.

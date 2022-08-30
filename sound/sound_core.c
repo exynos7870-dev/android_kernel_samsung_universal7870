@@ -287,7 +287,12 @@ retry:
 				goto retry;
 			}
 			spin_unlock(&sound_loader_lock);
+<<<<<<< HEAD
 			return -EBUSY;
+=======
+			r = -EBUSY;
+			goto fail;
+>>>>>>> common/deprecated/android-3.18
 		}
 	}
 

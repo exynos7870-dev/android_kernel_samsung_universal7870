@@ -16,6 +16,7 @@ CFLAGS_REMOVE_ftrace.o = -pg
 CFLAGS_REMOVE_early_printk.o = -pg
 endif
 
+<<<<<<< HEAD
 KASAN_SANITIZE_head$(BITS).o := n
 KASAN_SANITIZE_dumpstack.o := n
 KASAN_SANITIZE_dumpstack_$(BITS).o := n
@@ -26,6 +27,8 @@ KASAN_SANITIZE_dumpstack_$(BITS).o := n
 # non-deterministic coverage.
 KCOV_INSTRUMENT		:= n
 
+=======
+>>>>>>> common/deprecated/android-3.18
 CFLAGS_irq.o := -I$(src)/../include/asm/trace
 
 obj-y			:= process_$(BITS).o signal.o entry_$(BITS).o
@@ -48,6 +51,10 @@ obj-y			+= alternative.o i8253.o pci-nommu.o hw_breakpoint.o
 obj-y			+= tsc.o tsc_msr.o io_delay.o rtc.o
 obj-y			+= pci-iommu_table.o
 obj-y			+= resource.o
+<<<<<<< HEAD
+=======
+obj-y			+= irqflags.o
+>>>>>>> common/deprecated/android-3.18
 
 obj-y				+= process.o
 obj-y				+= i387.o xsave.o

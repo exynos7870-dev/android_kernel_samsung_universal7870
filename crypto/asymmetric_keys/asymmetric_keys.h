@@ -11,6 +11,12 @@
 
 extern struct asymmetric_key_id *asymmetric_key_hex_to_key_id(const char *id);
 
+<<<<<<< HEAD
+=======
+extern int __asymmetric_key_hex_to_key_id(const char *id,
+					  struct asymmetric_key_id *match_id,
+					  size_t hexlen);
+>>>>>>> common/deprecated/android-3.18
 static inline
 const struct asymmetric_key_ids *asymmetric_key_ids(const struct key *key)
 {

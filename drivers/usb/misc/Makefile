@@ -17,7 +17,10 @@ obj-$(CONFIG_USB_LCD)			+= usblcd.o
 obj-$(CONFIG_USB_LD)			+= ldusb.o
 obj-$(CONFIG_USB_LED)			+= usbled.o
 obj-$(CONFIG_USB_LEGOTOWER)		+= legousbtower.o
+<<<<<<< HEAD
 obj-$(CONFIG_USB_RIO500)		+= rio500.o
+=======
+>>>>>>> common/deprecated/android-3.18
 obj-$(CONFIG_USB_TEST)			+= usbtest.o
 obj-$(CONFIG_USB_EHSET_TEST_FIXTURE)    += ehset.o
 obj-$(CONFIG_USB_TRANCEVIBRATOR)	+= trancevibrator.o

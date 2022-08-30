@@ -8,7 +8,11 @@ struct mt2063_config {
 	u32 refclock;
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_MEDIA_TUNER_MT2063)
+=======
+#if IS_REACHABLE(CONFIG_MEDIA_TUNER_MT2063)
+>>>>>>> common/deprecated/android-3.18
 struct dvb_frontend *mt2063_attach(struct dvb_frontend *fe,
 				   struct mt2063_config *config,
 				   struct i2c_adapter *i2c);

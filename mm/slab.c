@@ -659,6 +659,7 @@ static void start_cpu_timer(int cpu)
 
 static void init_arraycache(struct array_cache *ac, int limit, int batch)
 {
+<<<<<<< HEAD
 	/*
 	 * The array_cache structures contain pointers to free object.
 	 * However, when such objects are allocated or transferred to another
@@ -667,6 +668,8 @@ static void init_arraycache(struct array_cache *ac, int limit, int batch)
 	 * not scan such objects.
 	 */
 	kmemleak_no_scan(ac);
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (ac) {
 		ac->avail = 0;
 		ac->limit = limit;
@@ -682,6 +685,17 @@ static struct array_cache *alloc_arraycache(int node, int entries,
 	struct array_cache *ac = NULL;
 
 	ac = kmalloc_node(memsize, gfp, node);
+<<<<<<< HEAD
+=======
+	/*
+	 * The array_cache structures contain pointers to free object.
+	 * However, when such objects are allocated or transferred to another
+	 * cache the pointers are not cleared and they could be counted as
+	 * valid references during a kmemleak scan. Therefore, kmemleak must
+	 * not scan such objects.
+	 */
+	kmemleak_no_scan(ac);
+>>>>>>> common/deprecated/android-3.18
 	init_arraycache(ac, entries, batchcount);
 	return ac;
 }
@@ -869,8 +883,16 @@ static struct alien_cache *__alloc_alien_cache(int node, int entries,
 	struct alien_cache *alc = NULL;
 
 	alc = kmalloc_node(memsize, gfp, node);
+<<<<<<< HEAD
 	init_arraycache(&alc->ac, entries, batch);
 	spin_lock_init(&alc->lock);
+=======
+	if (alc) {
+		kmemleak_no_scan(alc);
+		init_arraycache(&alc->ac, entries, batch);
+		spin_lock_init(&alc->lock);
+	}
+>>>>>>> common/deprecated/android-3.18
 	return alc;
 }
 
@@ -2175,9 +2197,22 @@ __kmem_cache_create (struct kmem_cache *cachep, unsigned long flags)
 			size += BYTES_PER_WORD;
 	}
 #if FORCED_DEBUG && defined(CONFIG_DEBUG_PAGEALLOC)
+<<<<<<< HEAD
 	if (size >= kmalloc_size(INDEX_NODE + 1)
 	    && cachep->object_size > cache_line_size()
 	    && ALIGN(size, cachep->align) < PAGE_SIZE) {
+=======
+	/*
+	 * To activate debug pagealloc, off-slab management is necessary
+	 * requirement. In early phase of initialization, small sized slab
+	 * doesn't get initialized so it would not be possible. So, we need
+	 * to check size >= 256. It guarantees that all necessary small
+	 * sized slab is initialized in current slab initialization sequence.
+	 */
+	if (!slab_early_init && size >= kmalloc_size(INDEX_NODE) &&
+		size >= 256 && cachep->object_size > cache_line_size() &&
+		ALIGN(size, cachep->align) < PAGE_SIZE) {
+>>>>>>> common/deprecated/android-3.18
 		cachep->obj_offset += PAGE_SIZE - ALIGN(size, cachep->align);
 		size = PAGE_SIZE;
 	}
@@ -3888,7 +3923,12 @@ next:
 	next_reap_node();
 out:
 	/* Set up the next iteration */
+<<<<<<< HEAD
 	schedule_delayed_work(work, round_jiffies_relative(REAPTIMEOUT_AC));
+=======
+	schedule_delayed_work_on(smp_processor_id(), work,
+				round_jiffies_relative(REAPTIMEOUT_AC));
+>>>>>>> common/deprecated/android-3.18
 }
 
 #ifdef CONFIG_SLABINFO

@@ -303,14 +303,32 @@ int mgag200_fbdev_init(struct mga_device *mdev)
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
 	drm_fb_helper_single_add_all_connectors(&mfbdev->helper);
+=======
+	ret = drm_fb_helper_single_add_all_connectors(&mfbdev->helper);
+	if (ret)
+		goto fini;
+>>>>>>> common/deprecated/android-3.18
 
 	/* disable all the possible outputs/crtcs before entering KMS mode */
 	drm_helper_disable_unused_functions(mdev->dev);
 
+<<<<<<< HEAD
 	drm_fb_helper_initial_config(&mfbdev->helper, bpp_sel);
 
 	return 0;
+=======
+	ret = drm_fb_helper_initial_config(&mfbdev->helper, bpp_sel);
+	if (ret)
+		goto fini;
+
+	return 0;
+
+fini:
+	drm_fb_helper_fini(&mfbdev->helper);
+	return ret;
+>>>>>>> common/deprecated/android-3.18
 }
 
 void mgag200_fbdev_fini(struct mga_device *mdev)

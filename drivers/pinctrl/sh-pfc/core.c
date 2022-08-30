@@ -529,9 +529,20 @@ static int sh_pfc_probe(struct platform_device *pdev)
 		ret = info->ops->init(pfc);
 		if (ret < 0)
 			return ret;
+<<<<<<< HEAD
 	}
 
 	pinctrl_provide_dummies();
+=======
+
+		/* .init() may have overridden pfc->info */
+		info = pfc->info;
+	}
+
+	/* Enable dummy states for those platforms without pinctrl support */
+	if (!of_have_populated_dt())
+		pinctrl_provide_dummies();
+>>>>>>> common/deprecated/android-3.18
 
 	ret = sh_pfc_init_ranges(pfc);
 	if (ret < 0)

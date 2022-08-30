@@ -23,15 +23,21 @@
 #include <linux/dmaengine.h>
 #include <linux/amba/bus.h>
 #include <linux/amba/pl330.h>
+<<<<<<< HEAD
 #include <linux/pm_runtime.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 #include <linux/scatterlist.h>
 #include <linux/of.h>
 #include <linux/of_dma.h>
 #include <linux/err.h>
 
 #include "dmaengine.h"
+<<<<<<< HEAD
 #include <soc/samsung/exynos-pm.h>
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #define PL330_MAX_CHAN		8
 #define PL330_MAX_IRQS		32
 #define PL330_MAX_PERI		32
@@ -249,6 +255,7 @@ enum pl330_byteswap {
 #define MCODE_BUFF_PER_REQ	256
 
 /* Use this _only_ to wait on transient states */
+<<<<<<< HEAD
 #define UNTIL(t, s)	do {									\
 				unsigned long timeout = jiffies + msecs_to_jiffies(5);		\
 				bool timeout_flag = true;					\
@@ -261,6 +268,9 @@ enum pl330_byteswap {
 				} while (time_before(jiffies, timeout));			\
 				if (timeout_flag) pr_err("%s Timeout error!!!!\n", __func__);	\
 			} while (0)
+=======
+#define UNTIL(t, s)	while (!(_state(t) & (s))) cpu_relax();
+>>>>>>> common/deprecated/android-3.18
 
 #ifdef PL330_DEBUG_MCGEN
 static unsigned cmd_line;
@@ -327,8 +337,13 @@ struct pl330_reqcfg {
  * There may be more than one xfer in a request.
  */
 struct pl330_xfer {
+<<<<<<< HEAD
 	dma_addr_t src_addr;
 	dma_addr_t dst_addr;
+=======
+	u32 src_addr;
+	u32 dst_addr;
+>>>>>>> common/deprecated/android-3.18
 	/* Size to xfer */
 	u32 bytes;
 };
@@ -389,8 +404,11 @@ struct pl330_thread {
 	unsigned lstenq;
 	/* Index of the last submitted request or -1 if the DMA is stopped */
 	int req_running;
+<<<<<<< HEAD
 	void __iomem *ar_wrapper;
 	void __iomem *aw_wrapper;
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 enum pl330_dmac_state {
@@ -475,12 +493,15 @@ struct pl330_dmac {
 	unsigned mcbufsz;
 	/* ioremap'ed address of PL330 registers. */
 	void __iomem	*base;
+<<<<<<< HEAD
 	/* Used the DMA wrapper */
 	bool wrapper;
 	/* Notifier block for powermode */
 	struct notifier_block lpa_nb;
 	void __iomem *inst_wrapper;
 	int 			usage_count;
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* Populated by the PL330 core driver during pl330_add */
 	struct pl330_config	pcfg;
 
@@ -530,7 +551,10 @@ struct dma_pl330_desc {
 	unsigned peri:5;
 	/* Hook to attach to DMAC's list of reqs with due callback */
 	struct list_head rqd;
+<<<<<<< HEAD
 	unsigned int infiniteloop;
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 struct _xfer_spec {
@@ -538,6 +562,7 @@ struct _xfer_spec {
 	struct dma_pl330_desc *desc;
 };
 
+<<<<<<< HEAD
 static inline void put_unaligned_le32(u32 val, u8 *p)
 {
 	*p++ = val;
@@ -551,6 +576,8 @@ static inline u32 get_unaligned_le32(u8 *p)
 	return p[0] | p[1] << 8 | p[2] << 16 | p[3] << 24;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static inline bool _queue_empty(struct pl330_thread *thrd)
 {
 	return thrd->req[0].desc == NULL && thrd->req[1].desc == NULL;
@@ -605,7 +632,11 @@ static inline u32 _emit_END(unsigned dry_run, u8 buf[])
 	return SZ_DMAEND;
 }
 
+<<<<<<< HEAD
 static inline int _emit_FLUSHP(unsigned dry_run, u8 buf[], u8 peri)
+=======
+static inline u32 _emit_FLUSHP(unsigned dry_run, u8 buf[], u8 peri)
+>>>>>>> common/deprecated/android-3.18
 {
 	if (dry_run)
 		return SZ_DMAFLUSHP;
@@ -660,7 +691,11 @@ static inline u32 _emit_LDP(unsigned dry_run, u8 buf[],
 	return SZ_DMALDP;
 }
 
+<<<<<<< HEAD
 static inline int _emit_LP(unsigned dry_run, u8 buf[],
+=======
+static inline u32 _emit_LP(unsigned dry_run, u8 buf[],
+>>>>>>> common/deprecated/android-3.18
 		unsigned loop, u8 cnt)
 {
 	if (dry_run)
@@ -686,7 +721,11 @@ struct _arg_LPEND {
 	u8 bjump;
 };
 
+<<<<<<< HEAD
 static inline int _emit_LPEND(unsigned dry_run, u8 buf[],
+=======
+static inline u32 _emit_LPEND(unsigned dry_run, u8 buf[],
+>>>>>>> common/deprecated/android-3.18
 		const struct _arg_LPEND *arg)
 {
 	enum pl330_cond cond = arg->cond;
@@ -731,7 +770,11 @@ static inline u32 _emit_KILL(unsigned dry_run, u8 buf[])
 	return SZ_DMAKILL;
 }
 
+<<<<<<< HEAD
 static inline int _emit_MOV(unsigned dry_run, u8 buf[],
+=======
+static inline u32 _emit_MOV(unsigned dry_run, u8 buf[],
+>>>>>>> common/deprecated/android-3.18
 		enum dmamov_dst dst, u32 val)
 {
 	if (dry_run)
@@ -739,8 +782,12 @@ static inline int _emit_MOV(unsigned dry_run, u8 buf[],
 
 	buf[0] = CMD_DMAMOV;
 	buf[1] = dst;
+<<<<<<< HEAD
 
 	put_unaligned_le32(val, &buf[2]);
+=======
+	*((u32 *)&buf[2]) = val;
+>>>>>>> common/deprecated/android-3.18
 
 	PL330_DBGCMD_DUMP(SZ_DMAMOV, "\tDMAMOV %s 0x%x\n",
 		dst == SAR ? "SAR" : (dst == DAR ? "DAR" : "CCR"), val);
@@ -772,7 +819,11 @@ static inline u32 _emit_RMB(unsigned dry_run, u8 buf[])
 	return SZ_DMARMB;
 }
 
+<<<<<<< HEAD
 static inline int _emit_SEV(unsigned dry_run, u8 buf[], u8 ev)
+=======
+static inline u32 _emit_SEV(unsigned dry_run, u8 buf[], u8 ev)
+>>>>>>> common/deprecated/android-3.18
 {
 	if (dry_run)
 		return SZ_DMASEV;
@@ -918,26 +969,51 @@ static inline u32 _emit_GO(unsigned dry_run, u8 buf[],
 
 	buf[1] = chan & 0x7;
 
+<<<<<<< HEAD
 	put_unaligned_le32(addr, &buf[2]);
+=======
+	*((u32 *)&buf[2]) = addr;
+>>>>>>> common/deprecated/android-3.18
 
 	return SZ_DMAGO;
 }
 
+<<<<<<< HEAD
+=======
+#define msecs_to_loops(t) (loops_per_jiffy / 1000 * HZ * t)
+
+>>>>>>> common/deprecated/android-3.18
 /* Returns Time-Out */
 static bool _until_dmac_idle(struct pl330_thread *thrd)
 {
 	void __iomem *regs = thrd->dmac->base;
+<<<<<<< HEAD
 	unsigned long timeout = jiffies + msecs_to_jiffies(5);
+=======
+	unsigned long loops = msecs_to_loops(5);
+>>>>>>> common/deprecated/android-3.18
 
 	do {
 		/* Until Manager is Idle */
 		if (!(readl(regs + DBGSTATUS) & DBG_BUSY))
+<<<<<<< HEAD
 			return false;
 
 		cpu_relax();
 	} while (time_before(jiffies, timeout));
 
 	return true;
+=======
+			break;
+
+		cpu_relax();
+	} while (--loops);
+
+	if (!loops)
+		return true;
+
+	return false;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static inline void _execute_DBGINSN(struct pl330_thread *thrd,
@@ -953,7 +1029,11 @@ static inline void _execute_DBGINSN(struct pl330_thread *thrd,
 	}
 	writel(val, regs + DBGINST0);
 
+<<<<<<< HEAD
 	val = get_unaligned_le32(&insn[2]);
+=======
+	val = *((u32 *)&insn[2]);
+>>>>>>> common/deprecated/android-3.18
 	writel(val, regs + DBGINST1);
 
 	/* If timed out due to halted state-machine */
@@ -1028,6 +1108,10 @@ static void _stop(struct pl330_thread *thrd)
 {
 	void __iomem *regs = thrd->dmac->base;
 	u8 insn[6] = {0, 0, 0, 0, 0, 0};
+<<<<<<< HEAD
+=======
+	u32 inten = readl(regs + INTEN);
+>>>>>>> common/deprecated/android-3.18
 
 	if (_state(thrd) == PL330_STATE_FAULT_COMPLETING)
 		UNTIL(thrd, PL330_STATE_FAULTING | PL330_STATE_KILLING);
@@ -1040,11 +1124,21 @@ static void _stop(struct pl330_thread *thrd)
 
 	_emit_KILL(0, insn);
 
+<<<<<<< HEAD
 	/* Stop generating interrupts and clear pending interrupts for SEV */
 	writel(readl(regs + INTEN) & ~(1 << thrd->ev), regs + INTEN);
 	writel(1 << thrd->ev, regs + INTCLR);
 
 	_execute_DBGINSN(thrd, insn, is_manager(thrd));
+=======
+	_execute_DBGINSN(thrd, insn, is_manager(thrd));
+
+	/* clear the event */
+	if (inten & (1 << thrd->ev))
+		writel(1 << thrd->ev, regs + INTCLR);
+	/* Stop generating interrupts for SEV */
+	writel(inten & ~(1 << thrd->ev), regs + INTEN);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /* Start doing req 'idx' of thread 'thrd' */
@@ -1109,14 +1203,22 @@ static bool _start(struct pl330_thread *thrd)
 		UNTIL(thrd, PL330_STATE_FAULTING | PL330_STATE_KILLING);
 
 		if (_state(thrd) == PL330_STATE_KILLING)
+<<<<<<< HEAD
 			UNTIL(thrd, PL330_STATE_STOPPED);
+=======
+			UNTIL(thrd, PL330_STATE_STOPPED)
+>>>>>>> common/deprecated/android-3.18
 
 	case PL330_STATE_FAULTING:
 		_stop(thrd);
 
 	case PL330_STATE_KILLING:
 	case PL330_STATE_COMPLETING:
+<<<<<<< HEAD
 		UNTIL(thrd, PL330_STATE_STOPPED);
+=======
+		UNTIL(thrd, PL330_STATE_STOPPED)
+>>>>>>> common/deprecated/android-3.18
 
 	case PL330_STATE_STOPPED:
 		return _trigger(thrd);
@@ -1163,11 +1265,18 @@ static inline int _ldst_devtomem(unsigned dry_run, u8 buf[],
 		const struct _xfer_spec *pxs, int cyc)
 {
 	int off = 0;
+<<<<<<< HEAD
 	enum pl330_cond cond = (pxs->desc->rqcfg.brst_len == 1) ? SINGLE : BURST;
 
 	while (cyc--) {
 		off += _emit_WFP(dry_run, &buf[off], cond, pxs->desc->peri);
 		off += _emit_LDP(dry_run, &buf[off], cond, pxs->desc->peri);
+=======
+
+	while (cyc--) {
+		off += _emit_WFP(dry_run, &buf[off], SINGLE, pxs->desc->peri);
+		off += _emit_LDP(dry_run, &buf[off], SINGLE, pxs->desc->peri);
+>>>>>>> common/deprecated/android-3.18
 		off += _emit_ST(dry_run, &buf[off], ALWAYS);
 		off += _emit_FLUSHP(dry_run, &buf[off], pxs->desc->peri);
 	}
@@ -1179,12 +1288,20 @@ static inline int _ldst_memtodev(unsigned dry_run, u8 buf[],
 		const struct _xfer_spec *pxs, int cyc)
 {
 	int off = 0;
+<<<<<<< HEAD
 	enum pl330_cond cond = (pxs->desc->rqcfg.brst_len == 1) ? SINGLE : BURST;
 
 	while (cyc--) {
 		off += _emit_WFP(dry_run, &buf[off], cond, pxs->desc->peri);
 		off += _emit_LD(dry_run, &buf[off], ALWAYS);
 		off += _emit_STP(dry_run, &buf[off], cond, pxs->desc->peri);
+=======
+
+	while (cyc--) {
+		off += _emit_WFP(dry_run, &buf[off], SINGLE, pxs->desc->peri);
+		off += _emit_LD(dry_run, &buf[off], ALWAYS);
+		off += _emit_STP(dry_run, &buf[off], SINGLE, pxs->desc->peri);
+>>>>>>> common/deprecated/android-3.18
 		off += _emit_FLUSHP(dry_run, &buf[off], pxs->desc->peri);
 	}
 
@@ -1214,6 +1331,7 @@ static int _bursts(unsigned dry_run, u8 buf[],
 	return off;
 }
 
+<<<<<<< HEAD
 /* Returns bytes consumed */
 static inline int _loop_infiniteloop(unsigned dry_run, u8 buf[],
 		unsigned long bursts, const struct _xfer_spec *pxs, int ev)
@@ -1285,6 +1403,8 @@ static inline int _loop_infiniteloop(unsigned dry_run, u8 buf[],
 	return off;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /* Returns bytes consumed and updates bursts */
 static inline int _loop(unsigned dry_run, u8 buf[],
 		unsigned long *bursts, const struct _xfer_spec *pxs)
@@ -1364,6 +1484,7 @@ static inline int _loop(unsigned dry_run, u8 buf[],
 	return off;
 }
 
+<<<<<<< HEAD
 static inline int _setup_xfer_infiniteloop(unsigned dry_run, u8 buf[],
 		const struct _xfer_spec *pxs, int ev)
 {
@@ -1378,6 +1499,8 @@ static inline int _setup_xfer_infiniteloop(unsigned dry_run, u8 buf[],
 	return off;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static inline int _setup_loops(unsigned dry_run, u8 buf[],
 		const struct _xfer_spec *pxs)
 {
@@ -1434,6 +1557,7 @@ static int _setup_req(unsigned dry_run, struct pl330_thread *thrd,
 	if (x->bytes % (BRST_SIZE(pxs->ccr) * BRST_LEN(pxs->ccr)))
 		return -EINVAL;
 
+<<<<<<< HEAD
 	if (!pxs->desc->infiniteloop) {
 		off += _setup_xfer(dry_run, &buf[off], pxs);
 
@@ -1446,6 +1570,14 @@ static int _setup_req(unsigned dry_run, struct pl330_thread *thrd,
 				pxs, thrd->ev);
 	}
 
+=======
+	off += _setup_xfer(dry_run, &buf[off], pxs);
+
+	/* DMASEV peripheral/event */
+	off += _emit_SEV(dry_run, &buf[off], thrd->ev);
+	/* DMAEND */
+	off += _emit_END(dry_run, &buf[off]);
+>>>>>>> common/deprecated/android-3.18
 
 	return off;
 }
@@ -1496,7 +1628,10 @@ static int pl330_submit_req(struct pl330_thread *thrd,
 	unsigned idx;
 	u32 ccr;
 	int ret = 0;
+<<<<<<< HEAD
 	struct device_node *np = thrd->dmac->ddma.dev->of_node;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	if (pl330->state == DYING
 		|| pl330->dmac_tbd.reset_chan & (1 << thrd->id)) {
@@ -1551,11 +1686,14 @@ static int pl330_submit_req(struct pl330_thread *thrd,
 	thrd->req[idx].desc = desc;
 	_setup_req(0, thrd, idx, &xs);
 
+<<<<<<< HEAD
 	if (np && pl330->wrapper) {
 		__raw_writel((xs.desc->px.src_addr >> 32) & 0xf, thrd->ar_wrapper);
 		__raw_writel((xs.desc->px.dst_addr >> 32) & 0xf, thrd->aw_wrapper);
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	ret = 0;
 
 xfer_exit:
@@ -1564,8 +1702,11 @@ xfer_exit:
 	return ret;
 }
 
+<<<<<<< HEAD
 static void pl330_tasklet(unsigned long data);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static void dma_pl330_rqcb(struct dma_pl330_desc *desc, enum pl330_op_err err)
 {
 	struct dma_pl330_chan *pch;
@@ -1577,7 +1718,11 @@ static void dma_pl330_rqcb(struct dma_pl330_desc *desc, enum pl330_op_err err)
 	pch = desc->pchan;
 
 	/* If desc aborted */
+<<<<<<< HEAD
 	if (!pch || !pch->thread)
+=======
+	if (!pch)
+>>>>>>> common/deprecated/android-3.18
 		return;
 
 	spin_lock_irqsave(&pch->lock, flags);
@@ -1586,10 +1731,14 @@ static void dma_pl330_rqcb(struct dma_pl330_desc *desc, enum pl330_op_err err)
 
 	spin_unlock_irqrestore(&pch->lock, flags);
 
+<<<<<<< HEAD
 	if (desc->infiniteloop)
 		pl330_tasklet((unsigned long)pch);
 	else
 		tasklet_schedule(&pch->task);
+=======
+	tasklet_schedule(&pch->task);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void pl330_dotask(unsigned long data)
@@ -1600,12 +1749,15 @@ static void pl330_dotask(unsigned long data)
 
 	spin_lock_irqsave(&pl330->lock, flags);
 
+<<<<<<< HEAD
 	if (!pl330->usage_count) {
 		pr_info("[%s] Channel is already free!\n",__func__);
 		spin_unlock_irqrestore(&pl330->lock, flags);
 		return;
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* The DMAC itself gone nuts */
 	if (pl330->dmac_tbd.reset_dmac) {
 		pl330->state = DYING;
@@ -1659,7 +1811,11 @@ static void pl330_dotask(unsigned long data)
 /* Returns 1 if state was updated, 0 otherwise */
 static int pl330_update(struct pl330_dmac *pl330)
 {
+<<<<<<< HEAD
 	struct dma_pl330_desc *descdone, *tmp;
+=======
+	struct dma_pl330_desc *descdone;
+>>>>>>> common/deprecated/android-3.18
 	unsigned long flags;
 	void __iomem *regs;
 	u32 val;
@@ -1669,12 +1825,15 @@ static int pl330_update(struct pl330_dmac *pl330)
 
 	spin_lock_irqsave(&pl330->lock, flags);
 
+<<<<<<< HEAD
 	if (!pl330->usage_count) {
 		dev_err(pl330->ddma.dev, "%s:%d event is not exist!\n", __func__, __LINE__);
 		spin_unlock_irqrestore(&pl330->lock, flags);
 		return 0;
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	val = readl(regs + FSM) & 0x1;
 	if (val)
 		pl330->dmac_tbd.reset_mngr = true;
@@ -1722,9 +1881,12 @@ static int pl330_update(struct pl330_dmac *pl330)
 
 			id = pl330->events[ev];
 
+<<<<<<< HEAD
 			if (id == -1)
 				continue;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 			thrd = &pl330->channels[id];
 
 			active = thrd->req_running;
@@ -1733,6 +1895,7 @@ static int pl330_update(struct pl330_dmac *pl330)
 
 			/* Detach the req */
 			descdone = thrd->req[active].desc;
+<<<<<<< HEAD
 
 			if (!descdone->infiniteloop) {
 				thrd->req[active].desc = NULL;
@@ -1740,6 +1903,12 @@ static int pl330_update(struct pl330_dmac *pl330)
 				/* Get going again ASAP */
 				_start(thrd);
 			}
+=======
+			thrd->req[active].desc = NULL;
+
+			/* Get going again ASAP */
+			_start(thrd);
+>>>>>>> common/deprecated/android-3.18
 
 			/* For now, just make a list of callbacks to be done */
 			list_add_tail(&descdone->rqd, &pl330->req_done);
@@ -1747,7 +1916,13 @@ static int pl330_update(struct pl330_dmac *pl330)
 	}
 
 	/* Now that we are in no hurry, do the callbacks */
+<<<<<<< HEAD
 	list_for_each_entry_safe(descdone, tmp, &pl330->req_done, rqd) {
+=======
+	while (!list_empty(&pl330->req_done)) {
+		descdone = list_first_entry(&pl330->req_done,
+					    struct dma_pl330_desc, rqd);
+>>>>>>> common/deprecated/android-3.18
 		list_del(&descdone->rqd);
 		spin_unlock_irqrestore(&pl330->lock, flags);
 		dma_pl330_rqcb(descdone, PL330_ERR_NONE);
@@ -1793,7 +1968,10 @@ static bool _chan_ns(const struct pl330_dmac *pl330, int i)
 static struct pl330_thread *pl330_request_channel(struct pl330_dmac *pl330)
 {
 	struct pl330_thread *thrd = NULL;
+<<<<<<< HEAD
 	unsigned long flags;
+=======
+>>>>>>> common/deprecated/android-3.18
 	int chans, i;
 
 	if (pl330->state == DYING)
@@ -1801,8 +1979,11 @@ static struct pl330_thread *pl330_request_channel(struct pl330_dmac *pl330)
 
 	chans = pl330->pcfg.num_chan;
 
+<<<<<<< HEAD
 	spin_lock_irqsave(&pl330->lock, flags);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	for (i = 0; i < chans; i++) {
 		thrd = &pl330->channels[i];
 		if ((thrd->free) && (!_manager_ns(thrd) ||
@@ -1814,15 +1995,21 @@ static struct pl330_thread *pl330_request_channel(struct pl330_dmac *pl330)
 				thrd->req[0].desc = NULL;
 				thrd->req[1].desc = NULL;
 				thrd->req_running = -1;
+<<<<<<< HEAD
 				pl330->usage_count++;
+=======
+>>>>>>> common/deprecated/android-3.18
 				break;
 			}
 		}
 		thrd = NULL;
 	}
 
+<<<<<<< HEAD
 	spin_unlock_irqrestore(&pl330->lock, flags);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	return thrd;
 }
 
@@ -1833,16 +2020,24 @@ static inline void _free_event(struct pl330_thread *thrd, int ev)
 
 	/* If the event is valid and was held by the thread */
 	if (ev >= 0 && ev < pl330->pcfg.num_events
+<<<<<<< HEAD
 			&& pl330->events[ev] == thrd->id) {
 		pl330->events[ev] = -1;
 		pl330->usage_count--;
 	}
+=======
+			&& pl330->events[ev] == thrd->id)
+		pl330->events[ev] = -1;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void pl330_release_channel(struct pl330_thread *thrd)
 {
 	struct pl330_dmac *pl330;
+<<<<<<< HEAD
 	unsigned long flags;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	if (!thrd || thrd->free)
 		return;
@@ -1854,10 +2049,15 @@ static void pl330_release_channel(struct pl330_thread *thrd)
 
 	pl330 = thrd->dmac;
 
+<<<<<<< HEAD
 	spin_lock_irqsave(&pl330->lock, flags);
 	_free_event(thrd, thrd->ev);
 	thrd->free = true;
 	spin_unlock_irqrestore(&pl330->lock, flags);
+=======
+	_free_event(thrd, thrd->ev);
+	thrd->free = true;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /* Initialize the structure for PL330 configuration, that can be used
@@ -1943,6 +2143,7 @@ static int dmac_alloc_threads(struct pl330_dmac *pl330)
 		thrd->dmac = pl330;
 		_reset_thread(thrd);
 		thrd->free = true;
+<<<<<<< HEAD
 
 		if (pl330->ddma.dev->of_node && pl330->wrapper) {
 			thrd->ar_wrapper = of_dma_get_arwrapper_address(
@@ -1950,6 +2151,8 @@ static int dmac_alloc_threads(struct pl330_dmac *pl330)
 			thrd->aw_wrapper = of_dma_get_awwrapper_address(
 					pl330->ddma.dev->of_node, i);
 		}
+=======
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/* MANAGER is indexed at the end */
@@ -1966,6 +2169,7 @@ static int dmac_alloc_resources(struct pl330_dmac *pl330)
 {
 	int chans = pl330->pcfg.num_chan;
 	int ret;
+<<<<<<< HEAD
 	dma_addr_t addr;
 
 	if (pl330->ddma.dev->of_node) {
@@ -1978,6 +2182,8 @@ static int dmac_alloc_resources(struct pl330_dmac *pl330)
 		if (pl330->wrapper)
 			pl330->inst_wrapper = of_dma_get_instwrapper_address(pl330->ddma.dev->of_node);
 	}
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * Alloc MicroCode buffer for 'chans' Channel threads.
@@ -1986,10 +2192,13 @@ static int dmac_alloc_resources(struct pl330_dmac *pl330)
 	pl330->mcode_cpu = dma_alloc_coherent(pl330->ddma.dev,
 				chans * pl330->mcbufsz,
 				&pl330->mcode_bus, GFP_KERNEL);
+<<<<<<< HEAD
 
 	if (pl330->inst_wrapper)
 		__raw_writel((pl330->mcode_bus >> 32) & 0xf, pl330->inst_wrapper);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (!pl330->mcode_cpu) {
 		dev_err(pl330->ddma.dev, "%s:%d Can't allocate memory!\n",
 			__func__, __LINE__);
@@ -2054,7 +2263,10 @@ static int pl330_add(struct pl330_dmac *pl330)
 	tasklet_init(&pl330->tasks, pl330_dotask, (unsigned long) pl330);
 
 	pl330->state = INIT;
+<<<<<<< HEAD
 	pl330->usage_count = 0;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }
@@ -2141,10 +2353,13 @@ static void pl330_tasklet(unsigned long data)
 	struct dma_pl330_desc *desc, *_dt;
 	unsigned long flags;
 
+<<<<<<< HEAD
 	/* If pch and thread is empty */
 	if (!pch || !pch->thread)
 		return;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	spin_lock_irqsave(&pch->lock, flags);
 
 	/* Pick up ripe tomatoes */
@@ -2230,24 +2445,36 @@ static int pl330_alloc_chan_resources(struct dma_chan *chan)
 	struct pl330_dmac *pl330 = pch->dmac;
 	unsigned long flags;
 
+<<<<<<< HEAD
 #ifdef CONFIG_PM_RUNTIME
 	pm_runtime_get_sync(pl330->ddma.dev);
 #endif
 
 	spin_lock_irqsave(&pch->lock, flags);
+=======
+	spin_lock_irqsave(&pl330->lock, flags);
+>>>>>>> common/deprecated/android-3.18
 
 	dma_cookie_init(chan);
 	pch->cyclic = false;
 
 	pch->thread = pl330_request_channel(pl330);
 	if (!pch->thread) {
+<<<<<<< HEAD
 		spin_unlock_irqrestore(&pch->lock, flags);
+=======
+		spin_unlock_irqrestore(&pl330->lock, flags);
+>>>>>>> common/deprecated/android-3.18
 		return -ENOMEM;
 	}
 
 	tasklet_init(&pch->task, pl330_tasklet, (unsigned long) pch);
 
+<<<<<<< HEAD
 	spin_unlock_irqrestore(&pch->lock, flags);
+=======
+	spin_unlock_irqrestore(&pl330->lock, flags);
+>>>>>>> common/deprecated/android-3.18
 
 	return 1;
 }
@@ -2324,11 +2551,19 @@ static int pl330_control(struct dma_chan *chan, enum dma_ctrl_cmd cmd, unsigned 
 static void pl330_free_chan_resources(struct dma_chan *chan)
 {
 	struct dma_pl330_chan *pch = to_pchan(chan);
+<<<<<<< HEAD
+=======
+	struct pl330_dmac *pl330 = pch->dmac;
+>>>>>>> common/deprecated/android-3.18
 	unsigned long flags;
 
 	tasklet_kill(&pch->task);
 
+<<<<<<< HEAD
 	spin_lock_irqsave(&pch->lock, flags);
+=======
+	spin_lock_irqsave(&pl330->lock, flags);
+>>>>>>> common/deprecated/android-3.18
 
 	pl330_release_channel(pch->thread);
 	pch->thread = NULL;
@@ -2336,11 +2571,15 @@ static void pl330_free_chan_resources(struct dma_chan *chan)
 	if (pch->cyclic)
 		list_splice_tail_init(&pch->work_list, &pch->dmac->desc_pool);
 
+<<<<<<< HEAD
 	spin_unlock_irqrestore(&pch->lock, flags);
 
 #ifdef CONFIG_PM_RUNTIME
 	pm_runtime_put_sync(pch->dmac->ddma.dev);
 #endif
+=======
+	spin_unlock_irqrestore(&pl330->lock, flags);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static enum dma_status
@@ -2399,8 +2638,13 @@ static dma_cookie_t pl330_tx_submit(struct dma_async_tx_descriptor *tx)
 static inline void _init_desc(struct dma_pl330_desc *desc)
 {
 	desc->rqcfg.swap = SWAP_NO;
+<<<<<<< HEAD
 	desc->rqcfg.scctl = CCTRL2;
 	desc->rqcfg.dcctl = CCTRL2;
+=======
+	desc->rqcfg.scctl = CCTRL0;
+	desc->rqcfg.dcctl = CCTRL0;
+>>>>>>> common/deprecated/android-3.18
 	desc->txd.tx_submit = pl330_tx_submit;
 
 	INIT_LIST_HEAD(&desc->node);
@@ -2479,7 +2723,10 @@ static struct dma_pl330_desc *pl330_get_desc(struct dma_pl330_chan *pch)
 	desc->txd.cookie = 0;
 	async_tx_ack(&desc->txd);
 
+<<<<<<< HEAD
 	desc->infiniteloop = 0;
+=======
+>>>>>>> common/deprecated/android-3.18
 	desc->peri = peri_id ? pch->chan.chan_id : 0;
 	desc->rqcfg.pcfg = &pch->dmac->pcfg;
 
@@ -2550,7 +2797,11 @@ static inline int get_burst_len(struct dma_pl330_desc *desc, size_t len)
 static struct dma_async_tx_descriptor *pl330_prep_dma_cyclic(
 		struct dma_chan *chan, dma_addr_t dma_addr, size_t len,
 		size_t period_len, enum dma_transfer_direction direction,
+<<<<<<< HEAD
 		unsigned long flags, void *context)
+=======
+		unsigned long flags)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct dma_pl330_desc *desc = NULL, *first = NULL;
 	struct dma_pl330_chan *pch = to_pchan(chan);
@@ -2558,7 +2809,10 @@ static struct dma_async_tx_descriptor *pl330_prep_dma_cyclic(
 	unsigned int i;
 	dma_addr_t dst;
 	dma_addr_t src;
+<<<<<<< HEAD
 	unsigned int *infinite = context;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	if (len % period_len != 0)
 		return NULL;
@@ -2572,13 +2826,22 @@ static struct dma_async_tx_descriptor *pl330_prep_dma_cyclic(
 	for (i = 0; i < len / period_len; i++) {
 		desc = pl330_get_desc(pch);
 		if (!desc) {
+<<<<<<< HEAD
+=======
+			unsigned long iflags;
+
+>>>>>>> common/deprecated/android-3.18
 			dev_err(pch->dmac->ddma.dev, "%s:%d Unable to fetch desc\n",
 				__func__, __LINE__);
 
 			if (!first)
 				return NULL;
 
+<<<<<<< HEAD
 			spin_lock_irqsave(&pl330->pool_lock, flags);
+=======
+			spin_lock_irqsave(&pl330->pool_lock, iflags);
+>>>>>>> common/deprecated/android-3.18
 
 			while (!list_empty(&first->node)) {
 				desc = list_entry(first->node.next,
@@ -2588,7 +2851,11 @@ static struct dma_async_tx_descriptor *pl330_prep_dma_cyclic(
 
 			list_move_tail(&first->node, &pl330->desc_pool);
 
+<<<<<<< HEAD
 			spin_unlock_irqrestore(&pl330->pool_lock, flags);
+=======
+			spin_unlock_irqrestore(&pl330->pool_lock, iflags);
+>>>>>>> common/deprecated/android-3.18
 
 			return NULL;
 		}
@@ -2613,7 +2880,10 @@ static struct dma_async_tx_descriptor *pl330_prep_dma_cyclic(
 		desc->rqtype = direction;
 		desc->rqcfg.brst_size = pch->burst_sz;
 		desc->rqcfg.brst_len = 1;
+<<<<<<< HEAD
 		desc->infiniteloop = *infinite;
+=======
+>>>>>>> common/deprecated/android-3.18
 		fill_px(&desc->px, dst, src, period_len);
 
 		if (!first)
@@ -2668,15 +2938,25 @@ pl330_prep_dma_memcpy(struct dma_chan *chan, dma_addr_t dst,
 	while (burst != (1 << desc->rqcfg.brst_size))
 		desc->rqcfg.brst_size++;
 
+<<<<<<< HEAD
+=======
+	desc->rqcfg.brst_len = get_burst_len(desc, len);
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * If burst size is smaller than bus width then make sure we only
 	 * transfer one at a time to avoid a burst stradling an MFIFO entry.
 	 */
+<<<<<<< HEAD
 	if (desc->rqcfg.brst_size * 8 < pl330->pcfg.data_bus_width)
 		desc->rqcfg.brst_len = 1;
 
 	desc->rqcfg.brst_len = get_burst_len(desc, len);
 
+=======
+	if (burst * 8 < pl330->pcfg.data_bus_width)
+		desc->rqcfg.brst_len = 1;
+
+>>>>>>> common/deprecated/android-3.18
 	desc->txd.flags = flags;
 
 	return &desc->txd;
@@ -2754,7 +3034,11 @@ pl330_prep_slave_sg(struct dma_chan *chan, struct scatterlist *sgl,
 		}
 
 		desc->rqcfg.brst_size = pch->burst_sz;
+<<<<<<< HEAD
 		desc->rqcfg.brst_len = pch->burst_len;
+=======
+		desc->rqcfg.brst_len = 1;
+>>>>>>> common/deprecated/android-3.18
 		desc->rqtype = direction;
 	}
 
@@ -2771,6 +3055,7 @@ static irqreturn_t pl330_irq_handler(int irq, void *data)
 		return IRQ_NONE;
 }
 
+<<<<<<< HEAD
 int pl330_dma_getposition(struct dma_chan *chan,
 		dma_addr_t *src, dma_addr_t *dst)
 {
@@ -2793,6 +3078,8 @@ int pl330_dma_getposition(struct dma_chan *chan,
 }
 EXPORT_SYMBOL(pl330_dma_getposition);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #define PL330_DMA_BUSWIDTHS \
 	BIT(DMA_SLAVE_BUSWIDTH_UNDEFINED) | \
 	BIT(DMA_SLAVE_BUSWIDTH_1_BYTE) | \
@@ -2813,6 +3100,7 @@ static int pl330_dma_device_slave_caps(struct dma_chan *dchan,
 	return 0;
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_CPU_IDLE
 static int pl330_notifier(struct notifier_block *nb,
 			unsigned long event, void *data)
@@ -2856,6 +3144,8 @@ static const struct dev_pm_ops pl330_pm_ops = {
 
 #endif /* !CONFIG_PM */
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static int
 pl330_probe(struct amba_device *adev, const struct amba_id *id)
 {
@@ -2881,7 +3171,10 @@ pl330_probe(struct amba_device *adev, const struct amba_id *id)
 		return -ENOMEM;
 	}
 
+<<<<<<< HEAD
 	pl330->ddma.dev = &adev->dev;
+=======
+>>>>>>> common/deprecated/android-3.18
 	pl330->mcbufsz = pdat ? pdat->mcbuf_sz : 0;
 
 	res = &adev->res;
@@ -2904,6 +3197,7 @@ pl330_probe(struct amba_device *adev, const struct amba_id *id)
 		}
 	}
 
+<<<<<<< HEAD
 	if (adev->dev.of_node){
 		*adev->dev.dma_mask = of_dma_get_mask(adev->dev.of_node,
 				"dma-mask-bit");
@@ -2912,6 +3206,8 @@ pl330_probe(struct amba_device *adev, const struct amba_id *id)
 		pl330->wrapper = of_dma_get_wrapper_available(adev->dev.of_node);
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	pcfg = &pl330->pcfg;
 
 	pcfg->periph_id = adev->periphid;
@@ -3018,6 +3314,7 @@ pl330_probe(struct amba_device *adev, const struct amba_id *id)
 		pcfg->data_buf_dep, pcfg->data_bus_width / 8, pcfg->num_chan,
 		pcfg->num_peri, pcfg->num_events);
 
+<<<<<<< HEAD
 #ifdef CONFIG_CPU_IDLE
 	pl330->lpa_nb.notifier_call = pl330_notifier;
 	pl330->lpa_nb.next = NULL;
@@ -3034,6 +3331,8 @@ pl330_probe(struct amba_device *adev, const struct amba_id *id)
 	pm_runtime_put_sync(&adev->dev);
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 probe_err3:
 	/* Idle the DMAC */
@@ -3097,7 +3396,10 @@ MODULE_DEVICE_TABLE(amba, pl330_ids);
 static struct amba_driver pl330_driver = {
 	.drv = {
 		.owner = THIS_MODULE,
+<<<<<<< HEAD
 		.pm = PL330_PM,
+=======
+>>>>>>> common/deprecated/android-3.18
 		.name = "dma-pl330",
 	},
 	.id_table = pl330_ids,

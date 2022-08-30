@@ -222,6 +222,10 @@ nouveau_hw_get_clock(struct drm_device *dev, enum nvbios_pll_type plltype)
 		uint32_t mpllP;
 
 		pci_read_config_dword(pci_get_bus_and_slot(0, 3), 0x6c, &mpllP);
+<<<<<<< HEAD
+=======
+		mpllP = (mpllP >> 8) & 0xf;
+>>>>>>> common/deprecated/android-3.18
 		if (!mpllP)
 			mpllP = 4;
 
@@ -232,7 +236,11 @@ nouveau_hw_get_clock(struct drm_device *dev, enum nvbios_pll_type plltype)
 		uint32_t clock;
 
 		pci_read_config_dword(pci_get_bus_and_slot(0, 5), 0x4c, &clock);
+<<<<<<< HEAD
 		return clock;
+=======
+		return clock / 1000;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	ret = nouveau_hw_get_pllvals(dev, plltype, &pllvals);

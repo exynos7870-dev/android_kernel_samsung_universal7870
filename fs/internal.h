@@ -108,6 +108,10 @@ extern struct file *do_file_open_root(struct dentry *, struct vfsmount *,
 extern long do_handle_open(int mountdirfd,
 			   struct file_handle __user *ufh, int open_flag);
 extern int open_check_o_direct(struct file *f);
+<<<<<<< HEAD
+=======
+extern int vfs_open(const struct path *, struct file *, const struct cred *);
+>>>>>>> common/deprecated/android-3.18
 
 /*
  * inode.c
@@ -123,7 +127,10 @@ extern void inode_add_lru(struct inode *inode);
 extern void inode_wb_list_del(struct inode *inode);
 
 extern long get_nr_dirty_inodes(void);
+<<<<<<< HEAD
 extern void evict_inodes(struct super_block *);
+=======
+>>>>>>> common/deprecated/android-3.18
 extern int invalidate_inodes(struct super_block *, bool);
 
 /*

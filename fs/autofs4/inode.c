@@ -18,7 +18,10 @@
 #include <linux/pagemap.h>
 #include <linux/parser.h>
 #include <linux/bitops.h>
+<<<<<<< HEAD
 #include <linux/magic.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 #include "autofs_i.h"
 #include <linux/module.h>
 
@@ -256,8 +259,15 @@ int autofs4_fill_super(struct super_block *s, void *data, int silent)
 	}
 	root_inode = autofs4_get_inode(s, S_IFDIR | 0755);
 	root = d_make_root(root_inode);
+<<<<<<< HEAD
 	if (!root)
 		goto fail_ino;
+=======
+	if (!root) {
+		ret = -ENOMEM;
+		goto fail_ino;
+	}
+>>>>>>> common/deprecated/android-3.18
 	pipe = NULL;
 
 	root->d_fsdata = ino;

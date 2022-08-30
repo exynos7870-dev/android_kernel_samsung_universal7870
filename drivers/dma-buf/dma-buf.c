@@ -265,6 +265,7 @@ static inline int is_dma_buf_file(struct file *file)
 }
 
 /**
+<<<<<<< HEAD
  * get_dma_buf_file - Finds dma_buf from a file descriptor
  *
  * @filp: [in] file descriptor to extract dma_buf.
@@ -287,6 +288,8 @@ struct dma_buf *get_dma_buf_file(struct file *filp)
 	return dmabuf;
 }
 /**
+=======
+>>>>>>> common/deprecated/android-3.18
  * dma_buf_export_named - Creates a new dma_buf, and associates an anon file
  * with this buffer, so it can be exported.
  * Also connect the allocator specific data and ops to the buffer.

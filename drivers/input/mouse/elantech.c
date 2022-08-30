@@ -797,7 +797,11 @@ static int elantech_packet_check_v4(struct psmouse *psmouse)
 	if (etd->crc_enabled)
 		sanity_check = ((packet[3] & 0x08) == 0x00);
 	else
+<<<<<<< HEAD
 		sanity_check = ((packet[0] & 0x0c) == 0x04 &&
+=======
+		sanity_check = ((packet[0] & 0x08) == 0x00 &&
+>>>>>>> common/deprecated/android-3.18
 				(packet[3] & 0x1c) == 0x10);
 
 	if (!sanity_check)
@@ -1114,8 +1118,18 @@ static int elantech_get_resolution_v4(struct psmouse *psmouse,
  * Asus UX31               0x361f00        20, 15, 0e      clickpad
  * Asus UX32VD             0x361f02        00, 15, 0e      clickpad
  * Avatar AVIU-145A2       0x361f00        ?               clickpad
+<<<<<<< HEAD
  * Fujitsu LIFEBOOK E544   0x470f00        d0, 12, 09      2 hw buttons
  * Fujitsu LIFEBOOK E554   0x570f01        40, 14, 0c      2 hw buttons
+=======
+ * Fujitsu CELSIUS H760    0x570f02        40, 14, 0c      3 hw buttons (**)
+ * Fujitsu CELSIUS H780    0x5d0f02        41, 16, 0d      3 hw buttons (**)
+ * Fujitsu LIFEBOOK E544   0x470f00        d0, 12, 09      2 hw buttons
+ * Fujitsu LIFEBOOK E546   0x470f00        50, 12, 09      2 hw buttons
+ * Fujitsu LIFEBOOK E547   0x470f00        50, 12, 09      2 hw buttons
+ * Fujitsu LIFEBOOK E554   0x570f01        40, 14, 0c      2 hw buttons
+ * Fujitsu LIFEBOOK E557   0x570f01        40, 14, 0c      2 hw buttons
+>>>>>>> common/deprecated/android-3.18
  * Fujitsu H730            0x570f00        c0, 14, 0c      3 hw buttons (**)
  * Gigabyte U2442          0x450f01        58, 17, 0c      2 hw buttons
  * Lenovo L430             0x350f02        b9, 15, 0c      2 hw buttons (*)
@@ -1155,10 +1169,31 @@ static const struct dmi_system_id elantech_dmi_has_middle_button[] = {
 			DMI_MATCH(DMI_PRODUCT_NAME, "CELSIUS H730"),
 		},
 	},
+<<<<<<< HEAD
+=======
+	{
+		/* Fujitsu H780 also has a middle button */
+		.matches = {
+			DMI_MATCH(DMI_SYS_VENDOR, "FUJITSU"),
+			DMI_MATCH(DMI_PRODUCT_NAME, "CELSIUS H780"),
+		},
+	},
+>>>>>>> common/deprecated/android-3.18
 #endif
 	{ }
 };
 
+<<<<<<< HEAD
+=======
+static const char * const middle_button_pnp_ids[] = {
+	"LEN2131", /* ThinkPad P52 w/ NFC */
+	"LEN2132", /* ThinkPad P52 */
+	"LEN2133", /* ThinkPad P72 w/ NFC */
+	"LEN2134", /* ThinkPad P72 */
+	NULL
+};
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Set the appropriate event bits for the input subsystem
  */
@@ -1178,7 +1213,12 @@ static int elantech_set_input_params(struct psmouse *psmouse)
 	__clear_bit(EV_REL, dev->evbit);
 
 	__set_bit(BTN_LEFT, dev->keybit);
+<<<<<<< HEAD
 	if (dmi_check_system(elantech_dmi_has_middle_button))
+=======
+	if (dmi_check_system(elantech_dmi_has_middle_button) ||
+			psmouse_matches_pnp_id(psmouse, middle_button_pnp_ids))
+>>>>>>> common/deprecated/android-3.18
 		__set_bit(BTN_MIDDLE, dev->keybit);
 	__set_bit(BTN_RIGHT, dev->keybit);
 
@@ -1214,7 +1254,11 @@ static int elantech_set_input_params(struct psmouse *psmouse)
 			input_set_abs_params(dev, ABS_TOOL_WIDTH, ETP_WMIN_V2,
 					     ETP_WMAX_V2, 0, 0);
 		}
+<<<<<<< HEAD
 		input_mt_init_slots(dev, 2, 0);
+=======
+		input_mt_init_slots(dev, 2, INPUT_MT_SEMI_MT);
+>>>>>>> common/deprecated/android-3.18
 		input_set_abs_params(dev, ABS_MT_POSITION_X, x_min, x_max, 0, 0);
 		input_set_abs_params(dev, ABS_MT_POSITION_Y, y_min, y_max, 0, 0);
 		break;
@@ -1376,10 +1420,18 @@ static bool elantech_is_signature_valid(const unsigned char *param)
 		return true;
 
 	/*
+<<<<<<< HEAD
 	 * Some models have a revision higher then 20. Meaning param[2] may
 	 * be 10 or 20, skip the rates check for these.
 	 */
 	if (param[0] == 0x46 && (param[1] & 0xef) == 0x0f && param[2] < 40)
+=======
+	 * Some hw_version >= 4 models have a revision higher then 20. Meaning
+	 * that param[2] may be 10 or 20, skip the rates check for these.
+	 */
+	if ((param[0] & 0x0f) >= 0x06 && (param[1] & 0xaf) == 0x0f &&
+	    param[2] < 40)
+>>>>>>> common/deprecated/android-3.18
 		return true;
 
 	for (i = 0; i < ARRAY_SIZE(rates); i++)
@@ -1495,10 +1547,17 @@ static const struct dmi_system_id elantech_dmi_force_crc_enabled[] = {
 		},
 	},
 	{
+<<<<<<< HEAD
 		/* Fujitsu LIFEBOOK E554  does not work with crc_enabled == 0 */
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "FUJITSU"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "LIFEBOOK E554"),
+=======
+		/* Fujitsu LIFEBOOK E547 does not work with crc_enabled == 0 */
+		.matches = {
+			DMI_MATCH(DMI_SYS_VENDOR, "FUJITSU"),
+			DMI_MATCH(DMI_PRODUCT_NAME, "LIFEBOOK E547"),
+>>>>>>> common/deprecated/android-3.18
 		},
 	},
 	{
@@ -1508,6 +1567,37 @@ static const struct dmi_system_id elantech_dmi_force_crc_enabled[] = {
 			DMI_MATCH(DMI_PRODUCT_NAME, "LIFEBOOK E544"),
 		},
 	},
+<<<<<<< HEAD
+=======
+	{
+		/* Fujitsu LIFEBOOK E546  does not work with crc_enabled == 0 */
+		.matches = {
+			DMI_MATCH(DMI_SYS_VENDOR, "FUJITSU"),
+			DMI_MATCH(DMI_PRODUCT_NAME, "LIFEBOOK E546"),
+		},
+	},
+	{
+		/* Fujitsu LIFEBOOK E554  does not work with crc_enabled == 0 */
+		.matches = {
+			DMI_MATCH(DMI_SYS_VENDOR, "FUJITSU"),
+			DMI_MATCH(DMI_PRODUCT_NAME, "LIFEBOOK E554"),
+		},
+	},
+	{
+		/* Fujitsu LIFEBOOK E556 does not work with crc_enabled == 0 */
+		.matches = {
+			DMI_MATCH(DMI_SYS_VENDOR, "FUJITSU"),
+			DMI_MATCH(DMI_PRODUCT_NAME, "LIFEBOOK E556"),
+		},
+	},
+	{
+		/* Fujitsu LIFEBOOK E557 does not work with crc_enabled == 0 */
+		.matches = {
+			DMI_MATCH(DMI_SYS_VENDOR, "FUJITSU"),
+			DMI_MATCH(DMI_PRODUCT_NAME, "LIFEBOOK E557"),
+		},
+	},
+>>>>>>> common/deprecated/android-3.18
 #endif
 	{ }
 };
@@ -1549,12 +1639,16 @@ static int elantech_set_properties(struct elantech_data *etd)
 		case 5:
 			etd->hw_version = 3;
 			break;
+<<<<<<< HEAD
 		case 6:
 		case 7:
 		case 8:
 		case 9:
 		case 10:
 		case 13:
+=======
+		case 6 ... 15:
+>>>>>>> common/deprecated/android-3.18
 			etd->hw_version = 4;
 			break;
 		default:

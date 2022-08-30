@@ -150,7 +150,11 @@ static int __init weim_parse_dt(struct platform_device *pdev,
 			return ret;
 	}
 
+<<<<<<< HEAD
 	for_each_child_of_node(pdev->dev.of_node, child) {
+=======
+	for_each_available_child_of_node(pdev->dev.of_node, child) {
+>>>>>>> common/deprecated/android-3.18
 		if (!child->name)
 			continue;
 

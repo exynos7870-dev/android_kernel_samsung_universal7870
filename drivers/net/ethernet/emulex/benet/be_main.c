@@ -26,7 +26,10 @@
 #include <net/vxlan.h>
 
 MODULE_VERSION(DRV_VER);
+<<<<<<< HEAD
 MODULE_DEVICE_TABLE(pci, be_dev_ids);
+=======
+>>>>>>> common/deprecated/android-3.18
 MODULE_DESCRIPTION(DRV_DESC " " DRV_VER);
 MODULE_AUTHOR("Emulex Corporation");
 MODULE_LICENSE("GPL");
@@ -3602,8 +3605,17 @@ int be_update_queues(struct be_adapter *adapter)
 	struct net_device *netdev = adapter->netdev;
 	int status;
 
+<<<<<<< HEAD
 	if (netif_running(netdev))
 		be_close(netdev);
+=======
+	if (netif_running(netdev)) {
+		/* device cannot transmit now, avoid dev_watchdog timeouts */
+		netif_carrier_off(netdev);
+
+		be_close(netdev);
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	be_cancel_worker(adapter);
 
@@ -4113,8 +4125,13 @@ static int lancer_fw_download(struct be_adapter *adapter,
 
 	flash_cmd.size = sizeof(struct lancer_cmd_req_write_object)
 				+ LANCER_FW_DOWNLOAD_CHUNK;
+<<<<<<< HEAD
 	flash_cmd.va = dma_alloc_coherent(dev, flash_cmd.size,
 					  &flash_cmd.dma, GFP_KERNEL);
+=======
+	flash_cmd.va = dma_zalloc_coherent(dev, flash_cmd.size,
+					   &flash_cmd.dma, GFP_KERNEL);
+>>>>>>> common/deprecated/android-3.18
 	if (!flash_cmd.va)
 		return -ENOMEM;
 
@@ -4209,8 +4226,13 @@ static int be_fw_download(struct be_adapter *adapter, const struct firmware* fw)
 	int status = 0, i = 0, num_imgs = 0, ufi_type = 0;
 
 	flash_cmd.size = sizeof(struct be_cmd_write_flashrom);
+<<<<<<< HEAD
 	flash_cmd.va = dma_alloc_coherent(&adapter->pdev->dev, flash_cmd.size,
 					  &flash_cmd.dma, GFP_KERNEL);
+=======
+	flash_cmd.va = dma_zalloc_coherent(&adapter->pdev->dev, flash_cmd.size,
+					   &flash_cmd.dma, GFP_KERNEL);
+>>>>>>> common/deprecated/android-3.18
 	if (!flash_cmd.va) {
 		status = -ENOMEM;
 		goto be_fw_exit;
@@ -4587,10 +4609,17 @@ static int be_ctrl_init(struct be_adapter *adapter)
 		goto done;
 
 	mbox_mem_alloc->size = sizeof(struct be_mcc_mailbox) + 16;
+<<<<<<< HEAD
 	mbox_mem_alloc->va = dma_alloc_coherent(&adapter->pdev->dev,
 						mbox_mem_alloc->size,
 						&mbox_mem_alloc->dma,
 						GFP_KERNEL);
+=======
+	mbox_mem_alloc->va = dma_zalloc_coherent(&adapter->pdev->dev,
+						 mbox_mem_alloc->size,
+						 &mbox_mem_alloc->dma,
+						 GFP_KERNEL);
+>>>>>>> common/deprecated/android-3.18
 	if (!mbox_mem_alloc->va) {
 		status = -ENOMEM;
 		goto unmap_pci_bars;
@@ -4970,6 +4999,10 @@ stats_clean:
 ctrl_clean:
 	be_ctrl_cleanup(adapter);
 free_netdev:
+<<<<<<< HEAD
+=======
+	pci_disable_pcie_error_reporting(pdev);
+>>>>>>> common/deprecated/android-3.18
 	free_netdev(netdev);
 rel_reg:
 	pci_release_regions(pdev);

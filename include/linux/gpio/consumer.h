@@ -275,7 +275,11 @@ static inline int gpiod_to_irq(const struct gpio_desc *desc)
 
 static inline struct gpio_desc *gpio_to_desc(unsigned gpio)
 {
+<<<<<<< HEAD
 	return ERR_PTR(-EINVAL);
+=======
+	return NULL;
+>>>>>>> common/deprecated/android-3.18
 }
 static inline int desc_to_gpio(const struct gpio_desc *desc)
 {

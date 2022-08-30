@@ -159,7 +159,11 @@ static inline int get_recursion_context(int *recursion)
 		rctx = 3;
 	else if (in_irq())
 		rctx = 2;
+<<<<<<< HEAD
 	else if (in_softirq())
+=======
+	else if (in_serving_softirq())
+>>>>>>> common/deprecated/android-3.18
 		rctx = 1;
 	else
 		rctx = 0;

@@ -30,7 +30,10 @@ hci_uart-$(CONFIG_BT_HCIUART_LL)	+= hci_ll.o
 hci_uart-$(CONFIG_BT_HCIUART_ATH3K)	+= hci_ath.o
 hci_uart-$(CONFIG_BT_HCIUART_3WIRE)	+= hci_h5.o
 hci_uart-objs				:= $(hci_uart-y)
+<<<<<<< HEAD
 obj-$(CONFIG_BT_QCA9377)	+= bluetooth-power.o
 obj-$(CONFIG_BT_BCM43XX)	+= bcm43xx.o
+=======
+>>>>>>> common/deprecated/android-3.18
 
 ccflags-y += -D__CHECK_ENDIAN__

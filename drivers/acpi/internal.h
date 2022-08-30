@@ -173,4 +173,13 @@ static inline void suspend_nvs_restore(void) {}
 bool acpi_osi_is_win8(void);
 #endif
 
+<<<<<<< HEAD
+=======
+/*--------------------------------------------------------------------------
+				Device properties
+  -------------------------------------------------------------------------- */
+void acpi_init_properties(struct acpi_device *adev);
+void acpi_free_properties(struct acpi_device *adev);
+
+>>>>>>> common/deprecated/android-3.18
 #endif /* _ACPI_INTERNAL_H_ */

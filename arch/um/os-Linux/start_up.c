@@ -95,6 +95,11 @@ static int start_ptraced_child(void)
 {
 	int pid, n, status;
 
+<<<<<<< HEAD
+=======
+	fflush(stdout);
+
+>>>>>>> common/deprecated/android-3.18
 	pid = fork();
 	if (pid == 0)
 		ptrace_child();

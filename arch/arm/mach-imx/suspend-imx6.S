@@ -73,6 +73,10 @@
 #define MX6Q_CCM_CCR	0x0
 
 	.align 3
+<<<<<<< HEAD
+=======
+	.arm
+>>>>>>> common/deprecated/android-3.18
 
 	.macro  sync_l2_cache
 
@@ -330,6 +334,7 @@ resume:
 
 	ret	lr
 ENDPROC(imx6_suspend)
+<<<<<<< HEAD
 
 /*
  * The following code must assume it is running from physical address
@@ -344,3 +349,5 @@ ENTRY(v7_cpu_resume)
 #endif
 	b	cpu_resume
 ENDPROC(v7_cpu_resume)
+=======
+>>>>>>> common/deprecated/android-3.18

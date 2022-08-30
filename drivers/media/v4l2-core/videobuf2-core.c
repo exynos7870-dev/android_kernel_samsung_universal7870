@@ -348,6 +348,7 @@ static int __vb2_queue_alloc(struct vb2_queue *q, enum v4l2_memory memory,
 	struct vb2_buffer *vb;
 	int ret;
 
+<<<<<<< HEAD
 	q->timeline_max = 0;
 	q->timeline = sw_sync_timeline_create("vb2");
 	if (!q->timeline) {
@@ -355,6 +356,8 @@ static int __vb2_queue_alloc(struct vb2_queue *q, enum v4l2_memory memory,
 		return 0;
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	for (buffer = 0; buffer < num_buffers; ++buffer) {
 		/* Allocate videobuf buffer structures */
 		vb = kzalloc(q->buf_struct_size, GFP_KERNEL);
@@ -548,12 +551,15 @@ static int __vb2_queue_free(struct vb2_queue *q, unsigned int buffers)
 		q->memory = 0;
 		INIT_LIST_HEAD(&q->queued_list);
 	}
+<<<<<<< HEAD
 
 	if (q->timeline) {
 		sync_timeline_destroy(&q->timeline->obj);
 		q->timeline = NULL;
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -1133,7 +1139,11 @@ EXPORT_SYMBOL_GPL(vb2_create_bufs);
  */
 void *vb2_plane_vaddr(struct vb2_buffer *vb, unsigned int plane_no)
 {
+<<<<<<< HEAD
 	if (plane_no > vb->num_planes || !vb->planes[plane_no].mem_priv)
+=======
+	if (plane_no >= vb->num_planes || !vb->planes[plane_no].mem_priv)
+>>>>>>> common/deprecated/android-3.18
 		return NULL;
 
 	return call_ptr_memop(vb, vaddr, vb->planes[plane_no].mem_priv);
@@ -1214,7 +1224,10 @@ void vb2_buffer_done(struct vb2_buffer *vb, enum vb2_buffer_state state)
 	if (state != VB2_BUF_STATE_QUEUED)
 		list_add_tail(&vb->done_entry, &q->done_list);
 	atomic_dec(&q->owned_by_drv_count);
+<<<<<<< HEAD
 	sw_sync_timeline_inc(q->timeline, 1);
+=======
+>>>>>>> common/deprecated/android-3.18
 	spin_unlock_irqrestore(&q->done_lock, flags);
 
 	if (state == VB2_BUF_STATE_QUEUED)
@@ -1347,7 +1360,10 @@ static void __fill_vb2_buffer(struct vb2_buffer *vb, const struct v4l2_buffer *b
 		 */
 		vb->v4l2_buf.flags &= ~V4L2_BUF_FLAG_TIMECODE;
 		vb->v4l2_buf.field = b->field;
+<<<<<<< HEAD
 		vb->v4l2_buf.reserved2 = b->reserved2;
+=======
+>>>>>>> common/deprecated/android-3.18
 	} else {
 		/* Zero any output buffer flags as this is a capture buffer */
 		vb->v4l2_buf.flags &= ~V4L2_BUFFER_OUT_FLAGS;
@@ -1381,6 +1397,15 @@ static int __qbuf_userptr(struct vb2_buffer *vb, const struct v4l2_buffer *b)
 	__fill_vb2_buffer(vb, b, planes);
 
 	for (plane = 0; plane < vb->num_planes; ++plane) {
+<<<<<<< HEAD
+=======
+		/* Skip the plane if already verified */
+		if (vb->v4l2_planes[plane].m.userptr &&
+		    vb->v4l2_planes[plane].m.userptr == planes[plane].m.userptr
+		    && vb->v4l2_planes[plane].length == planes[plane].length)
+			continue;
+
+>>>>>>> common/deprecated/android-3.18
 		dprintk(3, "userspace address for plane %d changed, "
 				"reacquiring memory\n", plane);
 
@@ -1630,6 +1655,7 @@ static int __buf_prepare(struct vb2_buffer *vb, const struct v4l2_buffer *b)
 	vb->v4l2_buf.timestamp.tv_usec = 0;
 	vb->v4l2_buf.sequence = 0;
 
+<<<<<<< HEAD
 	if (!!(b->flags & V4L2_BUF_FLAG_USE_SYNC) && ((int)b->reserved >= 0)) {
 		vb->acquire_fence = sync_fence_fdget((int)b->reserved);
 		if (!vb->acquire_fence) {
@@ -1639,6 +1665,8 @@ static int __buf_prepare(struct vb2_buffer *vb, const struct v4l2_buffer *b)
 		}
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	switch (q->memory) {
 	case V4L2_MEMORY_MMAP:
 		ret = __qbuf_mmap(vb, b);
@@ -1800,6 +1828,7 @@ static int vb2_start_streaming(struct vb2_queue *q)
 	return ret;
 }
 
+<<<<<<< HEAD
 static int __allocate_acquire_fence(struct vb2_queue *q, struct vb2_buffer *vb,
 				     bool use_sync)
 {
@@ -1836,6 +1865,8 @@ static int __allocate_acquire_fence(struct vb2_queue *q, struct vb2_buffer *vb,
 	return 0;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static int vb2_internal_qbuf(struct vb2_queue *q, struct v4l2_buffer *b)
 {
 	int ret = vb2_queue_or_prepare_buf(q, b, "qbuf");
@@ -1844,6 +1875,14 @@ static int vb2_internal_qbuf(struct vb2_queue *q, struct v4l2_buffer *b)
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
+=======
+	if (q->error) {
+		dprintk(1, "fatal error occurred on queue\n");
+		return -EIO;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	vb = q->bufs[b->index];
 
 	switch (vb->state) {
@@ -1890,11 +1929,14 @@ static int vb2_internal_qbuf(struct vb2_queue *q, struct v4l2_buffer *b)
 	if (q->start_streaming_called)
 		__enqueue_in_driver(vb);
 
+<<<<<<< HEAD
 	ret = __allocate_acquire_fence(q, vb,
 				!!(b->flags & V4L2_BUF_FLAG_USE_SYNC));
 	if (ret)
 		return ret;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* Fill buffer information for the userspace */
 	__fill_v4l2_buffer(vb, b);
 
@@ -2134,6 +2176,14 @@ static int vb2_internal_dqbuf(struct vb2_queue *q, struct v4l2_buffer *b, bool n
 	dprintk(1, "dqbuf of buffer %d, with state %d\n",
 			vb->v4l2_buf.index, vb->state);
 
+<<<<<<< HEAD
+=======
+	/*
+	 * After calling the VIDIOC_DQBUF V4L2_BUF_FLAG_DONE must be
+	 * cleared.
+	 */
+	b->flags &= ~V4L2_BUF_FLAG_DONE;
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -2176,7 +2226,10 @@ EXPORT_SYMBOL_GPL(vb2_dqbuf);
  */
 static void __vb2_queue_cancel(struct vb2_queue *q)
 {
+<<<<<<< HEAD
 	struct vb2_buffer *vb;
+=======
+>>>>>>> common/deprecated/android-3.18
 	unsigned int i;
 
 	/*
@@ -2205,6 +2258,7 @@ static void __vb2_queue_cancel(struct vb2_queue *q)
 	q->queued_count = 0;
 	q->error = 0;
 
+<<<<<<< HEAD
 	list_for_each_entry(vb, &q->queued_list, queued_entry) {
 		if (vb->acquire_fence) {
 			sync_fence_put(vb->acquire_fence);
@@ -2212,6 +2266,8 @@ static void __vb2_queue_cancel(struct vb2_queue *q)
 		}
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Remove all buffers from videobuf's list...
 	 */
@@ -2536,9 +2592,19 @@ int vb2_mmap(struct vb2_queue *q, struct vm_area_struct *vma)
 			return -EINVAL;
 		}
 	}
+<<<<<<< HEAD
 	if (vb2_fileio_is_active(q)) {
 		dprintk(1, "mmap: file io in progress\n");
 		return -EBUSY;
+=======
+
+	mutex_lock(&q->mmap_lock);
+
+	if (vb2_fileio_is_active(q)) {
+		dprintk(1, "mmap: file io in progress\n");
+		ret = -EBUSY;
+		goto unlock;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/*
@@ -2546,7 +2612,11 @@ int vb2_mmap(struct vb2_queue *q, struct vm_area_struct *vma)
 	 */
 	ret = __find_plane_by_offset(q, off, &buffer, &plane);
 	if (ret)
+<<<<<<< HEAD
 		return ret;
+=======
+		goto unlock;
+>>>>>>> common/deprecated/android-3.18
 
 	vb = q->bufs[buffer];
 
@@ -2559,11 +2629,21 @@ int vb2_mmap(struct vb2_queue *q, struct vm_area_struct *vma)
 	if (length < (vma->vm_end - vma->vm_start)) {
 		dprintk(1,
 			"MMAP invalid, as it would overflow buffer length\n");
+<<<<<<< HEAD
 		return -EINVAL;
 	}
 
 	mutex_lock(&q->mmap_lock);
 	ret = call_memop(vb, mmap, vb->planes[plane].mem_priv, vma);
+=======
+		ret = -EINVAL;
+		goto unlock;
+	}
+
+	ret = call_memop(vb, mmap, vb->planes[plane].mem_priv, vma);
+
+unlock:
+>>>>>>> common/deprecated/android-3.18
 	mutex_unlock(&q->mmap_lock);
 	if (ret)
 		return ret;
@@ -2685,10 +2765,17 @@ unsigned int vb2_poll(struct vb2_queue *q, struct file *file, poll_table *wait)
 		return res | POLLERR;
 
 	/*
+<<<<<<< HEAD
 	 * For output streams you can write as long as there are fewer buffers
 	 * queued than there are buffers available.
 	 */
 	if (V4L2_TYPE_IS_OUTPUT(q->type) && q->queued_count < q->num_buffers)
+=======
+	 * For output streams you can call write() as long as there are fewer
+	 * buffers queued than there are buffers available.
+	 */
+	if (V4L2_TYPE_IS_OUTPUT(q->type) && q->fileio && q->queued_count < q->num_buffers)
+>>>>>>> common/deprecated/android-3.18
 		return res | POLLOUT | POLLWRNORM;
 
 	if (list_empty(&q->done_list))
@@ -3288,7 +3375,10 @@ EXPORT_SYMBOL_GPL(vb2_thread_start);
 int vb2_thread_stop(struct vb2_queue *q)
 {
 	struct vb2_threadio_data *threadio = q->threadio;
+<<<<<<< HEAD
 	struct vb2_fileio_data __attribute__((__unused__)) *fileio = q->fileio;
+=======
+>>>>>>> common/deprecated/android-3.18
 	int err;
 
 	if (threadio == NULL)

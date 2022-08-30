@@ -435,7 +435,11 @@ static void imx1_pinconf_group_dbg_show(struct pinctrl_dev *pctldev,
 	const char *name;
 	int i, ret;
 
+<<<<<<< HEAD
 	if (group > info->ngroups)
+=======
+	if (group >= info->ngroups)
+>>>>>>> common/deprecated/android-3.18
 		return;
 
 	seq_puts(s, "\n");

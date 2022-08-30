@@ -195,8 +195,14 @@ static int handle_to_path(int mountdirfd, struct file_handle __user *ufh,
 		goto out_err;
 	}
 	/* copy the full handle */
+<<<<<<< HEAD
 	if (copy_from_user(handle, ufh,
 			   sizeof(struct file_handle) +
+=======
+	*handle = f_handle;
+	if (copy_from_user(&handle->f_handle,
+			   &ufh->f_handle,
+>>>>>>> common/deprecated/android-3.18
 			   f_handle.handle_bytes)) {
 		retval = -EFAULT;
 		goto out_handle;
@@ -227,7 +233,11 @@ long do_handle_open(int mountdirfd,
 		path_put(&path);
 		return fd;
 	}
+<<<<<<< HEAD
 	file = file_open_root(path.dentry, path.mnt, "", open_flag);
+=======
+	file = file_open_root(path.dentry, path.mnt, "", open_flag, 0);
+>>>>>>> common/deprecated/android-3.18
 	if (IS_ERR(file)) {
 		put_unused_fd(fd);
 		retval =  PTR_ERR(file);

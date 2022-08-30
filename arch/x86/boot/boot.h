@@ -16,14 +16,21 @@
 #ifndef BOOT_BOOT_H
 #define BOOT_BOOT_H
 
+<<<<<<< HEAD
 #define STACK_SIZE	512	/* Minimum number of bytes for stack */
+=======
+#define STACK_SIZE	1024	/* Minimum number of bytes for stack */
+>>>>>>> common/deprecated/android-3.18
 
 #ifndef __ASSEMBLY__
 
 #include <stdarg.h>
 #include <linux/types.h>
 #include <linux/edd.h>
+<<<<<<< HEAD
 #include <asm/boot.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 #include <asm/setup.h>
 #include "bitops.h"
 #include "ctype.h"

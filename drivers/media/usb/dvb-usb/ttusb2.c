@@ -78,6 +78,12 @@ static int ttusb2_msg(struct dvb_usb_device *d, u8 cmd,
 	u8 *s, *r = NULL;
 	int ret = 0;
 
+<<<<<<< HEAD
+=======
+	if (4 + rlen > 64)
+		return -EIO;
+
+>>>>>>> common/deprecated/android-3.18
 	s = kzalloc(wlen+4, GFP_KERNEL);
 	if (!s)
 		return -ENOMEM;
@@ -381,6 +387,25 @@ static int ttusb2_i2c_xfer(struct i2c_adapter *adap,struct i2c_msg msg[],int num
 		write_read = i+1 < num && (msg[i+1].flags & I2C_M_RD);
 		read = msg[i].flags & I2C_M_RD;
 
+<<<<<<< HEAD
+=======
+		if (3 + msg[i].len > sizeof(obuf)) {
+			err("i2c wr len=%d too high", msg[i].len);
+			break;
+		}
+		if (write_read) {
+			if (3 + msg[i+1].len > sizeof(ibuf)) {
+				err("i2c rd len=%d too high", msg[i+1].len);
+				break;
+			}
+		} else if (read) {
+			if (3 + msg[i].len > sizeof(ibuf)) {
+				err("i2c rd len=%d too high", msg[i].len);
+				break;
+			}
+		}
+
+>>>>>>> common/deprecated/android-3.18
 		obuf[0] = (msg[i].addr << 1) | (write_read | read);
 		if (read)
 			obuf[1] = 0;

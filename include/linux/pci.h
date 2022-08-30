@@ -177,6 +177,13 @@ enum pci_dev_flags {
 	PCI_DEV_FLAG_PCIE_BRIDGE_ALIAS = (__force pci_dev_flags_t) (1 << 5),
 	/* Do not use bus resets for device */
 	PCI_DEV_FLAGS_NO_BUS_RESET = (__force pci_dev_flags_t) (1 << 6),
+<<<<<<< HEAD
+=======
+	/* Do not use PM reset even if device advertises NoSoftRst- */
+	PCI_DEV_FLAGS_NO_PM_RESET = (__force pci_dev_flags_t) (1 << 7),
+	/* Get VPD from function 0 VPD */
+	PCI_DEV_FLAGS_VPD_REF_F0 = (__force pci_dev_flags_t) (1 << 8),
+>>>>>>> common/deprecated/android-3.18
 };
 
 enum pci_irq_reroute_variant {
@@ -351,6 +358,12 @@ struct pci_dev {
 	unsigned int	__aer_firmware_first:1;
 	unsigned int	broken_intx_masking:1;
 	unsigned int	io_window_1k:1;	/* Intel P2P bridge 1K I/O windows */
+<<<<<<< HEAD
+=======
+	unsigned int	irq_managed:1;
+	unsigned int	has_secondary_link:1;
+	unsigned int	non_compliant_bars:1;	/* broken BARs; ignore them */
+>>>>>>> common/deprecated/android-3.18
 	pci_dev_flags_t dev_flags;
 	atomic_t	enable_cnt;	/* pci_enable_device has been called */
 
@@ -993,6 +1006,10 @@ int __must_check pci_assign_resource(struct pci_dev *dev, int i);
 int __must_check pci_reassign_resource(struct pci_dev *dev, int i, resource_size_t add_size, resource_size_t align);
 int pci_select_bars(struct pci_dev *dev, unsigned long flags);
 bool pci_device_is_present(struct pci_dev *pdev);
+<<<<<<< HEAD
+=======
+void pci_ignore_hotplug(struct pci_dev *dev);
+>>>>>>> common/deprecated/android-3.18
 
 /* ROM control related routines */
 int pci_enable_rom(struct pci_dev *pdev);
@@ -1006,7 +1023,10 @@ void __iomem __must_check *pci_platform_rom(struct pci_dev *pdev, size_t *size);
 int pci_save_state(struct pci_dev *dev);
 void pci_restore_state(struct pci_dev *dev);
 struct pci_saved_state *pci_store_saved_state(struct pci_dev *dev);
+<<<<<<< HEAD
 int pci_load_saved_state(struct pci_dev *dev, struct pci_saved_state *state);
+=======
+>>>>>>> common/deprecated/android-3.18
 int pci_load_and_free_saved_state(struct pci_dev *dev,
 				  struct pci_saved_state **state);
 struct pci_cap_saved_state *pci_find_saved_cap(struct pci_dev *dev, char cap);
@@ -1029,11 +1049,14 @@ bool pci_dev_run_wake(struct pci_dev *dev);
 bool pci_check_pme_status(struct pci_dev *dev);
 void pci_pme_wakeup_bus(struct pci_bus *bus);
 
+<<<<<<< HEAD
 static inline void pci_ignore_hotplug(struct pci_dev *dev)
 {
 	dev->ignore_hotplug = 1;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static inline int pci_enable_wake(struct pci_dev *dev, pci_power_t state,
 				  bool enable)
 {
@@ -1665,6 +1688,10 @@ int pci_num_vf(struct pci_dev *dev);
 int pci_vfs_assigned(struct pci_dev *dev);
 int pci_sriov_set_totalvfs(struct pci_dev *dev, u16 numvfs);
 int pci_sriov_get_totalvfs(struct pci_dev *dev);
+<<<<<<< HEAD
+=======
+resource_size_t pci_iov_resource_size(struct pci_dev *dev, int resno);
+>>>>>>> common/deprecated/android-3.18
 #else
 static inline int pci_enable_sriov(struct pci_dev *dev, int nr_virtfn)
 { return -ENODEV; }
@@ -1676,6 +1703,11 @@ static inline int pci_sriov_set_totalvfs(struct pci_dev *dev, u16 numvfs)
 { return 0; }
 static inline int pci_sriov_get_totalvfs(struct pci_dev *dev)
 { return 0; }
+<<<<<<< HEAD
+=======
+static inline resource_size_t pci_iov_resource_size(struct pci_dev *dev, int resno)
+{ return 0; }
+>>>>>>> common/deprecated/android-3.18
 #endif
 
 #if defined(CONFIG_HOTPLUG_PCI) || defined(CONFIG_HOTPLUG_PCI_MODULE)
@@ -1728,6 +1760,23 @@ static inline int pci_pcie_type(const struct pci_dev *dev)
 	return (pcie_caps_reg(dev) & PCI_EXP_FLAGS_TYPE) >> 4;
 }
 
+<<<<<<< HEAD
+=======
+static inline struct pci_dev *pcie_find_root_port(struct pci_dev *dev)
+{
+	while (1) {
+		if (!pci_is_pcie(dev))
+			break;
+		if (pci_pcie_type(dev) == PCI_EXP_TYPE_ROOT_PORT)
+			return dev;
+		if (!dev->bus->self)
+			break;
+		dev = dev->bus->self;
+	}
+	return NULL;
+}
+
+>>>>>>> common/deprecated/android-3.18
 void pci_request_acs(void);
 bool pci_acs_enabled(struct pci_dev *pdev, u16 acs_flags);
 bool pci_acs_path_enabled(struct pci_dev *start,

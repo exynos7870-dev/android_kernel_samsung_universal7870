@@ -17,7 +17,10 @@
  * Moorestown platform Langwell chip.
  * Medfield platform Penwell chip.
  * Clovertrail platform Cloverview chip.
+<<<<<<< HEAD
  * Merrifield platform Tangier chip.
+=======
+>>>>>>> common/deprecated/android-3.18
  */
 
 #include <linux/module.h>
@@ -64,10 +67,13 @@ enum GPIO_REG {
 /* intel_mid gpio driver data */
 struct intel_mid_gpio_ddata {
 	u16 ngpio;		/* number of gpio pins */
+<<<<<<< HEAD
 	u32 gplr_offset;	/* offset of first GPLR register from base */
 	u32 flis_base;		/* base address of FLIS registers */
 	u32 flis_len;		/* length of FLIS registers */
 	u32 (*get_flis_offset)(int gpio);
+=======
+>>>>>>> common/deprecated/android-3.18
 	u32 chip_irq_type;	/* chip interrupt type */
 };
 
@@ -257,6 +263,7 @@ static const struct intel_mid_gpio_ddata gpio_cloverview_core = {
 	.chip_irq_type = INTEL_MID_IRQ_TYPE_EDGE,
 };
 
+<<<<<<< HEAD
 static const struct intel_mid_gpio_ddata gpio_tangier = {
 	.ngpio = 192,
 	.gplr_offset = 4,
@@ -266,6 +273,8 @@ static const struct intel_mid_gpio_ddata gpio_tangier = {
 	.chip_irq_type = INTEL_MID_IRQ_TYPE_EDGE,
 };
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static const struct pci_device_id intel_gpio_ids[] = {
 	{
 		/* Lincroft */
@@ -292,11 +301,14 @@ static const struct pci_device_id intel_gpio_ids[] = {
 		PCI_DEVICE(PCI_VENDOR_ID_INTEL, 0x08f7),
 		.driver_data = (kernel_ulong_t)&gpio_cloverview_core,
 	},
+<<<<<<< HEAD
 	{
 		/* Tangier */
 		PCI_DEVICE(PCI_VENDOR_ID_INTEL, 0x1199),
 		.driver_data = (kernel_ulong_t)&gpio_tangier,
 	},
+=======
+>>>>>>> common/deprecated/android-3.18
 	{ 0 }
 };
 MODULE_DEVICE_TABLE(pci, intel_gpio_ids);
@@ -345,7 +357,11 @@ static void intel_mid_irq_init_hw(struct intel_mid_gpio *priv)
 	}
 }
 
+<<<<<<< HEAD
 static int intel_gpio_runtime_idle(struct device *dev)
+=======
+static int __maybe_unused intel_gpio_runtime_idle(struct device *dev)
+>>>>>>> common/deprecated/android-3.18
 {
 	int err = pm_schedule_suspend(dev, 500);
 	return err ?: -EBUSY;

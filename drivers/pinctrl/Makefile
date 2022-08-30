@@ -1,7 +1,10 @@
 # generic pinmux support
 
 ccflags-$(CONFIG_DEBUG_PINCTRL)	+= -DDEBUG
+<<<<<<< HEAD
 ccflags-y := $(KBUILD_FP_SENSOR_CFLAGS)
+=======
+>>>>>>> common/deprecated/android-3.18
 
 obj-$(CONFIG_PINCTRL)		+= core.o pinctrl-utils.o
 obj-$(CONFIG_PINMUX)		+= pinmux.o

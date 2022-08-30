@@ -86,6 +86,10 @@ static int crypto_authenc_esn_setkey(struct crypto_aead *authenc_esn, const u8 *
 					   CRYPTO_TFM_RES_MASK);
 
 out:
+<<<<<<< HEAD
+=======
+	memzero_explicit(&keys, sizeof(keys));
+>>>>>>> common/deprecated/android-3.18
 	return err;
 
 badkey:

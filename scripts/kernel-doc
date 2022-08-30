@@ -2616,4 +2616,8 @@ if ($verbose && $warnings) {
   print STDERR "$warnings warnings\n";
 }
 
+<<<<<<< HEAD
 exit($errors);
+=======
+exit($output_mode eq "none" ? 0 : $errors);
+>>>>>>> common/deprecated/android-3.18

@@ -245,6 +245,10 @@ struct mwifiex_ds_encrypt_key {
 
 struct mwifiex_power_cfg {
 	u32 is_power_auto;
+<<<<<<< HEAD
+=======
+	u32 is_power_fixed;
+>>>>>>> common/deprecated/android-3.18
 	u32 power_level;
 };
 

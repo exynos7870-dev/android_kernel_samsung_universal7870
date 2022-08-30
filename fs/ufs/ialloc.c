@@ -69,11 +69,19 @@ void ufs_free_inode (struct inode * inode)
 	
 	ino = inode->i_ino;
 
+<<<<<<< HEAD
 	lock_ufs(sb);
 
 	if (!((ino > 1) && (ino < (uspi->s_ncg * uspi->s_ipg )))) {
 		ufs_warning(sb, "ufs_free_inode", "reserved inode or nonexistent inode %u\n", ino);
 		unlock_ufs(sb);
+=======
+	mutex_lock(&UFS_SB(sb)->s_lock);
+
+	if (!((ino > 1) && (ino < (uspi->s_ncg * uspi->s_ipg )))) {
+		ufs_warning(sb, "ufs_free_inode", "reserved inode or nonexistent inode %u\n", ino);
+		mutex_unlock(&UFS_SB(sb)->s_lock);
+>>>>>>> common/deprecated/android-3.18
 		return;
 	}
 	
@@ -81,7 +89,11 @@ void ufs_free_inode (struct inode * inode)
 	bit = ufs_inotocgoff (ino);
 	ucpi = ufs_load_cylinder (sb, cg);
 	if (!ucpi) {
+<<<<<<< HEAD
 		unlock_ufs(sb);
+=======
+		mutex_unlock(&UFS_SB(sb)->s_lock);
+>>>>>>> common/deprecated/android-3.18
 		return;
 	}
 	ucg = ubh_get_ucg(UCPI_UBH(ucpi));
@@ -115,7 +127,11 @@ void ufs_free_inode (struct inode * inode)
 		ubh_sync_block(UCPI_UBH(ucpi));
 	
 	ufs_mark_sb_dirty(sb);
+<<<<<<< HEAD
 	unlock_ufs(sb);
+=======
+	mutex_unlock(&UFS_SB(sb)->s_lock);
+>>>>>>> common/deprecated/android-3.18
 	UFSD("EXIT\n");
 }
 
@@ -193,7 +209,11 @@ struct inode *ufs_new_inode(struct inode *dir, umode_t mode)
 	sbi = UFS_SB(sb);
 	uspi = sbi->s_uspi;
 
+<<<<<<< HEAD
 	lock_ufs(sb);
+=======
+	mutex_lock(&sbi->s_lock);
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * Try to place the inode in its parent directory
@@ -331,21 +351,33 @@ cg_found:
 			sync_dirty_buffer(bh);
 		brelse(bh);
 	}
+<<<<<<< HEAD
 	unlock_ufs(sb);
+=======
+	mutex_unlock(&sbi->s_lock);
+>>>>>>> common/deprecated/android-3.18
 
 	UFSD("allocating inode %lu\n", inode->i_ino);
 	UFSD("EXIT\n");
 	return inode;
 
 fail_remove_inode:
+<<<<<<< HEAD
 	unlock_ufs(sb);
+=======
+	mutex_unlock(&sbi->s_lock);
+>>>>>>> common/deprecated/android-3.18
 	clear_nlink(inode);
 	unlock_new_inode(inode);
 	iput(inode);
 	UFSD("EXIT (FAILED): err %d\n", err);
 	return ERR_PTR(err);
 failed:
+<<<<<<< HEAD
 	unlock_ufs(sb);
+=======
+	mutex_unlock(&sbi->s_lock);
+>>>>>>> common/deprecated/android-3.18
 	make_bad_inode(inode);
 	iput (inode);
 	UFSD("EXIT (FAILED): err %d\n", err);

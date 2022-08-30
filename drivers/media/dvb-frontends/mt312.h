@@ -36,7 +36,11 @@ struct mt312_config {
 	unsigned int voltage_inverted:1;
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_MT312)
+=======
+#if IS_REACHABLE(CONFIG_DVB_MT312)
+>>>>>>> common/deprecated/android-3.18
 struct dvb_frontend *mt312_attach(const struct mt312_config *config,
 					struct i2c_adapter *i2c);
 #else

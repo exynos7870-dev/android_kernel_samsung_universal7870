@@ -31,8 +31,12 @@
  * If the temperature is higher than a trip point,
  *    a. if the trend is THERMAL_TREND_RAISING, use higher cooling
  *       state for this trip point
+<<<<<<< HEAD
  *    b. if the trend is THERMAL_TREND_DROPPING, use lower cooling
  *       state for this trip point
+=======
+ *    b. if the trend is THERMAL_TREND_DROPPING, do nothing
+>>>>>>> common/deprecated/android-3.18
  *    c. if the trend is THERMAL_TREND_RAISE_FULL, use upper limit
  *       for this trip point
  *    d. if the trend is THERMAL_TREND_DROP_FULL, use lower limit
@@ -63,6 +67,22 @@ static unsigned long get_target_state(struct thermal_instance *instance,
 	next_target = instance->target;
 	dev_dbg(&cdev->device, "cur_state=%ld\n", cur_state);
 
+<<<<<<< HEAD
+=======
+	if (!instance->initialized) {
+		if (throttle) {
+			next_target = (cur_state + 1) >= instance->upper ?
+					instance->upper :
+					((cur_state + 1) < instance->lower ?
+					instance->lower : (cur_state + 1));
+		} else {
+			next_target = THERMAL_NO_TARGET;
+		}
+
+		return next_target;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	switch (trend) {
 	case THERMAL_TREND_RAISING:
 		if (throttle) {
@@ -81,9 +101,17 @@ static unsigned long get_target_state(struct thermal_instance *instance,
 			if (!throttle)
 				next_target = THERMAL_NO_TARGET;
 		} else {
+<<<<<<< HEAD
 			next_target = cur_state - 1;
 			if (next_target > instance->upper)
 				next_target = instance->upper;
+=======
+			if (!throttle) {
+				next_target = cur_state - 1;
+				if (next_target > instance->upper)
+					next_target = instance->upper;
+			}
+>>>>>>> common/deprecated/android-3.18
 		}
 		break;
 	case THERMAL_TREND_DROP_FULL:
@@ -149,7 +177,11 @@ static void thermal_zone_trip_update(struct thermal_zone_device *tz, int trip)
 		dev_dbg(&instance->cdev->device, "old_target=%d, target=%d\n",
 					old_target, (int)instance->target);
 
+<<<<<<< HEAD
 		if (old_target == instance->target)
+=======
+		if (instance->initialized && old_target == instance->target)
+>>>>>>> common/deprecated/android-3.18
 			continue;
 
 		/* Activate a passive thermal instance */
@@ -161,7 +193,11 @@ static void thermal_zone_trip_update(struct thermal_zone_device *tz, int trip)
 			instance->target == THERMAL_NO_TARGET)
 			update_passive_instance(tz, trip_type, -1);
 
+<<<<<<< HEAD
 
+=======
+		instance->initialized = true;
+>>>>>>> common/deprecated/android-3.18
 		instance->cdev->updated = false; /* cdev needs update */
 	}
 
@@ -194,9 +230,12 @@ static int step_wise_throttle(struct thermal_zone_device *tz, int trip)
 	list_for_each_entry(instance, &tz->thermal_instances, tz_node)
 		thermal_cdev_update(instance->cdev);
 
+<<<<<<< HEAD
 	if (tz->ops->throttle_cpu_hotplug)
 		tz->ops->throttle_cpu_hotplug(tz);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	mutex_unlock(&tz->lock);
 
 	return 0;

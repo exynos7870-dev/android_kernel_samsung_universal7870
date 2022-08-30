@@ -387,7 +387,12 @@ struct qdisc_rate_table *qdisc_get_rtab(struct tc_ratespec *r, struct nlattr *ta
 {
 	struct qdisc_rate_table *rtab;
 
+<<<<<<< HEAD
 	if (tab == NULL || r->rate == 0 || r->cell_log == 0 ||
+=======
+	if (tab == NULL || r->rate == 0 ||
+	    r->cell_log == 0 || r->cell_log >= 32 ||
+>>>>>>> common/deprecated/android-3.18
 	    nla_len(tab) != TC_RTAB_SIZE)
 		return NULL;
 
@@ -740,14 +745,23 @@ static u32 qdisc_alloc_handle(struct net_device *dev)
 	return 0;
 }
 
+<<<<<<< HEAD
 void qdisc_tree_decrease_qlen(struct Qdisc *sch, unsigned int n)
+=======
+void qdisc_tree_reduce_backlog(struct Qdisc *sch, unsigned int n,
+			       unsigned int len)
+>>>>>>> common/deprecated/android-3.18
 {
 	const struct Qdisc_class_ops *cops;
 	unsigned long cl;
 	u32 parentid;
 	int drops;
 
+<<<<<<< HEAD
 	if (n == 0)
+=======
+	if (n == 0 && len == 0)
+>>>>>>> common/deprecated/android-3.18
 		return;
 	drops = max_t(int, n, 0);
 	while ((parentid = sch->parent)) {
@@ -766,10 +780,18 @@ void qdisc_tree_decrease_qlen(struct Qdisc *sch, unsigned int n)
 			cops->put(sch, cl);
 		}
 		sch->q.qlen -= n;
+<<<<<<< HEAD
 		__qdisc_qstats_drop(sch, drops);
 	}
 }
 EXPORT_SYMBOL(qdisc_tree_decrease_qlen);
+=======
+		sch->qstats.backlog -= len;
+		__qdisc_qstats_drop(sch, drops);
+	}
+}
+EXPORT_SYMBOL(qdisc_tree_reduce_backlog);
+>>>>>>> common/deprecated/android-3.18
 
 static void notify_and_destroy(struct net *net, struct sk_buff *skb,
 			       struct nlmsghdr *n, u32 clid,
@@ -815,10 +837,15 @@ static int qdisc_graft(struct net_device *dev, struct Qdisc *parent,
 		if (dev->flags & IFF_UP)
 			dev_deactivate(dev);
 
+<<<<<<< HEAD
 		if (new && new->ops->attach) {
 			new->ops->attach(new);
 			num_q = 0;
 		}
+=======
+		if (new && new->ops->attach)
+			goto skip;
+>>>>>>> common/deprecated/android-3.18
 
 		for (i = 0; i < num_q; i++) {
 			struct netdev_queue *dev_queue = dev_ingress_queue(dev);
@@ -834,12 +861,22 @@ static int qdisc_graft(struct net_device *dev, struct Qdisc *parent,
 				qdisc_destroy(old);
 		}
 
+<<<<<<< HEAD
+=======
+skip:
+>>>>>>> common/deprecated/android-3.18
 		if (!ingress) {
 			notify_and_destroy(net, skb, n, classid,
 					   dev->qdisc, new);
 			if (new && !new->ops->attach)
 				atomic_inc(&new->refcnt);
 			dev->qdisc = new ? : &noop_qdisc;
+<<<<<<< HEAD
+=======
+
+			if (new && new->ops->attach)
+				new->ops->attach(new);
+>>>>>>> common/deprecated/android-3.18
 		} else {
 			notify_and_destroy(net, skb, n, classid, old, new);
 		}
@@ -991,6 +1028,12 @@ qdisc_create(struct net_device *dev, struct netdev_queue *dev_queue,
 
 		return sch;
 	}
+<<<<<<< HEAD
+=======
+	/* ops->init() failed, we call ->destroy() like qdisc_create_dflt() */
+	if (ops->destroy)
+		ops->destroy(sch);
+>>>>>>> common/deprecated/android-3.18
 err_out3:
 	dev_put(dev);
 	kfree((char *) sch - sch->padded);
@@ -1160,6 +1203,7 @@ static int tc_get_qdisc(struct sk_buff *skb, struct nlmsghdr *n)
 }
 
 /*
+<<<<<<< HEAD
  * enable/disable flow on qdisc.
  */
 void
@@ -1189,6 +1233,8 @@ tc_qdisc_flow_control(struct net_device *dev, u32 tcm_handle, int enable_flow)
 EXPORT_SYMBOL(tc_qdisc_flow_control);
 
 /*
+=======
+>>>>>>> common/deprecated/android-3.18
  * Create/change qdisc.
  */
 
@@ -1836,10 +1882,18 @@ done:
 int tc_classify_compat(struct sk_buff *skb, const struct tcf_proto *tp,
 		       struct tcf_result *res)
 {
+<<<<<<< HEAD
 	__be16 protocol = skb->protocol;
 	int err;
 
 	for (; tp; tp = rcu_dereference_bh(tp->next)) {
+=======
+	int err;
+
+	for (; tp; tp = rcu_dereference_bh(tp->next)) {
+		__be16 protocol = skb->protocol;
+
+>>>>>>> common/deprecated/android-3.18
 		if (tp->protocol != protocol &&
 		    tp->protocol != htons(ETH_P_ALL))
 			continue;

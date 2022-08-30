@@ -7,6 +7,10 @@
 
 #include <linux/uidgid.h>
 #include <net/inet_frag.h>
+<<<<<<< HEAD
+=======
+#include <linux/siphash.h>
+>>>>>>> common/deprecated/android-3.18
 
 struct tcpm_hash_bucket;
 struct ctl_table_header;
@@ -81,6 +85,10 @@ struct netns_ipv4 {
 
 	int sysctl_fwmark_reflect;
 	int sysctl_tcp_fwmark_accept;
+<<<<<<< HEAD
+=======
+	int sysctl_tcp_min_snd_mss;
+>>>>>>> common/deprecated/android-3.18
 
 	struct ping_group_range ping_group_range;
 
@@ -99,5 +107,9 @@ struct netns_ipv4 {
 #endif
 #endif
 	atomic_t	rt_genid;
+<<<<<<< HEAD
+=======
+	siphash_key_t	ip_id_key;
+>>>>>>> common/deprecated/android-3.18
 };
 #endif

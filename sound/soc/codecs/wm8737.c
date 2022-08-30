@@ -171,7 +171,11 @@ SOC_DOUBLE("Polarity Invert Switch", WM8737_ADC_CONTROL, 5, 6, 1, 0),
 SOC_SINGLE("3D Switch", WM8737_3D_ENHANCE, 0, 1, 0),
 SOC_SINGLE("3D Depth", WM8737_3D_ENHANCE, 1, 15, 0),
 SOC_ENUM("3D Low Cut-off", low_3d),
+<<<<<<< HEAD
 SOC_ENUM("3D High Cut-off", low_3d),
+=======
+SOC_ENUM("3D High Cut-off", high_3d),
+>>>>>>> common/deprecated/android-3.18
 SOC_SINGLE_TLV("3D ADC Volume", WM8737_3D_ENHANCE, 7, 1, 1, adc_tlv),
 
 SOC_SINGLE("Noise Gate Switch", WM8737_NOISE_GATE, 0, 1, 0),
@@ -494,7 +498,12 @@ static int wm8737_set_bias_level(struct snd_soc_codec *codec,
 
 			/* Fast VMID ramp at 2*2.5k */
 			snd_soc_update_bits(codec, WM8737_MISC_BIAS_CONTROL,
+<<<<<<< HEAD
 					    WM8737_VMIDSEL_MASK, 0x4);
+=======
+					    WM8737_VMIDSEL_MASK,
+					    2 << WM8737_VMIDSEL_SHIFT);
+>>>>>>> common/deprecated/android-3.18
 
 			/* Bring VMID up */
 			snd_soc_update_bits(codec, WM8737_POWER_MANAGEMENT,
@@ -508,7 +517,12 @@ static int wm8737_set_bias_level(struct snd_soc_codec *codec,
 
 		/* VMID at 2*300k */
 		snd_soc_update_bits(codec, WM8737_MISC_BIAS_CONTROL,
+<<<<<<< HEAD
 				    WM8737_VMIDSEL_MASK, 2);
+=======
+				    WM8737_VMIDSEL_MASK,
+				    1 << WM8737_VMIDSEL_SHIFT);
+>>>>>>> common/deprecated/android-3.18
 
 		break;
 

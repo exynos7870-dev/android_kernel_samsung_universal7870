@@ -675,6 +675,7 @@ config KEYBOARD_CAP1106
 	  To compile this driver as a module, choose M here: the
 	  module will be called cap1106.
 
+<<<<<<< HEAD
 config KEYBOARD_TC300K
 	tristate "Coreriver TC300K touchkey"
 	depends on I2C
@@ -718,4 +719,6 @@ config KEYBOARD_ABOV_TOUCH
 	  Say Y here if you want to use ABOV MC96FT16XX chip as touchkey.
 
 source "drivers/input/keyboard/melfas_mip4/Kconfig"
+=======
+>>>>>>> common/deprecated/android-3.18
 endif

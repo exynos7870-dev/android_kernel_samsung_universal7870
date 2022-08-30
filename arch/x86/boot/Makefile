@@ -9,6 +9,7 @@
 # Changed by many, many contributors over the years.
 #
 
+<<<<<<< HEAD
 KASAN_SANITIZE			:= n
 OBJECT_FILES_NON_STANDARD	:= y
 
@@ -19,6 +20,8 @@ OBJECT_FILES_NON_STANDARD	:= y
 # so boot code is not interesting anyway.
 KCOV_INSTRUMENT		:= n
 
+=======
+>>>>>>> common/deprecated/android-3.18
 # If you want to preset the SVGA mode, uncomment the next line and
 # set SVGA_MODE to whatever number you want.
 # Set it to -DSVGA_MODE=NORMAL_VGA if you just want the EGA/VGA mode.
@@ -72,12 +75,22 @@ GCOV_PROFILE := n
 $(obj)/bzImage: asflags-y  := $(SVGA_MODE)
 
 quiet_cmd_image = BUILD   $@
+<<<<<<< HEAD
 cmd_image = $(obj)/tools/build $(obj)/setup.bin $(obj)/vmlinux.bin \
 			       $(obj)/zoffset.h $@
 
 $(obj)/bzImage: $(obj)/setup.bin $(obj)/vmlinux.bin $(obj)/tools/build FORCE
 	$(call if_changed,image)
 	@echo 'Kernel: $@ is ready' ' (#'`cat .version`')'
+=======
+silent_redirect_image = >/dev/null
+cmd_image = $(obj)/tools/build $(obj)/setup.bin $(obj)/vmlinux.bin \
+			       $(obj)/zoffset.h $@ $($(quiet)redirect_image)
+
+$(obj)/bzImage: $(obj)/setup.bin $(obj)/vmlinux.bin $(obj)/tools/build FORCE
+	$(call if_changed,image)
+	@$(kecho) 'Kernel: $@ is ready' ' (#'`cat .version`')'
+>>>>>>> common/deprecated/android-3.18
 
 OBJCOPYFLAGS_vmlinux.bin := -O binary -R .note -R .comment -S
 $(obj)/vmlinux.bin: $(obj)/compressed/vmlinux FORCE
@@ -107,7 +120,11 @@ $(obj)/zoffset.h: $(obj)/compressed/vmlinux FORCE
 AFLAGS_header.o += -I$(obj)
 $(obj)/header.o: $(obj)/voffset.h $(obj)/zoffset.h
 
+<<<<<<< HEAD
 LDFLAGS_setup.elf	:= -T
+=======
+LDFLAGS_setup.elf	:= -m elf_i386 -T
+>>>>>>> common/deprecated/android-3.18
 $(obj)/setup.elf: $(src)/setup.ld $(SETUP_OBJS) FORCE
 	$(call if_changed,ld)
 
@@ -170,6 +187,12 @@ isoimage: $(obj)/bzImage
 	for i in lib lib64 share end ; do \
 		if [ -f /usr/$$i/syslinux/isolinux.bin ] ; then \
 			cp /usr/$$i/syslinux/isolinux.bin $(obj)/isoimage ; \
+<<<<<<< HEAD
+=======
+			if [ -f /usr/$$i/syslinux/ldlinux.c32 ]; then \
+				cp /usr/$$i/syslinux/ldlinux.c32 $(obj)/isoimage ; \
+			fi ; \
+>>>>>>> common/deprecated/android-3.18
 			break ; \
 		fi ; \
 		if [ $$i = end ] ; then exit 1 ; fi ; \

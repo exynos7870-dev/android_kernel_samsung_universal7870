@@ -140,18 +140,29 @@ static long afu_ioctl_start_work(struct cxl_context *ctx,
 
 	pr_devel("%s: pe: %i\n", __func__, ctx->pe);
 
+<<<<<<< HEAD
+=======
+	/* Do this outside the status_mutex to avoid a circular dependency with
+	 * the locking in cxl_mmap_fault() */
+	if (copy_from_user(&work, uwork, sizeof(work)))
+		return -EFAULT;
+
+>>>>>>> common/deprecated/android-3.18
 	mutex_lock(&ctx->status_mutex);
 	if (ctx->status != OPENED) {
 		rc = -EIO;
 		goto out;
 	}
 
+<<<<<<< HEAD
 	if (copy_from_user(&work, uwork,
 			   sizeof(struct cxl_ioctl_start_work))) {
 		rc = -EFAULT;
 		goto out;
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * if any of the reserved fields are set or any of the unused
 	 * flags are set it's invalid

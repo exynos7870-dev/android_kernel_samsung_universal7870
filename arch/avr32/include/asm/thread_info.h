@@ -30,7 +30,10 @@ struct thread_info {
 						   saved by debug handler
 						   when setting up
 						   trampoline */
+<<<<<<< HEAD
 	struct restart_block	restart_block;
+=======
+>>>>>>> common/deprecated/android-3.18
 	__u8			supervisor_stack[0];
 };
 
@@ -41,9 +44,12 @@ struct thread_info {
 	.flags		= 0,						\
 	.cpu		= 0,						\
 	.preempt_count	= INIT_PREEMPT_COUNT,				\
+<<<<<<< HEAD
 	.restart_block	= {						\
 		.fn	= do_no_restart_syscall				\
 	}								\
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 
 #define init_thread_info	(init_thread_union.thread_info)

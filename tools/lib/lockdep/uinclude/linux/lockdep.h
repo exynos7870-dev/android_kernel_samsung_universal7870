@@ -8,7 +8,11 @@
 #include <linux/utsname.h>
 
 
+<<<<<<< HEAD
 #define MAX_LOCK_DEPTH 2000UL
+=======
+#define MAX_LOCK_DEPTH 255UL
+>>>>>>> common/deprecated/android-3.18
 
 #define asmlinkage
 #define __visible

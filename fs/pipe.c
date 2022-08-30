@@ -179,9 +179,15 @@ EXPORT_SYMBOL(generic_pipe_buf_steal);
  *	in the tee() system call, when we duplicate the buffers in one
  *	pipe into another.
  */
+<<<<<<< HEAD
 void generic_pipe_buf_get(struct pipe_inode_info *pipe, struct pipe_buffer *buf)
 {
 	page_cache_get(buf->page);
+=======
+bool generic_pipe_buf_get(struct pipe_inode_info *pipe, struct pipe_buffer *buf)
+{
+	return try_get_page(buf->page);
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL(generic_pipe_buf_get);
 
@@ -618,6 +624,12 @@ struct pipe_inode_info *alloc_pipe_info(void)
 		unsigned long pipe_bufs = PIPE_DEF_BUFFERS;
 		struct user_struct *user = get_current_user();
 
+<<<<<<< HEAD
+=======
+		if (pipe_bufs * PAGE_SIZE > pipe_max_size && !capable(CAP_SYS_RESOURCE))
+			pipe_bufs = pipe_max_size >> PAGE_SHIFT;
+
+>>>>>>> common/deprecated/android-3.18
 		if (!too_many_pipe_buffers_hard(user)) {
 			if (too_many_pipe_buffers_soft(user))
 				pipe_bufs = 1;
@@ -1002,6 +1014,12 @@ static long pipe_set_size(struct pipe_inode_info *pipe, unsigned long nr_pages)
 {
 	struct pipe_buffer *bufs;
 
+<<<<<<< HEAD
+=======
+	if (!nr_pages)
+		return -EINVAL;
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * We can shrink the pipe, if arg >= pipe->nrbufs. Since we don't
 	 * expect a lot of shrink+grow operations, just free and allocate
@@ -1046,13 +1064,27 @@ static long pipe_set_size(struct pipe_inode_info *pipe, unsigned long nr_pages)
 
 /*
  * Currently we rely on the pipe array holding a power-of-2 number
+<<<<<<< HEAD
  * of pages.
+=======
+ * of pages. Returns 0 on error.
+>>>>>>> common/deprecated/android-3.18
  */
 static inline unsigned int round_pipe_size(unsigned int size)
 {
 	unsigned long nr_pages;
 
+<<<<<<< HEAD
 	nr_pages = (size + PAGE_SIZE - 1) >> PAGE_SHIFT;
+=======
+	if (size < pipe_min_size)
+		size = pipe_min_size;
+
+	nr_pages = (size + PAGE_SIZE - 1) >> PAGE_SHIFT;
+	if (nr_pages == 0)
+		return 0;
+
+>>>>>>> common/deprecated/android-3.18
 	return roundup_pow_of_two(nr_pages) << PAGE_SHIFT;
 }
 
@@ -1063,13 +1095,25 @@ static inline unsigned int round_pipe_size(unsigned int size)
 int pipe_proc_fn(struct ctl_table *table, int write, void __user *buf,
 		 size_t *lenp, loff_t *ppos)
 {
+<<<<<<< HEAD
+=======
+	unsigned int rounded_pipe_max_size;
+>>>>>>> common/deprecated/android-3.18
 	int ret;
 
 	ret = proc_dointvec_minmax(table, write, buf, lenp, ppos);
 	if (ret < 0 || !write)
 		return ret;
 
+<<<<<<< HEAD
 	pipe_max_size = round_pipe_size(pipe_max_size);
+=======
+	rounded_pipe_max_size = round_pipe_size(pipe_max_size);
+	if (rounded_pipe_max_size == 0)
+		return -EINVAL;
+
+	pipe_max_size = rounded_pipe_max_size;
+>>>>>>> common/deprecated/android-3.18
 	return ret;
 }
 

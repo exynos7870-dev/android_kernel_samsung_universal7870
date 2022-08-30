@@ -4,7 +4,10 @@
 
 obj-$(CONFIG_HW_RANDOM) += rng-core.o
 rng-core-y := core.o
+<<<<<<< HEAD
 obj-$(CONFIG_HW_RANDOM_EXYNOS_SWD) += exyswd-rng.o
+=======
+>>>>>>> common/deprecated/android-3.18
 obj-$(CONFIG_HW_RANDOM_TIMERIOMEM) += timeriomem-rng.o
 obj-$(CONFIG_HW_RANDOM_INTEL) += intel-rng.o
 obj-$(CONFIG_HW_RANDOM_AMD) += amd-rng.o

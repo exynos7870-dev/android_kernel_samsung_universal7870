@@ -578,6 +578,10 @@ static void __exit cttimeout_exit(void)
 #ifdef CONFIG_NF_CONNTRACK_TIMEOUT
 	RCU_INIT_POINTER(nf_ct_timeout_find_get_hook, NULL);
 	RCU_INIT_POINTER(nf_ct_timeout_put_hook, NULL);
+<<<<<<< HEAD
+=======
+	synchronize_rcu();
+>>>>>>> common/deprecated/android-3.18
 #endif /* CONFIG_NF_CONNTRACK_TIMEOUT */
 }
 

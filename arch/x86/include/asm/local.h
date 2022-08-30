@@ -52,7 +52,11 @@ static inline void local_sub(long i, local_t *l)
  */
 static inline int local_sub_and_test(long i, local_t *l)
 {
+<<<<<<< HEAD
 	GEN_BINARY_RMWcc(_ASM_SUB, l->a.counter, "er", i, "%0", "e");
+=======
+	GEN_BINARY_RMWcc(_ASM_SUB, l->a.counter, "er", i, "%0", e);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -65,7 +69,11 @@ static inline int local_sub_and_test(long i, local_t *l)
  */
 static inline int local_dec_and_test(local_t *l)
 {
+<<<<<<< HEAD
 	GEN_UNARY_RMWcc(_ASM_DEC, l->a.counter, "%0", "e");
+=======
+	GEN_UNARY_RMWcc(_ASM_DEC, l->a.counter, "%0", e);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -78,7 +86,11 @@ static inline int local_dec_and_test(local_t *l)
  */
 static inline int local_inc_and_test(local_t *l)
 {
+<<<<<<< HEAD
 	GEN_UNARY_RMWcc(_ASM_INC, l->a.counter, "%0", "e");
+=======
+	GEN_UNARY_RMWcc(_ASM_INC, l->a.counter, "%0", e);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -92,7 +104,11 @@ static inline int local_inc_and_test(local_t *l)
  */
 static inline int local_add_negative(long i, local_t *l)
 {
+<<<<<<< HEAD
 	GEN_BINARY_RMWcc(_ASM_ADD, l->a.counter, "er", i, "%0", "s");
+=======
+	GEN_BINARY_RMWcc(_ASM_ADD, l->a.counter, "er", i, "%0", s);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**

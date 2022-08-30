@@ -53,9 +53,12 @@
 #include <linux/pm_runtime.h>
 #include <asm/uaccess.h>
 #include <asm/unaligned.h>
+<<<<<<< HEAD
 #ifdef CONFIG_USB_STORAGE_DETECT
 #include <linux/kthread.h>
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #include <scsi/scsi.h>
 #include <scsi/scsi_cmnd.h>
@@ -179,7 +182,12 @@ cache_type_store(struct device *dev, struct device_attribute *attr,
 
 	for (i = 0; i < ARRAY_SIZE(sd_cache_types); i++) {
 		len = strlen(sd_cache_types[i]);
+<<<<<<< HEAD
 		if (strncmp(sd_cache_types[i], buf, len) == 0) {
+=======
+		if (strncmp(sd_cache_types[i], buf, len) == 0 &&
+		    buf[len] == '\n') {
+>>>>>>> common/deprecated/android-3.18
 			ct = i;
 			break;
 		}
@@ -207,6 +215,15 @@ cache_type_store(struct device *dev, struct device_attribute *attr,
 	buffer_data[2] |= wce << 2 | rcd;
 	sp = buffer_data[0] & 0x80 ? 1 : 0;
 
+<<<<<<< HEAD
+=======
+	/*
+	 * Ensure WP, DPOFUA, and RESERVED fields are cleared in
+	 * received mode parameter buffer before doing MODE SELECT.
+	 */
+	data.device_specific = 0;
+
+>>>>>>> common/deprecated/android-3.18
 	if (scsi_mode_select(sdp, 1, sp, 8, buffer_data, len, SD_TIMEOUT,
 			     SD_MAX_RETRIES, &data, &sshdr)) {
 		if (scsi_sense_valid(&sshdr))
@@ -233,11 +250,22 @@ manage_start_stop_store(struct device *dev, struct device_attribute *attr,
 {
 	struct scsi_disk *sdkp = to_scsi_disk(dev);
 	struct scsi_device *sdp = sdkp->device;
+<<<<<<< HEAD
+=======
+	bool v;
+>>>>>>> common/deprecated/android-3.18
 
 	if (!capable(CAP_SYS_ADMIN))
 		return -EACCES;
 
+<<<<<<< HEAD
 	sdp->manage_start_stop = simple_strtoul(buf, NULL, 10);
+=======
+	if (kstrtobool(buf, &v))
+		return -EINVAL;
+
+	sdp->manage_start_stop = v;
+>>>>>>> common/deprecated/android-3.18
 
 	return count;
 }
@@ -255,6 +283,10 @@ static ssize_t
 allow_restart_store(struct device *dev, struct device_attribute *attr,
 		    const char *buf, size_t count)
 {
+<<<<<<< HEAD
+=======
+	bool v;
+>>>>>>> common/deprecated/android-3.18
 	struct scsi_disk *sdkp = to_scsi_disk(dev);
 	struct scsi_device *sdp = sdkp->device;
 
@@ -264,7 +296,14 @@ allow_restart_store(struct device *dev, struct device_attribute *attr,
 	if (sdp->type != TYPE_DISK)
 		return -EINVAL;
 
+<<<<<<< HEAD
 	sdp->allow_restart = simple_strtoul(buf, NULL, 10);
+=======
+	if (kstrtobool(buf, &v))
+		return -EINVAL;
+
+	sdp->allow_restart = v;
+>>>>>>> common/deprecated/android-3.18
 
 	return count;
 }
@@ -1281,6 +1320,7 @@ static int sd_getgeo(struct block_device *bdev, struct hd_geometry *geo)
 	struct scsi_disk *sdkp = scsi_disk(bdev->bd_disk);
 	struct scsi_device *sdp = sdkp->device;
 	struct Scsi_Host *host = sdp->host;
+<<<<<<< HEAD
 	int diskinfo[4];
 
 	/* default to most commonly used values */
@@ -1293,6 +1333,21 @@ static int sd_getgeo(struct block_device *bdev, struct hd_geometry *geo)
 		host->hostt->bios_param(sdp, bdev, sdkp->capacity, diskinfo);
 	else
 		scsicam_bios_param(bdev, sdkp->capacity, diskinfo);
+=======
+	sector_t capacity = logical_to_sectors(sdp, sdkp->capacity);
+	int diskinfo[4];
+
+	/* default to most commonly used values */
+	diskinfo[0] = 0x40;	/* 1 << 6 */
+	diskinfo[1] = 0x20;	/* 1 << 5 */
+	diskinfo[2] = capacity >> 11;
+
+	/* override with calculated, extended default, or driver values */
+	if (host->hostt->bios_param)
+		host->hostt->bios_param(sdp, bdev, capacity, diskinfo);
+	else
+		scsicam_bios_param(bdev, capacity, diskinfo);
+>>>>>>> common/deprecated/android-3.18
 
 	geo->heads = diskinfo[0];
 	geo->sectors = diskinfo[1];
@@ -1322,7 +1377,11 @@ static int sd_ioctl(struct block_device *bdev, fmode_t mode,
 	struct scsi_device *sdp = sdkp->device;
 	void __user *p = (void __user *)arg;
 	int error;
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> common/deprecated/android-3.18
 	SCSI_LOG_IOCTL(1, sd_printk(KERN_INFO, sdkp, "sd_ioctl: disk=%s, "
 				    "cmd=0x%x\n", disk->disk_name, cmd));
 
@@ -1349,8 +1408,11 @@ static int sd_ioctl(struct block_device *bdev, fmode_t mode,
 	switch (cmd) {
 		case SCSI_IOCTL_GET_IDLUN:
 		case SCSI_IOCTL_GET_BUS_NUMBER:
+<<<<<<< HEAD
 		case SCSI_IOCTL_SECURITY_PROTOCOL_IN:
 		case SCSI_IOCTL_SECURITY_PROTOCOL_OUT:
+=======
+>>>>>>> common/deprecated/android-3.18
 			error = scsi_ioctl(sdp, cmd, p);
 			break;
 		default:
@@ -1405,11 +1467,23 @@ static int media_not_present(struct scsi_disk *sdkp,
  **/
 static unsigned int sd_check_events(struct gendisk *disk, unsigned int clearing)
 {
+<<<<<<< HEAD
 	struct scsi_disk *sdkp = scsi_disk(disk);
 	struct scsi_device *sdp = sdkp->device;
 	struct scsi_sense_hdr *sshdr = NULL;
 	int retval;
 
+=======
+	struct scsi_disk *sdkp = scsi_disk_get(disk);
+	struct scsi_device *sdp;
+	struct scsi_sense_hdr *sshdr = NULL;
+	int retval;
+
+	if (!sdkp)
+		return 0;
+
+	sdp = sdkp->device;
+>>>>>>> common/deprecated/android-3.18
 	SCSI_LOG_HLQUEUE(3, sd_printk(KERN_INFO, sdkp, "sd_check_events\n"));
 
 	/*
@@ -1466,6 +1540,10 @@ out:
 	kfree(sshdr);
 	retval = sdp->changed ? DISK_EVENT_MEDIA_CHANGE : 0;
 	sdp->changed = 0;
+<<<<<<< HEAD
+=======
+	scsi_disk_put(sdkp);
+>>>>>>> common/deprecated/android-3.18
 	return retval;
 }
 
@@ -1638,6 +1716,10 @@ static unsigned int sd_completed_bytes(struct scsi_cmnd *scmd)
 {
 	u64 start_lba = blk_rq_pos(scmd->request);
 	u64 end_lba = blk_rq_pos(scmd->request) + (scsi_bufflen(scmd) / 512);
+<<<<<<< HEAD
+=======
+	u64 factor = scmd->device->sector_size / 512;
+>>>>>>> common/deprecated/android-3.18
 	u64 bad_lba;
 	int info_valid;
 	/*
@@ -1659,6 +1741,7 @@ static unsigned int sd_completed_bytes(struct scsi_cmnd *scmd)
 	if (scsi_bufflen(scmd) <= scmd->device->sector_size)
 		return 0;
 
+<<<<<<< HEAD
 	if (scmd->device->sector_size < 512) {
 		/* only legitimate sector_size here is 256 */
 		start_lba <<= 1;
@@ -1669,6 +1752,11 @@ static unsigned int sd_completed_bytes(struct scsi_cmnd *scmd)
 		do_div(start_lba, factor);
 		do_div(end_lba, factor);
 	}
+=======
+	/* be careful ... don't want any overflows */
+	do_div(start_lba, factor);
+	do_div(end_lba, factor);
+>>>>>>> common/deprecated/android-3.18
 
 	/* The bad lba was reported incorrectly, we have no idea where
 	 * the error is.
@@ -1857,6 +1945,11 @@ sd_spinup_disk(struct scsi_disk *sdkp)
 				break;	/* standby */
 			if (sshdr.asc == 4 && sshdr.ascq == 0xc)
 				break;	/* unavailable */
+<<<<<<< HEAD
+=======
+			if (sshdr.asc == 4 && sshdr.ascq == 0x1b)
+				break;	/* sanitize in progress */
+>>>>>>> common/deprecated/android-3.18
 			/*
 			 * Issue command to spin up drive when not ready
 			 */
@@ -1923,8 +2016,15 @@ static int sd_read_protection_type(struct scsi_disk *sdkp, unsigned char *buffer
 	u8 type;
 	int ret = 0;
 
+<<<<<<< HEAD
 	if (scsi_device_protection(sdp) == 0 || (buffer[12] & 1) == 0)
 		return ret;
+=======
+	if (scsi_device_protection(sdp) == 0 || (buffer[12] & 1) == 0) {
+		sdkp->protection_type = 0;
+		return ret;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	type = ((buffer[12] >> 1) & 7) + 1; /* P_TYPE 0 = Type 1 */
 
@@ -1988,6 +2088,25 @@ static void read_capacity_error(struct scsi_disk *sdkp, struct scsi_device *sdp,
 
 #define READ_CAPACITY_RETRIES_ON_RESET	10
 
+<<<<<<< HEAD
+=======
+/*
+ * Ensure that we don't overflow sector_t when CONFIG_LBDAF is not set
+ * and the reported logical block size is bigger than 512 bytes. Note
+ * that last_sector is a u64 and therefore logical_to_sectors() is not
+ * applicable.
+ */
+static bool sd_addressable_capacity(u64 lba, unsigned int sector_size)
+{
+	u64 last_sector = (lba + 1ULL) << (ilog2(sector_size) - 9);
+
+	if (sizeof(sector_t) == 4 && last_sector > U32_MAX)
+		return false;
+
+	return true;
+}
+
+>>>>>>> common/deprecated/android-3.18
 static int read_capacity_16(struct scsi_disk *sdkp, struct scsi_device *sdp,
 						unsigned char *buffer)
 {
@@ -2053,7 +2172,11 @@ static int read_capacity_16(struct scsi_disk *sdkp, struct scsi_device *sdp,
 		return -ENODEV;
 	}
 
+<<<<<<< HEAD
 	if ((sizeof(sdkp->capacity) == 4) && (lba >= 0xffffffffULL)) {
+=======
+	if (!sd_addressable_capacity(lba, sector_size)) {
+>>>>>>> common/deprecated/android-3.18
 		sd_printk(KERN_ERR, sdkp, "Too big for this kernel. Use a "
 			"kernel compiled with support for large block "
 			"devices.\n");
@@ -2139,7 +2262,11 @@ static int read_capacity_10(struct scsi_disk *sdkp, struct scsi_device *sdp,
 		return sector_size;
 	}
 
+<<<<<<< HEAD
 	if ((sizeof(sdkp->capacity) == 4) && (lba == 0xffffffff)) {
+=======
+	if (!sd_addressable_capacity(lba, sector_size)) {
+>>>>>>> common/deprecated/android-3.18
 		sd_printk(KERN_ERR, sdkp, "Too big for this kernel. Use a "
 			"kernel compiled with support for large block "
 			"devices.\n");
@@ -2235,8 +2362,12 @@ got_data:
 	if (sector_size != 512 &&
 	    sector_size != 1024 &&
 	    sector_size != 2048 &&
+<<<<<<< HEAD
 	    sector_size != 4096 &&
 	    sector_size != 256) {
+=======
+	    sector_size != 4096) {
+>>>>>>> common/deprecated/android-3.18
 		sd_printk(KERN_NOTICE, sdkp, "Unsupported sector size %d.\n",
 			  sector_size);
 		/*
@@ -2284,6 +2415,7 @@ got_data:
 	} else
 		sdkp->max_xfer_blocks = SD_DEF_XFER_BLOCKS;
 
+<<<<<<< HEAD
 	/* Rescale capacity to 512-byte units */
 	if (sector_size == 4096)
 		sdkp->capacity <<= 3;
@@ -2294,6 +2426,8 @@ got_data:
 	else if (sector_size == 256)
 		sdkp->capacity >>= 1;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	blk_queue_physical_block_size(sdp->request_queue,
 				      sdkp->physical_block_size);
 	sdkp->device->sector_size = sector_size;
@@ -2501,7 +2635,12 @@ sd_read_cache_type(struct scsi_disk *sdkp, unsigned char *buffer)
 		if (sdp->broken_fua) {
 			sd_first_printk(KERN_NOTICE, sdkp, "Disabling FUA\n");
 			sdkp->DPOFUA = 0;
+<<<<<<< HEAD
 		} else if (sdkp->DPOFUA && !sdkp->device->use_10_for_rw) {
+=======
+		} else if (sdkp->DPOFUA && !sdkp->device->use_10_for_rw &&
+			   !sdkp->device->use_16_for_rw) {
+>>>>>>> common/deprecated/android-3.18
 			sd_first_printk(KERN_NOTICE, sdkp,
 				  "Uses READ/WRITE(6), disabling FUA\n");
 			sdkp->DPOFUA = 0;
@@ -2800,10 +2939,13 @@ static int sd_revalidate_disk(struct gendisk *disk)
 	 * react badly if we do.
 	 */
 	if (sdkp->media_present) {
+<<<<<<< HEAD
 #ifdef CONFIG_USB_STORAGE_DETECT
 		if (sdp->host->by_usb)
 			disk->flags |= GENHD_FL_MEDIA_PRESENT;
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 		sd_read_capacity(sdkp, buffer);
 
 		if (sd_try_extended_inquiry(sdp)) {
@@ -2829,10 +2971,17 @@ static int sd_revalidate_disk(struct gendisk *disk)
 	max_xfer = sdkp->max_xfer_blocks;
 	max_xfer <<= ilog2(sdp->sector_size) - 9;
 
+<<<<<<< HEAD
 	max_xfer = min_not_zero(queue_max_hw_sectors(sdkp->disk->queue),
 				max_xfer);
 	blk_queue_max_hw_sectors(sdkp->disk->queue, max_xfer);
 	set_capacity(disk, sdkp->capacity);
+=======
+	sdkp->disk->queue->limits.max_sectors =
+		min_not_zero(queue_max_hw_sectors(sdkp->disk->queue), max_xfer);
+
+	set_capacity(disk, logical_to_sectors(sdp, sdkp->capacity));
+>>>>>>> common/deprecated/android-3.18
 	sd_config_write_same(sdkp);
 	kfree(buffer);
 
@@ -2906,6 +3055,7 @@ static int sd_format_disk_name(char *prefix, int index, char *buf, int buflen)
 	return 0;
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_USB_STORAGE_DETECT
 static void sd_media_state_emit(struct scsi_disk *sdkp)
 {
@@ -3004,6 +3154,8 @@ static int sd_media_scan_thread(void *__sdkp)
 	complete_and_exit(&sdkp->scanning_done, 0);
 }
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * The asynchronous part of sd_probe
  */
@@ -3048,6 +3200,7 @@ static void sd_probe_async(void *data, async_cookie_t cookie)
 		gd->flags |= GENHD_FL_REMOVABLE;
 		gd->events |= DISK_EVENT_MEDIA_CHANGE;
 	}
+<<<<<<< HEAD
 #ifdef CONFIG_USB_STORAGE_DETECT
 	if (sdp->host->by_usb) {
 		gd->flags |= GENHD_FL_IF_USB;
@@ -3061,6 +3214,11 @@ static void sd_probe_async(void *data, async_cookie_t cookie)
 	if (sdp->host->by_usb)
 		sdkp->prv_media_present = sdkp->media_present;
 #endif
+=======
+
+	blk_pm_runtime_init(sdp->request_queue, dev);
+	add_disk(gd);
+>>>>>>> common/deprecated/android-3.18
 	if (sdkp->capacity)
 		sd_dif_config_host(sdkp);
 
@@ -3070,12 +3228,15 @@ static void sd_probe_async(void *data, async_cookie_t cookie)
 		  sdp->removable ? "removable " : "");
 	scsi_autopm_put_device(sdp);
 	put_device(&sdkp->dev);
+<<<<<<< HEAD
 #ifdef CONFIG_USB_STORAGE_DETECT
 	if (sdp->host->by_usb) {
 		if (!IS_ERR(sdkp->th))
 			wake_up_process(sdkp->th);
 	}
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -3166,6 +3327,7 @@ static int sd_probe(struct device *dev)
 
 	get_device(dev);
 	dev_set_drvdata(dev, sdkp);
+<<<<<<< HEAD
 #ifdef CONFIG_USB_STORAGE_DETECT
 	if (sdp->host->by_usb) {
 		init_waitqueue_head(&sdkp->delay_wait);
@@ -3179,6 +3341,8 @@ static int sd_probe(struct device *dev)
 		}
 	}
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	get_device(&sdkp->dev);	/* prevent release before async_schedule */
 	async_schedule_domain(sd_probe_async, sdkp, &scsi_sd_probe_domain);
@@ -3217,6 +3381,7 @@ static int sd_remove(struct device *dev)
 	sdkp = dev_get_drvdata(dev);
 	devt = disk_devt(sdkp->disk);
 	scsi_autopm_get_device(sdkp->device);
+<<<<<<< HEAD
 #ifdef CONFIG_USB_STORAGE_DETECT
 	sd_printk(KERN_INFO, sdkp, "%s\n", __func__);
 	if (sdkp->device->host->by_usb) {
@@ -3227,6 +3392,8 @@ static int sd_remove(struct device *dev)
 		sd_printk(KERN_NOTICE, sdkp, "scan thread kill success\n");
 	}
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	async_synchronize_full_domain(&scsi_sd_pm_domain);
 	async_synchronize_full_domain(&scsi_sd_probe_domain);
@@ -3315,9 +3482,12 @@ static int sd_start_stop_device(struct scsi_disk *sdkp, int start)
 static void sd_shutdown(struct device *dev)
 {
 	struct scsi_disk *sdkp = scsi_disk_get_from_dev(dev);
+<<<<<<< HEAD
 	struct scsi_device *sdp = to_scsi_device(dev);
 	struct request_queue *q = sdp->request_queue;
 	unsigned long flags;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	if (!sdkp)
 		return;         /* this can happen */
@@ -3336,12 +3506,15 @@ static void sd_shutdown(struct device *dev)
 	}
 
 exit:
+<<<<<<< HEAD
 	if (sdp->host->by_ufs) {
 		spin_lock_irqsave(q->queue_lock, flags);
 		blk_stop_queue(q);
 		spin_unlock_irqrestore(q->queue_lock, flags);
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	scsi_disk_put(sdkp);
 }
 
@@ -3350,8 +3523,13 @@ static int sd_suspend_common(struct device *dev, bool ignore_stop_errors)
 	struct scsi_disk *sdkp = scsi_disk_get_from_dev(dev);
 	int ret = 0;
 
+<<<<<<< HEAD
 	if (!sdkp)
 		return 0;	/* this can happen */
+=======
+	if (!sdkp)	/* E.g.: runtime suspend following sd_remove() */
+		return 0;
+>>>>>>> common/deprecated/android-3.18
 
 	if (sdkp->WCE && sdkp->media_present) {
 		sd_printk(KERN_NOTICE, sdkp, "Synchronizing SCSI cache\n");
@@ -3392,6 +3570,12 @@ static int sd_resume(struct device *dev)
 	struct scsi_disk *sdkp = scsi_disk_get_from_dev(dev);
 	int ret = 0;
 
+<<<<<<< HEAD
+=======
+	if (!sdkp)	/* E.g.: runtime resume at the start of sd_probe() */
+		return 0;
+
+>>>>>>> common/deprecated/android-3.18
 	if (!sdkp->device->manage_start_stop)
 		goto done;
 

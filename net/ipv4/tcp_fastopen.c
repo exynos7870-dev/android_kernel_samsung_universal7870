@@ -78,8 +78,11 @@ static bool __tcp_fastopen_cookie_gen(const void *path,
 	struct tcp_fastopen_context *ctx;
 	bool ok = false;
 
+<<<<<<< HEAD
 	tcp_fastopen_init_key_once(true);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	rcu_read_lock();
 	ctx = rcu_dereference(tcp_fastopen_ctx);
 	if (ctx) {
@@ -114,7 +117,11 @@ static bool tcp_fastopen_cookie_gen(struct request_sock *req,
 		struct tcp_fastopen_cookie tmp;
 
 		if (__tcp_fastopen_cookie_gen(&ip6h->saddr, &tmp)) {
+<<<<<<< HEAD
 			struct in6_addr *buf = (struct in6_addr *) tmp.val;
+=======
+			struct in6_addr *buf = &tmp.addr;
+>>>>>>> common/deprecated/android-3.18
 			int i;
 
 			for (i = 0; i < 4; i++)
@@ -166,6 +173,10 @@ static bool tcp_fastopen_create_child(struct sock *sk,
 	 * scaled. So correct it appropriately.
 	 */
 	tp->snd_wnd = ntohs(tcp_hdr(skb)->window);
+<<<<<<< HEAD
+=======
+	tp->max_window = tp->snd_wnd;
+>>>>>>> common/deprecated/android-3.18
 
 	/* Activate the retrans timer so that SYNACK can be retransmitted.
 	 * The request socket is not added to the SYN table of the parent

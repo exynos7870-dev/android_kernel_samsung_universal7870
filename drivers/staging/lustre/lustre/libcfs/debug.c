@@ -401,9 +401,15 @@ int libcfs_debug_init(unsigned long bufsize)
 	}
 
 	if (libcfs_debug_file_path != NULL) {
+<<<<<<< HEAD
 		strncpy(libcfs_debug_file_path_arr,
 			libcfs_debug_file_path, PATH_MAX-1);
 		libcfs_debug_file_path_arr[PATH_MAX - 1] = '\0';
+=======
+		strlcpy(libcfs_debug_file_path_arr,
+			libcfs_debug_file_path,
+			sizeof(libcfs_debug_file_path_arr));
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/* If libcfs_debug_mb is set to an invalid value or uninitialized

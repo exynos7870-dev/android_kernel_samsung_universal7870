@@ -149,12 +149,20 @@ int afs_write_begin(struct file *file, struct address_space *mapping,
 		kfree(candidate);
 		return -ENOMEM;
 	}
+<<<<<<< HEAD
 	*pagep = page;
 	/* page won't leak in error case: it eventually gets cleaned off LRU */
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	if (!PageUptodate(page) && len != PAGE_CACHE_SIZE) {
 		ret = afs_fill_page(vnode, key, index << PAGE_CACHE_SHIFT, page);
 		if (ret < 0) {
+<<<<<<< HEAD
+=======
+			unlock_page(page);
+			put_page(page);
+>>>>>>> common/deprecated/android-3.18
 			kfree(candidate);
 			_leave(" = %d [prep]", ret);
 			return ret;
@@ -162,6 +170,12 @@ int afs_write_begin(struct file *file, struct address_space *mapping,
 		SetPageUptodate(page);
 	}
 
+<<<<<<< HEAD
+=======
+	/* page won't leak in error case: it eventually gets cleaned off LRU */
+	*pagep = page;
+
+>>>>>>> common/deprecated/android-3.18
 try_again:
 	spin_lock(&vnode->writeback_lock);
 
@@ -297,10 +311,21 @@ static void afs_kill_pages(struct afs_vnode *vnode, bool error,
 		ASSERTCMP(pv.nr, ==, count);
 
 		for (loop = 0; loop < count; loop++) {
+<<<<<<< HEAD
 			ClearPageUptodate(pv.pages[loop]);
 			if (error)
 				SetPageError(pv.pages[loop]);
 			end_page_writeback(pv.pages[loop]);
+=======
+			struct page *page = pv.pages[loop];
+			ClearPageUptodate(page);
+			if (error)
+				SetPageError(page);
+			if (PageWriteback(page))
+				end_page_writeback(page);
+			if (page->index >= first)
+				first = page->index + 1;
+>>>>>>> common/deprecated/android-3.18
 		}
 
 		__pagevec_release(&pv);
@@ -504,6 +529,10 @@ static int afs_writepages_region(struct address_space *mapping,
 
 		if (PageWriteback(page) || !PageDirty(page)) {
 			unlock_page(page);
+<<<<<<< HEAD
+=======
+			put_page(page);
+>>>>>>> common/deprecated/android-3.18
 			continue;
 		}
 
@@ -742,6 +771,23 @@ out:
 }
 
 /*
+<<<<<<< HEAD
+=======
+ * Flush out all outstanding writes on a file opened for writing when it is
+ * closed.
+ */
+int afs_flush(struct file *file, fl_owner_t id)
+{
+	_enter("");
+
+	if ((file->f_mode & FMODE_WRITE) == 0)
+		return 0;
+
+	return vfs_fsync(file, 0);
+}
+
+/*
+>>>>>>> common/deprecated/android-3.18
  * notification that a previously read-only page is about to become writable
  * - if it returns an error, the caller will deliver a bus error signal
  */

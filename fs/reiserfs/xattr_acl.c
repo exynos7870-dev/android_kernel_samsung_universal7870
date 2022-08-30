@@ -37,7 +37,18 @@ reiserfs_set_acl(struct inode *inode, struct posix_acl *acl, int type)
 	error = journal_begin(&th, inode->i_sb, jcreate_blocks);
 	reiserfs_write_unlock(inode->i_sb);
 	if (error == 0) {
+<<<<<<< HEAD
 		error = __reiserfs_set_acl(&th, inode, type, acl);
+=======
+		if (type == ACL_TYPE_ACCESS && acl) {
+			error = posix_acl_update_mode(inode, &inode->i_mode,
+						      &acl);
+			if (error)
+				goto unlock;
+		}
+		error = __reiserfs_set_acl(&th, inode, type, acl);
+unlock:
+>>>>>>> common/deprecated/android-3.18
 		reiserfs_write_lock(inode->i_sb);
 		error2 = journal_end(&th);
 		reiserfs_write_unlock(inode->i_sb);
@@ -245,6 +256,7 @@ __reiserfs_set_acl(struct reiserfs_transaction_handle *th, struct inode *inode,
 	switch (type) {
 	case ACL_TYPE_ACCESS:
 		name = POSIX_ACL_XATTR_ACCESS;
+<<<<<<< HEAD
 		if (acl) {
 			error = posix_acl_equiv_mode(acl, &inode->i_mode);
 			if (error < 0)
@@ -254,6 +266,8 @@ __reiserfs_set_acl(struct reiserfs_transaction_handle *th, struct inode *inode,
 					acl = NULL;
 			}
 		}
+=======
+>>>>>>> common/deprecated/android-3.18
 		break;
 	case ACL_TYPE_DEFAULT:
 		name = POSIX_ACL_XATTR_DEFAULT;

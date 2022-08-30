@@ -773,7 +773,10 @@ enum dpm_order {
 	DPM_ORDER_DEV_AFTER_PARENT,
 	DPM_ORDER_PARENT_BEFORE_DEV,
 	DPM_ORDER_DEV_LAST,
+<<<<<<< HEAD
 	DPM_ORDER_DEV_FIRST,
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 #endif /* _LINUX_PM_H */

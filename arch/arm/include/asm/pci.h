@@ -18,6 +18,16 @@ static inline int pcibios_assign_all_busses(void)
 }
 
 #ifdef CONFIG_PCI_DOMAINS
+<<<<<<< HEAD
+=======
+static inline int pci_domain_nr(struct pci_bus *bus)
+{
+	struct pci_sys_data *root = bus->sysdata;
+
+	return root->domain;
+}
+
+>>>>>>> common/deprecated/android-3.18
 static inline int pci_proc_domain(struct pci_bus *bus)
 {
 	return pci_domain_nr(bus);

@@ -399,6 +399,14 @@ SYSCALL_DEFINE2(timerfd_create, int, clockid, int, flags)
 	     clockid != CLOCK_BOOTTIME_ALARM))
 		return -EINVAL;
 
+<<<<<<< HEAD
+=======
+	if (!capable(CAP_WAKE_ALARM) &&
+	    (clockid == CLOCK_REALTIME_ALARM ||
+	     clockid == CLOCK_BOOTTIME_ALARM))
+		return -EPERM;
+
+>>>>>>> common/deprecated/android-3.18
 	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
 	if (!ctx)
 		return -ENOMEM;
@@ -443,6 +451,14 @@ static int do_timerfd_settime(int ufd, int flags,
 		return ret;
 	ctx = f.file->private_data;
 
+<<<<<<< HEAD
+=======
+	if (!capable(CAP_WAKE_ALARM) && isalarm(ctx)) {
+		fdput(f);
+		return -EPERM;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	timerfd_setup_cancel(ctx, flags);
 
 	/*

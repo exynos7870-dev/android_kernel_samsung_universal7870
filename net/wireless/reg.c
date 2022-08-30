@@ -688,7 +688,11 @@ static bool reg_does_bw_fit(const struct ieee80211_freq_range *freq_range,
  * definitions (the "2.4 GHz band", the "5 GHz band" and the "60GHz band"),
  * however it is safe for now to assume that a frequency rule should not be
  * part of a frequency's band if the start freq or end freq are off by more
+<<<<<<< HEAD
  * than 2 GHz for the 2.4 and 5 GHz bands, and by more than 10 GHz for the
+=======
+ * than 2 GHz for the 2.4 and 5 GHz bands, and by more than 20 GHz for the
+>>>>>>> common/deprecated/android-3.18
  * 60 GHz band.
  * This resolution can be lowered and should be considered as we add
  * regulatory rule support for other "bands".
@@ -703,7 +707,11 @@ static bool freq_in_rule_band(const struct ieee80211_freq_range *freq_range,
 	 * with the Channel starting frequency above 45 GHz.
 	 */
 	u32 limit = freq_khz > 45 * ONE_GHZ_IN_KHZ ?
+<<<<<<< HEAD
 			10 * ONE_GHZ_IN_KHZ : 2 * ONE_GHZ_IN_KHZ;
+=======
+			20 * ONE_GHZ_IN_KHZ : 2 * ONE_GHZ_IN_KHZ;
+>>>>>>> common/deprecated/android-3.18
 	if (abs(freq_khz - freq_range->start_freq_khz) <= limit)
 		return true;
 	if (abs(freq_khz - freq_range->end_freq_khz) <= limit)
@@ -1615,6 +1623,7 @@ static void reg_set_request_processed(void)
 	bool need_more_processing = false;
 	struct regulatory_request *lr = get_last_request();
 
+<<<<<<< HEAD
 #ifdef CONFIG_CFG80211_REG_NOT_UPDATED
 	/*
 	* SAMSUNG FIX : Regulatory Configuration was update
@@ -1627,6 +1636,8 @@ static void reg_set_request_processed(void)
 	return;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	lr->processed = true;
 
 	spin_lock(&reg_requests_lock);
@@ -1965,7 +1976,11 @@ static void reg_process_pending_hints(void)
 
 	/* When last_request->processed becomes true this will be rescheduled */
 	if (lr && !lr->processed) {
+<<<<<<< HEAD
 		reg_process_hint(lr);
+=======
+		pr_debug("Pending regulatory request, waiting for it to be processed...\n");
+>>>>>>> common/deprecated/android-3.18
 		return;
 	}
 
@@ -2020,6 +2035,7 @@ static void reg_todo(struct work_struct *work)
 
 static void queue_regulatory_request(struct regulatory_request *request)
 {
+<<<<<<< HEAD
 	/*
 	* SAMSUNG FIX : Regulatory Configuration was update
 	* via WIPHY_FLAG_CUSTOM_REGULATORY of Wi-Fi Driver.
@@ -2035,6 +2051,8 @@ static void queue_regulatory_request(struct regulatory_request *request)
 	return;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	request->alpha2[0] = toupper(request->alpha2[0]);
 	request->alpha2[1] = toupper(request->alpha2[1]);
 
@@ -2060,6 +2078,10 @@ static int regulatory_hint_core(const char *alpha2)
 	request->alpha2[0] = alpha2[0];
 	request->alpha2[1] = alpha2[1];
 	request->initiator = NL80211_REGDOM_SET_BY_CORE;
+<<<<<<< HEAD
+=======
+	request->wiphy_idx = WIPHY_IDX_INVALID;
+>>>>>>> common/deprecated/android-3.18
 
 	queue_regulatory_request(request);
 
@@ -2075,6 +2097,12 @@ int regulatory_hint_user(const char *alpha2,
 	if (WARN_ON(!alpha2))
 		return -EINVAL;
 
+<<<<<<< HEAD
+=======
+	if (!is_world_regdom(alpha2) && !is_an_alpha2(alpha2))
+		return -EINVAL;
+
+>>>>>>> common/deprecated/android-3.18
 	request = kzalloc(sizeof(struct regulatory_request), GFP_KERNEL);
 	if (!request)
 		return -ENOMEM;
@@ -2089,7 +2117,10 @@ int regulatory_hint_user(const char *alpha2,
 
 	return 0;
 }
+<<<<<<< HEAD
 EXPORT_SYMBOL(regulatory_hint_user);
+=======
+>>>>>>> common/deprecated/android-3.18
 
 int regulatory_hint_indoor_user(void)
 {
@@ -2272,6 +2303,7 @@ static void restore_regulatory_settings(bool reset_user)
 	LIST_HEAD(tmp_reg_req_list);
 	struct cfg80211_registered_device *rdev;
 
+<<<<<<< HEAD
 	/*
 	* SAMSUNG FIX : Regulatory Configuration was update
 	* via WIPHY_FLAG_CUSTOM_REGULATORY of Wi-Fi Driver.
@@ -2285,6 +2317,8 @@ static void restore_regulatory_settings(bool reset_user)
 	return;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	ASSERT_RTNL();
 
 	reg_is_indoor = false;
@@ -2380,6 +2414,7 @@ int regulatory_hint_found_beacon(struct wiphy *wiphy,
 	struct reg_beacon *reg_beacon;
 	bool processing;
 
+<<<<<<< HEAD
 	/*
 	* SAMSUNG FIX : Regulatory Configuration was update
 	* via WIPHY_FLAG_CUSTOM_REGULATORY of Wi-Fi Driver.
@@ -2393,6 +2428,8 @@ int regulatory_hint_found_beacon(struct wiphy *wiphy,
 	return 0;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (beacon_chan->beacon_found ||
 	    beacon_chan->flags & IEEE80211_CHAN_RADAR ||
 	    (beacon_chan->band == IEEE80211_BAND_2GHZ &&
@@ -2447,7 +2484,11 @@ static void print_rd_rules(const struct ieee80211_regdomain *rd)
 		power_rule = &reg_rule->power_rule;
 
 		if (reg_rule->flags & NL80211_RRF_AUTO_BW)
+<<<<<<< HEAD
 			snprintf(bw, sizeof(bw), "%d KHz, %d KHz AUTO",
+=======
+			snprintf(bw, sizeof(bw), "%d KHz, %u KHz AUTO",
+>>>>>>> common/deprecated/android-3.18
 				 freq_range->max_bandwidth_khz,
 				 reg_get_max_bandwidth(rd, reg_rule));
 		else

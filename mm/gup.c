@@ -9,12 +9,16 @@
 #include <linux/rmap.h>
 #include <linux/swap.h>
 #include <linux/swapops.h>
+<<<<<<< HEAD
 #include <linux/migrate.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #include <linux/sched.h>
 #include <linux/rwsem.h>
 #include <asm/pgtable.h>
 
+<<<<<<< HEAD
 #ifdef CONFIG_CMA_PINPAGE_MIGRATION
 #include <linux/mm_inline.h>
 #include <linux/mmu_notifier.h>
@@ -97,6 +101,10 @@ static int __migrate_cma_pinpage(struct page *page, struct vm_area_struct *vma)
 }
 #endif
 
+=======
+#include "internal.h"
+
+>>>>>>> common/deprecated/android-3.18
 static struct page *no_page_table(struct vm_area_struct *vma,
 		unsigned int flags)
 {
@@ -170,6 +178,7 @@ retry:
 		page = pte_page(pte);
 	}
 
+<<<<<<< HEAD
 #ifdef CONFIG_CMA_PINPAGE_MIGRATION
 	if (__need_migrate_cma_page(page, vma, address, flags)) {
 		pte_unmap_unlock(ptep, ptl);
@@ -193,6 +202,8 @@ retry:
 		}
 	}
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (flags & FOLL_GET)
 		get_page_foll(page);
 	if (flags & FOLL_TOUCH) {
@@ -424,7 +435,11 @@ static int faultin_page(struct task_struct *tsk, struct vm_area_struct *vma,
 	 * reCOWed by userspace write).
 	 */
 	if ((ret & VM_FAULT_WRITE) && !(vma->vm_flags & VM_WRITE))
+<<<<<<< HEAD
 		*flags |= FOLL_COW;
+=======
+	        *flags |= FOLL_COW;
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -544,9 +559,12 @@ long __get_user_pages(struct task_struct *tsk, struct mm_struct *mm,
 	if (!(gup_flags & FOLL_FORCE))
 		gup_flags |= FOLL_NUMA;
 
+<<<<<<< HEAD
 	if ((gup_flags & FOLL_CMA) != 0)
 		migrate_prep();
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	do {
 		struct page *page;
 		unsigned int foll_flags = gup_flags;

@@ -184,6 +184,10 @@ struct reiserfs_dentry_buf {
 	struct dir_context ctx;
 	struct dentry *xadir;
 	int count;
+<<<<<<< HEAD
+=======
+	int err;
+>>>>>>> common/deprecated/android-3.18
 	struct dentry *dentries[8];
 };
 
@@ -205,6 +209,10 @@ fill_with_dentries(void *buf, const char *name, int namelen, loff_t offset,
 
 	dentry = lookup_one_len(name, dbuf->xadir, namelen);
 	if (IS_ERR(dentry)) {
+<<<<<<< HEAD
+=======
+		dbuf->err = PTR_ERR(dentry);
+>>>>>>> common/deprecated/android-3.18
 		return PTR_ERR(dentry);
 	} else if (!dentry->d_inode) {
 		/* A directory entry exists, but no file? */
@@ -213,6 +221,10 @@ fill_with_dentries(void *buf, const char *name, int namelen, loff_t offset,
 			       "not found for file %s.\n",
 			       dentry->d_name.name, dbuf->xadir->d_name.name);
 		dput(dentry);
+<<<<<<< HEAD
+=======
+		dbuf->err = -EIO;
+>>>>>>> common/deprecated/android-3.18
 		return -EIO;
 	}
 
@@ -260,6 +272,13 @@ static int reiserfs_for_each_xattr(struct inode *inode,
 		err = reiserfs_readdir_inode(dir->d_inode, &buf.ctx);
 		if (err)
 			break;
+<<<<<<< HEAD
+=======
+		if (buf.err) {
+			err = buf.err;
+			break;
+		}
+>>>>>>> common/deprecated/android-3.18
 		if (!buf.count)
 			break;
 		for (i = 0; !err && i < buf.count && buf.dentries[i]; i++) {
@@ -648,6 +667,16 @@ reiserfs_xattr_get(struct inode *inode, const char *name, void *buffer,
 	if (get_inode_sd_version(inode) == STAT_DATA_V1)
 		return -EOPNOTSUPP;
 
+<<<<<<< HEAD
+=======
+	/*
+	 * priv_root needn't be initialized during mount so allow initial
+	 * lookups to succeed.
+	 */
+	if (!REISERFS_SB(inode->i_sb)->priv_root)
+		return 0;
+
+>>>>>>> common/deprecated/android-3.18
 	dentry = xattr_lookup(inode, name, XATTR_REPLACE);
 	if (IS_ERR(dentry)) {
 		err = PTR_ERR(dentry);
@@ -842,8 +871,15 @@ static int listxattr_filler(void *buf, const char *name, int namelen,
 			size = handler->list(b->dentry, b->buf + b->pos,
 					 b->size, name, namelen,
 					 handler->flags);
+<<<<<<< HEAD
 			if (size > b->size)
 				return -ERANGE;
+=======
+			if (b->pos + size > b->size) {
+				b->pos = -ERANGE;
+				return -ERANGE;
+			}
+>>>>>>> common/deprecated/android-3.18
 		} else {
 			size = handler->list(b->dentry, NULL, 0, name,
 					     namelen, handler->flags);

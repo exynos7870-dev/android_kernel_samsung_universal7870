@@ -126,7 +126,11 @@ static int _usbctrl_vendorreq_sync_read(struct usb_device *udev, u8 request,
 
 	do {
 		status = usb_control_msg(udev, pipe, request, reqtype, value,
+<<<<<<< HEAD
 					 index, pdata, len, 0); /*max. timeout*/
+=======
+					 index, pdata, len, 1000);
+>>>>>>> common/deprecated/android-3.18
 		if (status < 0) {
 			/* firmware download is checksumed, don't retry */
 			if ((value >= FW_8192C_START_ADDRESS &&
@@ -531,6 +535,11 @@ static void _rtl_usb_rx_process_noagg(struct ieee80211_hw *hw,
 			ieee80211_rx(hw, skb);
 		else
 			dev_kfree_skb_any(skb);
+<<<<<<< HEAD
+=======
+	} else {
+		dev_kfree_skb_any(skb);
+>>>>>>> common/deprecated/android-3.18
 	}
 }
 
@@ -1070,8 +1079,15 @@ int rtl_usb_probe(struct usb_interface *intf,
 	rtlpriv = hw->priv;
 	rtlpriv->usb_data = kzalloc(RTL_USB_MAX_RX_COUNT * sizeof(u32),
 				    GFP_KERNEL);
+<<<<<<< HEAD
 	if (!rtlpriv->usb_data)
 		return -ENOMEM;
+=======
+	if (!rtlpriv->usb_data) {
+		ieee80211_free_hw(hw);
+		return -ENOMEM;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	/* this spin lock must be initialized early */
 	spin_lock_init(&rtlpriv->locks.usb_lock);
@@ -1134,6 +1150,10 @@ error_out:
 	_rtl_usb_io_handler_release(hw);
 	usb_put_dev(udev);
 	complete(&rtlpriv->firmware_loading_complete);
+<<<<<<< HEAD
+=======
+	kfree(rtlpriv->usb_data);
+>>>>>>> common/deprecated/android-3.18
 	return -ENODEV;
 }
 EXPORT_SYMBOL(rtl_usb_probe);

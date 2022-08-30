@@ -16,6 +16,10 @@
 
 #include <linux/pci.h>
 #include <linux/jiffies.h>
+<<<<<<< HEAD
+=======
+#include <linux/ktime.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/delay.h>
 #include <linux/kthread.h>
 #include <linux/irqreturn.h>
@@ -218,17 +222,29 @@ static u32 mei_txe_aliveness_get(struct mei_device *dev)
  *
  * Polls for HICR_HOST_ALIVENESS_RESP.ALIVENESS_RESP to be set
  *
+<<<<<<< HEAD
  * Return: > 0 if the expected value was received, -ETIME otherwise
+=======
+ * Return: 0 if the expected value was received, -ETIME otherwise
+>>>>>>> common/deprecated/android-3.18
  */
 static int mei_txe_aliveness_poll(struct mei_device *dev, u32 expected)
 {
 	struct mei_txe_hw *hw = to_txe_hw(dev);
+<<<<<<< HEAD
 	int t = 0;
 
+=======
+	ktime_t stop, start;
+
+	start = ktime_get();
+	stop = ktime_add(start, ms_to_ktime(SEC_ALIVENESS_WAIT_TIMEOUT));
+>>>>>>> common/deprecated/android-3.18
 	do {
 		hw->aliveness = mei_txe_aliveness_get(dev);
 		if (hw->aliveness == expected) {
 			dev->pg_event = MEI_PG_EVENT_IDLE;
+<<<<<<< HEAD
 			dev_dbg(dev->dev,
 				"aliveness settled after %d msecs\n", t);
 			return t;
@@ -238,6 +254,14 @@ static int mei_txe_aliveness_poll(struct mei_device *dev, u32 expected)
 		mutex_lock(&dev->device_lock);
 		t += MSEC_PER_SEC / 5;
 	} while (t < SEC_ALIVENESS_WAIT_TIMEOUT);
+=======
+			dev_dbg(dev->dev, "aliveness settled after %lld usecs\n",
+				ktime_to_us(ktime_sub(ktime_get(), start)));
+			return 0;
+		}
+		usleep_range(20, 50);
+	} while (ktime_before(ktime_get(), stop));
+>>>>>>> common/deprecated/android-3.18
 
 	dev->pg_event = MEI_PG_EVENT_IDLE;
 	dev_err(dev->dev, "aliveness timed out\n");
@@ -302,6 +326,21 @@ int mei_txe_aliveness_set_sync(struct mei_device *dev, u32 req)
 }
 
 /**
+<<<<<<< HEAD
+=======
+ * mei_txe_pg_in_transition - is device now in pg transition
+ *
+ * @dev: the device structure
+ *
+ * Return: true if in pg transition, false otherwise
+ */
+static bool mei_txe_pg_in_transition(struct mei_device *dev)
+{
+	return dev->pg_event == MEI_PG_EVENT_WAIT;
+}
+
+/**
+>>>>>>> common/deprecated/android-3.18
  * mei_txe_pg_is_enabled - detect if PG is supported by HW
  *
  * @dev: the device structure
@@ -961,11 +1000,21 @@ static bool mei_txe_check_and_ack_intrs(struct mei_device *dev, bool do_ack)
 	hisr = mei_txe_br_reg_read(hw, HISR_REG);
 
 	aliveness = mei_txe_aliveness_get(dev);
+<<<<<<< HEAD
 	if (hhisr & IPC_HHIER_SEC && aliveness)
 		ipc_isr = mei_txe_sec_reg_read_silent(hw,
 				SEC_IPC_HOST_INT_STATUS_REG);
 	else
 		ipc_isr = 0;
+=======
+	if (hhisr & IPC_HHIER_SEC && aliveness) {
+		ipc_isr = mei_txe_sec_reg_read_silent(hw,
+				SEC_IPC_HOST_INT_STATUS_REG);
+	} else {
+		ipc_isr = 0;
+		hhisr &= ~IPC_HHIER_SEC;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	generated = generated ||
 		(hisr & HISR_INT_STS_MSK) ||
@@ -1139,6 +1188,10 @@ static const struct mei_hw_ops mei_txe_hw_ops = {
 	.hw_config = mei_txe_hw_config,
 	.hw_start = mei_txe_hw_start,
 
+<<<<<<< HEAD
+=======
+	.pg_in_transition = mei_txe_pg_in_transition,
+>>>>>>> common/deprecated/android-3.18
 	.pg_is_enabled = mei_txe_pg_is_enabled,
 
 	.intr_clear = mei_txe_intr_clear,

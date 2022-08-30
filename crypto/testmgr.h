@@ -514,11 +514,15 @@ static struct hash_testvec sha1_tv_template[] = {
 		.plaintext = "abc",
 		.psize	= 3,
 		.digest	= "\xa9\x99\x3e\x36\x47\x06\x81\x6a\xba\x3e"
+<<<<<<< HEAD
 #if FIPS_FUNC_TEST == 6
 			  "\x25\x72\x78\x50\xc2\x6c\x9c\xd0\xd8\x9d",
 #else
 			  "\x25\x71\x78\x50\xc2\x6c\x9c\xd0\xd8\x9d",
 #endif
+=======
+			  "\x25\x71\x78\x50\xc2\x6c\x9c\xd0\xd8\x9d",
+>>>>>>> common/deprecated/android-3.18
 	}, {
 		.plaintext = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
 		.psize	= 56,
@@ -2139,11 +2143,15 @@ static struct hash_testvec hmac_sha1_tv_template[] = {
 		.plaintext = "Hi There",
 		.psize	= 8,
 		.digest	= "\xb6\x17\x31\x86\x55\x05\x72\x64"
+<<<<<<< HEAD
 #if FIPS_FUNC_TEST == 12
 			  "\xe3\x8b\xc0\xb6\xfb\x37\x8c\x8e\xf1"
 #else
 			  "\xe2\x8b\xc0\xb6\xfb\x37\x8c\x8e\xf1"
 #endif
+=======
+			  "\xe2\x8b\xc0\xb6\xfb\x37\x8c\x8e\xf1"
+>>>>>>> common/deprecated/android-3.18
 			  "\x46\xbe",
 	}, {
 		.key	= "Jefe",
@@ -3806,11 +3814,15 @@ static struct cipher_testvec des_ctr_dec_tv_template[] = {
 static struct cipher_testvec des3_ede_enc_tv_template[] = {
 	{ /* These are from openssl */
 		.key	= "\x01\x23\x45\x67\x89\xab\xcd\xef"
+<<<<<<< HEAD
 #if FIPS_FUNC_TEST == 7
 			  "\x53\x55\x55\x55\x55\x55\x55\x55"
 #else
 			  "\x55\x55\x55\x55\x55\x55\x55\x55"
 #endif
+=======
+			  "\x55\x55\x55\x55\x55\x55\x55\x55"
+>>>>>>> common/deprecated/android-3.18
 			  "\xfe\xdc\xba\x98\x76\x54\x32\x10",
 		.klen	= 24,
 		.input	= "\x73\x6f\x6d\x65\x64\x61\x74\x61",
@@ -13653,11 +13665,15 @@ static struct cipher_testvec cast6_xts_dec_tv_template[] = {
 static struct cipher_testvec aes_enc_tv_template[] = {
 	{ /* From FIPS-197 */
 		.key	= "\x00\x01\x02\x03\x04\x05\x06\x07"
+<<<<<<< HEAD
 #if FIPS_FUNC_TEST == 1
 			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x01",
 #else
 			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
 #endif
+=======
+			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
+>>>>>>> common/deprecated/android-3.18
 		.klen	= 16,
 		.input	= "\x00\x11\x22\x33\x44\x55\x66\x77"
 			  "\x88\x99\xaa\xbb\xcc\xdd\xee\xff",
@@ -19291,11 +19307,15 @@ static struct aead_testvec aes_gcm_enc_tv_template[] = {
 		.rlen	= 32,
 	}, {
 		.key	= "\xfe\xff\xe9\x92\x86\x65\x73\x1c"
+<<<<<<< HEAD
 #if FIPS_FUNC_TEST == 100
 			  "\x6c\x6a\x8f\x94\x67\x30\x83\x08",
 #else
 			  "\x6d\x6a\x8f\x94\x67\x30\x83\x08",
 #endif
+=======
+			  "\x6d\x6a\x8f\x94\x67\x30\x83\x08",
+>>>>>>> common/deprecated/android-3.18
 		.klen	= 16,
 		.iv	= "\xca\xfe\xba\xbe\xfa\xce\xdb\xad"
 			  "\xde\xca\xf8\x88",
@@ -20734,11 +20754,15 @@ static struct aead_testvec aes_ccm_rfc4309_dec_tv_template[] = {
 static struct cprng_testvec ansi_cprng_aes_tv_template[] = {
 	{
 		.key	= "\xf3\xb1\x66\x6d\x13\x60\x72\x42"
+<<<<<<< HEAD
 #if FIPS_FUNC_TEST == 8
 			  "\xee\x06\x1c\xab\xb8\xd4\x62\x02",
 #else
 			  "\xed\x06\x1c\xab\xb8\xd4\x62\x02",
 #endif
+=======
+			  "\xed\x06\x1c\xab\xb8\xd4\x62\x02",
+>>>>>>> common/deprecated/android-3.18
 		.klen	= 16,
 		.dt	= "\xe6\xb3\xbe\x78\x2a\x23\xfa\x62"
 			  "\xd7\x1d\x4a\xfb\xb0\xe9\x22\xf9",
@@ -20834,11 +20858,15 @@ static struct cprng_testvec ansi_cprng_aes_tv_template[] = {
 static struct drbg_testvec drbg_pr_sha256_tv_template[] = {
 	{
 		.entropy = (unsigned char *)
+<<<<<<< HEAD
 #if FIPS_FUNC_TEST == 92
 			"\x71\x88\x4c\xcd\x6c\x85\x57\x70\xf7\x0b\x8b\x86"
 #else
 			"\x72\x88\x4c\xcd\x6c\x85\x57\x70\xf7\x0b\x8b\x86"
 #endif
+=======
+			"\x72\x88\x4c\xcd\x6c\x85\x57\x70\xf7\x0b\x8b\x86"
+>>>>>>> common/deprecated/android-3.18
 			"\xc1\xeb\xd2\x4e\x36\x14\xab\x18\xc4\x9c\xc9\xcf"
 			"\x1a\xe8\xf7\x7b\x02\x49\x73\xd7\xf1\x42\x7d\xc6"
 			"\x3f\x29\x2d\xec\xd3\x66\x51\x3f\x1d\x8d\x5b\x4e",
@@ -20996,11 +21024,15 @@ static struct drbg_testvec drbg_pr_sha256_tv_template[] = {
 static struct drbg_testvec drbg_pr_hmac_sha256_tv_template[] = {
 	{
 		.entropy = (unsigned char *)
+<<<<<<< HEAD
 #if FIPS_FUNC_TEST == 93
 			"\x98\x69\xe5\x4b\x47\x03\xff\x31\x78\x5b\x87\x9a"
 #else
 			"\x99\x69\xe5\x4b\x47\x03\xff\x31\x78\x5b\x87\x9a"
 #endif
+=======
+			"\x99\x69\xe5\x4b\x47\x03\xff\x31\x78\x5b\x87\x9a"
+>>>>>>> common/deprecated/android-3.18
 			"\x7e\x5c\x0e\xae\x0d\x3e\x30\x95\x59\xe9\xfe\x96"
 			"\xb0\x67\x6d\x49\xd5\x91\xea\x4d\x07\xd2\x0d\x46"
 			"\xd0\x64\x75\x7d\x30\x23\xca\xc2\x37\x61\x27\xab",
@@ -21158,11 +21190,15 @@ static struct drbg_testvec drbg_pr_hmac_sha256_tv_template[] = {
 static struct drbg_testvec drbg_pr_ctr_aes128_tv_template[] = {
 	{
 		.entropy = (unsigned char *)
+<<<<<<< HEAD
 #if FIPS_FUNC_TEST == 91
 			"\xd2\x44\xc6\x61\x81\x6d\xca\x9d\x15\x28\x8a\x42"
 #else
 			"\xd1\x44\xc6\x61\x81\x6d\xca\x9d\x15\x28\x8a\x42"
 #endif
+=======
+			"\xd1\x44\xc6\x61\x81\x6d\xca\x9d\x15\x28\x8a\x42"
+>>>>>>> common/deprecated/android-3.18
 			"\x94\xd7\x28\x9c\x43\x77\x19\x29\x1a\x6d\xc3\xa2",
 		.entropylen = 24,
 		.entpra = (unsigned char *)

@@ -51,7 +51,10 @@ struct fixed_voltage_config {
 	int microvolts;
 	int gpio;
 	unsigned startup_delay;
+<<<<<<< HEAD
 	unsigned endup_delay;
+=======
+>>>>>>> common/deprecated/android-3.18
 	unsigned gpio_is_open_drain:1;
 	unsigned enable_high:1;
 	unsigned enabled_at_boot:1;

@@ -47,7 +47,11 @@ static inline void prandom_state_selftest(void)
 }
 #endif
 
+<<<<<<< HEAD
 static DEFINE_PER_CPU(struct rnd_state, net_rand_state);
+=======
+DEFINE_PER_CPU(struct rnd_state, net_rand_state);
+>>>>>>> common/deprecated/android-3.18
 
 /**
  *	prandom_u32_state - seeded pseudo-random number generator.

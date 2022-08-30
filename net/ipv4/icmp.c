@@ -245,7 +245,11 @@ static struct {
 /**
  * icmp_global_allow - Are we allowed to send one more ICMP message ?
  *
+<<<<<<< HEAD
  * Uses a token bucket to limit our ICMP messages to sysctl_icmp_msgs_per_sec.
+=======
+ * Uses a token bucket to limit our ICMP messages to ~sysctl_icmp_msgs_per_sec.
+>>>>>>> common/deprecated/android-3.18
  * Returns false if we reached the limit and can not send another packet.
  * Note: called with BH disabled
  */
@@ -255,10 +259,18 @@ bool icmp_global_allow(void)
 	bool rc = false;
 
 	/* Check if token bucket is empty and cannot be refilled
+<<<<<<< HEAD
 	 * without taking the spinlock.
 	 */
 	if (!icmp_global.credit) {
 		delta = min_t(u32, now - icmp_global.stamp, HZ);
+=======
+	 * without taking the spinlock. The READ_ONCE() are paired
+	 * with the following WRITE_ONCE() in this same function.
+	 */
+	if (!READ_ONCE(icmp_global.credit)) {
+		delta = min_t(u32, now - READ_ONCE(icmp_global.stamp), HZ);
+>>>>>>> common/deprecated/android-3.18
 		if (delta < HZ / 50)
 			return false;
 	}
@@ -268,6 +280,7 @@ bool icmp_global_allow(void)
 	if (delta >= HZ / 50) {
 		incr = sysctl_icmp_msgs_per_sec * delta / HZ ;
 		if (incr)
+<<<<<<< HEAD
 			icmp_global.stamp = now;
 	}
 	credit = min_t(u32, icmp_global.credit + incr, sysctl_icmp_msgs_burst);
@@ -276,6 +289,19 @@ bool icmp_global_allow(void)
 		rc = true;
 	}
 	icmp_global.credit = credit;
+=======
+			WRITE_ONCE(icmp_global.stamp, now);
+	}
+	credit = min_t(u32, icmp_global.credit + incr, sysctl_icmp_msgs_burst);
+	if (credit) {
+		/* We want to use a credit of one in average, but need to randomize
+		 * it for security reasons.
+		 */
+		credit = max_t(int, credit - prandom_u32_max(3), 0);
+		rc = true;
+	}
+	WRITE_ONCE(icmp_global.credit, credit);
+>>>>>>> common/deprecated/android-3.18
 	spin_unlock(&icmp_global.lock);
 	return rc;
 }
@@ -543,7 +569,12 @@ relookup_failed:
  *			MUST reply to only the first fragment.
  */
 
+<<<<<<< HEAD
 void icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info)
+=======
+void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
+		 const struct ip_options *opt)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct iphdr *iph;
 	int room;
@@ -657,7 +688,11 @@ void icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info)
 					  iph->tos;
 	mark = IP4_REPLY_MARK(net, skb_in->mark);
 
+<<<<<<< HEAD
 	if (ip_options_echo(&icmp_param->replyopts.opt.opt, skb_in))
+=======
+	if (__ip_options_echo(&icmp_param->replyopts.opt.opt, skb_in, opt))
+>>>>>>> common/deprecated/android-3.18
 		goto out_unlock;
 
 
@@ -709,7 +744,11 @@ out_free:
 	kfree(icmp_param);
 out:;
 }
+<<<<<<< HEAD
 EXPORT_SYMBOL(icmp_send);
+=======
+EXPORT_SYMBOL(__icmp_send);
+>>>>>>> common/deprecated/android-3.18
 
 
 static void icmp_socket_deliver(struct sk_buff *skb, u32 info)
@@ -904,7 +943,10 @@ static void icmp_echo(struct sk_buff *skb)
  */
 static void icmp_timestamp(struct sk_buff *skb)
 {
+<<<<<<< HEAD
 	struct timespec tv;
+=======
+>>>>>>> common/deprecated/android-3.18
 	struct icmp_bxm icmp_param;
 	/*
 	 *	Too short.
@@ -915,9 +957,13 @@ static void icmp_timestamp(struct sk_buff *skb)
 	/*
 	 *	Fill in the current time as ms since midnight UT:
 	 */
+<<<<<<< HEAD
 	getnstimeofday(&tv);
 	icmp_param.data.times[1] = htonl((tv.tv_sec % 86400) * MSEC_PER_SEC +
 					 tv.tv_nsec / NSEC_PER_MSEC);
+=======
+	icmp_param.data.times[1] = inet_current_timestamp();
+>>>>>>> common/deprecated/android-3.18
 	icmp_param.data.times[2] = icmp_param.data.times[1];
 	if (skb_copy_bits(skb, 0, &icmp_param.data.times[0], 4))
 		BUG();

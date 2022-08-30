@@ -744,10 +744,13 @@ struct Scsi_Host {
 	 * Needed just in case we have virtual hosts.
 	 */
 	struct device *dma_dev;
+<<<<<<< HEAD
 #ifdef CONFIG_USB_STORAGE_DETECT
 	unsigned int  by_usb;
 #endif
 	unsigned int  by_ufs;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * We should ensure that this is aligned, both for better performance

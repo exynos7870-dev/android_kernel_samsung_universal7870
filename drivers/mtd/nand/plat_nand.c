@@ -105,7 +105,11 @@ static int plat_nand_probe(struct platform_device *pdev)
 	if (!err)
 		return err;
 
+<<<<<<< HEAD
 	nand_release(&data->mtd);
+=======
+	nand_cleanup(&data->chip);
+>>>>>>> common/deprecated/android-3.18
 out:
 	if (pdata->ctrl.remove)
 		pdata->ctrl.remove(pdev);

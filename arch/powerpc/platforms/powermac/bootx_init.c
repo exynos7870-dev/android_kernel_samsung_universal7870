@@ -467,7 +467,11 @@ void __init bootx_init(unsigned long r3, unsigned long r4)
 	boot_infos_t *bi = (boot_infos_t *) r4;
 	unsigned long hdr;
 	unsigned long space;
+<<<<<<< HEAD
 	unsigned long ptr, x;
+=======
+	unsigned long ptr;
+>>>>>>> common/deprecated/android-3.18
 	char *model;
 	unsigned long offset = reloc_offset();
 
@@ -561,6 +565,11 @@ void __init bootx_init(unsigned long r3, unsigned long r4)
 	 * MMU switched OFF, so this should not be useful anymore.
 	 */
 	if (bi->version < 4) {
+<<<<<<< HEAD
+=======
+		unsigned long x __maybe_unused;
+
+>>>>>>> common/deprecated/android-3.18
 		bootx_printf("Touching pages...\n");
 
 		/*

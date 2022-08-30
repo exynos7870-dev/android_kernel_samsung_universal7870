@@ -135,6 +135,10 @@ static int led_pwm_add(struct device *dev, struct led_pwm_priv *priv,
 	ret = led_classdev_register(dev, &led_data->cdev);
 	if (ret == 0) {
 		priv->num_leds++;
+<<<<<<< HEAD
+=======
+		led_pwm_set(&led_data->cdev, led_data->cdev.brightness);
+>>>>>>> common/deprecated/android-3.18
 	} else {
 		dev_err(dev, "failed to register PWM led for %s: %d\n",
 			led->name, ret);

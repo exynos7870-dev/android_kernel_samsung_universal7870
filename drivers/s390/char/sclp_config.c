@@ -43,7 +43,13 @@ static void sclp_cpu_capability_notify(struct work_struct *work)
 
 static void __ref sclp_cpu_change_notify(struct work_struct *work)
 {
+<<<<<<< HEAD
 	smp_rescan_cpus();
+=======
+	lock_device_hotplug();
+	smp_rescan_cpus();
+	unlock_device_hotplug();
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void sclp_conf_receiver_fn(struct evbuf_header *evbuf)

@@ -691,6 +691,11 @@ static int sba_dma_supported( struct device *dev, u64 mask)
 		return 0;
 
 	ioc = GET_IOC(dev);
+<<<<<<< HEAD
+=======
+	if (!ioc)
+		return 0;
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * check if mask is >= than the current max IO Virt Address
@@ -722,6 +727,11 @@ sba_map_single(struct device *dev, void *addr, size_t size,
 	int pide;
 
 	ioc = GET_IOC(dev);
+<<<<<<< HEAD
+=======
+	if (!ioc)
+		return DMA_ERROR_CODE;
+>>>>>>> common/deprecated/android-3.18
 
 	/* save offset bits */
 	offset = ((dma_addr_t) (long) addr) & ~IOVP_MASK;
@@ -803,6 +813,13 @@ sba_unmap_single(struct device *dev, dma_addr_t iova, size_t size,
 	DBG_RUN("%s() iovp 0x%lx/%x\n", __func__, (long) iova, size);
 
 	ioc = GET_IOC(dev);
+<<<<<<< HEAD
+=======
+	if (!ioc) {
+		WARN_ON(!ioc);
+		return;
+	}
+>>>>>>> common/deprecated/android-3.18
 	offset = iova & ~IOVP_MASK;
 	iova ^= offset;        /* clear offset bits */
 	size += offset;
@@ -942,6 +959,11 @@ sba_map_sg(struct device *dev, struct scatterlist *sglist, int nents,
 	DBG_RUN_SG("%s() START %d entries\n", __func__, nents);
 
 	ioc = GET_IOC(dev);
+<<<<<<< HEAD
+=======
+	if (!ioc)
+		return 0;
+>>>>>>> common/deprecated/android-3.18
 
 	/* Fast path single entry scatterlists. */
 	if (nents == 1) {
@@ -1028,6 +1050,13 @@ sba_unmap_sg(struct device *dev, struct scatterlist *sglist, int nents,
 		__func__, nents, sg_virt_addr(sglist), sglist->length);
 
 	ioc = GET_IOC(dev);
+<<<<<<< HEAD
+=======
+	if (!ioc) {
+		WARN_ON(!ioc);
+		return;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 #ifdef SBA_COLLECT_STATS
 	ioc->usg_calls++;
@@ -1265,7 +1294,11 @@ sba_ioc_init_pluto(struct parisc_device *sba, struct ioc *ioc, int ioc_num)
 	** (one that doesn't overlap memory or LMMIO space) in the
 	** IBASE and IMASK registers.
 	*/
+<<<<<<< HEAD
 	ioc->ibase = READ_REG(ioc->ioc_hpa + IOC_IBASE);
+=======
+	ioc->ibase = READ_REG(ioc->ioc_hpa + IOC_IBASE) & ~0x1fffffULL;
+>>>>>>> common/deprecated/android-3.18
 	iova_space_size = ~(READ_REG(ioc->ioc_hpa + IOC_IMASK) & 0xFFFFFFFFUL) + 1;
 
 	if ((ioc->ibase < 0xfed00000UL) && ((ioc->ibase + iova_space_size) > 0xfee00000UL)) {

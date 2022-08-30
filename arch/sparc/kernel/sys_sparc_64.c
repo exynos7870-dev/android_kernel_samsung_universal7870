@@ -118,7 +118,11 @@ unsigned long arch_get_unmapped_area(struct file *filp, unsigned long addr, unsi
 
 		vma = find_vma(mm, addr);
 		if (task_size - len >= addr &&
+<<<<<<< HEAD
 		    (!vma || addr + len <= vma->vm_start))
+=======
+		    (!vma || addr + len <= vm_start_gap(vma)))
+>>>>>>> common/deprecated/android-3.18
 			return addr;
 	}
 
@@ -181,7 +185,11 @@ arch_get_unmapped_area_topdown(struct file *filp, const unsigned long addr0,
 
 		vma = find_vma(mm, addr);
 		if (task_size - len >= addr &&
+<<<<<<< HEAD
 		    (!vma || addr + len <= vma->vm_start))
+=======
+		    (!vma || addr + len <= vm_start_gap(vma)))
+>>>>>>> common/deprecated/android-3.18
 			return addr;
 	}
 
@@ -413,7 +421,11 @@ out:
 
 SYSCALL_DEFINE1(sparc64_personality, unsigned long, personality)
 {
+<<<<<<< HEAD
 	int ret;
+=======
+	long ret;
+>>>>>>> common/deprecated/android-3.18
 
 	if (personality(current->personality) == PER_LINUX32 &&
 	    personality(personality) == PER_LINUX)
@@ -524,11 +536,17 @@ extern void check_pending(int signum);
 
 SYSCALL_DEFINE2(getdomainname, char __user *, name, int, len)
 {
+<<<<<<< HEAD
         int nlen, err;
+=======
+	int nlen, err;
+	char tmp[__NEW_UTS_LEN + 1];
+>>>>>>> common/deprecated/android-3.18
 
 	if (len < 0)
 		return -EINVAL;
 
+<<<<<<< HEAD
  	down_read(&uts_sem);
  	
 	nlen = strlen(utsname()->domainname) + 1;
@@ -541,6 +559,23 @@ SYSCALL_DEFINE2(getdomainname, char __user *, name, int, len)
 		err = 0;
 
 out:
+=======
+	down_read(&uts_sem);
+
+	nlen = strlen(utsname()->domainname) + 1;
+	err = -EINVAL;
+	if (nlen > len)
+		goto out_unlock;
+	memcpy(tmp, utsname()->domainname, nlen);
+
+	up_read(&uts_sem);
+
+	if (copy_to_user(name, tmp, nlen))
+		return -EFAULT;
+	return 0;
+
+out_unlock:
+>>>>>>> common/deprecated/android-3.18
 	up_read(&uts_sem);
 	return err;
 }

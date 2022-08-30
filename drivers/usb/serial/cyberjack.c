@@ -50,6 +50,10 @@
 #define CYBERJACK_PRODUCT_ID	0x0100
 
 /* Function prototypes */
+<<<<<<< HEAD
+=======
+static int cyberjack_attach(struct usb_serial *serial);
+>>>>>>> common/deprecated/android-3.18
 static int cyberjack_port_probe(struct usb_serial_port *port);
 static int cyberjack_port_remove(struct usb_serial_port *port);
 static int  cyberjack_open(struct tty_struct *tty,
@@ -77,6 +81,10 @@ static struct usb_serial_driver cyberjack_device = {
 	.description =		"Reiner SCT Cyberjack USB card reader",
 	.id_table =		id_table,
 	.num_ports =		1,
+<<<<<<< HEAD
+=======
+	.attach =		cyberjack_attach,
+>>>>>>> common/deprecated/android-3.18
 	.port_probe =		cyberjack_port_probe,
 	.port_remove =		cyberjack_port_remove,
 	.open =			cyberjack_open,
@@ -100,6 +108,17 @@ struct cyberjack_private {
 	short		wrsent;		/* Data already sent */
 };
 
+<<<<<<< HEAD
+=======
+static int cyberjack_attach(struct usb_serial *serial)
+{
+	if (serial->num_bulk_out < serial->num_ports)
+		return -ENODEV;
+
+	return 0;
+}
+
+>>>>>>> common/deprecated/android-3.18
 static int cyberjack_port_probe(struct usb_serial_port *port)
 {
 	struct cyberjack_private *priv;
@@ -358,11 +377,20 @@ static void cyberjack_write_bulk_callback(struct urb *urb)
 	struct cyberjack_private *priv = usb_get_serial_port_data(port);
 	struct device *dev = &port->dev;
 	int status = urb->status;
+<<<<<<< HEAD
 
 	set_bit(0, &port->write_urbs_free);
 	if (status) {
 		dev_dbg(dev, "%s - nonzero write bulk status received: %d\n",
 			__func__, status);
+=======
+	bool resubmitted = false;
+
+	if (status) {
+		dev_dbg(dev, "%s - nonzero write bulk status received: %d\n",
+			__func__, status);
+		set_bit(0, &port->write_urbs_free);
+>>>>>>> common/deprecated/android-3.18
 		return;
 	}
 
@@ -395,6 +423,11 @@ static void cyberjack_write_bulk_callback(struct urb *urb)
 			goto exit;
 		}
 
+<<<<<<< HEAD
+=======
+		resubmitted = true;
+
+>>>>>>> common/deprecated/android-3.18
 		dev_dbg(dev, "%s - priv->wrsent=%d\n", __func__, priv->wrsent);
 		dev_dbg(dev, "%s - priv->wrfilled=%d\n", __func__, priv->wrfilled);
 
@@ -411,6 +444,11 @@ static void cyberjack_write_bulk_callback(struct urb *urb)
 
 exit:
 	spin_unlock(&priv->lock);
+<<<<<<< HEAD
+=======
+	if (!resubmitted)
+		set_bit(0, &port->write_urbs_free);
+>>>>>>> common/deprecated/android-3.18
 	usb_serial_port_softint(port);
 }
 

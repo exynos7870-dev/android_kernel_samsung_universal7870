@@ -28,6 +28,10 @@ struct timespec __current_kernel_time(void);
 struct timespec get_monotonic_coarse(void);
 extern void getrawmonotonic(struct timespec *ts);
 extern void ktime_get_ts64(struct timespec64 *ts);
+<<<<<<< HEAD
+=======
+extern time64_t ktime_get_real_seconds(void);
+>>>>>>> common/deprecated/android-3.18
 
 extern int __getnstimeofday64(struct timespec64 *tv);
 extern void getnstimeofday64(struct timespec64 *tv);

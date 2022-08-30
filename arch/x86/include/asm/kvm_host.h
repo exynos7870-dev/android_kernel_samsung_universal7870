@@ -201,6 +201,10 @@ union kvm_mmu_page_role {
 		unsigned nxe:1;
 		unsigned cr0_wp:1;
 		unsigned smep_andnot_wp:1;
+<<<<<<< HEAD
+=======
+		unsigned smap_andnot_wp:1;
+>>>>>>> common/deprecated/android-3.18
 	};
 };
 
@@ -392,6 +396,10 @@ struct kvm_vcpu_arch {
 	struct kvm_mmu_memory_cache mmu_page_header_cache;
 
 	struct fpu guest_fpu;
+<<<<<<< HEAD
+=======
+	bool eager_fpu;
+>>>>>>> common/deprecated/android-3.18
 	u64 xcr0;
 	u64 guest_supported_xcr0;
 	u32 guest_xstate_size;
@@ -569,7 +577,11 @@ struct kvm_arch {
 	struct kvm_pic *vpic;
 	struct kvm_ioapic *vioapic;
 	struct kvm_pit *vpit;
+<<<<<<< HEAD
 	int vapics_in_nmi_mode;
+=======
+	atomic_t vapics_in_nmi_mode;
+>>>>>>> common/deprecated/android-3.18
 	struct mutex apic_map_lock;
 	struct kvm_apic_map *apic_map;
 
@@ -707,6 +719,10 @@ struct kvm_x86_ops {
 	void (*cache_reg)(struct kvm_vcpu *vcpu, enum kvm_reg reg);
 	unsigned long (*get_rflags)(struct kvm_vcpu *vcpu);
 	void (*set_rflags)(struct kvm_vcpu *vcpu, unsigned long rflags);
+<<<<<<< HEAD
+=======
+	void (*fpu_activate)(struct kvm_vcpu *vcpu);
+>>>>>>> common/deprecated/android-3.18
 	void (*fpu_deactivate)(struct kvm_vcpu *vcpu);
 
 	void (*tlb_flush)(struct kvm_vcpu *vcpu);
@@ -846,7 +862,12 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, unsigned long cr2,
 static inline int emulate_instruction(struct kvm_vcpu *vcpu,
 			int emulation_type)
 {
+<<<<<<< HEAD
 	return x86_emulate_instruction(vcpu, 0, emulation_type, NULL, 0);
+=======
+	return x86_emulate_instruction(vcpu, 0,
+			emulation_type | EMULTYPE_NO_REEXECUTE, NULL, 0);
+>>>>>>> common/deprecated/android-3.18
 }
 
 void kvm_enable_efer_bits(u64);
@@ -1024,6 +1045,7 @@ enum {
 #define HF_IRET_MASK		(1 << 4)
 #define HF_GUEST_MASK		(1 << 5) /* VCPU is in guest-mode */
 
+<<<<<<< HEAD
 /*
  * Hardware virtualization extension instructions may fault if a
  * reboot turns off virtualization while processes are running.
@@ -1043,6 +1065,31 @@ asmlinkage void kvm_spurious_fault(void);
 	"call kvm_spurious_fault \n\t"	      \
 	".popsection \n\t" \
 	_ASM_EXTABLE(666b, 667b)
+=======
+asmlinkage void __noreturn kvm_spurious_fault(void);
+
+/*
+ * Hardware virtualization extension instructions may fault if a
+ * reboot turns off virtualization while processes are running.
+ * Usually after catching the fault we just panic; during reboot
+ * instead the instruction is ignored.
+ */
+#define ____kvm_handle_fault_on_reboot(insn, cleanup_insn)		\
+	"666: \n\t"							\
+	insn "\n\t"							\
+	"jmp	668f \n\t"						\
+	"667: \n\t"							\
+	"call	kvm_spurious_fault \n\t"				\
+	"668: \n\t"							\
+	".pushsection .fixup, \"ax\" \n\t"				\
+	"700: \n\t"							\
+	cleanup_insn "\n\t"						\
+	"cmpb	$0, kvm_rebooting\n\t"					\
+	"je	667b \n\t"						\
+	"jmp	668b \n\t"						\
+	".popsection \n\t"						\
+	_ASM_EXTABLE(666b, 700b)
+>>>>>>> common/deprecated/android-3.18
 
 #define __kvm_handle_fault_on_reboot(insn)		\
 	____kvm_handle_fault_on_reboot(insn, "")

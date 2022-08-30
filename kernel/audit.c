@@ -69,12 +69,15 @@
 
 #include "audit.h"
 
+<<<<<<< HEAD
 // [ SEC_SELINUX_PORTING_EXYNOS
 #ifdef CONFIG_SEC_AVC_LOG
 #include <linux/sec_debug.h>
 #endif
 // ] SEC_SELINUX_PORTING_EXYNOS
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /* No auditing will take place until audit_initialized == AUDIT_INITIALIZED.
  * (Initialization happens after skb_init is called.) */
 #define AUDIT_DISABLED		-1
@@ -85,13 +88,22 @@ static int	audit_initialized;
 #define AUDIT_OFF	0
 #define AUDIT_ON	1
 #define AUDIT_LOCKED	2
+<<<<<<< HEAD
 u32		audit_enabled;
 u32		audit_ever_enabled;
+=======
+u32		audit_enabled = AUDIT_OFF;
+u32		audit_ever_enabled = !!AUDIT_OFF;
+>>>>>>> common/deprecated/android-3.18
 
 EXPORT_SYMBOL_GPL(audit_enabled);
 
 /* Default state when kernel boots without any parameters. */
+<<<<<<< HEAD
 static u32	audit_default = 1;
+=======
+static u32	audit_default = AUDIT_OFF;
+>>>>>>> common/deprecated/android-3.18
 
 /* If auditing cannot proceed, audit_failure selects what happens. */
 static u32	audit_failure = AUDIT_FAIL_PRINTK;
@@ -398,17 +410,24 @@ static void audit_printk_skb(struct sk_buff *skb)
 	struct nlmsghdr *nlh = nlmsg_hdr(skb);
 	char *data = nlmsg_data(nlh);
 
+<<<<<<< HEAD
 	if (nlh->nlmsg_type != AUDIT_EOE && nlh->nlmsg_type != AUDIT_NETFILTER_CFG) {
 // [ SEC_SELINUX_PORTING_EXYNOS
 #ifdef CONFIG_SEC_AVC_LOG
 		sec_debug_avc_log("type=%d %s\n", nlh->nlmsg_type, data);
 #else
+=======
+	if (nlh->nlmsg_type != AUDIT_EOE) {
+>>>>>>> common/deprecated/android-3.18
 		if (printk_ratelimit())
 			pr_notice("type=%d %s\n", nlh->nlmsg_type, data);
 		else
 			audit_log_lost("printk limit exceeded");
+<<<<<<< HEAD
 #endif
 // ] SEC_SELINUX_PORTING_EXYNOS
+=======
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	audit_hold_skb(skb);
@@ -430,6 +449,7 @@ static void kauditd_send_skb(struct sk_buff *skb)
 		}
 		/* we might get lucky and get this in the next auditd */
 		audit_hold_skb(skb);
+<<<<<<< HEAD
 	} else {
 // [ SEC_SELINUX_PORTING_EXYNOS
 #ifdef CONFIG_SEC_AVC_LOG
@@ -444,6 +464,11 @@ static void kauditd_send_skb(struct sk_buff *skb)
 		/* drop the extra reference if sent ok */
 		consume_skb(skb);
 	}
+=======
+	} else
+		/* drop the extra reference if sent ok */
+		consume_skb(skb);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
@@ -761,6 +786,11 @@ static void audit_log_feature_change(int which, u32 old_feature, u32 new_feature
 		return;
 
 	ab = audit_log_start(NULL, GFP_KERNEL, AUDIT_FEATURE_CHANGE);
+<<<<<<< HEAD
+=======
+	if (!ab)
+		return;
+>>>>>>> common/deprecated/android-3.18
 	audit_log_task_info(ab, current);
 	audit_log_format(ab, " feature=%s old=%u new=%u old_lock=%u new_lock=%u res=%d",
 			 audit_feature_names[which], !!old_feature, !!new_feature,
@@ -768,6 +798,7 @@ static void audit_log_feature_change(int which, u32 old_feature, u32 new_feature
 	audit_log_end(ab);
 }
 
+<<<<<<< HEAD
 static int audit_set_feature(struct sk_buff *skb)
 {
 	struct audit_features *uaf;
@@ -775,6 +806,13 @@ static int audit_set_feature(struct sk_buff *skb)
 
 	BUILD_BUG_ON(AUDIT_LAST_FEATURE + 1 > ARRAY_SIZE(audit_feature_names));
 	uaf = nlmsg_data(nlmsg_hdr(skb));
+=======
+static int audit_set_feature(struct audit_features *uaf)
+{
+	int i;
+
+	BUILD_BUG_ON(AUDIT_LAST_FEATURE + 1 > ARRAY_SIZE(audit_feature_names));
+>>>>>>> common/deprecated/android-3.18
 
 	/* if there is ever a version 2 we should handle that here */
 
@@ -830,6 +868,10 @@ static int audit_receive_msg(struct sk_buff *skb, struct nlmsghdr *nlh)
 {
 	u32			seq;
 	void			*data;
+<<<<<<< HEAD
+=======
+	int			data_len;
+>>>>>>> common/deprecated/android-3.18
 	int			err;
 	struct audit_buffer	*ab;
 	u16			msg_type = nlh->nlmsg_type;
@@ -853,6 +895,10 @@ static int audit_receive_msg(struct sk_buff *skb, struct nlmsghdr *nlh)
 	}
 	seq  = nlh->nlmsg_seq;
 	data = nlmsg_data(nlh);
+<<<<<<< HEAD
+=======
+	data_len = nlmsg_len(nlh);
+>>>>>>> common/deprecated/android-3.18
 
 	switch (msg_type) {
 	case AUDIT_GET: {
@@ -874,7 +920,11 @@ static int audit_receive_msg(struct sk_buff *skb, struct nlmsghdr *nlh)
 		struct audit_status	s;
 		memset(&s, 0, sizeof(s));
 		/* guard against past and future API changes */
+<<<<<<< HEAD
 		memcpy(&s, data, min_t(size_t, sizeof(s), nlmsg_len(nlh)));
+=======
+		memcpy(&s, data, min_t(size_t, sizeof(s), data_len));
+>>>>>>> common/deprecated/android-3.18
 		if (s.mask & AUDIT_STATUS_ENABLED) {
 			err = audit_set_enabled(s.enabled);
 			if (err < 0)
@@ -886,6 +936,15 @@ static int audit_receive_msg(struct sk_buff *skb, struct nlmsghdr *nlh)
 				return err;
 		}
 		if (s.mask & AUDIT_STATUS_PID) {
+<<<<<<< HEAD
+=======
+			/* NOTE: we are using task_tgid_vnr() below because
+			 *       the s.pid value is relative to the namespace
+			 *       of the caller; at present this doesn't matter
+			 *       much since you can really only run auditd
+			 *       from the initial pid namespace, but something
+			 *       to keep in mind if this changes */
+>>>>>>> common/deprecated/android-3.18
 			int new_pid = s.pid;
 
 			if ((!new_pid) && (task_tgid_vnr(current) != audit_pid))
@@ -924,7 +983,13 @@ static int audit_receive_msg(struct sk_buff *skb, struct nlmsghdr *nlh)
 			return err;
 		break;
 	case AUDIT_SET_FEATURE:
+<<<<<<< HEAD
 		err = audit_set_feature(skb);
+=======
+		if (data_len < sizeof(struct audit_features))
+			return -EINVAL;
+		err = audit_set_feature(data);
+>>>>>>> common/deprecated/android-3.18
 		if (err)
 			return err;
 		break;
@@ -933,9 +998,20 @@ static int audit_receive_msg(struct sk_buff *skb, struct nlmsghdr *nlh)
 	case AUDIT_FIRST_USER_MSG2 ... AUDIT_LAST_USER_MSG2:
 		if (!audit_enabled && msg_type != AUDIT_USER_AVC)
 			return 0;
+<<<<<<< HEAD
 
 		err = audit_filter_user(msg_type);
 		if (err == 1) { /* match or error */
+=======
+		/* exit early if there isn't at least one character to print */
+		if (data_len < 2)
+			return -EINVAL;
+
+		err = audit_filter_user(msg_type);
+		if (err == 1) { /* match or error */
+			char *str = data;
+
+>>>>>>> common/deprecated/android-3.18
 			err = 0;
 			if (msg_type == AUDIT_USER_TTY) {
 				err = tty_audit_push_current();
@@ -944,6 +1020,7 @@ static int audit_receive_msg(struct sk_buff *skb, struct nlmsghdr *nlh)
 			}
 			mutex_unlock(&audit_cmd_mutex);
 			audit_log_common_recv_msg(&ab, msg_type);
+<<<<<<< HEAD
 			if (msg_type != AUDIT_USER_TTY)
 				audit_log_format(ab, " msg='%.*s'",
 						 AUDIT_MESSAGE_TEXT_MAX,
@@ -957,6 +1034,19 @@ static int audit_receive_msg(struct sk_buff *skb, struct nlmsghdr *nlh)
 				    ((unsigned char *)data)[size - 1] == '\0')
 					size--;
 				audit_log_n_untrustedstring(ab, data, size);
+=======
+			if (msg_type != AUDIT_USER_TTY) {
+				/* ensure NULL termination */
+				str[data_len - 1] = '\0';
+				audit_log_format(ab, " msg='%.*s'",
+						 AUDIT_MESSAGE_TEXT_MAX,
+						 str);
+			} else {
+				audit_log_format(ab, " data=");
+				if (data_len > 0 && str[data_len - 1] == '\0')
+					data_len--;
+				audit_log_n_untrustedstring(ab, str, data_len);
+>>>>>>> common/deprecated/android-3.18
 			}
 			audit_set_portid(ab, NETLINK_CB(skb).portid);
 			audit_log_end(ab);
@@ -965,7 +1055,11 @@ static int audit_receive_msg(struct sk_buff *skb, struct nlmsghdr *nlh)
 		break;
 	case AUDIT_ADD_RULE:
 	case AUDIT_DEL_RULE:
+<<<<<<< HEAD
 		if (nlmsg_len(nlh) < sizeof(struct audit_rule_data))
+=======
+		if (data_len < sizeof(struct audit_rule_data))
+>>>>>>> common/deprecated/android-3.18
 			return -EINVAL;
 		if (audit_enabled == AUDIT_LOCKED) {
 			audit_log_common_recv_msg(&ab, AUDIT_CONFIG_CHANGE);
@@ -974,7 +1068,11 @@ static int audit_receive_msg(struct sk_buff *skb, struct nlmsghdr *nlh)
 			return -EPERM;
 		}
 		err = audit_rule_change(msg_type, NETLINK_CB(skb).portid,
+<<<<<<< HEAD
 					   seq, data, nlmsg_len(nlh));
+=======
+					   seq, data, data_len);
+>>>>>>> common/deprecated/android-3.18
 		break;
 	case AUDIT_LIST_RULES:
 		err = audit_list_rules_send(skb, seq);
@@ -988,7 +1086,11 @@ static int audit_receive_msg(struct sk_buff *skb, struct nlmsghdr *nlh)
 	case AUDIT_MAKE_EQUIV: {
 		void *bufp = data;
 		u32 sizes[2];
+<<<<<<< HEAD
 		size_t msglen = nlmsg_len(nlh);
+=======
+		size_t msglen = data_len;
+>>>>>>> common/deprecated/android-3.18
 		char *old, *new;
 
 		err = -EINVAL;
@@ -1065,7 +1167,11 @@ static int audit_receive_msg(struct sk_buff *skb, struct nlmsghdr *nlh)
 
 		memset(&s, 0, sizeof(s));
 		/* guard against past and future API changes */
+<<<<<<< HEAD
 		memcpy(&s, data, min_t(size_t, sizeof(s), nlmsg_len(nlh)));
+=======
+		memcpy(&s, data, min_t(size_t, sizeof(s), data_len));
+>>>>>>> common/deprecated/android-3.18
 		/* check if new data is valid */
 		if ((s.enabled != 0 && s.enabled != 1) ||
 		    (s.log_passwd != 0 && s.log_passwd != 1))
@@ -1196,8 +1302,11 @@ static int __init audit_init(void)
 	skb_queue_head_init(&audit_skb_queue);
 	skb_queue_head_init(&audit_skb_hold_queue);
 	audit_initialized = AUDIT_INITIALIZED;
+<<<<<<< HEAD
 	audit_enabled = audit_default;
 	audit_ever_enabled |= !!audit_default;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	audit_log(NULL, GFP_KERNEL, AUDIT_KERNEL, "initialized");
 
@@ -1214,6 +1323,11 @@ static int __init audit_enable(char *str)
 	audit_default = !!simple_strtol(str, NULL, 0);
 	if (!audit_default)
 		audit_initialized = AUDIT_DISABLED;
+<<<<<<< HEAD
+=======
+	audit_enabled = audit_default;
+	audit_ever_enabled = !!audit_enabled;
+>>>>>>> common/deprecated/android-3.18
 
 	pr_info("%s\n", audit_default ?
 		"enabled (after initialization)" : "disabled (until reboot)");
@@ -1895,7 +2009,11 @@ void audit_log_task_info(struct audit_buffer *ab, struct task_struct *tsk)
 			 " euid=%u suid=%u fsuid=%u"
 			 " egid=%u sgid=%u fsgid=%u tty=%s ses=%u",
 			 task_ppid_nr(tsk),
+<<<<<<< HEAD
 			 task_pid_nr(tsk),
+=======
+			 task_tgid_nr(tsk),
+>>>>>>> common/deprecated/android-3.18
 			 from_kuid(&init_user_ns, audit_get_loginuid(tsk)),
 			 from_kuid(&init_user_ns, cred->uid),
 			 from_kgid(&init_user_ns, cred->gid),

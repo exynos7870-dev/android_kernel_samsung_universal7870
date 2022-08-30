@@ -581,6 +581,7 @@ static void edac_mc_workq_setup(struct mem_ctl_info *mci, unsigned msec,
  */
 static void edac_mc_workq_teardown(struct mem_ctl_info *mci)
 {
+<<<<<<< HEAD
 	int status;
 
 	if (mci->op_state != OP_RUNNING_POLL)
@@ -593,6 +594,12 @@ static void edac_mc_workq_teardown(struct mem_ctl_info *mci)
 		/* workq instance might be running, wait for it */
 		flush_workqueue(edac_workqueue);
 	}
+=======
+	mci->op_state = OP_OFFLINE;
+
+	cancel_delayed_work_sync(&mci->work);
+	flush_workqueue(edac_workqueue);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
@@ -967,7 +974,11 @@ static void edac_inc_ue_error(struct mem_ctl_info *mci,
 	mci->ue_mc += count;
 
 	if (!enable_per_layer_report) {
+<<<<<<< HEAD
 		mci->ce_noinfo_count += count;
+=======
+		mci->ue_noinfo_count += count;
+>>>>>>> common/deprecated/android-3.18
 		return;
 	}
 

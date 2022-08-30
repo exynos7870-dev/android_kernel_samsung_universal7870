@@ -22,9 +22,16 @@ MODULE_LICENSE("GPL");
 
 #define __QUOTA_QT_PARANOIA
 
+<<<<<<< HEAD
 static int __get_index(struct qtree_mem_dqinfo *info, qid_t id, int depth)
 {
 	unsigned int epb = info->dqi_usable_bs >> 2;
+=======
+static int get_index(struct qtree_mem_dqinfo *info, struct kqid qid, int depth)
+{
+	unsigned int epb = info->dqi_usable_bs >> 2;
+	qid_t id = from_kqid(&init_user_ns, qid);
+>>>>>>> common/deprecated/android-3.18
 
 	depth = info->dqi_qtree_depth - depth - 1;
 	while (depth--)
@@ -32,6 +39,7 @@ static int __get_index(struct qtree_mem_dqinfo *info, qid_t id, int depth)
 	return id % epb;
 }
 
+<<<<<<< HEAD
 static int get_index(struct qtree_mem_dqinfo *info, struct kqid qid, int depth)
 {
 	qid_t id = from_kqid(&init_user_ns, qid);
@@ -39,6 +47,8 @@ static int get_index(struct qtree_mem_dqinfo *info, struct kqid qid, int depth)
 	return __get_index(info, id, depth);
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /* Number of entries in one blocks */
 static int qtree_dqstr_in_blk(struct qtree_mem_dqinfo *info)
 {
@@ -61,7 +71,11 @@ static ssize_t read_blk(struct qtree_mem_dqinfo *info, uint blk, char *buf)
 
 	memset(buf, 0, info->dqi_usable_bs);
 	return sb->s_op->quota_read(sb, info->dqi_type, buf,
+<<<<<<< HEAD
 	       info->dqi_usable_bs, blk << info->dqi_blocksize_bits);
+=======
+	       info->dqi_usable_bs, (loff_t)blk << info->dqi_blocksize_bits);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static ssize_t write_blk(struct qtree_mem_dqinfo *info, uint blk, char *buf)
@@ -70,7 +84,11 @@ static ssize_t write_blk(struct qtree_mem_dqinfo *info, uint blk, char *buf)
 	ssize_t ret;
 
 	ret = sb->s_op->quota_write(sb, info->dqi_type, buf,
+<<<<<<< HEAD
 	       info->dqi_usable_bs, blk << info->dqi_blocksize_bits);
+=======
+	       info->dqi_usable_bs, (loff_t)blk << info->dqi_blocksize_bits);
+>>>>>>> common/deprecated/android-3.18
 	if (ret != info->dqi_usable_bs) {
 		quota_error(sb, "dquota write failed");
 		if (ret >= 0)
@@ -283,7 +301,11 @@ static uint find_free_dqentry(struct qtree_mem_dqinfo *info,
 			    blk);
 		goto out_buf;
 	}
+<<<<<<< HEAD
 	dquot->dq_off = (blk << info->dqi_blocksize_bits) +
+=======
+	dquot->dq_off = ((loff_t)blk << info->dqi_blocksize_bits) +
+>>>>>>> common/deprecated/android-3.18
 			sizeof(struct qt_disk_dqdbheader) +
 			i * info->dqi_entry_size;
 	kfree(buf);
@@ -551,7 +573,11 @@ static loff_t find_block_dqentry(struct qtree_mem_dqinfo *info,
 		ret = -EIO;
 		goto out_buf;
 	} else {
+<<<<<<< HEAD
 		ret = (blk << info->dqi_blocksize_bits) + sizeof(struct
+=======
+		ret = ((loff_t)blk << info->dqi_blocksize_bits) + sizeof(struct
+>>>>>>> common/deprecated/android-3.18
 		  qt_disk_dqdbheader) + i * info->dqi_entry_size;
 	}
 out_buf:
@@ -667,6 +693,7 @@ int qtree_release_dquot(struct qtree_mem_dqinfo *info, struct dquot *dquot)
 	return 0;
 }
 EXPORT_SYMBOL(qtree_release_dquot);
+<<<<<<< HEAD
 
 static int find_next_id(struct qtree_mem_dqinfo *info, qid_t *id,
 			unsigned int blk, int depth)
@@ -724,3 +751,5 @@ int qtree_get_next_id(struct qtree_mem_dqinfo *info, struct kqid *qid)
 	return 0;
 }
 EXPORT_SYMBOL(qtree_get_next_id);
+=======
+>>>>>>> common/deprecated/android-3.18

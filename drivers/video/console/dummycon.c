@@ -71,7 +71,10 @@ const struct consw dummy_con = {
     .con_switch =	DUMMY,
     .con_blank =	DUMMY,
     .con_font_set =	DUMMY,
+<<<<<<< HEAD
     .con_font_get =	DUMMY,
+=======
+>>>>>>> common/deprecated/android-3.18
     .con_font_default =	DUMMY,
     .con_font_copy =	DUMMY,
     .con_set_palette =	DUMMY,

@@ -25,6 +25,10 @@
  *
  **************************************************************************/
 #include <linux/module.h>
+<<<<<<< HEAD
+=======
+#include <linux/console.h>
+>>>>>>> common/deprecated/android-3.18
 
 #include <drm/drmP.h>
 #include "vmwgfx_drv.h"
@@ -561,6 +565,7 @@ out_fixup:
 static int vmw_dma_masks(struct vmw_private *dev_priv)
 {
 	struct drm_device *dev = dev_priv->dev;
+<<<<<<< HEAD
 
 	if (intel_iommu_enabled &&
 	    (sizeof(unsigned long) == 4 || vmw_restrict_dma_mask)) {
@@ -568,6 +573,18 @@ static int vmw_dma_masks(struct vmw_private *dev_priv)
 		return dma_set_mask(dev->dev, DMA_BIT_MASK(44));
 	}
 	return 0;
+=======
+	int ret = 0;
+
+	ret = dma_set_mask_and_coherent(dev->dev, DMA_BIT_MASK(64));
+	if (dev_priv->map_mode != vmw_dma_phys &&
+	    (sizeof(unsigned long) == 4 || vmw_restrict_dma_mask)) {
+		DRM_INFO("Restricting DMA addresses to 44 bits.\n");
+		return dma_set_mask_and_coherent(dev->dev, DMA_BIT_MASK(44));
+	}
+
+	return ret;
+>>>>>>> common/deprecated/android-3.18
 }
 #else
 static int vmw_dma_masks(struct vmw_private *dev_priv)
@@ -1447,6 +1464,15 @@ static int vmw_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 static int __init vmwgfx_init(void)
 {
 	int ret;
+<<<<<<< HEAD
+=======
+
+#ifdef CONFIG_VGA_CONSOLE
+	if (vgacon_text_force())
+		return -EINVAL;
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 	ret = drm_pci_init(&driver, &vmw_pci_driver);
 	if (ret)
 		DRM_ERROR("Failed initializing DRM.\n");

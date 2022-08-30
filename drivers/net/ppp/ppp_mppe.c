@@ -62,6 +62,10 @@ MODULE_AUTHOR("Frank Cusack <fcusack@fcusack.com>");
 MODULE_DESCRIPTION("Point-to-Point Protocol Microsoft Point-to-Point Encryption support");
 MODULE_LICENSE("Dual BSD/GPL");
 MODULE_ALIAS("ppp-compress-" __stringify(CI_MPPE));
+<<<<<<< HEAD
+=======
+MODULE_SOFTDEP("pre: arc4");
+>>>>>>> common/deprecated/android-3.18
 MODULE_VERSION("1.0.2");
 
 static unsigned int

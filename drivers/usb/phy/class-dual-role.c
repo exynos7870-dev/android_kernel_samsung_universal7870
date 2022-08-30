@@ -76,13 +76,21 @@ static void dual_role_changed_work(struct work_struct *work)
 	    container_of(work, struct dual_role_phy_instance,
 			 changed_work);
 
+<<<<<<< HEAD
 	dev_info(&dual_role->dev, "%s\n", __func__);
+=======
+	dev_dbg(&dual_role->dev, "%s\n", __func__);
+>>>>>>> common/deprecated/android-3.18
 	kobject_uevent(&dual_role->dev.kobj, KOBJ_CHANGE);
 }
 
 void dual_role_instance_changed(struct dual_role_phy_instance *dual_role)
 {
+<<<<<<< HEAD
 	dev_info(&dual_role->dev, "%s\n", __func__);
+=======
+	dev_dbg(&dual_role->dev, "%s\n", __func__);
+>>>>>>> common/deprecated/android-3.18
 	pm_wakeup_event(&dual_role->dev, DUAL_ROLE_NOTIFICATION_TIMEOUT);
 	schedule_work(&dual_role->changed_work);
 }
@@ -282,7 +290,11 @@ static ssize_t dual_role_show_property(struct device *dev,
 
 		if (ret < 0) {
 			if (ret == -ENODATA)
+<<<<<<< HEAD
 				dev_info(dev,
+=======
+				dev_dbg(dev,
+>>>>>>> common/deprecated/android-3.18
 					"driver has no data for `%s' property\n",
 					attr->attr.name);
 			else if (ret != -ENODEV)
@@ -348,7 +360,10 @@ static ssize_t dual_role_store_property(struct device *dev,
 	bool result = false;
 
 	dup_buf = kstrdupcase(buf, GFP_KERNEL, false);
+<<<<<<< HEAD
 	printk("%s : off %d, buf %s\n", __func__, (int)off, buf);
+=======
+>>>>>>> common/deprecated/android-3.18
 	switch (off) {
 	case DUAL_ROLE_PROP_MODE:
 		total = DUAL_ROLE_PROP_MODE_TOTAL;
@@ -452,6 +467,7 @@ int dual_role_uevent(struct device *dev, struct kobj_uevent_env *env)
 	char *prop_buf;
 	char *attrname;
 
+<<<<<<< HEAD
 	dev_info(dev, "uevent\n");
 
 	if (!dual_role || !dual_role->desc) {
@@ -460,6 +476,16 @@ int dual_role_uevent(struct device *dev, struct kobj_uevent_env *env)
 	}
 
 	dev_info(dev, "DUAL_ROLE_NAME=%s\n", dual_role->desc->name);
+=======
+	dev_dbg(dev, "uevent\n");
+
+	if (!dual_role || !dual_role->desc) {
+		dev_dbg(dev, "No dual_role phy yet\n");
+		return ret;
+	}
+
+	dev_dbg(dev, "DUAL_ROLE_NAME=%s\n", dual_role->desc->name);
+>>>>>>> common/deprecated/android-3.18
 
 	ret = add_uevent_var(env, "DUAL_ROLE_NAME=%s", dual_role->desc->name);
 	if (ret)
@@ -491,7 +517,11 @@ int dual_role_uevent(struct device *dev, struct kobj_uevent_env *env)
 		if (!attrname)
 			ret = -ENOMEM;
 
+<<<<<<< HEAD
 		dev_info(dev, "prop %s=%s\n", attrname, prop_buf);
+=======
+		dev_dbg(dev, "prop %s=%s\n", attrname, prop_buf);
+>>>>>>> common/deprecated/android-3.18
 
 		ret = add_uevent_var(env, "DUAL_ROLE_%s=%s", attrname,
 				     prop_buf);

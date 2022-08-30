@@ -52,8 +52,15 @@ extern struct inet_hashinfo tcp_hashinfo;
 extern struct percpu_counter tcp_orphan_count;
 void tcp_time_wait(struct sock *sk, int state, int timeo);
 
+<<<<<<< HEAD
 #define MAX_TCP_HEADER	(128 + MAX_HEADER)
 #define MAX_TCP_OPTION_SPACE 40
+=======
+#define MAX_TCP_HEADER	L1_CACHE_ALIGN(128 + MAX_HEADER)
+#define MAX_TCP_OPTION_SPACE 40
+#define TCP_MIN_SND_MSS		48
+#define TCP_MIN_GSO_SIZE	(TCP_MIN_SND_MSS - MAX_TCP_OPTION_SPACE)
+>>>>>>> common/deprecated/android-3.18
 
 /* 
  * Never offer a window over 32767 without using window scaling. Some
@@ -138,8 +145,11 @@ void tcp_time_wait(struct sock *sk, int state, int timeo);
 						 * most likely due to retrans in 3WHS.
 						 */
 
+<<<<<<< HEAD
 #define TCP_DELACK_SEG          1
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #define TCP_RESOURCE_PROBE_INTERVAL ((unsigned)(HZ/2U)) /* Maximal interval between probes
 					                 * for local resources.
 					                 */
@@ -279,6 +289,7 @@ extern unsigned int sysctl_tcp_notsent_lowat;
 extern int sysctl_tcp_min_tso_segs;
 extern int sysctl_tcp_autocorking;
 extern int sysctl_tcp_default_init_rwnd;
+<<<<<<< HEAD
 #ifdef CONFIG_NETPM
 extern int sysctl_tcp_netpm[4];
 extern struct net_device *ip6_dev_find(struct net *net, const struct in6_addr *addr);
@@ -292,6 +303,21 @@ extern int sysctl_tcp_use_userconfig;
 extern struct percpu_counter tcp_sockets_allocated;
 extern int tcp_memory_pressure;
 
+=======
+
+extern atomic_long_t tcp_memory_allocated;
+extern struct percpu_counter tcp_sockets_allocated;
+extern int tcp_memory_pressure;
+
+/* optimized version of sk_under_memory_pressure() for TCP sockets */
+static inline bool tcp_under_memory_pressure(const struct sock *sk)
+{
+	if (mem_cgroup_sockets_enabled && sk->sk_cgrp)
+		return !!sk->sk_cgrp->memory_pressure;
+
+	return tcp_memory_pressure;
+}
+>>>>>>> common/deprecated/android-3.18
 /*
  * The next routines deal with comparing 32 bit unsigned ints
  * and worry about wraparound (automatic with unsigned arithmetic).
@@ -383,12 +409,16 @@ ssize_t tcp_splice_read(struct socket *sk, loff_t *ppos,
 			struct pipe_inode_info *pipe, size_t len,
 			unsigned int flags);
 
+<<<<<<< HEAD
 /* sysctl master controller */
 extern int tcp_use_userconfig_sysctl_handler(struct ctl_table *, int,
 				void __user *, size_t *, loff_t *);
 extern int tcp_proc_delayed_ack_control(struct ctl_table *, int,
 				void __user *, size_t *, loff_t *);
 
+=======
+void tcp_enter_quickack_mode(struct sock *sk, unsigned int max_quickacks);
+>>>>>>> common/deprecated/android-3.18
 static inline void tcp_dec_quickack_mode(struct sock *sk,
 					 const unsigned int pkts)
 {
@@ -547,6 +577,10 @@ int tcp_send_synack(struct sock *);
 bool tcp_syn_flood_action(struct sock *sk, const struct sk_buff *skb,
 			  const char *proto);
 void tcp_push_one(struct sock *, unsigned int mss_now);
+<<<<<<< HEAD
+=======
+void __tcp_send_ack(struct sock *sk, u32 rcv_nxt);
+>>>>>>> common/deprecated/android-3.18
 void tcp_send_ack(struct sock *sk);
 void tcp_send_delayed_ack(struct sock *sk);
 void tcp_send_loss_probe(struct sock *sk);
@@ -633,7 +667,11 @@ static inline void tcp_fast_path_check(struct sock *sk)
 {
 	struct tcp_sock *tp = tcp_sk(sk);
 
+<<<<<<< HEAD
 	if (skb_queue_empty(&tp->out_of_order_queue) &&
+=======
+	if (RB_EMPTY_ROOT(&tp->out_of_order_queue) &&
+>>>>>>> common/deprecated/android-3.18
 	    tp->rcv_wnd &&
 	    atomic_read(&sk->sk_rmem_alloc) < sk->sk_rcvbuf &&
 	    !tp->urg_data)
@@ -789,8 +827,11 @@ enum tcp_ca_event {
 	CA_EVENT_LOSS,		/* loss timeout */
 	CA_EVENT_ECN_NO_CE,	/* ECT set, but not CE marked */
 	CA_EVENT_ECN_IS_CE,	/* received CE marked IP packet */
+<<<<<<< HEAD
 	CA_EVENT_DELAYED_ACK,	/* Delayed ack is sent */
 	CA_EVENT_NON_DELAYED_ACK,
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 /* Information about inbound ACK, passed to cong_ops->in_ack_event() */
@@ -1087,6 +1128,10 @@ static inline void tcp_prequeue_init(struct tcp_sock *tp)
 }
 
 bool tcp_prequeue(struct sock *sk, struct sk_buff *skb);
+<<<<<<< HEAD
+=======
+int tcp_filter(struct sock *sk, struct sk_buff *skb);
+>>>>>>> common/deprecated/android-3.18
 
 #undef STATE_TRACE
 
@@ -1116,6 +1161,7 @@ void tcp_select_initial_window(int __space, __u32 mss, __u32 *rcv_wnd,
 			       __u32 *window_clamp, int wscale_ok,
 			       __u8 *rcv_wscale, __u32 init_rcv_wnd);
 
+<<<<<<< HEAD
 #ifdef CONFIG_NETPM
 static inline int tcp_space_from_win(int win)
 {
@@ -1131,6 +1177,15 @@ static inline int tcp_win_from_space(int space)
 	return sysctl_tcp_adv_win_scale<=0 ?
 		(space>>(-sysctl_tcp_adv_win_scale)) :
 		space - (space>>sysctl_tcp_adv_win_scale);
+=======
+static inline int tcp_win_from_space(int space)
+{
+	int tcp_adv_win_scale = sysctl_tcp_adv_win_scale;
+
+	return tcp_adv_win_scale <= 0 ?
+		(space>>(-tcp_adv_win_scale)) :
+		space - (space>>tcp_adv_win_scale);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /* Note: caller must be prepared to deal with negative returns */ 
@@ -1388,6 +1443,14 @@ bool tcp_try_fastopen(struct sock *sk, struct sk_buff *skb,
 void tcp_fastopen_init_key_once(bool publish);
 #define TCP_FASTOPEN_KEY_LENGTH 16
 
+<<<<<<< HEAD
+=======
+static inline void tcp_init_send_head(struct sock *sk)
+{
+	sk->sk_send_head = NULL;
+}
+
+>>>>>>> common/deprecated/android-3.18
 /* Fastopen key context */
 struct tcp_fastopen_context {
 	struct crypto_cipher	*tfm;
@@ -1395,6 +1458,11 @@ struct tcp_fastopen_context {
 	struct rcu_head		rcu;
 };
 
+<<<<<<< HEAD
+=======
+static inline void tcp_init_send_head(struct sock *sk);
+
+>>>>>>> common/deprecated/android-3.18
 /* write queue abstraction */
 static inline void tcp_write_queue_purge(struct sock *sk)
 {
@@ -1402,8 +1470,16 @@ static inline void tcp_write_queue_purge(struct sock *sk)
 
 	while ((skb = __skb_dequeue(&sk->sk_write_queue)) != NULL)
 		sk_wmem_free_skb(sk, skb);
+<<<<<<< HEAD
 	sk_mem_reclaim(sk);
 	tcp_clear_all_retrans_hints(tcp_sk(sk));
+=======
+	tcp_init_send_head(sk);
+	sk_mem_reclaim(sk);
+	tcp_clear_all_retrans_hints(tcp_sk(sk));
+	tcp_init_send_head(sk);
+	inet_csk(sk)->icsk_backoff = 0;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static inline struct sk_buff *tcp_write_queue_head(const struct sock *sk)
@@ -1464,9 +1540,31 @@ static inline void tcp_check_send_head(struct sock *sk, struct sk_buff *skb_unli
 		tcp_sk(sk)->highest_sack = NULL;
 }
 
+<<<<<<< HEAD
 static inline void tcp_init_send_head(struct sock *sk)
 {
 	sk->sk_send_head = NULL;
+=======
+static inline struct sk_buff *tcp_rtx_queue_head(const struct sock *sk)
+{
+	struct sk_buff *skb = tcp_write_queue_head(sk);
+
+	if (skb == tcp_send_head(sk))
+		skb = NULL;
+
+	return skb;
+}
+
+static inline struct sk_buff *tcp_rtx_queue_tail(const struct sock *sk)
+{
+	struct sk_buff *skb = tcp_send_head(sk);
+
+	/* empty retransmit queue, for example due to zero window */
+	if (skb == tcp_write_queue_head(sk))
+		return NULL;
+
+	return skb ? tcp_write_queue_prev(sk, skb) : tcp_write_queue_tail(sk);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static inline void __tcp_add_write_queue_tail(struct sock *sk, struct sk_buff *skb)
@@ -1561,12 +1659,21 @@ static inline void tcp_highest_sack_reset(struct sock *sk)
 	tcp_sk(sk)->highest_sack = tcp_write_queue_head(sk);
 }
 
+<<<<<<< HEAD
 /* Called when old skb is about to be deleted (to be combined with new skb) */
 static inline void tcp_highest_sack_combine(struct sock *sk,
 					    struct sk_buff *old,
 					    struct sk_buff *new)
 {
 	if (tcp_sk(sk)->sacked_out && (old == tcp_sk(sk)->highest_sack))
+=======
+/* Called when old skb is about to be deleted and replaced by new skb */
+static inline void tcp_highest_sack_replace(struct sock *sk,
+					    struct sk_buff *old,
+					    struct sk_buff *new)
+{
+	if (old == tcp_highest_sack(sk))
+>>>>>>> common/deprecated/android-3.18
 		tcp_sk(sk)->highest_sack = new;
 }
 
@@ -1632,8 +1739,11 @@ static inline bool tcp_stream_memory_free(const struct sock *sk)
 	return notsent_bytes < tcp_notsent_lowat(tp);
 }
 
+<<<<<<< HEAD
 extern int tcp_nuke_addr(struct net *net, struct sockaddr *addr);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #ifdef CONFIG_PROC_FS
 int tcp4_proc_init(void);
 void tcp4_proc_exit(void);

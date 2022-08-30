@@ -239,7 +239,11 @@ static void __wrmsr_safe_regs_on_cpu(void *info)
 	rv->err = wrmsr_safe_regs(rv->regs);
 }
 
+<<<<<<< HEAD
 int rdmsr_safe_regs_on_cpu(unsigned int cpu, u32 *regs)
+=======
+int rdmsr_safe_regs_on_cpu(unsigned int cpu, u32 regs[8])
+>>>>>>> common/deprecated/android-3.18
 {
 	int err;
 	struct msr_regs_info rv;
@@ -252,7 +256,11 @@ int rdmsr_safe_regs_on_cpu(unsigned int cpu, u32 *regs)
 }
 EXPORT_SYMBOL(rdmsr_safe_regs_on_cpu);
 
+<<<<<<< HEAD
 int wrmsr_safe_regs_on_cpu(unsigned int cpu, u32 *regs)
+=======
+int wrmsr_safe_regs_on_cpu(unsigned int cpu, u32 regs[8])
+>>>>>>> common/deprecated/android-3.18
 {
 	int err;
 	struct msr_regs_info rv;

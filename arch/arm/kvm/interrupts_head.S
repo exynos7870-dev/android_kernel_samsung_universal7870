@@ -599,8 +599,18 @@ ARM_BE8(rev	r6, r6  )
 .endm
 
 /* Configures the HCPTR (Hyp Coprocessor Trap Register) on entry/return
+<<<<<<< HEAD
  * (hardware reset value is 0). Keep previous value in r2. */
 .macro set_hcptr operation, mask
+=======
+ * (hardware reset value is 0). Keep previous value in r2.
+ * An ISB is emited on vmexit/vmtrap, but executed on vmexit only if
+ * VFP wasn't already enabled (always executed on vmtrap).
+ * If a label is specified with vmexit, it is branched to if VFP wasn't
+ * enabled.
+ */
+.macro set_hcptr operation, mask, label = none
+>>>>>>> common/deprecated/android-3.18
 	mrc	p15, 4, r2, c1, c1, 2
 	ldr	r3, =\mask
 	.if \operation == vmentry
@@ -609,6 +619,20 @@ ARM_BE8(rev	r6, r6  )
 	bic	r3, r2, r3		@ Don't trap defined coproc-accesses
 	.endif
 	mcr	p15, 4, r3, c1, c1, 2
+<<<<<<< HEAD
+=======
+	.if \operation != vmentry
+	.if \operation == vmexit
+	tst	r2, #(HCPTR_TCP(10) | HCPTR_TCP(11))
+	beq	1f
+	.endif
+	isb
+	.if \label != none
+	b	\label
+	.endif
+1:
+	.endif
+>>>>>>> common/deprecated/android-3.18
 .endm
 
 /* Configures the HDCR (Hyp Debug Configuration Register) on entry/return

@@ -2305,7 +2305,12 @@ static int mv_udc_probe(struct platform_device *pdev)
 	return 0;
 
 err_create_workqueue:
+<<<<<<< HEAD
 	destroy_workqueue(udc->qwork);
+=======
+	if (udc->qwork)
+		destroy_workqueue(udc->qwork);
+>>>>>>> common/deprecated/android-3.18
 err_destroy_dma:
 	dma_pool_destroy(udc->dtd_pool);
 err_free_dma:

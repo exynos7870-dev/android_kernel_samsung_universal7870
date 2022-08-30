@@ -956,7 +956,11 @@ raw3270_deactivate_view(struct raw3270_view *view)
  * Add view to device with minor "minor".
  */
 int
+<<<<<<< HEAD
 raw3270_add_view(struct raw3270_view *view, struct raw3270_fn *fn, int minor)
+=======
+raw3270_add_view(struct raw3270_view *view, struct raw3270_fn *fn, int minor, int subclass)
+>>>>>>> common/deprecated/android-3.18
 {
 	unsigned long flags;
 	struct raw3270 *rp;
@@ -978,6 +982,10 @@ raw3270_add_view(struct raw3270_view *view, struct raw3270_fn *fn, int minor)
 		view->cols = rp->cols;
 		view->ascebc = rp->ascebc;
 		spin_lock_init(&view->lock);
+<<<<<<< HEAD
+=======
+		lockdep_set_subclass(&view->lock, subclass);
+>>>>>>> common/deprecated/android-3.18
 		list_add(&view->list, &rp->view_list);
 		rc = 0;
 		spin_unlock_irqrestore(get_ccwdev_lock(rp->cdev), flags);

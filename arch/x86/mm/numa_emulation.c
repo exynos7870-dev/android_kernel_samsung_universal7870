@@ -60,7 +60,11 @@ static int __init emu_setup_memblk(struct numa_meminfo *ei,
 	eb->nid = nid;
 
 	if (emu_nid_to_phys[nid] == NUMA_NO_NODE)
+<<<<<<< HEAD
 		emu_nid_to_phys[nid] = nid;
+=======
+		emu_nid_to_phys[nid] = pb->nid;
+>>>>>>> common/deprecated/android-3.18
 
 	pb->start += size;
 	if (pb->start >= pb->end) {

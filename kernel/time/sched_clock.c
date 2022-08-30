@@ -146,6 +146,14 @@ void __init sched_clock_register(u64 (*read)(void), int bits,
 	cd.epoch_ns = ns;
 	raw_write_seqcount_end(&cd.seq);
 
+<<<<<<< HEAD
+=======
+	if (sched_clock_timer.function != NULL) {
+		/* update timeout for clock wrap */
+		hrtimer_start(&sched_clock_timer, cd.wrap_kt, HRTIMER_MODE_REL);
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	r = rate;
 	if (r >= 4000000) {
 		r /= 1000000;

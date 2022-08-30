@@ -369,7 +369,11 @@ static inline __u8 uac_processing_unit_bControlSize(struct uac_processing_unit_d
 {
 	return (protocol == UAC_VERSION_1) ?
 		desc->baSourceID[desc->bNrInPins + 4] :
+<<<<<<< HEAD
 		desc->baSourceID[desc->bNrInPins + 6];
+=======
+		2; /* in UAC2, this value is constant */
+>>>>>>> common/deprecated/android-3.18
 }
 
 static inline __u8 *uac_processing_unit_bmControls(struct uac_processing_unit_descriptor *desc,
@@ -377,7 +381,11 @@ static inline __u8 *uac_processing_unit_bmControls(struct uac_processing_unit_de
 {
 	return (protocol == UAC_VERSION_1) ?
 		&desc->baSourceID[desc->bNrInPins + 5] :
+<<<<<<< HEAD
 		&desc->baSourceID[desc->bNrInPins + 7];
+=======
+		&desc->baSourceID[desc->bNrInPins + 6];
+>>>>>>> common/deprecated/android-3.18
 }
 
 static inline __u8 uac_processing_unit_iProcessing(struct uac_processing_unit_descriptor *desc,

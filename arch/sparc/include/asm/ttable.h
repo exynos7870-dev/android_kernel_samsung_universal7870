@@ -589,8 +589,13 @@ user_rtt_fill_64bit:					\
 	 restored;					\
 	nop; nop; nop; nop; nop; nop;			\
 	nop; nop; nop; nop; nop;			\
+<<<<<<< HEAD
 	ba,a,pt	%xcc, user_rtt_fill_fixup;		\
 	ba,a,pt	%xcc, user_rtt_fill_fixup;		\
+=======
+	ba,a,pt	%xcc, user_rtt_fill_fixup_dax;		\
+	ba,a,pt	%xcc, user_rtt_fill_fixup_mna;		\
+>>>>>>> common/deprecated/android-3.18
 	ba,a,pt	%xcc, user_rtt_fill_fixup;
 
 
@@ -652,8 +657,13 @@ user_rtt_fill_32bit:					\
 	 restored;					\
 	nop; nop; nop; nop; nop;			\
 	nop; nop; nop;					\
+<<<<<<< HEAD
 	ba,a,pt	%xcc, user_rtt_fill_fixup;		\
 	ba,a,pt	%xcc, user_rtt_fill_fixup;		\
+=======
+	ba,a,pt	%xcc, user_rtt_fill_fixup_dax;		\
+	ba,a,pt	%xcc, user_rtt_fill_fixup_mna;		\
+>>>>>>> common/deprecated/android-3.18
 	ba,a,pt	%xcc, user_rtt_fill_fixup;
 
 

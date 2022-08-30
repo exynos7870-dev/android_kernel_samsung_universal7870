@@ -732,7 +732,11 @@
 
 	dp_phy: video-phy@10040720 {
 		compatible = "samsung,exynos5250-dp-video-phy";
+<<<<<<< HEAD
 		reg = <0x10040720 4>;
+=======
+		samsung,pmu-syscon = <&pmu_system_controller>;
+>>>>>>> common/deprecated/android-3.18
 		#phy-cells = <0>;
 	};
 

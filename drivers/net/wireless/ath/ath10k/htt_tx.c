@@ -402,8 +402,15 @@ int ath10k_htt_mgmt_tx(struct ath10k_htt *htt, struct sk_buff *msdu)
 	skb_cb->paddr = dma_map_single(dev, msdu->data, msdu->len,
 				       DMA_TO_DEVICE);
 	res = dma_mapping_error(dev, skb_cb->paddr);
+<<<<<<< HEAD
 	if (res)
 		goto err_free_txdesc;
+=======
+	if (res) {
+		res = -EIO;
+		goto err_free_txdesc;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	skb_put(txdesc, len);
 	cmd = (struct htt_cmd *)txdesc->data;
@@ -488,8 +495,15 @@ int ath10k_htt_tx(struct ath10k_htt *htt, struct sk_buff *msdu)
 	skb_cb->paddr = dma_map_single(dev, msdu->data, msdu->len,
 				       DMA_TO_DEVICE);
 	res = dma_mapping_error(dev, skb_cb->paddr);
+<<<<<<< HEAD
 	if (res)
 		goto err_free_txbuf;
+=======
+	if (res) {
+		res = -EIO;
+		goto err_free_txbuf;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	if (likely(use_frags)) {
 		frags = skb_cb->htt.txbuf->frags;

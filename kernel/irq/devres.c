@@ -104,7 +104,11 @@ int devm_request_any_context_irq(struct device *dev, unsigned int irq,
 		return -ENOMEM;
 
 	rc = request_any_context_irq(irq, handler, irqflags, devname, dev_id);
+<<<<<<< HEAD
 	if (rc) {
+=======
+	if (rc < 0) {
+>>>>>>> common/deprecated/android-3.18
 		devres_free(dr);
 		return rc;
 	}
@@ -113,7 +117,11 @@ int devm_request_any_context_irq(struct device *dev, unsigned int irq,
 	dr->dev_id = dev_id;
 	devres_add(dev, dr);
 
+<<<<<<< HEAD
 	return 0;
+=======
+	return rc;
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL(devm_request_any_context_irq);
 

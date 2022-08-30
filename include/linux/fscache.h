@@ -764,7 +764,11 @@ bool fscache_maybe_release_page(struct fscache_cookie *cookie,
 {
 	if (fscache_cookie_valid(cookie) && PageFsCache(page))
 		return __fscache_maybe_release_page(cookie, page, gfp);
+<<<<<<< HEAD
 	return false;
+=======
+	return true;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**

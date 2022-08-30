@@ -915,12 +915,19 @@ void bnx2i_free_hba(struct bnx2i_hba *hba)
 	INIT_LIST_HEAD(&hba->ep_ofld_list);
 	INIT_LIST_HEAD(&hba->ep_active_list);
 	INIT_LIST_HEAD(&hba->ep_destroy_list);
+<<<<<<< HEAD
 	pci_dev_put(hba->pcidev);
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	if (hba->regview) {
 		pci_iounmap(hba->pcidev, hba->regview);
 		hba->regview = NULL;
 	}
+<<<<<<< HEAD
+=======
+	pci_dev_put(hba->pcidev);
+>>>>>>> common/deprecated/android-3.18
 	bnx2i_free_mp_bdt(hba);
 	bnx2i_release_free_cid_que(hba);
 	iscsi_host_free(shost);

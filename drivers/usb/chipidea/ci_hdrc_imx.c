@@ -87,6 +87,13 @@ static struct imx_usbmisc_data *usbmisc_get_init_data(struct device *dev)
 	if (!misc_pdev)
 		return ERR_PTR(-EPROBE_DEFER);
 
+<<<<<<< HEAD
+=======
+	if (!platform_get_drvdata(misc_pdev)) {
+		put_device(&misc_pdev->dev);
+		return ERR_PTR(-EPROBE_DEFER);
+	}
+>>>>>>> common/deprecated/android-3.18
 	data->dev = &misc_pdev->dev;
 
 	if (of_find_property(np, "disable-over-current", NULL))

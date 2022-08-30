@@ -1250,6 +1250,15 @@ static const struct usb_gadget_ops fsl_gadget_ops = {
 	.udc_stop = fsl_udc_stop,
 };
 
+<<<<<<< HEAD
+=======
+/*
+ * Empty complete function used by this driver to fill in the req->complete
+ * field when creating a request since the complete field is mandatory.
+ */
+static void fsl_noop_complete(struct usb_ep *ep, struct usb_request *req) { }
+
+>>>>>>> common/deprecated/android-3.18
 /* Set protocol stall on ep0, protocol stall will automatically be cleared
    on new transaction */
 static void ep0stall(struct fsl_udc *udc)
@@ -1284,7 +1293,11 @@ static int ep0_prime_status(struct fsl_udc *udc, int direction)
 	req->req.length = 0;
 	req->req.status = -EINPROGRESS;
 	req->req.actual = 0;
+<<<<<<< HEAD
 	req->req.complete = NULL;
+=======
+	req->req.complete = fsl_noop_complete;
+>>>>>>> common/deprecated/android-3.18
 	req->dtd_count = 0;
 
 	ret = usb_gadget_map_request(&ep->udc->gadget, &req->req, ep_is_in(ep));
@@ -1305,7 +1318,11 @@ static void udc_reset_ep_queue(struct fsl_udc *udc, u8 pipe)
 {
 	struct fsl_ep *ep = get_ep_by_pipe(udc, pipe);
 
+<<<<<<< HEAD
 	if (ep->name)
+=======
+	if (ep->ep.name)
+>>>>>>> common/deprecated/android-3.18
 		nuke(ep, -ESHUTDOWN);
 }
 
@@ -1367,7 +1384,11 @@ static void ch9getstatus(struct fsl_udc *udc, u8 request_type, u16 value,
 	req->req.length = 2;
 	req->req.status = -EINPROGRESS;
 	req->req.actual = 0;
+<<<<<<< HEAD
 	req->req.complete = NULL;
+=======
+	req->req.complete = fsl_noop_complete;
+>>>>>>> common/deprecated/android-3.18
 	req->dtd_count = 0;
 
 	ret = usb_gadget_map_request(&ep->udc->gadget, &req->req, ep_is_in(ep));
@@ -1693,7 +1714,11 @@ static void dtd_complete_irq(struct fsl_udc *udc)
 		curr_ep = get_ep_by_pipe(udc, i);
 
 		/* If the ep is configured */
+<<<<<<< HEAD
 		if (curr_ep->name == NULL) {
+=======
+		if (!curr_ep->ep.name) {
+>>>>>>> common/deprecated/android-3.18
 			WARNING("Invalid EP?");
 			continue;
 		}
@@ -2549,7 +2574,11 @@ static int __exit fsl_udc_remove(struct platform_device *pdev)
 	dma_pool_destroy(udc_controller->td_pool);
 	free_irq(udc_controller->irq, udc_controller);
 	iounmap(dr_regs);
+<<<<<<< HEAD
 	if (pdata->operating_mode == FSL_USB2_DR_DEVICE)
+=======
+	if (res && (pdata->operating_mode == FSL_USB2_DR_DEVICE))
+>>>>>>> common/deprecated/android-3.18
 		release_mem_region(res->start, resource_size(res));
 
 	/* free udc --wait for the release() finished */

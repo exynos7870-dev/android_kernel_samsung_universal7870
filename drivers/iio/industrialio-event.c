@@ -84,7 +84,11 @@ static unsigned int iio_event_poll(struct file *filep,
 	unsigned int events = 0;
 
 	if (!indio_dev->info)
+<<<<<<< HEAD
 		return -ENODEV;
+=======
+		return events;
+>>>>>>> common/deprecated/android-3.18
 
 	poll_wait(filep, &ev_int->wait, wait);
 

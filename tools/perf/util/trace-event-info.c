@@ -513,12 +513,20 @@ struct tracing_data *tracing_data_get(struct list_head *pattrs,
 			 "/tmp/perf-XXXXXX");
 		if (!mkstemp(tdata->temp_file)) {
 			pr_debug("Can't make temp file");
+<<<<<<< HEAD
+=======
+			free(tdata);
+>>>>>>> common/deprecated/android-3.18
 			return NULL;
 		}
 
 		temp_fd = open(tdata->temp_file, O_RDWR);
 		if (temp_fd < 0) {
 			pr_debug("Can't read '%s'", tdata->temp_file);
+<<<<<<< HEAD
+=======
+			free(tdata);
+>>>>>>> common/deprecated/android-3.18
 			return NULL;
 		}
 

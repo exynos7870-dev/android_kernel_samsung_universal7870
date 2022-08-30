@@ -233,7 +233,11 @@ static __initconst const struct x86_pmu p6_pmu = {
 
 static __init void p6_pmu_rdpmc_quirk(void)
 {
+<<<<<<< HEAD
 	if (boot_cpu_data.x86_mask < 9) {
+=======
+	if (boot_cpu_data.x86_stepping < 9) {
+>>>>>>> common/deprecated/android-3.18
 		/*
 		 * PPro erratum 26; fixed in stepping 9 and above.
 		 */

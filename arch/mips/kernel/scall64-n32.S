@@ -72,7 +72,11 @@ n32_syscall_trace_entry:
 	SAVE_STATIC
 	move	s0, t2
 	move	a0, sp
+<<<<<<< HEAD
 	daddiu	a1, v0, __NR_N32_Linux
+=======
+	move	a1, v0
+>>>>>>> common/deprecated/android-3.18
 	jal	syscall_trace_enter
 
 	bltz	v0, 2f			# seccomp failed? Skip syscall
@@ -307,7 +311,11 @@ EXPORT(sysn32_call_table)
 	PTR	compat_sys_sched_getaffinity
 	PTR	sys_cacheflush
 	PTR	sys_cachectl
+<<<<<<< HEAD
 	PTR	sys_sysmips
+=======
+	PTR	__sys_sysmips
+>>>>>>> common/deprecated/android-3.18
 	PTR	compat_sys_io_setup			/* 6200 */
 	PTR	sys_io_destroy
 	PTR	compat_sys_io_getevents
@@ -353,7 +361,11 @@ EXPORT(sysn32_call_table)
 	PTR	sys_ni_syscall			/* available, was setaltroot */
 	PTR	sys_add_key
 	PTR	sys_request_key
+<<<<<<< HEAD
 	PTR	sys_keyctl			/* 6245 */
+=======
+	PTR	compat_sys_keyctl		/* 6245 */
+>>>>>>> common/deprecated/android-3.18
 	PTR	sys_set_thread_area
 	PTR	sys_inotify_init
 	PTR	sys_inotify_add_watch

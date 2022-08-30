@@ -962,6 +962,10 @@ net2272_dequeue(struct usb_ep *_ep, struct usb_request *_req)
 			break;
 	}
 	if (&req->req != _req) {
+<<<<<<< HEAD
+=======
+		ep->stopped = stopped;
+>>>>>>> common/deprecated/android-3.18
 		spin_unlock_irqrestore(&ep->dev->lock, flags);
 		return -EINVAL;
 	}
@@ -2072,7 +2076,11 @@ static irqreturn_t net2272_irq(int irq, void *_dev)
 #if defined(PLX_PCI_RDK2)
 	/* see if PCI int for us by checking irqstat */
 	intcsr = readl(dev->rdk2.fpga_base_addr + RDK2_IRQSTAT);
+<<<<<<< HEAD
 	if (!intcsr & (1 << NET2272_PCI_IRQ)) {
+=======
+	if (!(intcsr & (1 << NET2272_PCI_IRQ))) {
+>>>>>>> common/deprecated/android-3.18
 		spin_unlock(&dev->lock);
 		return IRQ_NONE;
 	}
@@ -2651,6 +2659,11 @@ net2272_plat_probe(struct platform_device *pdev)
  err_req:
 	release_mem_region(base, len);
  err:
+<<<<<<< HEAD
+=======
+	kfree(dev);
+
+>>>>>>> common/deprecated/android-3.18
 	return ret;
 }
 

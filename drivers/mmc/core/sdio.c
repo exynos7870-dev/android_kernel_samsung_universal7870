@@ -33,10 +33,13 @@
 #include <linux/mmc/sdio_ids.h>
 #endif
 
+<<<<<<< HEAD
 #ifdef CONFIG_QCOM_WIFI
 #define MANUAL_BUS_TUNING 1
 #endif /* CONFIG_QCOM_WIFI */
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static int sdio_read_fbr(struct sdio_func *func)
 {
 	int ret;
@@ -197,11 +200,15 @@ static int sdio_read_cccr(struct mmc_card *card, u32 ocr)
 		if (!card->sw_caps.sd3_bus_mode) {
 			if (speed & SDIO_SPEED_SHS) {
 				card->cccr.high_speed = 1;
+<<<<<<< HEAD
 #ifndef CONFIG_MMC_SEC_QUIRK_CLOCK_SETTING
 				card->sw_caps.hs_max_dtr = 50000000;
 #else
 				card->sw_caps.hs_max_dtr = 51000000;
 #endif
+=======
+				card->sw_caps.hs_max_dtr = 50000000;
+>>>>>>> common/deprecated/android-3.18
 			} else {
 				card->cccr.high_speed = 0;
 				card->sw_caps.hs_max_dtr = 25000000;
@@ -383,11 +390,15 @@ static unsigned mmc_sdio_get_max_clock(struct mmc_card *card)
 		 * high-speed, but it seems that 50 MHz is
 		 * mandatory.
 		 */
+<<<<<<< HEAD
 #ifndef CONFIG_MMC_SEC_QUIRK_CLOCK_SETTING
 		max_dtr = 50000000;
 #else
 		max_dtr = 51000000;
 #endif
+=======
+		max_dtr = 50000000;
+>>>>>>> common/deprecated/android-3.18
 	} else {
 		max_dtr = card->cis.max_dtr;
 	}
@@ -537,6 +548,7 @@ static int sdio_set_bus_speed_mode(struct mmc_card *card)
 	if (err)
 		return err;
 
+<<<<<<< HEAD
 #ifdef CONFIG_QCOM_WIFI
 	if (MANUAL_BUS_TUNING && (!strcmp("mmc1", mmc_hostname(card->host)))) {
 		unsigned char temp;
@@ -584,6 +596,8 @@ static int sdio_set_bus_speed_mode(struct mmc_card *card)
 		}
 	}
 #endif /* CONFIG_QCOM_WIFI */
+=======
+>>>>>>> common/deprecated/android-3.18
 	speed &= ~SDIO_SPEED_BSS_MASK;
 	speed |= bus_speed;
 	err = mmc_io_rw_direct(card, 1, 0, SDIO_CCCR_SPEED, speed, NULL);
@@ -631,6 +645,7 @@ static int mmc_sdio_init_uhs_card(struct mmc_card *card)
 	 * SPI mode doesn't define CMD19 and tuning is only valid for SDR50 and
 	 * SDR104 mode SD-cards. Note that tuning is mandatory for SDR104.
 	 */
+<<<<<<< HEAD
 	if (!mmc_host_is_spi(card->host) && card->host->ops->execute_tuning &&
 			((card->sw_caps.sd3_bus_mode & SD_MODE_UHS_SDR50) ||
 			 (card->sw_caps.sd3_bus_mode & SD_MODE_UHS_SDR104))) {
@@ -642,6 +657,13 @@ static int mmc_sdio_init_uhs_card(struct mmc_card *card)
 
 out:
 
+=======
+	if (!mmc_host_is_spi(card->host) &&
+	    ((card->host->ios.timing == MMC_TIMING_UHS_SDR50) ||
+	      (card->host->ios.timing == MMC_TIMING_UHS_SDR104)))
+		err = mmc_execute_tuning(card);
+out:
+>>>>>>> common/deprecated/android-3.18
 	return err;
 }
 
@@ -733,7 +755,11 @@ try_again:
 	 */
 	if (!powered_resume && (rocr & ocr & R4_18V_PRESENT)) {
 		err = mmc_set_signal_voltage(host, MMC_SIGNAL_VOLTAGE_180,
+<<<<<<< HEAD
 					ocr);
+=======
+					ocr_card);
+>>>>>>> common/deprecated/android-3.18
 		if (err == -EAGAIN) {
 			sdio_reset(host);
 			mmc_go_idle(host);
@@ -1057,7 +1083,11 @@ static int mmc_sdio_resume(struct mmc_host *host)
 	}
 
 	/* No need to reinitialize powered-resumed nonremovable cards */
+<<<<<<< HEAD
 	if ((mmc_card_is_removable(host) || !mmc_card_keep_power(host)) && (strcmp("mmc1", mmc_hostname(host)))) {
+=======
+	if (mmc_card_is_removable(host) || !mmc_card_keep_power(host)) {
+>>>>>>> common/deprecated/android-3.18
 		sdio_reset(host);
 		mmc_go_idle(host);
 		err = mmc_sdio_init_card(host, host->card->ocr, host->card,
@@ -1277,6 +1307,7 @@ int mmc_attach_sdio(struct mmc_host *host)
 			goto remove_added;
 	}
 
+<<<<<<< HEAD
 	#if defined(CONFIG_BCM4343) || defined(CONFIG_BCM43454) || \
 		defined(CONFIG_BCM43455) || defined(CONFIG_BCM43456)
 		if(!strcmp("mmc1", mmc_hostname(host))) {
@@ -1287,6 +1318,8 @@ int mmc_attach_sdio(struct mmc_host *host)
 		  CONFIG_BCM43455 || CONFIG_BCM43456 */
 
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	mmc_claim_host(host);
 	return 0;
 
@@ -1312,6 +1345,7 @@ err:
 
 int sdio_reset_comm(struct mmc_card *card)
 {
+<<<<<<< HEAD
 #if defined(CONFIG_BCM4343) || defined(CONFIG_BCM43454) || \
 	defined(CONFIG_BCM43455) || defined(CONFIG_BCM43456)
 	struct mmc_host *host = card->host;
@@ -1357,6 +1391,8 @@ err:
 	mmc_release_host(host);
 	return err;
 #else
+=======
+>>>>>>> common/deprecated/android-3.18
 	struct mmc_host *host = card->host;
 	u32 ocr;
 	u32 rocr;
@@ -1390,7 +1426,10 @@ err:
 	       mmc_hostname(host), err);
 	mmc_release_host(host);
 	return err;
+<<<<<<< HEAD
 #endif /* CONFIG_BCM4343 || CONFIG_BCM43454 || \
 	  CONFIG_BCM43455 || CONFIG_BCM43456 */
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL(sdio_reset_comm);

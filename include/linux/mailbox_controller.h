@@ -48,7 +48,11 @@ struct mbox_chan_ops {
 	int (*send_data)(struct mbox_chan *chan, void *data);
 	int (*startup)(struct mbox_chan *chan);
 	void (*shutdown)(struct mbox_chan *chan);
+<<<<<<< HEAD
 	int (*last_tx_done)(struct mbox_chan *chan);
+=======
+	bool (*last_tx_done)(struct mbox_chan *chan);
+>>>>>>> common/deprecated/android-3.18
 	bool (*peek_data)(struct mbox_chan *chan);
 };
 

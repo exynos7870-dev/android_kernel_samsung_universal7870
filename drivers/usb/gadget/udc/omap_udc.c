@@ -2037,6 +2037,10 @@ static inline int machine_without_vbus_sense(void)
 {
 	return machine_is_omap_innovator()
 		|| machine_is_omap_osk()
+<<<<<<< HEAD
+=======
+		|| machine_is_omap_palmte()
+>>>>>>> common/deprecated/android-3.18
 		|| machine_is_sx1()
 		/* No known omap7xx boards with vbus sense */
 		|| cpu_is_omap7xx();
@@ -2045,7 +2049,11 @@ static inline int machine_without_vbus_sense(void)
 static int omap_udc_start(struct usb_gadget *g,
 		struct usb_gadget_driver *driver)
 {
+<<<<<<< HEAD
 	int		status = -ENODEV;
+=======
+	int		status;
+>>>>>>> common/deprecated/android-3.18
 	struct omap_ep	*ep;
 	unsigned long	flags;
 
@@ -2083,6 +2091,10 @@ static int omap_udc_start(struct usb_gadget *g,
 			goto done;
 		}
 	} else {
+<<<<<<< HEAD
+=======
+		status = 0;
+>>>>>>> common/deprecated/android-3.18
 		if (can_pullup(udc))
 			pullup_enable(udc);
 		else
@@ -2591,9 +2603,28 @@ omap_ep_setup(char *name, u8 addr, u8 type,
 
 static void omap_udc_release(struct device *dev)
 {
+<<<<<<< HEAD
 	complete(udc->done);
 	kfree(udc);
 	udc = NULL;
+=======
+	pullup_disable(udc);
+	if (!IS_ERR_OR_NULL(udc->transceiver)) {
+		usb_put_phy(udc->transceiver);
+		udc->transceiver = NULL;
+	}
+	omap_writew(0, UDC_SYSCON1);
+	remove_proc_file();
+	if (udc->dc_clk) {
+		if (udc->clk_requested)
+			omap_udc_enable_clock(0);
+		clk_put(udc->hhc_clk);
+		clk_put(udc->dc_clk);
+	}
+	if (udc->done)
+		complete(udc->done);
+	kfree(udc);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int
@@ -2865,8 +2896,13 @@ bad_on_1710:
 		udc->clr_halt = UDC_RESET_EP;
 
 	/* USB general purpose IRQ:  ep0, state changes, dma, etc */
+<<<<<<< HEAD
 	status = request_irq(pdev->resource[1].start, omap_udc_irq,
 			0, driver_name, udc);
+=======
+	status = devm_request_irq(&pdev->dev, pdev->resource[1].start,
+				  omap_udc_irq, 0, driver_name, udc);
+>>>>>>> common/deprecated/android-3.18
 	if (status != 0) {
 		ERR("can't get irq %d, err %d\n",
 			(int) pdev->resource[1].start, status);
@@ -2874,6 +2910,7 @@ bad_on_1710:
 	}
 
 	/* USB "non-iso" IRQ (PIO for all but ep0) */
+<<<<<<< HEAD
 	status = request_irq(pdev->resource[2].start, omap_udc_pio_irq,
 			0, "omap_udc pio", udc);
 	if (status != 0) {
@@ -2888,6 +2925,22 @@ bad_on_1710:
 		ERR("can't get irq %d, err %d\n",
 			(int) pdev->resource[3].start, status);
 		goto cleanup3;
+=======
+	status = devm_request_irq(&pdev->dev, pdev->resource[2].start,
+				  omap_udc_pio_irq, 0, "omap_udc pio", udc);
+	if (status != 0) {
+		ERR("can't get irq %d, err %d\n",
+			(int) pdev->resource[2].start, status);
+		goto cleanup1;
+	}
+#ifdef	USE_ISO
+	status = devm_request_irq(&pdev->dev, pdev->resource[3].start,
+				  omap_udc_iso_irq, 0, "omap_udc iso", udc);
+	if (status != 0) {
+		ERR("can't get irq %d, err %d\n",
+			(int) pdev->resource[3].start, status);
+		goto cleanup1;
+>>>>>>> common/deprecated/android-3.18
 	}
 #endif
 	if (cpu_is_omap16xx() || cpu_is_omap7xx()) {
@@ -2898,6 +2951,7 @@ bad_on_1710:
 	}
 
 	create_proc_file();
+<<<<<<< HEAD
 	status = usb_add_gadget_udc_release(&pdev->dev, &udc->gadget,
 			omap_udc_release);
 	if (status)
@@ -2915,6 +2969,10 @@ cleanup3:
 
 cleanup2:
 	free_irq(pdev->resource[1].start, udc);
+=======
+	return usb_add_gadget_udc_release(&pdev->dev, &udc->gadget,
+					  omap_udc_release);
+>>>>>>> common/deprecated/android-3.18
 
 cleanup1:
 	kfree(udc);
@@ -2941,6 +2999,7 @@ static int omap_udc_remove(struct platform_device *pdev)
 {
 	DECLARE_COMPLETION_ONSTACK(done);
 
+<<<<<<< HEAD
 	if (!udc)
 		return -ENODEV;
 
@@ -2971,12 +3030,22 @@ static int omap_udc_remove(struct platform_device *pdev)
 		clk_put(udc->hhc_clk);
 		clk_put(udc->dc_clk);
 	}
+=======
+	udc->done = &done;
+
+	usb_del_gadget_udc(&udc->gadget);
+
+	wait_for_completion(&done);
+>>>>>>> common/deprecated/android-3.18
 
 	release_mem_region(pdev->resource[0].start,
 			pdev->resource[0].end - pdev->resource[0].start + 1);
 
+<<<<<<< HEAD
 	wait_for_completion(&done);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 

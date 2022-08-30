@@ -66,6 +66,10 @@ struct llc_sap {
 	int sk_count;
 	struct hlist_nulls_head sk_laddr_hash[LLC_SK_LADDR_HASH_ENTRIES];
 	struct hlist_head sk_dev_hash[LLC_SK_DEV_HASH_ENTRIES];
+<<<<<<< HEAD
+=======
+	struct rcu_head rcu;
+>>>>>>> common/deprecated/android-3.18
 };
 
 static inline
@@ -116,6 +120,14 @@ static inline void llc_sap_hold(struct llc_sap *sap)
 	atomic_inc(&sap->refcnt);
 }
 
+<<<<<<< HEAD
+=======
+static inline bool llc_sap_hold_safe(struct llc_sap *sap)
+{
+	return atomic_inc_not_zero(&sap->refcnt);
+}
+
+>>>>>>> common/deprecated/android-3.18
 void llc_sap_close(struct llc_sap *sap);
 
 static inline void llc_sap_put(struct llc_sap *sap)

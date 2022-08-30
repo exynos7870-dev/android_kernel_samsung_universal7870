@@ -361,7 +361,11 @@
 	ENTRY_SAME(ni_syscall)	/* 263: reserved for vserver */
 	ENTRY_SAME(add_key)
 	ENTRY_SAME(request_key)		/* 265 */
+<<<<<<< HEAD
 	ENTRY_SAME(keyctl)
+=======
+	ENTRY_COMP(keyctl)
+>>>>>>> common/deprecated/android-3.18
 	ENTRY_SAME(ioprio_set)
 	ENTRY_SAME(ioprio_get)
 	ENTRY_SAME(inotify_init)

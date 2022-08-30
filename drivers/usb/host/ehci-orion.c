@@ -226,7 +226,12 @@ static int ehci_orion_drv_probe(struct platform_device *pdev)
 	priv->phy = devm_phy_optional_get(&pdev->dev, "usb");
 	if (IS_ERR(priv->phy)) {
 		err = PTR_ERR(priv->phy);
+<<<<<<< HEAD
 		goto err_phy_get;
+=======
+		if (err != -ENOSYS)
+			goto err_phy_get;
+>>>>>>> common/deprecated/android-3.18
 	} else {
 		err = phy_init(priv->phy);
 		if (err)

@@ -126,10 +126,18 @@ struct phy_control *am335x_get_phy_control(struct device *dev)
 		return NULL;
 
 	dev = bus_find_device(&platform_bus_type, NULL, node, match);
+<<<<<<< HEAD
+=======
+	of_node_put(node);
+>>>>>>> common/deprecated/android-3.18
 	if (!dev)
 		return NULL;
 
 	ctrl_usb = dev_get_drvdata(dev);
+<<<<<<< HEAD
+=======
+	put_device(dev);
+>>>>>>> common/deprecated/android-3.18
 	if (!ctrl_usb)
 		return NULL;
 	return &ctrl_usb->phy_ctrl;

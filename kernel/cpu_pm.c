@@ -97,7 +97,11 @@ EXPORT_SYMBOL_GPL(cpu_pm_unregister_notifier);
  */
 int cpu_pm_enter(void)
 {
+<<<<<<< HEAD
 	int nr_calls;
+=======
+	int nr_calls = 0;
+>>>>>>> common/deprecated/android-3.18
 	int ret = 0;
 
 	read_lock(&cpu_pm_notifier_lock);
@@ -156,7 +160,11 @@ EXPORT_SYMBOL_GPL(cpu_pm_exit);
  */
 int cpu_cluster_pm_enter(void)
 {
+<<<<<<< HEAD
 	int nr_calls;
+=======
+	int nr_calls = 0;
+>>>>>>> common/deprecated/android-3.18
 	int ret = 0;
 
 	read_lock(&cpu_pm_notifier_lock);

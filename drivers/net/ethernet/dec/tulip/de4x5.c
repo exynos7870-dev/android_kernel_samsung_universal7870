@@ -1991,7 +1991,11 @@ SetMulticastFilter(struct net_device *dev)
 
 static u_char de4x5_irq[] = EISA_ALLOWED_IRQ_LIST;
 
+<<<<<<< HEAD
 static int __init de4x5_eisa_probe (struct device *gendev)
+=======
+static int de4x5_eisa_probe(struct device *gendev)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct eisa_device *edev;
 	u_long iobase;
@@ -2107,7 +2111,10 @@ static struct eisa_driver de4x5_eisa_driver = {
 		.remove  = de4x5_eisa_remove,
         }
 };
+<<<<<<< HEAD
 MODULE_DEVICE_TABLE(eisa, de4x5_eisa_ids);
+=======
+>>>>>>> common/deprecated/android-3.18
 #endif
 
 #ifdef CONFIG_PCI

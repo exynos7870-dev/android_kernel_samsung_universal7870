@@ -38,7 +38,10 @@
 #include <linux/sched/rt.h>
 #include <linux/mm_inline.h>
 #include <trace/events/writeback.h>
+<<<<<<< HEAD
 #include <linux/version.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #include "internal.h"
 
@@ -71,13 +74,21 @@ static long ratelimit_pages = 32;
 /*
  * Start background writeback (via writeback threads) at this percentage
  */
+<<<<<<< HEAD
 int dirty_background_ratio = 0;
+=======
+int dirty_background_ratio = 10;
+>>>>>>> common/deprecated/android-3.18
 
 /*
  * dirty_background_bytes starts at 0 (disabled) so that it is a function of
  * dirty_background_ratio * the amount of dirtyable memory
  */
+<<<<<<< HEAD
 unsigned long dirty_background_bytes = 25 * 1024 * 1024;
+=======
+unsigned long dirty_background_bytes;
+>>>>>>> common/deprecated/android-3.18
 
 /*
  * free highmem will not be subtracted from the total free memory
@@ -88,13 +99,21 @@ int vm_highmem_is_dirtyable;
 /*
  * The generator of dirty data starts writeback at this percentage
  */
+<<<<<<< HEAD
 int vm_dirty_ratio = 0;
+=======
+int vm_dirty_ratio = 20;
+>>>>>>> common/deprecated/android-3.18
 
 /*
  * vm_dirty_bytes starts at 0 (disabled) so that it is a function of
  * vm_dirty_ratio * the amount of dirtyable memory
  */
+<<<<<<< HEAD
 unsigned long vm_dirty_bytes = 50 * 1024 * 1024;
+=======
+unsigned long vm_dirty_bytes;
+>>>>>>> common/deprecated/android-3.18
 
 /*
  * The interval between `kupdate'-style writebacks
@@ -581,7 +600,11 @@ static long long pos_ratio_polynom(unsigned long setpoint,
 	long x;
 
 	x = div64_s64(((s64)setpoint - (s64)dirty) << RATELIMIT_CALC_SHIFT,
+<<<<<<< HEAD
 		    limit - setpoint + 1);
+=======
+		      (limit - setpoint) | 1);
+>>>>>>> common/deprecated/android-3.18
 	pos_ratio = x;
 	pos_ratio = pos_ratio * x >> RATELIMIT_CALC_SHIFT;
 	pos_ratio = pos_ratio * x >> RATELIMIT_CALC_SHIFT;
@@ -808,7 +831,11 @@ static unsigned long bdi_position_ratio(struct backing_dev_info *bdi,
 	 * scale global setpoint to bdi's:
 	 *	bdi_setpoint = setpoint * bdi_thresh / thresh
 	 */
+<<<<<<< HEAD
 	x = div_u64((u64)bdi_thresh << 16, thresh + 1);
+=======
+	x = div_u64((u64)bdi_thresh << 16, thresh | 1);
+>>>>>>> common/deprecated/android-3.18
 	bdi_setpoint = setpoint * (u64)x >> 16;
 	/*
 	 * Use span=(8*write_bw) in single bdi case as indicated by
@@ -823,7 +850,11 @@ static unsigned long bdi_position_ratio(struct backing_dev_info *bdi,
 
 	if (bdi_dirty < x_intercept - span / 4) {
 		pos_ratio = div64_u64(pos_ratio * (x_intercept - bdi_dirty),
+<<<<<<< HEAD
 				    x_intercept - bdi_setpoint + 1);
+=======
+				      (x_intercept - bdi_setpoint) | 1);
+>>>>>>> common/deprecated/android-3.18
 	} else
 		pos_ratio /= 4;
 
@@ -968,6 +999,10 @@ static void bdi_update_dirty_ratelimit(struct backing_dev_info *bdi,
 	unsigned long pos_ratio;
 	unsigned long step;
 	unsigned long x;
+<<<<<<< HEAD
+=======
+	unsigned long shift;
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * The dirty rate will match the writeout rate in long term, except
@@ -1095,11 +1130,19 @@ static void bdi_update_dirty_ratelimit(struct backing_dev_info *bdi,
 	 * rate itself is constantly fluctuating. So decrease the track speed
 	 * when it gets close to the target. Helps eliminate pointless tremors.
 	 */
+<<<<<<< HEAD
 	step >>= dirty_ratelimit / (2 * step + 1);
 	/*
 	 * Limit the tracking speed to avoid overshooting.
 	 */
 	step = (step + 7) / 8;
+=======
+	shift = dirty_ratelimit / (2 * step + 1);
+	if (shift < BITS_PER_LONG)
+		step = DIV_ROUND_UP(step >> shift, 8);
+	else
+		step = 0;
+>>>>>>> common/deprecated/android-3.18
 
 	if (dirty_ratelimit < balanced_dirty_ratelimit)
 		dirty_ratelimit += step;
@@ -1493,6 +1536,7 @@ pause:
 					  period,
 					  pause,
 					  start_time);
+<<<<<<< HEAD
 		/* Just collecting approximate value. No lock required. */
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 18, 0))
 		bdi->last_thresh = strictlimit ? bdi_thresh : dirty_thresh;
@@ -1503,6 +1547,8 @@ pause:
 #endif
 		bdi->paused_total += pause;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		__set_current_state(TASK_KILLABLE);
 		io_schedule_timeout(pause);
 
@@ -1841,6 +1887,16 @@ EXPORT_SYMBOL(tag_pages_for_writeback);
  * not miss some pages (e.g., because some other process has cleared TOWRITE
  * tag we set). The rule we follow is that TOWRITE tag can be cleared only
  * by the process clearing the DIRTY tag (and submitting the page for IO).
+<<<<<<< HEAD
+=======
+ *
+ * To avoid deadlocks between range_cyclic writeback and callers that hold
+ * pages in PageWriteback to aggregate IO until write_cache_pages() returns,
+ * we do not loop back to the start of the file. Doing so causes a page
+ * lock/page writeback access order inversion - we should only ever lock
+ * multiple pages in ascending page->index order, and looping back to the start
+ * of the file violates that rule and causes deadlocks.
+>>>>>>> common/deprecated/android-3.18
  */
 int write_cache_pages(struct address_space *mapping,
 		      struct writeback_control *wbc, writepage_t writepage,
@@ -1848,13 +1904,20 @@ int write_cache_pages(struct address_space *mapping,
 {
 	int ret = 0;
 	int done = 0;
+<<<<<<< HEAD
+=======
+	int error;
+>>>>>>> common/deprecated/android-3.18
 	struct pagevec pvec;
 	int nr_pages;
 	pgoff_t uninitialized_var(writeback_index);
 	pgoff_t index;
 	pgoff_t end;		/* Inclusive */
 	pgoff_t done_index;
+<<<<<<< HEAD
 	int cycled;
+=======
+>>>>>>> common/deprecated/android-3.18
 	int range_whole = 0;
 	int tag;
 
@@ -1862,37 +1925,52 @@ int write_cache_pages(struct address_space *mapping,
 	if (wbc->range_cyclic) {
 		writeback_index = mapping->writeback_index; /* prev offset */
 		index = writeback_index;
+<<<<<<< HEAD
 		if (index == 0)
 			cycled = 1;
 		else
 			cycled = 0;
+=======
+>>>>>>> common/deprecated/android-3.18
 		end = -1;
 	} else {
 		index = wbc->range_start >> PAGE_CACHE_SHIFT;
 		end = wbc->range_end >> PAGE_CACHE_SHIFT;
 		if (wbc->range_start == 0 && wbc->range_end == LLONG_MAX)
 			range_whole = 1;
+<<<<<<< HEAD
 		cycled = 1; /* ignore range_cyclic tests */
+=======
+>>>>>>> common/deprecated/android-3.18
 	}
 	if (wbc->sync_mode == WB_SYNC_ALL || wbc->tagged_writepages)
 		tag = PAGECACHE_TAG_TOWRITE;
 	else
 		tag = PAGECACHE_TAG_DIRTY;
+<<<<<<< HEAD
 retry:
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (wbc->sync_mode == WB_SYNC_ALL || wbc->tagged_writepages)
 		tag_pages_for_writeback(mapping, index, end);
 	done_index = index;
 	while (!done && (index <= end)) {
 		int i;
 
+<<<<<<< HEAD
 		nr_pages = pagevec_lookup_tag(&pvec, mapping, &index, tag,
 			      min(end - index, (pgoff_t)PAGEVEC_SIZE-1) + 1);
+=======
+		nr_pages = pagevec_lookup_range_tag(&pvec, mapping, &index, end,
+				tag);
+>>>>>>> common/deprecated/android-3.18
 		if (nr_pages == 0)
 			break;
 
 		for (i = 0; i < nr_pages; i++) {
 			struct page *page = pvec.pages[i];
 
+<<<<<<< HEAD
 			/*
 			 * At this point, the page may be truncated or
 			 * invalidated (changing page->mapping to NULL), or
@@ -1909,6 +1987,8 @@ retry:
 				break;
 			}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 			done_index = page->index;
 
 			lock_page(page);
@@ -1944,6 +2024,7 @@ continue_unlock:
 				goto continue_unlock;
 
 			trace_wbc_writepage(wbc, mapping->backing_dev_info);
+<<<<<<< HEAD
 			ret = (*writepage)(page, wbc, data);
 			if (unlikely(ret)) {
 				if (ret == AOP_WRITEPAGE_ACTIVATE) {
@@ -1959,10 +2040,36 @@ continue_unlock:
 					 * not be suitable for data integrity
 					 * writeout).
 					 */
+=======
+			error = (*writepage)(page, wbc, data);
+			if (unlikely(error)) {
+				/*
+				 * Handle errors according to the type of
+				 * writeback. There's no need to continue for
+				 * background writeback. Just push done_index
+				 * past this page so media errors won't choke
+				 * writeout for the entire file. For integrity
+				 * writeback, we must process the entire dirty
+				 * set regardless of errors because the fs may
+				 * still have state to clear for each page. In
+				 * that case we continue processing and return
+				 * the first error.
+				 */
+				if (error == AOP_WRITEPAGE_ACTIVATE) {
+					unlock_page(page);
+					error = 0;
+				} else if (wbc->sync_mode != WB_SYNC_ALL) {
+					ret = error;
+>>>>>>> common/deprecated/android-3.18
 					done_index = page->index + 1;
 					done = 1;
 					break;
 				}
+<<<<<<< HEAD
+=======
+				if (!ret)
+					ret = error;
+>>>>>>> common/deprecated/android-3.18
 			}
 
 			/*
@@ -1980,6 +2087,7 @@ continue_unlock:
 		pagevec_release(&pvec);
 		cond_resched();
 	}
+<<<<<<< HEAD
 	if (!cycled && !done) {
 		/*
 		 * range_cyclic:
@@ -1991,6 +2099,16 @@ continue_unlock:
 		end = writeback_index - 1;
 		goto retry;
 	}
+=======
+
+	/*
+	 * If we hit the last page and there is more work to be done: wrap
+	 * back the index back to the start of the file for the next
+	 * time we are called.
+	 */
+	if (wbc->range_cyclic && !done)
+		done_index = 0;
+>>>>>>> common/deprecated/android-3.18
 	if (wbc->range_cyclic || (range_whole && wbc->nr_to_write > 0))
 		mapping->writeback_index = done_index;
 

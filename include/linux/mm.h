@@ -105,12 +105,15 @@ extern struct rw_semaphore nommu_region_sem;
 extern unsigned int kobjsize(const void *objp);
 #endif
 
+<<<<<<< HEAD
 #ifdef CONFIG_ZSWAP
 extern int sysctl_zswap_compact;
 extern int sysctl_zswap_compaction_handler(struct ctl_table *table, int write,
 			void __user *buffer, size_t *length, loff_t *ppos);
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * vm_flags in vm_area_struct, see mm_types.h.
  */
@@ -218,11 +221,21 @@ extern pgprot_t protection_map[16];
  * ->fault function. The vma's ->fault is responsible for returning a bitmask
  * of VM_FAULT_xxx flags that give details about how the fault was handled.
  *
+<<<<<<< HEAD
+=======
+ * MM layer fills up gfp_mask for page allocations but fault handler might
+ * alter it if its implementation requires a different allocation context.
+ *
+>>>>>>> common/deprecated/android-3.18
  * pgoff should be used in favour of virtual_address, if possible. If pgoff
  * is used, one may implement ->remap_pages to get nonlinear mapping support.
  */
 struct vm_fault {
 	unsigned int flags;		/* FAULT_FLAG_xxx flags */
+<<<<<<< HEAD
+=======
+	gfp_t gfp_mask;			/* gfp mask to be used for allocations */
+>>>>>>> common/deprecated/android-3.18
 	pgoff_t pgoff;			/* Logical page offset based on vma */
 	void __user *virtual_address;	/* Faulting virtual address */
 
@@ -240,7 +253,11 @@ struct vm_fault {
 /*
  * These are the virtual MM functions - opening of an area, closing and
  * unmapping it (needed to keep files on disk up-to-date etc), pointer
+<<<<<<< HEAD
  * to the functions called when a no-page or a wp-page exception occurs.
+=======
+ * to the functions called when a no-page or a wp-page exception occurs. 
+>>>>>>> common/deprecated/android-3.18
  */
 struct vm_operations_struct {
 	void (*open)(struct vm_area_struct * area);
@@ -529,6 +546,21 @@ static inline void get_page(struct page *page)
 	atomic_inc(&page->_count);
 }
 
+<<<<<<< HEAD
+=======
+static inline __must_check bool try_get_page(struct page *page)
+{
+	if (unlikely(PageTail(page)))
+		if (likely(__get_page_tail(page)))
+			return true;
+
+	if (WARN_ON_ONCE(atomic_read(&page->_count) <= 0))
+		return false;
+	atomic_inc(&page->_count);
+	return true;
+}
+
+>>>>>>> common/deprecated/android-3.18
 static inline struct page *virt_to_head_page(const void *x)
 {
 	struct page *page = virt_to_page(x);
@@ -615,7 +647,11 @@ static inline compound_page_dtor *get_compound_page_dtor(struct page *page)
 	return (compound_page_dtor *)page[1].lru.next;
 }
 
+<<<<<<< HEAD
 static inline int compound_order(struct page *page)
+=======
+static inline unsigned int compound_order(struct page *page)
+>>>>>>> common/deprecated/android-3.18
 {
 	if (!PageHead(page))
 		return 0;
@@ -1131,6 +1167,11 @@ struct zap_details {
 
 struct page *vm_normal_page(struct vm_area_struct *vma, unsigned long addr,
 		pte_t pte);
+<<<<<<< HEAD
+=======
+struct page *vm_normal_page_pmd(struct vm_area_struct *vma, unsigned long addr,
+				pmd_t pmd);
+>>>>>>> common/deprecated/android-3.18
 
 int zap_vma_ptes(struct vm_area_struct *vma, unsigned long address,
 		unsigned long size);
@@ -1260,8 +1301,12 @@ int set_page_dirty_lock(struct page *page);
 int clear_page_dirty_for_io(struct page *page);
 int get_cmdline(struct task_struct *task, char *buffer, int buflen);
 
+<<<<<<< HEAD
 extern struct task_struct *task_of_stack(struct task_struct *task,
 				struct vm_area_struct *vma, bool in_group);
+=======
+int vma_is_stack_for_task(struct vm_area_struct *vma, struct task_struct *t);
+>>>>>>> common/deprecated/android-3.18
 
 extern unsigned long move_page_tables(struct vm_area_struct *vma,
 		unsigned long old_addr, struct vm_area_struct *new_vma,
@@ -1721,11 +1766,20 @@ extern int __meminit init_per_zone_wmark_min(void);
 extern void mem_init(void);
 extern void __init mmap_init(void);
 extern void show_mem(unsigned int flags);
+<<<<<<< HEAD
+=======
+extern long si_mem_available(void);
+>>>>>>> common/deprecated/android-3.18
 extern void si_meminfo(struct sysinfo * val);
 extern void si_meminfo_node(struct sysinfo *val, int nid);
 
 extern __printf(3, 4)
+<<<<<<< HEAD
 void warn_alloc_failed(gfp_t gfp_mask, int order, const char *fmt, ...);
+=======
+void warn_alloc_failed(gfp_t gfp_mask, unsigned int order,
+		const char *fmt, ...);
+>>>>>>> common/deprecated/android-3.18
 
 extern void setup_per_cpu_pageset(void);
 
@@ -1817,6 +1871,10 @@ extern void mm_drop_all_locks(struct mm_struct *mm);
 
 extern void set_mm_exe_file(struct mm_struct *mm, struct file *new_exe_file);
 extern struct file *get_mm_exe_file(struct mm_struct *mm);
+<<<<<<< HEAD
+=======
+extern struct file *get_task_exe_file(struct task_struct *task);
+>>>>>>> common/deprecated/android-3.18
 
 extern int may_expand_vm(struct mm_struct *mm, unsigned long npages);
 extern struct vm_area_struct *_install_special_mapping(struct mm_struct *mm,
@@ -1925,7 +1983,10 @@ void page_cache_async_readahead(struct address_space *mapping,
 unsigned long max_sane_readahead(unsigned long nr);
 
 extern unsigned long stack_guard_gap;
+<<<<<<< HEAD
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /* Generic expand stack which grows the stack according to GROWS{UP,DOWN} */
 extern int expand_stack(struct vm_area_struct *vma, unsigned long address);
 
@@ -2020,6 +2081,11 @@ int remap_pfn_range(struct vm_area_struct *, unsigned long addr,
 int vm_insert_page(struct vm_area_struct *, unsigned long addr, struct page *);
 int vm_insert_pfn(struct vm_area_struct *vma, unsigned long addr,
 			unsigned long pfn);
+<<<<<<< HEAD
+=======
+int vm_insert_pfn_prot(struct vm_area_struct *vma, unsigned long addr,
+			unsigned long pfn, pgprot_t pgprot);
+>>>>>>> common/deprecated/android-3.18
 int vm_insert_mixed(struct vm_area_struct *vma, unsigned long addr,
 			unsigned long pfn);
 int vm_iomap_memory(struct vm_area_struct *vma, phys_addr_t start, unsigned long len);
@@ -2049,8 +2115,12 @@ static inline struct page *follow_page(struct vm_area_struct *vma,
 #define FOLL_NUMA	0x200	/* force NUMA hinting page fault */
 #define FOLL_MIGRATION	0x400	/* wait for page to replace migration entry */
 #define FOLL_TRIED	0x800	/* a retry, previous pass started an IO */
+<<<<<<< HEAD
 #define FOLL_COW        0x4000  /* internal GUP flag */
 #define FOLL_CMA	0x80000	/* migrate if the page is from cma pageblock */
+=======
+#define FOLL_COW	0x4000	/* internal GUP flag */
+>>>>>>> common/deprecated/android-3.18
 
 typedef int (*pte_fn_t)(pte_t *pte, pgtable_t token, unsigned long addr,
 			void *data);

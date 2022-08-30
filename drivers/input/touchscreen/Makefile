@@ -79,6 +79,7 @@ obj-$(CONFIG_TOUCHSCREEN_WM97XX_ZYLONITE)	+= zylonite-wm97xx.o
 obj-$(CONFIG_TOUCHSCREEN_W90X900)	+= w90p910_ts.o
 obj-$(CONFIG_TOUCHSCREEN_TPS6507X)	+= tps6507x-ts.o
 obj-$(CONFIG_TOUCHSCREEN_ZFORCE)	+= zforce_ts.o
+<<<<<<< HEAD
 obj-$(CONFIG_TOUCHSCREEN_MXT540E)       += mxt540e.o
 obj-$(CONFIG_TOUCHSCREEN_SYNAPTICS_I2C_DSX) += synaptics_dsx/
 obj-$(CONFIG_TOUCHSCREEN_FTS)          += stm/
@@ -100,3 +101,5 @@ obj-$(CONFIG_TOUCHSCREEN_SYNAPTICS_I2C_TD4X00) += synaptics_td4x00/
 obj-$(CONFIG_TOUCHSCREEN_SEC_INCELL_TS) += sec_incell_ts/
 obj-$(CONFIG_TOUCHSCREEN_SEC_TS) += sec_ts/
 obj-$(CONFIG_TOUCHSCREEN_FTS1BA90A)	+= stm_fts1ba90a/
+=======
+>>>>>>> common/deprecated/android-3.18

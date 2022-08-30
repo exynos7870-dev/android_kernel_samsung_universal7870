@@ -290,6 +290,10 @@ static int is_out(const struct crush_map *map,
  * @type: the type of item to choose
  * @out: pointer to output vector
  * @outpos: our position in that vector
+<<<<<<< HEAD
+=======
+ * @out_size: size of the out vector
+>>>>>>> common/deprecated/android-3.18
  * @tries: number of attempts to make
  * @recurse_tries: number of attempts to have recursive chooseleaf make
  * @local_retries: localized retries
@@ -304,6 +308,10 @@ static int crush_choose_firstn(const struct crush_map *map,
 			       const __u32 *weight, int weight_max,
 			       int x, int numrep, int type,
 			       int *out, int outpos,
+<<<<<<< HEAD
+=======
+			       int out_size,
+>>>>>>> common/deprecated/android-3.18
 			       unsigned int tries,
 			       unsigned int recurse_tries,
 			       unsigned int local_retries,
@@ -322,6 +330,10 @@ static int crush_choose_firstn(const struct crush_map *map,
 	int item = 0;
 	int itemtype;
 	int collide, reject;
+<<<<<<< HEAD
+=======
+	int count = out_size;
+>>>>>>> common/deprecated/android-3.18
 
 	dprintk("CHOOSE%s bucket %d x %d outpos %d numrep %d tries %d recurse_tries %d local_retries %d local_fallback_retries %d parent_r %d\n",
 		recurse_to_leaf ? "_LEAF" : "",
@@ -329,7 +341,11 @@ static int crush_choose_firstn(const struct crush_map *map,
 		tries, recurse_tries, local_retries, local_fallback_retries,
 		parent_r);
 
+<<<<<<< HEAD
 	for (rep = outpos; rep < numrep; rep++) {
+=======
+	for (rep = outpos; rep < numrep && count > 0 ; rep++) {
+>>>>>>> common/deprecated/android-3.18
 		/* keep trying until we get a non-out, non-colliding item */
 		ftotal = 0;
 		skip_rep = 0;
@@ -403,7 +419,11 @@ static int crush_choose_firstn(const struct crush_map *map,
 							 map->buckets[-1-item],
 							 weight, weight_max,
 							 x, outpos+1, 0,
+<<<<<<< HEAD
 							 out2, outpos,
+=======
+							 out2, outpos, count,
+>>>>>>> common/deprecated/android-3.18
 							 recurse_tries, 0,
 							 local_retries,
 							 local_fallback_retries,
@@ -463,6 +483,10 @@ reject:
 		dprintk("CHOOSE got %d\n", item);
 		out[outpos] = item;
 		outpos++;
+<<<<<<< HEAD
+=======
+		count--;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	dprintk("CHOOSE returns %d\n", outpos);
@@ -654,6 +678,10 @@ int crush_do_rule(const struct crush_map *map,
 	__u32 step;
 	int i, j;
 	int numrep;
+<<<<<<< HEAD
+=======
+	int out_size;
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * the original choose_total_tries value was off by one (it
 	 * counted "retries" and not "tries").  add one.
@@ -761,6 +789,10 @@ int crush_do_rule(const struct crush_map *map,
 						x, numrep,
 						curstep->arg2,
 						o+osize, j,
+<<<<<<< HEAD
+=======
+						result_max-osize,
+>>>>>>> common/deprecated/android-3.18
 						choose_tries,
 						recurse_tries,
 						choose_local_retries,
@@ -770,11 +802,20 @@ int crush_do_rule(const struct crush_map *map,
 						c+osize,
 						0);
 				} else {
+<<<<<<< HEAD
+=======
+					out_size = ((numrep < (result_max-osize)) ?
+                                                    numrep : (result_max-osize));
+>>>>>>> common/deprecated/android-3.18
 					crush_choose_indep(
 						map,
 						map->buckets[-1-w[i]],
 						weight, weight_max,
+<<<<<<< HEAD
 						x, numrep, numrep,
+=======
+						x, out_size, numrep,
+>>>>>>> common/deprecated/android-3.18
 						curstep->arg2,
 						o+osize, j,
 						choose_tries,
@@ -783,7 +824,11 @@ int crush_do_rule(const struct crush_map *map,
 						recurse_to_leaf,
 						c+osize,
 						0);
+<<<<<<< HEAD
 					osize += numrep;
+=======
+					osize += out_size;
+>>>>>>> common/deprecated/android-3.18
 				}
 			}
 

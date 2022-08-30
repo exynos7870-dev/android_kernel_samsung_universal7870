@@ -463,6 +463,12 @@ efx_copy_channel(const struct efx_channel *old_channel)
 	*channel = *old_channel;
 
 	channel->napi_dev = NULL;
+<<<<<<< HEAD
+=======
+	INIT_HLIST_NODE(&channel->napi_str.napi_hash_node);
+	channel->napi_str.napi_id = 0;
+	channel->napi_str.state = 0;
+>>>>>>> common/deprecated/android-3.18
 	memset(&channel->eventq, 0, sizeof(channel->eventq));
 
 	for (j = 0; j < EFX_TXQ_TYPES; j++) {

@@ -80,7 +80,11 @@ static int wl1251_event_ps_report(struct wl1251 *wl,
 		break;
 	}
 
+<<<<<<< HEAD
 	return 0;
+=======
+	return ret;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void wl1251_event_mbox_dump(struct event_mailbox *mbox)

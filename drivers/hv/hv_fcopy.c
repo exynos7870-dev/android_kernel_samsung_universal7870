@@ -239,14 +239,22 @@ void hv_fcopy_onchannelcallback(void *context)
 
 		fcopy_transaction.active = true;
 		fcopy_transaction.recv_len = recvlen;
+<<<<<<< HEAD
 		fcopy_transaction.recv_channel = channel;
+=======
+>>>>>>> common/deprecated/android-3.18
 		fcopy_transaction.recv_req_id = requestid;
 		fcopy_transaction.fcopy_msg = fcopy_msg;
 
 		/*
 		 * Send the information to the user-level daemon.
 		 */
+<<<<<<< HEAD
 		schedule_delayed_work(&fcopy_work, 5*HZ);
+=======
+		schedule_delayed_work(&fcopy_work,
+				      HV_UTIL_TIMEOUT * HZ);
+>>>>>>> common/deprecated/android-3.18
 		fcopy_send_data();
 		return;
 	}
@@ -394,6 +402,10 @@ static void fcopy_dev_deinit(void)
 int hv_fcopy_init(struct hv_util_service *srv)
 {
 	recv_buffer = srv->recv_buffer;
+<<<<<<< HEAD
+=======
+	fcopy_transaction.recv_channel = srv->channel;
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * When this driver loads, the user level daemon that

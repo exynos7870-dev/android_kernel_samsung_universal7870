@@ -117,20 +117,31 @@ static int mqprio_init(struct Qdisc *sch, struct nlattr *opt)
 	/* pre-allocate qdisc, attachment can't fail */
 	priv->qdiscs = kcalloc(dev->num_tx_queues, sizeof(priv->qdiscs[0]),
 			       GFP_KERNEL);
+<<<<<<< HEAD
 	if (priv->qdiscs == NULL) {
 		err = -ENOMEM;
 		goto err;
 	}
+=======
+	if (!priv->qdiscs)
+		return -ENOMEM;
+>>>>>>> common/deprecated/android-3.18
 
 	for (i = 0; i < dev->num_tx_queues; i++) {
 		dev_queue = netdev_get_tx_queue(dev, i);
 		qdisc = qdisc_create_dflt(dev_queue, default_qdisc_ops,
 					  TC_H_MAKE(TC_H_MAJ(sch->handle),
 						    TC_H_MIN(i + 1)));
+<<<<<<< HEAD
 		if (qdisc == NULL) {
 			err = -ENOMEM;
 			goto err;
 		}
+=======
+		if (!qdisc)
+			return -ENOMEM;
+
+>>>>>>> common/deprecated/android-3.18
 		priv->qdiscs[i] = qdisc;
 		qdisc->flags |= TCQ_F_ONETXQUEUE;
 	}
@@ -143,7 +154,11 @@ static int mqprio_init(struct Qdisc *sch, struct nlattr *opt)
 		priv->hw_owned = 1;
 		err = dev->netdev_ops->ndo_setup_tc(dev, qopt->num_tc);
 		if (err)
+<<<<<<< HEAD
 			goto err;
+=======
+			return err;
+>>>>>>> common/deprecated/android-3.18
 	} else {
 		netdev_set_num_tc(dev, qopt->num_tc);
 		for (i = 0; i < qopt->num_tc; i++)
@@ -157,10 +172,13 @@ static int mqprio_init(struct Qdisc *sch, struct nlattr *opt)
 
 	sch->flags |= TCQ_F_MQROOT;
 	return 0;
+<<<<<<< HEAD
 
 err:
 	mqprio_destroy(sch);
 	return err;
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void mqprio_attach(struct Qdisc *sch)
@@ -362,7 +380,12 @@ static int mqprio_dump_class_stats(struct Qdisc *sch, unsigned long cl,
 		struct netdev_queue *dev_queue = mqprio_queue_get(sch, cl);
 
 		sch = dev_queue->qdisc_sleeping;
+<<<<<<< HEAD
 		if (gnet_stats_copy_basic(d, NULL, &sch->bstats) < 0 ||
+=======
+		if (gnet_stats_copy_basic(d, sch->cpu_bstats,
+					  &sch->bstats) < 0 ||
+>>>>>>> common/deprecated/android-3.18
 		    gnet_stats_copy_queue(d, NULL,
 					  &sch->qstats, sch->q.qlen) < 0)
 			return -1;

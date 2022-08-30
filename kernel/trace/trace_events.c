@@ -13,7 +13,11 @@
 #include <linux/workqueue.h>
 #include <linux/spinlock.h>
 #include <linux/kthread.h>
+<<<<<<< HEAD
 #include <linux/debugfs.h>
+=======
+#include <linux/tracefs.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/uaccess.h>
 #include <linux/module.h>
 #include <linux/ctype.h>
@@ -448,7 +452,11 @@ static void remove_subsystem(struct ftrace_subsystem_dir *dir)
 		return;
 
 	if (!--dir->nr_events) {
+<<<<<<< HEAD
 		debugfs_remove_recursive(dir->entry);
+=======
+		tracefs_remove_recursive(dir->entry);
+>>>>>>> common/deprecated/android-3.18
 		list_del(&dir->list);
 		__put_system_dir(dir);
 	}
@@ -467,7 +475,11 @@ static void remove_event_file_dir(struct ftrace_event_file *file)
 		}
 		spin_unlock(&dir->d_lock);
 
+<<<<<<< HEAD
 		debugfs_remove_recursive(dir);
+=======
+		tracefs_remove_recursive(dir);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	list_del(&file->list);
@@ -534,6 +546,11 @@ static int ftrace_set_clr_event(struct trace_array *tr, char *buf, int set)
 {
 	char *event = NULL, *sub = NULL, *match;
 
+<<<<<<< HEAD
+=======
+	if (!tr)
+		return -ENOENT;
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * The buf format can be <subsystem>:<event-name>
 	 *  *:<event-name> means any event by that name.
@@ -644,7 +661,12 @@ t_next(struct seq_file *m, void *v, loff_t *pos)
 		 * The ftrace subsystem is for showing formats only.
 		 * They can not be enabled or disabled via the event files.
 		 */
+<<<<<<< HEAD
 		if (call->class && call->class->reg)
+=======
+		if (call->class && call->class->reg &&
+		    !(call->flags & TRACE_EVENT_FL_IGNORE_ENABLE))
+>>>>>>> common/deprecated/android-3.18
 			return file;
 	}
 
@@ -801,7 +823,12 @@ system_enable_read(struct file *filp, char __user *ubuf, size_t cnt,
 	mutex_lock(&event_mutex);
 	list_for_each_entry(file, &tr->events, list) {
 		call = file->event_call;
+<<<<<<< HEAD
 		if (!ftrace_event_name(call) || !call->class || !call->class->reg)
+=======
+		if ((call->flags & TRACE_EVENT_FL_IGNORE_ENABLE) ||
+		    !ftrace_event_name(call) || !call->class || !call->class->reg)
+>>>>>>> common/deprecated/android-3.18
 			continue;
 
 		if (system && strcmp(call->class->system, system->name) != 0)
@@ -1008,9 +1035,12 @@ event_id_read(struct file *filp, char __user *ubuf, size_t cnt, loff_t *ppos)
 	char buf[32];
 	int len;
 
+<<<<<<< HEAD
 	if (*ppos)
 		return 0;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (unlikely(!id))
 		return -ENODEV;
 
@@ -1491,7 +1521,11 @@ event_subsystem_dir(struct trace_array *tr, const char *name,
 	} else
 		__get_system(system);
 
+<<<<<<< HEAD
 	dir->entry = debugfs_create_dir(name, parent);
+=======
+	dir->entry = tracefs_create_dir(name, parent);
+>>>>>>> common/deprecated/android-3.18
 	if (!dir->entry) {
 		pr_warn("Failed to create system directory %s\n", name);
 		__put_system(system);
@@ -1504,12 +1538,20 @@ event_subsystem_dir(struct trace_array *tr, const char *name,
 	dir->subsystem = system;
 	file->system = dir;
 
+<<<<<<< HEAD
 	entry = debugfs_create_file("filter", 0644, dir->entry, dir,
+=======
+	entry = tracefs_create_file("filter", 0644, dir->entry, dir,
+>>>>>>> common/deprecated/android-3.18
 				    &ftrace_subsystem_filter_fops);
 	if (!entry) {
 		kfree(system->filter);
 		system->filter = NULL;
+<<<<<<< HEAD
 		pr_warn("Could not create debugfs '%s/filter' entry\n", name);
+=======
+		pr_warn("Could not create tracefs '%s/filter' entry\n", name);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	trace_create_file("enable", 0644, dir->entry, dir,
@@ -1550,9 +1592,15 @@ event_create_dir(struct dentry *parent, struct ftrace_event_file *file)
 		d_events = parent;
 
 	name = ftrace_event_name(call);
+<<<<<<< HEAD
 	file->dir = debugfs_create_dir(name, d_events);
 	if (!file->dir) {
 		pr_warn("Could not create debugfs '%s' directory\n", name);
+=======
+	file->dir = tracefs_create_dir(name, d_events);
+	if (!file->dir) {
+		pr_warn("Could not create tracefs '%s' directory\n", name);
+>>>>>>> common/deprecated/android-3.18
 		return -1;
 	}
 
@@ -1583,8 +1631,18 @@ event_create_dir(struct dentry *parent, struct ftrace_event_file *file)
 	trace_create_file("filter", 0644, file->dir, file,
 			  &ftrace_event_filter_fops);
 
+<<<<<<< HEAD
 	trace_create_file("trigger", 0644, file->dir, file,
 			  &event_trigger_fops);
+=======
+	/*
+	 * Only event directories that can be enabled should have
+	 * triggers.
+	 */
+	if (!(call->flags & TRACE_EVENT_FL_IGNORE_ENABLE))
+		trace_create_file("trigger", 0644, file->dir, file,
+				  &event_trigger_fops);
+>>>>>>> common/deprecated/android-3.18
 
 	trace_create_file("format", 0444, file->dir, call,
 			  &ftrace_event_format_fops);
@@ -2193,7 +2251,11 @@ static inline int register_event_cmds(void) { return 0; }
 /*
  * The top level array has already had its ftrace_event_file
  * descriptors created in order to allow for early events to
+<<<<<<< HEAD
  * be recorded. This function is called after the debugfs has been
+=======
+ * be recorded. This function is called after the tracefs has been
+>>>>>>> common/deprecated/android-3.18
  * initialized, and we now have to create the files associated
  * to the events.
  */
@@ -2276,6 +2338,7 @@ create_event_toplevel_files(struct dentry *parent, struct trace_array *tr)
 	struct dentry *d_events;
 	struct dentry *entry;
 
+<<<<<<< HEAD
 	entry = debugfs_create_file("set_event", 0644, parent,
 				    tr, &ftrace_set_event_fops);
 	if (!entry) {
@@ -2286,6 +2349,18 @@ create_event_toplevel_files(struct dentry *parent, struct trace_array *tr)
 	d_events = debugfs_create_dir("events", parent);
 	if (!d_events) {
 		pr_warn("Could not create debugfs 'events' directory\n");
+=======
+	entry = tracefs_create_file("set_event", 0644, parent,
+				    tr, &ftrace_set_event_fops);
+	if (!entry) {
+		pr_warn("Could not create tracefs 'set_event' entry\n");
+		return -ENOMEM;
+	}
+
+	d_events = tracefs_create_dir("events", parent);
+	if (!d_events) {
+		pr_warn("Could not create tracefs 'events' directory\n");
+>>>>>>> common/deprecated/android-3.18
 		return -ENOMEM;
 	}
 
@@ -2377,7 +2452,11 @@ int event_trace_del_tracer(struct trace_array *tr)
 
 	down_write(&trace_event_sem);
 	__trace_remove_event_dirs(tr);
+<<<<<<< HEAD
 	debugfs_remove_recursive(tr->event_dir);
+=======
+	tracefs_remove_recursive(tr->event_dir);
+>>>>>>> common/deprecated/android-3.18
 	up_write(&trace_event_sem);
 
 	tr->event_dir = NULL;
@@ -2394,12 +2473,47 @@ static __init int event_trace_memsetup(void)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+static __init void
+early_enable_events(struct trace_array *tr, bool disable_first)
+{
+	char *buf = bootup_event_buf;
+	char *token;
+	int ret;
+
+	while (true) {
+		token = strsep(&buf, ",");
+
+		if (!token)
+			break;
+		if (!*token)
+			continue;
+
+		/* Restarting syscalls requires that we stop them first */
+		if (disable_first)
+			ftrace_set_clr_event(tr, token, 0);
+
+		ret = ftrace_set_clr_event(tr, token, 1);
+		if (ret)
+			pr_warn("Failed to enable trace event: %s\n", token);
+
+		/* Put back the comma to allow this to be called again */
+		if (buf)
+			*(buf - 1) = ',';
+	}
+}
+
+>>>>>>> common/deprecated/android-3.18
 static __init int event_trace_enable(void)
 {
 	struct trace_array *tr = top_trace_array();
 	struct ftrace_event_call **iter, *call;
+<<<<<<< HEAD
 	char *buf = bootup_event_buf;
 	char *token;
+=======
+>>>>>>> common/deprecated/android-3.18
 	int ret;
 
 	if (!tr)
@@ -2421,6 +2535,7 @@ static __init int event_trace_enable(void)
 	 */
 	__trace_early_add_events(tr);
 
+<<<<<<< HEAD
 	while (true) {
 		token = strsep(&buf, ",");
 
@@ -2433,6 +2548,9 @@ static __init int event_trace_enable(void)
 		if (ret)
 			pr_warn("Failed to enable trace event: %s\n", token);
 	}
+=======
+	early_enable_events(tr, false);
+>>>>>>> common/deprecated/android-3.18
 
 	trace_printk_start_comm();
 
@@ -2443,6 +2561,34 @@ static __init int event_trace_enable(void)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+/*
+ * event_trace_enable() is called from trace_event_init() first to
+ * initialize events and perhaps start any events that are on the
+ * command line. Unfortunately, there are some events that will not
+ * start this early, like the system call tracepoints that need
+ * to set the TIF_SYSCALL_TRACEPOINT flag of pid 1. But event_trace_enable()
+ * is called before pid 1 starts, and this flag is never set, making
+ * the syscall tracepoint never get reached, but the event is enabled
+ * regardless (and not doing anything).
+ */
+static __init int event_trace_enable_again(void)
+{
+	struct trace_array *tr;
+
+	tr = top_trace_array();
+	if (!tr)
+		return -ENODEV;
+
+	early_enable_events(tr, true);
+
+	return 0;
+}
+
+early_initcall(event_trace_enable_again);
+
+>>>>>>> common/deprecated/android-3.18
 static __init int event_trace_init(void)
 {
 	struct trace_array *tr;
@@ -2455,6 +2601,7 @@ static __init int event_trace_init(void)
 		return -ENODEV;
 
 	d_tracer = tracing_init_dentry();
+<<<<<<< HEAD
 	if (!d_tracer)
 		return 0;
 
@@ -2462,6 +2609,15 @@ static __init int event_trace_init(void)
 				    tr, &ftrace_avail_fops);
 	if (!entry)
 		pr_warn("Could not create debugfs 'available_events' entry\n");
+=======
+	if (IS_ERR(d_tracer))
+		return 0;
+
+	entry = tracefs_create_file("available_events", 0444, d_tracer,
+				    tr, &ftrace_avail_fops);
+	if (!entry)
+		pr_warn("Could not create tracefs 'available_events' entry\n");
+>>>>>>> common/deprecated/android-3.18
 
 	if (trace_define_common_fields())
 		pr_warn("tracing: Failed to allocate common fields");
@@ -2477,8 +2633,19 @@ static __init int event_trace_init(void)
 #endif
 	return 0;
 }
+<<<<<<< HEAD
 early_initcall(event_trace_memsetup);
 core_initcall(event_trace_enable);
+=======
+
+void __init trace_event_init(void)
+{
+	event_trace_memsetup();
+	init_ftrace_syscalls();
+	event_trace_enable();
+}
+
+>>>>>>> common/deprecated/android-3.18
 fs_initcall(event_trace_init);
 
 #ifdef CONFIG_FTRACE_STARTUP_TEST

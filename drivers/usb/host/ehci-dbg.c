@@ -850,7 +850,11 @@ static ssize_t fill_registers_buffer(struct debug_buffer *buf)
 			default:		/* unknown */
 				break;
 			}
+<<<<<<< HEAD
 			temp = (cap >> 8) & 0xff;
+=======
+			offset = (cap >> 8) & 0xff;
+>>>>>>> common/deprecated/android-3.18
 		}
 	}
 #endif

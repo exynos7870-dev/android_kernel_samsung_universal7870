@@ -12,14 +12,22 @@
 
 		.text
 
+<<<<<<< HEAD
 /* Prototype: int __clear_user(void *addr, size_t sz)
+=======
+/* Prototype: unsigned long arm_clear_user(void *addr, size_t sz)
+>>>>>>> common/deprecated/android-3.18
  * Purpose  : clear some user memory
  * Params   : addr - user memory address to clear
  *          : sz   - number of bytes to clear
  * Returns  : number of bytes NOT cleared
  */
 ENTRY(__clear_user_std)
+<<<<<<< HEAD
 WEAK(__clear_user)
+=======
+WEAK(arm_clear_user)
+>>>>>>> common/deprecated/android-3.18
 		stmfd	sp!, {r1, lr}
 		mov	r2, #0
 		cmp	r1, #4
@@ -44,7 +52,11 @@ WEAK(__clear_user)
 USER(		strnebt	r2, [r0])
 		mov	r0, #0
 		ldmfd	sp!, {r1, pc}
+<<<<<<< HEAD
 ENDPROC(__clear_user)
+=======
+ENDPROC(arm_clear_user)
+>>>>>>> common/deprecated/android-3.18
 ENDPROC(__clear_user_std)
 
 		.pushsection .fixup,"ax"

@@ -452,7 +452,11 @@ static int __init ring_buffer_benchmark_init(void)
 
 	if (producer_fifo >= 0) {
 		struct sched_param param = {
+<<<<<<< HEAD
 			.sched_priority = consumer_fifo
+=======
+			.sched_priority = producer_fifo
+>>>>>>> common/deprecated/android-3.18
 		};
 		sched_setscheduler(producer, SCHED_FIFO, &param);
 	} else

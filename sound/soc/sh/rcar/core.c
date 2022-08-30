@@ -625,6 +625,10 @@ static int rsnd_soc_dai_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 	}
 
 	/* set format */
+<<<<<<< HEAD
+=======
+	rdai->bit_clk_inv = 0;
+>>>>>>> common/deprecated/android-3.18
 	switch (fmt & SND_SOC_DAIFMT_FORMAT_MASK) {
 	case SND_SOC_DAIFMT_I2S:
 		rdai->sys_delay = 0;

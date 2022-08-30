@@ -987,6 +987,7 @@ bfad_start_ops(struct bfad_s *bfad) {
 
 	/* Fill the driver_info info to fcs*/
 	memset(&driver_info, 0, sizeof(driver_info));
+<<<<<<< HEAD
 	strncpy(driver_info.version, BFAD_DRIVER_VERSION,
 		sizeof(driver_info.version) - 1);
 	if (host_name)
@@ -1001,6 +1002,22 @@ bfad_start_ops(struct bfad_s *bfad) {
 
 	strncpy(driver_info.os_device_name, bfad->pci_name,
 		sizeof(driver_info.os_device_name) - 1);
+=======
+	strlcpy(driver_info.version, BFAD_DRIVER_VERSION,
+		sizeof(driver_info.version));
+	if (host_name)
+		strlcpy(driver_info.host_machine_name, host_name,
+			sizeof(driver_info.host_machine_name));
+	if (os_name)
+		strlcpy(driver_info.host_os_name, os_name,
+			sizeof(driver_info.host_os_name));
+	if (os_patch)
+		strlcpy(driver_info.host_os_patch, os_patch,
+			sizeof(driver_info.host_os_patch));
+
+	strlcpy(driver_info.os_device_name, bfad->pci_name,
+		sizeof(driver_info.os_device_name));
+>>>>>>> common/deprecated/android-3.18
 
 	/* FCS driver info init */
 	spin_lock_irqsave(&bfad->bfad_lock, flags);

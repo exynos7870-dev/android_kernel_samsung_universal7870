@@ -905,6 +905,20 @@ int ubi_attach_mtd_dev(struct mtd_info *mtd, int ubi_num,
 		return -EINVAL;
 	}
 
+<<<<<<< HEAD
+=======
+	/*
+	 * Both UBI and UBIFS have been designed for SLC NAND and NOR flashes.
+	 * MLC NAND is different and needs special care, otherwise UBI or UBIFS
+	 * will die soon and you will lose all your data.
+	 */
+	if (mtd->type == MTD_MLCNANDFLASH) {
+		pr_err("ubi: refuse attaching mtd%d - MLC NAND is not supported\n",
+			mtd->index);
+		return -EINVAL;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	if (ubi_num == UBI_DEV_NUM_AUTO) {
 		/* Search for an empty slot in the @ubi_devices array */
 		for (ubi_num = 0; ubi_num < UBI_MAX_DEVICES; ubi_num++)
@@ -999,6 +1013,12 @@ int ubi_attach_mtd_dev(struct mtd_info *mtd, int ubi_num,
 			goto out_detach;
 	}
 
+<<<<<<< HEAD
+=======
+	/* Make device "available" before it becomes accessible via sysfs */
+	ubi_devices[ubi_num] = ubi;
+
+>>>>>>> common/deprecated/android-3.18
 	err = uif_init(ubi, &ref);
 	if (err)
 		goto out_detach;
@@ -1043,7 +1063,10 @@ int ubi_attach_mtd_dev(struct mtd_info *mtd, int ubi_num,
 	wake_up_process(ubi->bgt_thread);
 	spin_unlock(&ubi->wl_lock);
 
+<<<<<<< HEAD
 	ubi_devices[ubi_num] = ubi;
+=======
+>>>>>>> common/deprecated/android-3.18
 	ubi_notify_all(ubi, UBI_VOLUME_ADDED, NULL);
 	return ubi_num;
 
@@ -1054,6 +1077,10 @@ out_uif:
 	ubi_assert(ref);
 	uif_close(ubi);
 out_detach:
+<<<<<<< HEAD
+=======
+	ubi_devices[ubi_num] = NULL;
+>>>>>>> common/deprecated/android-3.18
 	ubi_wl_close(ubi);
 	ubi_free_internal_volumes(ubi);
 	vfree(ubi->vtbl);
@@ -1127,16 +1154,29 @@ int ubi_detach_mtd_dev(int ubi_num, int anyway)
 	 */
 	get_device(&ubi->dev);
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_MTD_UBI_FASTMAP
+	cancel_work_sync(&ubi->fm_work);
+#endif
+>>>>>>> common/deprecated/android-3.18
 	ubi_debugfs_exit_dev(ubi);
 	uif_close(ubi);
 
 	ubi_wl_close(ubi);
 	ubi_free_internal_volumes(ubi);
 	vfree(ubi->vtbl);
+<<<<<<< HEAD
 	put_mtd_device(ubi->mtd);
 	vfree(ubi->peb_buf);
 	vfree(ubi->fm_buf);
 	ubi_msg("mtd%d is detached from ubi%d", ubi->mtd->index, ubi->ubi_num);
+=======
+	vfree(ubi->peb_buf);
+	vfree(ubi->fm_buf);
+	ubi_msg("mtd%d is detached from ubi%d", ubi->mtd->index, ubi->ubi_num);
+	put_mtd_device(ubi->mtd);
+>>>>>>> common/deprecated/android-3.18
 	put_device(&ubi->dev);
 	return 0;
 }

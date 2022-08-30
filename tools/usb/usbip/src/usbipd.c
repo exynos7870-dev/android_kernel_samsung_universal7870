@@ -453,7 +453,11 @@ static void set_signal(void)
 	sigaction(SIGTERM, &act, NULL);
 	sigaction(SIGINT, &act, NULL);
 	act.sa_handler = SIG_IGN;
+<<<<<<< HEAD
 	sigaction(SIGCLD, &act, NULL);
+=======
+	sigaction(SIGCHLD, &act, NULL);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static const char *pid_file;

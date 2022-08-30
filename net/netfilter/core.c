@@ -88,6 +88,10 @@ void nf_unregister_hook(struct nf_hook_ops *reg)
 	static_key_slow_dec(&nf_hooks_needed[reg->pf][reg->hooknum]);
 #endif
 	synchronize_net();
+<<<<<<< HEAD
+=======
+	nf_queue_nf_hook_drop(reg);
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL(nf_unregister_hook);
 

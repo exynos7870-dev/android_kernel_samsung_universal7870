@@ -58,6 +58,9 @@ config INTEGRITY_AUDIT
 
 source security/integrity/ima/Kconfig
 source security/integrity/evm/Kconfig
+<<<<<<< HEAD
 source security/integrity/five/Kconfig
+=======
+>>>>>>> common/deprecated/android-3.18
 
 endif   # if INTEGRITY

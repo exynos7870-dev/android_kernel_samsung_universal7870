@@ -5,7 +5,11 @@
  * Return the address of the last occurrence of a given character
  * within a null-terminated string, or null if it is not found.
  */
+<<<<<<< HEAD
 
+=======
+#include <asm/export.h>
+>>>>>>> common/deprecated/android-3.18
 #include <asm/regdef.h>
 
 	.set noreorder
@@ -85,3 +89,7 @@ $retnull:
 	ret			# .. e1 :
 
 	.end strrchr
+<<<<<<< HEAD
+=======
+	EXPORT_SYMBOL(strrchr)
+>>>>>>> common/deprecated/android-3.18

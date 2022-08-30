@@ -31,7 +31,11 @@ struct ec100_config {
 };
 
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_EC100)
+=======
+#if IS_REACHABLE(CONFIG_DVB_EC100)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend *ec100_attach(const struct ec100_config *config,
 	struct i2c_adapter *i2c);
 #else

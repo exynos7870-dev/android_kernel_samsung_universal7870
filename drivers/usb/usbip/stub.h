@@ -88,6 +88,10 @@ struct bus_id_priv {
 	struct stub_device *sdev;
 	struct usb_device *udev;
 	char shutdown_busid;
+<<<<<<< HEAD
+=======
+	spinlock_t busid_lock;
+>>>>>>> common/deprecated/android-3.18
 };
 
 /* stub_priv is allocated from stub_priv_cache */
@@ -98,6 +102,10 @@ extern struct usb_device_driver stub_driver;
 
 /* stub_main.c */
 struct bus_id_priv *get_busid_priv(const char *busid);
+<<<<<<< HEAD
+=======
+void put_busid_priv(struct bus_id_priv *bid);
+>>>>>>> common/deprecated/android-3.18
 int del_match_busid(char *busid);
 void stub_device_cleanup_urbs(struct stub_device *sdev);
 

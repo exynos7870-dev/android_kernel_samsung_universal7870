@@ -34,6 +34,11 @@ struct backend_info {
 	enum xenbus_state frontend_state;
 	struct xenbus_watch hotplug_status_watch;
 	u8 have_hotplug_status_watch:1;
+<<<<<<< HEAD
+=======
+
+	const char *hotplug_script;
+>>>>>>> common/deprecated/android-3.18
 };
 
 static int connect_rings(struct backend_info *be, struct xenvif_queue *queue);
@@ -236,6 +241,10 @@ static int netback_remove(struct xenbus_device *dev)
 		xenvif_free(be->vif);
 		be->vif = NULL;
 	}
+<<<<<<< HEAD
+=======
+	kfree(be->hotplug_script);
+>>>>>>> common/deprecated/android-3.18
 	kfree(be);
 	dev_set_drvdata(&dev->dev, NULL);
 	return 0;
@@ -253,6 +262,10 @@ static int netback_probe(struct xenbus_device *dev,
 	struct xenbus_transaction xbt;
 	int err;
 	int sg;
+<<<<<<< HEAD
+=======
+	const char *script;
+>>>>>>> common/deprecated/android-3.18
 	struct backend_info *be = kzalloc(sizeof(struct backend_info),
 					  GFP_KERNEL);
 	if (!be) {
@@ -345,6 +358,18 @@ static int netback_probe(struct xenbus_device *dev,
 	if (err)
 		pr_debug("Error writing multi-queue-max-queues\n");
 
+<<<<<<< HEAD
+=======
+	script = xenbus_read(XBT_NIL, dev->nodename, "script", NULL);
+	if (IS_ERR(script)) {
+		err = PTR_ERR(script);
+		xenbus_dev_fatal(dev, err, "reading script");
+		goto fail;
+	}
+
+	be->hotplug_script = script;
+
+>>>>>>> common/deprecated/android-3.18
 	err = xenbus_switch_state(dev, XenbusStateInitWait);
 	if (err)
 		goto fail;
@@ -377,6 +402,7 @@ static int netback_uevent(struct xenbus_device *xdev,
 			  struct kobj_uevent_env *env)
 {
 	struct backend_info *be = dev_get_drvdata(&xdev->dev);
+<<<<<<< HEAD
 	char *val;
 
 	val = xenbus_read(XBT_NIL, xdev->nodename, "script", NULL);
@@ -393,6 +419,16 @@ static int netback_uevent(struct xenbus_device *xdev,
 	}
 
 	if (!be || !be->vif)
+=======
+
+	if (!be)
+		return 0;
+
+	if (add_uevent_var(env, "script=%s", be->hotplug_script))
+		return -ENOMEM;
+
+	if (!be->vif)
+>>>>>>> common/deprecated/android-3.18
 		return 0;
 
 	return add_uevent_var(env, "vif=%s", be->vif->dev->name);
@@ -735,6 +771,10 @@ static void connect(struct backend_info *be)
 			goto err;
 		}
 
+<<<<<<< HEAD
+=======
+		queue->credit_bytes = credit_bytes;
+>>>>>>> common/deprecated/android-3.18
 		queue->remaining_credit = credit_bytes;
 		queue->credit_usec = credit_usec;
 
@@ -765,11 +805,24 @@ static void connect(struct backend_info *be)
 	xenvif_carrier_on(be->vif);
 
 	unregister_hotplug_status_watch(be);
+<<<<<<< HEAD
 	err = xenbus_watch_pathfmt(dev, &be->hotplug_status_watch,
 				   hotplug_status_changed,
 				   "%s/%s", dev->nodename, "hotplug-status");
 	if (!err)
 		be->have_hotplug_status_watch = 1;
+=======
+
+	if (xenbus_exists(XBT_NIL, dev->nodename, "hotplug-status")) {
+		err = xenbus_watch_pathfmt(dev, &be->hotplug_status_watch,
+					   hotplug_status_changed,
+					   "%s/%s", dev->nodename,
+					   "hotplug-status");
+		if (err)
+			goto err;
+		be->have_hotplug_status_watch = 1;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	netif_tx_wake_all_queues(be->vif->dev);
 

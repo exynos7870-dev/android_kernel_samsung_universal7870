@@ -432,7 +432,11 @@ static int cfg80211_sme_connect(struct wireless_dev *wdev,
 	if (wdev->current_bss)
 		return -EALREADY;
 
+<<<<<<< HEAD
 	if (WARN_ON(wdev->conn))
+=======
+	if (wdev->conn)
+>>>>>>> common/deprecated/android-3.18
 		return -EINPROGRESS;
 
 	wdev->conn = kzalloc(sizeof(*wdev->conn), GFP_KERNEL);

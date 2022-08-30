@@ -40,8 +40,11 @@ int cycles(void)
 	ebb_global_disable();
 	ebb_freeze_pmcs();
 
+<<<<<<< HEAD
 	count_pmc(1, sample_period);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	dump_ebb_state();
 
 	event_close(&event);

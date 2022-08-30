@@ -86,6 +86,10 @@ int main(int argc, char **argv)
 		case 'j':
 			include_jump = 1;
 			break;
+<<<<<<< HEAD
+=======
+		default:
+>>>>>>> common/deprecated/android-3.18
 			return usage();
 		}
 	}

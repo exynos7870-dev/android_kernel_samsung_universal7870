@@ -204,7 +204,11 @@ snd_seq_oss_open(struct file *file, int level)
 
 	dp->index = i;
 	if (i >= SNDRV_SEQ_OSS_MAX_CLIENTS) {
+<<<<<<< HEAD
 		pr_err("ALSA: seq_oss: too many applications\n");
+=======
+		pr_debug("ALSA: seq_oss: too many applications\n");
+>>>>>>> common/deprecated/android-3.18
 		rc = -ENOMEM;
 		goto _error;
 	}
@@ -441,6 +445,7 @@ snd_seq_oss_release(struct seq_oss_devinfo *dp)
 
 
 /*
+<<<<<<< HEAD
  * Wait until the queue is empty (if we don't have nonblock)
  */
 void
@@ -457,6 +462,8 @@ snd_seq_oss_drain_write(struct seq_oss_devinfo *dp)
 
 
 /*
+=======
+>>>>>>> common/deprecated/android-3.18
  * reset sequencer devices
  */
 void

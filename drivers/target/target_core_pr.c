@@ -58,8 +58,15 @@ void core_pr_dump_initiator_port(
 	char *buf,
 	u32 size)
 {
+<<<<<<< HEAD
 	if (!pr_reg->isid_present_at_reg)
 		buf[0] = '\0';
+=======
+	if (!pr_reg->isid_present_at_reg) {
+		buf[0] = '\0';
+		return;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	snprintf(buf, size, ",i,0x%s", pr_reg->pr_reg_isid);
 }

@@ -292,10 +292,13 @@ again:
  * @drv: cpuidle driver containing state data
  * @dev: the CPU
  */
+<<<<<<< HEAD
 #ifdef CONFIG_SEC_PHCOMP
 extern int get_phcomp_idle_time_threshold(void);
 extern void trigger_phcompd(int cpu);
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 static int menu_select(struct cpuidle_driver *drv, struct cpuidle_device *dev)
 {
 	struct menu_device *data = this_cpu_ptr(&menu_devices);
@@ -303,9 +306,12 @@ static int menu_select(struct cpuidle_driver *drv, struct cpuidle_device *dev)
 	int i;
 	unsigned int interactivity_req;
 	unsigned long nr_iowaiters, cpu_load;
+<<<<<<< HEAD
 #ifdef CONFIG_SEC_PHCOMP
 	int cpu = smp_processor_id();
 #endif	
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	if (data->needs_update) {
 		menu_update(drv, dev);
@@ -329,12 +335,18 @@ static int menu_select(struct cpuidle_driver *drv, struct cpuidle_device *dev)
 	 * operands are 32 bits.
 	 * Make sure to round up for half microseconds.
 	 */
+<<<<<<< HEAD
 	if (drv->skip_correction)
 		data->predicted_us = data->next_timer_us;
 	else
 		data->predicted_us = div_round64((uint64_t)data->next_timer_us *
 				data->correction_factor[data->bucket],
 				RESOLUTION * DECAY);
+=======
+	data->predicted_us = div_round64((uint64_t)data->next_timer_us *
+					 data->correction_factor[data->bucket],
+					 RESOLUTION * DECAY);
+>>>>>>> common/deprecated/android-3.18
 
 	get_typical_interval(data);
 
@@ -374,11 +386,14 @@ static int menu_select(struct cpuidle_driver *drv, struct cpuidle_device *dev)
 		data->last_state_idx = i;
 	}
 
+<<<<<<< HEAD
 #ifdef CONFIG_SEC_PHCOMP
 	if ( unlikely (data->last_state_idx >=1) )
 		if (data->predicted_us > get_phcomp_idle_time_threshold() )
 			trigger_phcompd(cpu);
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	return data->last_state_idx;
 }
 

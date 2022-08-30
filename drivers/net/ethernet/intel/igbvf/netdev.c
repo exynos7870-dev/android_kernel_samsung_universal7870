@@ -808,7 +808,11 @@ static bool igbvf_clean_tx_irq(struct igbvf_ring *tx_ring)
 			break;
 
 		/* prevent any other reads prior to eop_desc */
+<<<<<<< HEAD
 		read_barrier_depends();
+=======
+		smp_rmb();
+>>>>>>> common/deprecated/android-3.18
 
 		/* if DD is not set pending work has not been completed */
 		if (!(eop_desc->wb.status & cpu_to_le32(E1000_TXD_STAT_DD)))

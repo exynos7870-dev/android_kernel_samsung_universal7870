@@ -71,6 +71,10 @@
 #define CAN_ERR_CRTL_TX_PASSIVE  0x20 /* reached error passive status TX */
 				      /* (at least one error counter exceeds */
 				      /* the protocol-defined level of 127)  */
+<<<<<<< HEAD
+=======
+#define CAN_ERR_CRTL_ACTIVE      0x40 /* recovered to error active state */
+>>>>>>> common/deprecated/android-3.18
 
 /* error in CAN protocol (type) / data[2] */
 #define CAN_ERR_PROT_UNSPEC      0x00 /* unspecified */

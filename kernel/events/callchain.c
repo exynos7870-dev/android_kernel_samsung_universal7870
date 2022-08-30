@@ -107,6 +107,7 @@ int get_callchain_buffers(void)
 		goto exit;
 	}
 
+<<<<<<< HEAD
 	if (count > 1) {
 		/* If the allocation failed, give up */
 		if (!callchain_cpus_entries)
@@ -115,6 +116,10 @@ int get_callchain_buffers(void)
 	}
 
 	err = alloc_callchain_buffers();
+=======
+	if (count == 1)
+		err = alloc_callchain_buffers();
+>>>>>>> common/deprecated/android-3.18
 exit:
 	if (err)
 		atomic_dec(&nr_callchain_events);

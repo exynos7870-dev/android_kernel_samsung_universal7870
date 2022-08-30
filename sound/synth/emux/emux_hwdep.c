@@ -22,9 +22,15 @@
 #include <sound/core.h>
 #include <sound/hwdep.h>
 #include <asm/uaccess.h>
+<<<<<<< HEAD
 #include "emux_voice.h"
 
 
+=======
+#include <linux/nospec.h>
+#include "emux_voice.h"
+
+>>>>>>> common/deprecated/android-3.18
 #define TMP_CLIENT_ID	0x1001
 
 /*
@@ -66,13 +72,24 @@ snd_emux_hwdep_misc_mode(struct snd_emux *emu, void __user *arg)
 		return -EFAULT;
 	if (info.mode < 0 || info.mode >= EMUX_MD_END)
 		return -EINVAL;
+<<<<<<< HEAD
+=======
+	info.mode = array_index_nospec(info.mode, EMUX_MD_END);
+>>>>>>> common/deprecated/android-3.18
 
 	if (info.port < 0) {
 		for (i = 0; i < emu->num_ports; i++)
 			emu->portptrs[i]->ctrls[info.mode] = info.value;
 	} else {
+<<<<<<< HEAD
 		if (info.port < emu->num_ports)
 			emu->portptrs[info.port]->ctrls[info.mode] = info.value;
+=======
+		if (info.port < emu->num_ports) {
+			info.port = array_index_nospec(info.port, emu->num_ports);
+			emu->portptrs[info.port]->ctrls[info.mode] = info.value;
+		}
+>>>>>>> common/deprecated/android-3.18
 	}
 	return 0;
 }

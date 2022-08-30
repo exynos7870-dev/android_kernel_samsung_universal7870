@@ -3,7 +3,11 @@
 
 #include <linux/kconfig.h>
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_TDA18271C2DD)
+=======
+#if IS_REACHABLE(CONFIG_DVB_TDA18271C2DD)
+>>>>>>> common/deprecated/android-3.18
 struct dvb_frontend *tda18271c2dd_attach(struct dvb_frontend *fe,
 					 struct i2c_adapter *i2c, u8 adr);
 #else

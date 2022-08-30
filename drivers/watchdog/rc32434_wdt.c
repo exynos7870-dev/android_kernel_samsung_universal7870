@@ -237,7 +237,11 @@ static long rc32434_wdt_ioctl(struct file *file, unsigned int cmd,
 			return -EINVAL;
 		/* Fall through */
 	case WDIOC_GETTIMEOUT:
+<<<<<<< HEAD
 		return copy_to_user(argp, &timeout, sizeof(int));
+=======
+		return copy_to_user(argp, &timeout, sizeof(int)) ? -EFAULT : 0;
+>>>>>>> common/deprecated/android-3.18
 	default:
 		return -ENOTTY;
 	}

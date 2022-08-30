@@ -110,6 +110,10 @@ SECTIONS
   .fixup   : { *(.fixup) }
 
   EXCEPTION_TABLE(16)
+<<<<<<< HEAD
+=======
+  NOTES
+>>>>>>> common/deprecated/android-3.18
   /* Data section */
 
   _sdata = .;

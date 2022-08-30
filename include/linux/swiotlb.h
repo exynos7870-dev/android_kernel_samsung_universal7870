@@ -1,10 +1,19 @@
 #ifndef __LINUX_SWIOTLB_H
 #define __LINUX_SWIOTLB_H
 
+<<<<<<< HEAD
+=======
+#include <linux/dma-direction.h>
+#include <linux/init.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/types.h>
 
 struct device;
 struct dma_attrs;
+<<<<<<< HEAD
+=======
+struct page;
+>>>>>>> common/deprecated/android-3.18
 struct scatterlist;
 
 extern int swiotlb_force;

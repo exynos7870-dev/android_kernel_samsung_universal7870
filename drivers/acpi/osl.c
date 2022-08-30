@@ -138,7 +138,11 @@ static struct osi_linux {
 	unsigned int	enable:1;
 	unsigned int	dmi:1;
 	unsigned int	cmdline:1;
+<<<<<<< HEAD
 	unsigned int	default_disabling:1;
+=======
+	u8		default_disabling;
+>>>>>>> common/deprecated/android-3.18
 } osi_linux = {0, 0, 0, 0};
 
 static u32 acpi_osi_handler(acpi_string interface, u32 supported)
@@ -182,7 +186,11 @@ static void __init acpi_request_region (struct acpi_generic_address *gas,
 		request_mem_region(addr, length, desc);
 }
 
+<<<<<<< HEAD
 static int __init acpi_reserve_resources(void)
+=======
+static void __init acpi_reserve_resources(void)
+>>>>>>> common/deprecated/android-3.18
 {
 	acpi_request_region(&acpi_gbl_FADT.xpm1a_event_block, acpi_gbl_FADT.pm1_event_length,
 		"ACPI PM1a_EVT_BLK");
@@ -211,10 +219,14 @@ static int __init acpi_reserve_resources(void)
 	if (!(acpi_gbl_FADT.gpe1_block_length & 0x1))
 		acpi_request_region(&acpi_gbl_FADT.xgpe1_block,
 			       acpi_gbl_FADT.gpe1_block_length, "ACPI GPE1_BLK");
+<<<<<<< HEAD
 
 	return 0;
 }
 device_initcall(acpi_reserve_resources);
+=======
+}
+>>>>>>> common/deprecated/android-3.18
 
 void acpi_os_printf(const char *fmt, ...)
 {
@@ -427,24 +439,45 @@ acpi_os_map_memory(acpi_physical_address phys, acpi_size size)
 }
 EXPORT_SYMBOL_GPL(acpi_os_map_memory);
 
+<<<<<<< HEAD
 static void acpi_os_drop_map_ref(struct acpi_ioremap *map)
 {
 	if (!--map->refcount)
 		list_del_rcu(&map->list);
+=======
+/* Must be called with mutex_lock(&acpi_ioremap_lock) */
+static unsigned long acpi_os_drop_map_ref(struct acpi_ioremap *map)
+{
+	unsigned long refcount = --map->refcount;
+
+	if (!refcount)
+		list_del_rcu(&map->list);
+	return refcount;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void acpi_os_map_cleanup(struct acpi_ioremap *map)
 {
+<<<<<<< HEAD
 	if (!map->refcount) {
 		synchronize_rcu();
 		acpi_unmap(map->phys, map->virt);
 		kfree(map);
 	}
+=======
+	synchronize_rcu();
+	acpi_unmap(map->phys, map->virt);
+	kfree(map);
+>>>>>>> common/deprecated/android-3.18
 }
 
 void __ref acpi_os_unmap_iomem(void __iomem *virt, acpi_size size)
 {
 	struct acpi_ioremap *map;
+<<<<<<< HEAD
+=======
+	unsigned long refcount;
+>>>>>>> common/deprecated/android-3.18
 
 	if (!acpi_gbl_permanent_mmap) {
 		__acpi_unmap_table(virt, size);
@@ -458,10 +491,18 @@ void __ref acpi_os_unmap_iomem(void __iomem *virt, acpi_size size)
 		WARN(true, PREFIX "%s: bad address %p\n", __func__, virt);
 		return;
 	}
+<<<<<<< HEAD
 	acpi_os_drop_map_ref(map);
 	mutex_unlock(&acpi_ioremap_lock);
 
 	acpi_os_map_cleanup(map);
+=======
+	refcount = acpi_os_drop_map_ref(map);
+	mutex_unlock(&acpi_ioremap_lock);
+
+	if (!refcount)
+		acpi_os_map_cleanup(map);
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL_GPL(acpi_os_unmap_iomem);
 
@@ -502,6 +543,10 @@ void acpi_os_unmap_generic_address(struct acpi_generic_address *gas)
 {
 	u64 addr;
 	struct acpi_ioremap *map;
+<<<<<<< HEAD
+=======
+	unsigned long refcount;
+>>>>>>> common/deprecated/android-3.18
 
 	if (gas->space_id != ACPI_ADR_SPACE_SYSTEM_MEMORY)
 		return;
@@ -517,10 +562,18 @@ void acpi_os_unmap_generic_address(struct acpi_generic_address *gas)
 		mutex_unlock(&acpi_ioremap_lock);
 		return;
 	}
+<<<<<<< HEAD
 	acpi_os_drop_map_ref(map);
 	mutex_unlock(&acpi_ioremap_lock);
 
 	acpi_os_map_cleanup(map);
+=======
+	refcount = acpi_os_drop_map_ref(map);
+	mutex_unlock(&acpi_ioremap_lock);
+
+	if (!refcount)
+		acpi_os_map_cleanup(map);
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL(acpi_os_unmap_generic_address);
 
@@ -1191,6 +1244,10 @@ void acpi_os_wait_events_complete(void)
 	flush_workqueue(kacpid_wq);
 	flush_workqueue(kacpi_notify_wq);
 }
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL(acpi_os_wait_events_complete);
+>>>>>>> common/deprecated/android-3.18
 
 struct acpi_hp_work {
 	struct work_struct work;
@@ -1446,10 +1503,20 @@ void __init acpi_osi_setup(char *str)
 	if (*str == '!') {
 		str++;
 		if (*str == '\0') {
+<<<<<<< HEAD
 			osi_linux.default_disabling = 1;
 			return;
 		} else if (*str == '*') {
 			acpi_update_interfaces(ACPI_DISABLE_ALL_STRINGS);
+=======
+			/* Do not override acpi_osi=!* */
+			if (!osi_linux.default_disabling)
+				osi_linux.default_disabling =
+					ACPI_DISABLE_ALL_VENDOR_STRINGS;
+			return;
+		} else if (*str == '*') {
+			osi_linux.default_disabling = ACPI_DISABLE_ALL_STRINGS;
+>>>>>>> common/deprecated/android-3.18
 			for (i = 0; i < OSI_STRING_ENTRIES_MAX; i++) {
 				osi = &osi_setup_entries[i];
 				osi->enable = false;
@@ -1522,10 +1589,20 @@ static void __init acpi_osi_setup_late(void)
 	acpi_status status;
 
 	if (osi_linux.default_disabling) {
+<<<<<<< HEAD
 		status = acpi_update_interfaces(ACPI_DISABLE_ALL_VENDOR_STRINGS);
 
 		if (ACPI_SUCCESS(status))
 			printk(KERN_INFO PREFIX "Disabled all _OSI OS vendors\n");
+=======
+		status = acpi_update_interfaces(osi_linux.default_disabling);
+
+		if (ACPI_SUCCESS(status))
+			printk(KERN_INFO PREFIX "Disabled all _OSI OS vendors%s\n",
+				osi_linux.default_disabling ==
+				ACPI_DISABLE_ALL_STRINGS ?
+				" and feature groups" : "");
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	for (i = 0; i < OSI_STRING_ENTRIES_MAX; i++) {
@@ -1839,6 +1916,10 @@ acpi_status __init acpi_os_initialize(void)
 
 acpi_status __init acpi_os_initialize1(void)
 {
+<<<<<<< HEAD
+=======
+	acpi_reserve_resources();
+>>>>>>> common/deprecated/android-3.18
 	kacpid_wq = alloc_workqueue("kacpid", 0, 1);
 	kacpi_notify_wq = alloc_workqueue("kacpi_notify", 0, 1);
 	kacpi_hotplug_wq = alloc_ordered_workqueue("kacpi_hotplug", 0);

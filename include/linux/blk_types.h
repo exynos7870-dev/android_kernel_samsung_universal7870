@@ -85,12 +85,16 @@ struct bio {
 	};
 
 	unsigned short		bi_vcnt;	/* how many bio_vec's */
+<<<<<<< HEAD
 #if defined(CONFIG_MMC_DW_FMP_DM_CRYPT) || defined(CONFIG_UFS_FMP_DM_CRYPT)
 	int			private_enc_mode;
 	int			private_algo_mode;
 	unsigned char		*key;
 	unsigned int		key_length;
 #endif
+=======
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Everything starting with bi_max_vecs will be preserved by bio_reset()
 	 */
@@ -128,6 +132,7 @@ struct bio {
 #define BIO_QUIET	9	/* Make BIO Quiet */
 #define BIO_SNAP_STABLE	10	/* bio data must be snapshotted during write */
 
+<<<<<<< HEAD
 #ifdef CONFIG_JOURNAL_DATA_TAG
 /* XXX Be carefull not to touch BIO_RESET_BITS */
 #define BIO_JOURNAL    11      /* bio contains journal data */
@@ -137,12 +142,19 @@ struct bio {
 
 #define BIO_BYPASS	13
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * Flags starting here get preserved by bio_reset() - this includes
  * BIO_POOL_IDX()
  */
+<<<<<<< HEAD
 #define BIO_RESET_BITS	14	/* should be larger then BIO_BYPASS */
 #define BIO_OWNS_VEC	14	/* bio_free() should free bvec */
+=======
+#define BIO_RESET_BITS	13
+#define BIO_OWNS_VEC	13	/* bio_free() should free bvec */
+>>>>>>> common/deprecated/android-3.18
 
 #define bio_flagged(bio, flag)	((bio)->bi_flags & (1 << (flag)))
 
@@ -179,7 +191,10 @@ enum rq_flag_bits {
 	__REQ_INTEGRITY,	/* I/O includes block integrity payload */
 	__REQ_FUA,		/* forced unit access */
 	__REQ_FLUSH,		/* request for cache flush */
+<<<<<<< HEAD
 	__REQ_KERNEL, 		/* direct IO to kernel pages */
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	/* bio only flags */
 	__REQ_RAHEAD,		/* read ahead, can fail anytime */
@@ -227,7 +242,11 @@ enum rq_flag_bits {
 #define REQ_COMMON_MASK \
 	(REQ_WRITE | REQ_FAILFAST_MASK | REQ_SYNC | REQ_META | REQ_PRIO | \
 	 REQ_DISCARD | REQ_WRITE_SAME | REQ_NOIDLE | REQ_FLUSH | REQ_FUA | \
+<<<<<<< HEAD
 	 REQ_SECURE | REQ_INTEGRITY | REQ_KERNEL)
+=======
+	 REQ_SECURE | REQ_INTEGRITY)
+>>>>>>> common/deprecated/android-3.18
 #define REQ_CLONE_MASK		REQ_COMMON_MASK
 
 #define BIO_NO_ADVANCE_ITER_MASK	(REQ_DISCARD|REQ_WRITE_SAME)
@@ -257,7 +276,10 @@ enum rq_flag_bits {
 #define REQ_IO_STAT		(1ULL << __REQ_IO_STAT)
 #define REQ_MIXED_MERGE		(1ULL << __REQ_MIXED_MERGE)
 #define REQ_SECURE		(1ULL << __REQ_SECURE)
+<<<<<<< HEAD
 #define REQ_KERNEL		(1ULL << __REQ_KERNEL)
+=======
+>>>>>>> common/deprecated/android-3.18
 #define REQ_PM			(1ULL << __REQ_PM)
 #define REQ_HASHED		(1ULL << __REQ_HASHED)
 #define REQ_MQ_INFLIGHT		(1ULL << __REQ_MQ_INFLIGHT)

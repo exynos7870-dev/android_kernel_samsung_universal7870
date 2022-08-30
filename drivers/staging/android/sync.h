@@ -160,10 +160,14 @@ struct sync_fence {
 #endif
 	int num_fences;
 
+<<<<<<< HEAD
 	union {
 		wait_queue_head_t	wq;
 		struct llist_node	rmnode;
 	};
+=======
+	wait_queue_head_t	wq;
+>>>>>>> common/deprecated/android-3.18
 	atomic_t		status;
 
 	struct sync_fence_cb	cbs[];

@@ -95,7 +95,11 @@ static int wait_for_more_packets(struct sock *sk, int *err, long *timeo_p,
 	if (error)
 		goto out_err;
 
+<<<<<<< HEAD
 	if (sk->sk_receive_queue.prev != skb)
+=======
+	if (READ_ONCE(sk->sk_receive_queue.prev) != skb)
+>>>>>>> common/deprecated/android-3.18
 		goto out;
 
 	/* Socket shut down? */
@@ -143,7 +147,11 @@ static struct sk_buff *skb_set_peeked(struct sk_buff *skb)
 
 	nskb = skb_clone(skb, GFP_ATOMIC);
 	if (!nskb)
+<<<<<<< HEAD
 		return ERR_PTR(-ENOMEM);;
+=======
+		return ERR_PTR(-ENOMEM);
+>>>>>>> common/deprecated/android-3.18
 
 	skb->prev->next = nskb;
 	skb->next->prev = nskb;
@@ -780,7 +788,12 @@ __sum16 __skb_checksum_complete_head(struct sk_buff *skb, int len)
 		    !skb->csum_complete_sw)
 			netdev_rx_csum_fault(skb->dev);
 	}
+<<<<<<< HEAD
 	skb->csum_valid = !sum;
+=======
+	if (!skb_shared(skb))
+		skb->csum_valid = !sum;
+>>>>>>> common/deprecated/android-3.18
 	return sum;
 }
 EXPORT_SYMBOL(__skb_checksum_complete_head);
@@ -800,11 +813,21 @@ __sum16 __skb_checksum_complete(struct sk_buff *skb)
 			netdev_rx_csum_fault(skb->dev);
 	}
 
+<<<<<<< HEAD
 	/* Save full packet checksum */
 	skb->csum = csum;
 	skb->ip_summed = CHECKSUM_COMPLETE;
 	skb->csum_complete_sw = 1;
 	skb->csum_valid = !sum;
+=======
+	if (!skb_shared(skb)) {
+		/* Save full packet checksum */
+		skb->csum = csum;
+		skb->ip_summed = CHECKSUM_COMPLETE;
+		skb->csum_complete_sw = 1;
+		skb->csum_valid = !sum;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	return sum;
 }
@@ -815,7 +838,10 @@ EXPORT_SYMBOL(__skb_checksum_complete);
  *	@skb: skbuff
  *	@hlen: hardware length
  *	@iov: io vector
+<<<<<<< HEAD
  *	@len: amount of data to copy from skb to iov
+=======
+>>>>>>> common/deprecated/android-3.18
  *
  *	Caller _must_ check that skb will fit to this iovec.
  *
@@ -825,14 +851,21 @@ EXPORT_SYMBOL(__skb_checksum_complete);
  *			   can be modified!
  */
 int skb_copy_and_csum_datagram_iovec(struct sk_buff *skb,
+<<<<<<< HEAD
 				     int hlen, struct iovec *iov, int len)
+=======
+				     int hlen, struct iovec *iov)
+>>>>>>> common/deprecated/android-3.18
 {
 	__wsum csum;
 	int chunk = skb->len - hlen;
 
+<<<<<<< HEAD
 	if (chunk > len)
 		chunk = len;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (!chunk)
 		return 0;
 

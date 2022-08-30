@@ -7,6 +7,10 @@
 #include <linux/tick.h>
 #include <linux/mm.h>
 #include <linux/stackprotector.h>
+<<<<<<< HEAD
+=======
+#include <linux/suspend.h>
+>>>>>>> common/deprecated/android-3.18
 
 #include <asm/tlb.h>
 
@@ -14,6 +18,19 @@
 
 #include "sched.h"
 
+<<<<<<< HEAD
+=======
+/**
+ * sched_idle_set_state - Record idle state for the current CPU.
+ * @idle_state: State to record.
+ */
+void sched_idle_set_state(struct cpuidle_state *idle_state, int index)
+{
+	idle_set_state(this_rq(), idle_state);
+	idle_set_state_idx(this_rq(), index);
+}
+
+>>>>>>> common/deprecated/android-3.18
 static int __read_mostly cpu_idle_force_poll;
 
 void cpu_idle_poll_ctrl(bool enable)
@@ -76,7 +93,11 @@ void __weak arch_cpu_idle(void)
  */
 static void cpuidle_idle_call(void)
 {
+<<<<<<< HEAD
 	struct cpuidle_device *dev = __this_cpu_read(cpuidle_devices);
+=======
+	struct cpuidle_device *dev = cpuidle_get_device();
+>>>>>>> common/deprecated/android-3.18
 	struct cpuidle_driver *drv = cpuidle_get_cpu_driver(dev);
 	int next_state, entered_state;
 	unsigned int broadcast;
@@ -104,10 +125,29 @@ static void cpuidle_idle_call(void)
 	rcu_idle_enter();
 
 	/*
+<<<<<<< HEAD
+=======
+	 * Suspend-to-idle ("freeze") is a system state in which all user space
+	 * has been frozen, all I/O devices have been suspended and the only
+	 * activity happens here and in iterrupts (if any).  In that case bypass
+	 * the cpuidle governor and go stratight for the deepest idle state
+	 * available.  Possibly also suspend the local tick and the entire
+	 * timekeeping to prevent timer interrupts from kicking us out of idle
+	 * until a proper wakeup interrupt happens.
+	 */
+	if (idle_should_freeze()) {
+		cpuidle_enter_freeze();
+		local_irq_enable();
+		goto exit_idle;
+	}
+
+	/*
+>>>>>>> common/deprecated/android-3.18
 	 * Ask the cpuidle framework to choose a convenient idle state.
 	 * Fall back to the default arch idle method on errors.
 	 */
 	next_state = cpuidle_select(drv, dev);
+<<<<<<< HEAD
 	if (next_state < 0) {
 use_default:
 		/*
@@ -122,6 +162,10 @@ use_default:
 		goto exit_idle;
 	}
 
+=======
+	if (next_state < 0)
+		goto use_default;
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * The idle task must be scheduled, it is pointless to
@@ -179,6 +223,22 @@ exit_idle:
 
 	rcu_idle_exit();
 	start_critical_timings();
+<<<<<<< HEAD
+=======
+	return;
+
+use_default:
+	/*
+	 * We can't use the cpuidle framework, let's use the default
+	 * idle routine.
+	 */
+	if (current_clr_polling_and_test())
+		local_irq_enable();
+	else
+		arch_cpu_idle();
+
+	goto exit_idle;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
@@ -199,6 +259,10 @@ static void cpu_idle_loop(void)
 		 */
 
 		__current_set_polling();
+<<<<<<< HEAD
+=======
+		quiet_vmstat();
+>>>>>>> common/deprecated/android-3.18
 		tick_nohz_idle_enter();
 
 		while (!need_resched()) {

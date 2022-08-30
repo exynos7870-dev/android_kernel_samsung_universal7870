@@ -28,6 +28,7 @@
 #include <linux/io.h>
 #include <linux/aio.h>
 
+<<<<<<< HEAD
 #ifdef CONFIG_KNOX_KAP
 #include <linux/knox_kap.h>
 #endif
@@ -36,6 +37,8 @@
 #include <linux/mst_ctrl.h>
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #include <asm/uaccess.h>
 
 #ifdef CONFIG_IA64
@@ -68,6 +71,13 @@ static inline int valid_mmap_phys_addr_range(unsigned long pfn, size_t size)
 
 #if defined(CONFIG_DEVMEM) || defined(CONFIG_DEVKMEM)
 #ifdef CONFIG_STRICT_DEVMEM
+<<<<<<< HEAD
+=======
+static inline int page_is_allowed(unsigned long pfn)
+{
+	return devmem_is_allowed(pfn);
+}
+>>>>>>> common/deprecated/android-3.18
 static inline int range_is_allowed(unsigned long pfn, unsigned long size)
 {
 	u64 from = ((u64)pfn) << PAGE_SHIFT;
@@ -75,18 +85,30 @@ static inline int range_is_allowed(unsigned long pfn, unsigned long size)
 	u64 cursor = from;
 
 	while (cursor < to) {
+<<<<<<< HEAD
 		if (!devmem_is_allowed(pfn)) {
 			printk(KERN_INFO
 		"Program %s tried to access /dev/mem between %Lx->%Lx.\n",
 				current->comm, from, to);
 			return 0;
 		}
+=======
+		if (!devmem_is_allowed(pfn))
+			return 0;
+>>>>>>> common/deprecated/android-3.18
 		cursor += PAGE_SIZE;
 		pfn++;
 	}
 	return 1;
 }
 #else
+<<<<<<< HEAD
+=======
+static inline int page_is_allowed(unsigned long pfn)
+{
+	return 1;
+}
+>>>>>>> common/deprecated/android-3.18
 static inline int range_is_allowed(unsigned long pfn, unsigned long size)
 {
 	return 1;
@@ -99,6 +121,16 @@ void __weak unxlate_dev_mem_ptr(unsigned long phys, void *addr)
 {
 }
 
+<<<<<<< HEAD
+=======
+static inline bool should_stop_iteration(void)
+{
+	if (need_resched())
+		cond_resched();
+	return fatal_signal_pending(current);
+}
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * This funcion reads the *physical* memory. The f_pos points directly to the
  * memory location.
@@ -133,6 +165,7 @@ static ssize_t read_mem(struct file *file, char __user *buf,
 
 	while (count > 0) {
 		unsigned long remaining;
+<<<<<<< HEAD
 
 		sz = size_inside_page(p, count);
 
@@ -150,6 +183,33 @@ static ssize_t read_mem(struct file *file, char __user *buf,
 
 		remaining = copy_to_user(buf, ptr, sz);
 		unxlate_dev_mem_ptr(p, ptr);
+=======
+		int allowed;
+
+		sz = size_inside_page(p, count);
+
+		allowed = page_is_allowed(p >> PAGE_SHIFT);
+		if (!allowed)
+			return -EPERM;
+		if (allowed == 2) {
+			/* Show zeros for restricted memory. */
+			remaining = clear_user(buf, sz);
+		} else {
+			/*
+			 * On ia64 if a page has been mapped somewhere as
+			 * uncached, then it must also be accessed uncached
+			 * by the kernel or data corruption may occur.
+			 */
+			ptr = xlate_dev_mem_ptr(p);
+			if (!ptr)
+				return -EFAULT;
+
+			remaining = copy_to_user(buf, ptr, sz);
+
+			unxlate_dev_mem_ptr(p, ptr);
+		}
+
+>>>>>>> common/deprecated/android-3.18
 		if (remaining)
 			return -EFAULT;
 
@@ -157,6 +217,11 @@ static ssize_t read_mem(struct file *file, char __user *buf,
 		p += sz;
 		count -= sz;
 		read += sz;
+<<<<<<< HEAD
+=======
+		if (should_stop_iteration())
+			break;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	*ppos += read;
@@ -192,6 +257,7 @@ static ssize_t write_mem(struct file *file, const char __user *buf,
 #endif
 
 	while (count > 0) {
+<<<<<<< HEAD
 		sz = size_inside_page(p, count);
 
 		if (!range_is_allowed(p >> PAGE_SHIFT, sz))
@@ -216,12 +282,49 @@ static ssize_t write_mem(struct file *file, const char __user *buf,
 			if (written)
 				break;
 			return -EFAULT;
+=======
+		int allowed;
+
+		sz = size_inside_page(p, count);
+
+		allowed = page_is_allowed(p >> PAGE_SHIFT);
+		if (!allowed)
+			return -EPERM;
+
+		/* Skip actual writing when a page is marked as restricted. */
+		if (allowed == 1) {
+			/*
+			 * On ia64 if a page has been mapped somewhere as
+			 * uncached, then it must also be accessed uncached
+			 * by the kernel or data corruption may occur.
+			 */
+			ptr = xlate_dev_mem_ptr(p);
+			if (!ptr) {
+				if (written)
+					break;
+				return -EFAULT;
+			}
+
+			copied = copy_from_user(ptr, buf, sz);
+			unxlate_dev_mem_ptr(p, ptr);
+			if (copied) {
+				written += sz - copied;
+				if (written)
+					break;
+				return -EFAULT;
+			}
+>>>>>>> common/deprecated/android-3.18
 		}
 
 		buf += sz;
 		p += sz;
 		count -= sz;
 		written += sz;
+<<<<<<< HEAD
+=======
+		if (should_stop_iteration())
+			break;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	*ppos += written;
@@ -321,6 +424,14 @@ static const struct vm_operations_struct mmap_mem_ops = {
 static int mmap_mem(struct file *file, struct vm_area_struct *vma)
 {
 	size_t size = vma->vm_end - vma->vm_start;
+<<<<<<< HEAD
+=======
+	phys_addr_t offset = (phys_addr_t)vma->vm_pgoff << PAGE_SHIFT;
+
+	/* It's illegal to wrap around the end of the physical address space. */
+	if (offset + (phys_addr_t)size - 1 < offset)
+		return -EINVAL;
+>>>>>>> common/deprecated/android-3.18
 
 	if (!valid_mmap_phys_addr_range(vma->vm_pgoff, size))
 		return -EINVAL;
@@ -424,6 +535,13 @@ static ssize_t read_kmem(struct file *file, char __user *buf,
 			read += sz;
 			low_count -= sz;
 			count -= sz;
+<<<<<<< HEAD
+=======
+			if (should_stop_iteration()) {
+				count = 0;
+				break;
+			}
+>>>>>>> common/deprecated/android-3.18
 		}
 	}
 
@@ -448,6 +566,11 @@ static ssize_t read_kmem(struct file *file, char __user *buf,
 			buf += sz;
 			read += sz;
 			p += sz;
+<<<<<<< HEAD
+=======
+			if (should_stop_iteration())
+				break;
+>>>>>>> common/deprecated/android-3.18
 		}
 		free_page((unsigned long)kbuf);
 	}
@@ -498,6 +621,11 @@ static ssize_t do_write_kmem(unsigned long p, const char __user *buf,
 		p += sz;
 		count -= sz;
 		written += sz;
+<<<<<<< HEAD
+=======
+		if (should_stop_iteration())
+			break;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	*ppos += written;
@@ -549,6 +677,11 @@ static ssize_t write_kmem(struct file *file, const char __user *buf,
 			buf += sz;
 			virtr += sz;
 			p += sz;
+<<<<<<< HEAD
+=======
+			if (should_stop_iteration())
+				break;
+>>>>>>> common/deprecated/android-3.18
 		}
 		free_page((unsigned long)kbuf);
 	}
@@ -822,12 +955,15 @@ static const struct memdev {
 #ifdef CONFIG_PRINTK
 	[11] = { "kmsg", 0644, &kmsg_fops, NULL },
 #endif
+<<<<<<< HEAD
 #ifdef CONFIG_KNOX_KAP
 	[13] = { "knox_kap", 0664, &knox_kap_fops, NULL },
 #endif
 #ifdef CONFIG_MST_LDO
 	[14] = { "mst_ctrl", 0666, &mst_ctrl_fops, NULL },
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 static int memory_open(struct inode *inode, struct file *filp)

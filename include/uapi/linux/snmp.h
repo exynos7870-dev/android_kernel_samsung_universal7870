@@ -265,6 +265,10 @@ enum
 	LINUX_MIB_TCPWANTZEROWINDOWADV,		/* TCPWantZeroWindowAdv */
 	LINUX_MIB_TCPSYNRETRANS,		/* TCPSynRetrans */
 	LINUX_MIB_TCPORIGDATASENT,		/* TCPOrigDataSent */
+<<<<<<< HEAD
+=======
+	LINUX_MIB_TCPWQUEUETOOBIG,		/* TCPWqueueTooBig */
+>>>>>>> common/deprecated/android-3.18
 	__LINUX_MIB_MAX
 };
 

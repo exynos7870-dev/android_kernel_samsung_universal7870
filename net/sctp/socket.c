@@ -82,7 +82,11 @@
 /* Forward declarations for internal helper functions. */
 static int sctp_writeable(struct sock *sk);
 static void sctp_wfree(struct sk_buff *skb);
+<<<<<<< HEAD
 static int sctp_wait_for_sndbuf(struct sctp_association *, long *timeo_p,
+=======
+static int sctp_wait_for_sndbuf(struct sctp_association *asoc, long *timeo_p,
+>>>>>>> common/deprecated/android-3.18
 				size_t msg_len);
 static int sctp_wait_for_packet(struct sock *sk, int *err, long *timeo_p);
 static int sctp_wait_for_connect(struct sctp_association *, long *timeo_p);
@@ -173,6 +177,39 @@ static inline void sctp_set_owner_w(struct sctp_chunk *chunk)
 	sk_mem_charge(sk, chunk->skb->truesize);
 }
 
+<<<<<<< HEAD
+=======
+static void sctp_clear_owner_w(struct sctp_chunk *chunk)
+{
+	skb_orphan(chunk->skb);
+}
+
+static void sctp_for_each_tx_datachunk(struct sctp_association *asoc,
+				       void (*cb)(struct sctp_chunk *))
+
+{
+	struct sctp_outq *q = &asoc->outqueue;
+	struct sctp_transport *t;
+	struct sctp_chunk *chunk;
+
+	list_for_each_entry(t, &asoc->peer.transport_addr_list, transports)
+		list_for_each_entry(chunk, &t->transmitted, transmitted_list)
+			cb(chunk);
+
+	list_for_each_entry(chunk, &q->retransmit, transmitted_list)
+		cb(chunk);
+
+	list_for_each_entry(chunk, &q->sacked, transmitted_list)
+		cb(chunk);
+
+	list_for_each_entry(chunk, &q->abandoned, transmitted_list)
+		cb(chunk);
+
+	list_for_each_entry(chunk, &q->out_chunk_list, list)
+		cb(chunk);
+}
+
+>>>>>>> common/deprecated/android-3.18
 /* Verify that this is a valid address. */
 static inline int sctp_verify_addr(struct sock *sk, union sctp_addr *addr,
 				   int len)
@@ -223,11 +260,18 @@ struct sctp_association *sctp_id2assoc(struct sock *sk, sctp_assoc_t id)
 
 	spin_lock_bh(&sctp_assocs_id_lock);
 	asoc = (struct sctp_association *)idr_find(&sctp_assocs_id, (int)id);
+<<<<<<< HEAD
 	spin_unlock_bh(&sctp_assocs_id_lock);
 
 	if (!asoc || (asoc->base.sk != sk) || asoc->base.dead)
 		return NULL;
 
+=======
+	if (asoc && (asoc->base.sk != sk || asoc->base.dead))
+		asoc = NULL;
+	spin_unlock_bh(&sctp_assocs_id_lock);
+
+>>>>>>> common/deprecated/android-3.18
 	return asoc;
 }
 
@@ -240,8 +284,17 @@ static struct sctp_transport *sctp_addr_id2transport(struct sock *sk,
 					      sctp_assoc_t id)
 {
 	struct sctp_association *addr_asoc = NULL, *id_asoc = NULL;
+<<<<<<< HEAD
 	struct sctp_transport *transport;
 	union sctp_addr *laddr = (union sctp_addr *)addr;
+=======
+	struct sctp_af *af = sctp_get_af_specific(addr->ss_family);
+	union sctp_addr *laddr = (union sctp_addr *)addr;
+	struct sctp_transport *transport;
+
+	if (!af || sctp_verify_addr(sk, laddr, af->sockaddr_len))
+		return NULL;
+>>>>>>> common/deprecated/android-3.18
 
 	addr_asoc = sctp_endpoint_lookup_assoc(sctp_sk(sk)->ep,
 					       laddr,
@@ -303,6 +356,7 @@ static struct sctp_af *sctp_sockaddr_af(struct sctp_sock *opt,
 	if (len < sizeof (struct sockaddr))
 		return NULL;
 
+<<<<<<< HEAD
 	/* V4 mapped address are really of AF_INET family */
 	if (addr->sa.sa_family == AF_INET6 &&
 	    ipv6_addr_v4mapped(&addr->v6.sin6_addr)) {
@@ -311,6 +365,17 @@ static struct sctp_af *sctp_sockaddr_af(struct sctp_sock *opt,
 	} else {
 		/* Does this PF support this AF? */
 		if (!opt->pf->af_supported(addr->sa.sa_family, opt))
+=======
+	if (!opt->pf->af_supported(addr->sa.sa_family, opt))
+		return NULL;
+
+	if (addr->sa.sa_family == AF_INET6) {
+		if (len < SIN6_LEN_RFC2133)
+			return NULL;
+		/* V4 mapped address are really of AF_INET family */
+		if (ipv6_addr_v4mapped(&addr->v6.sin6_addr) &&
+		    !opt->pf->af_supported(AF_INET, opt))
+>>>>>>> common/deprecated/android-3.18
 			return NULL;
 	}
 
@@ -323,6 +388,21 @@ static struct sctp_af *sctp_sockaddr_af(struct sctp_sock *opt,
 	return af;
 }
 
+<<<<<<< HEAD
+=======
+static void sctp_auto_asconf_init(struct sctp_sock *sp)
+{
+	struct net *net = sock_net(&sp->inet.sk);
+
+	if (net->sctp.default_auto_asconf) {
+		spin_lock(&net->sctp.addr_wq_lock);
+		list_add_tail(&sp->auto_asconf_list, &net->sctp.auto_asconf_splist);
+		spin_unlock(&net->sctp.addr_wq_lock);
+		sp->do_auto_asconf = 1;
+	}
+}
+
+>>>>>>> common/deprecated/android-3.18
 /* Bind a local address either to an endpoint or to an association.  */
 static int sctp_do_bind(struct sock *sk, union sctp_addr *addr, int len)
 {
@@ -385,8 +465,15 @@ static int sctp_do_bind(struct sock *sk, union sctp_addr *addr, int len)
 	}
 
 	/* Refresh ephemeral port.  */
+<<<<<<< HEAD
 	if (!bp->port)
 		bp->port = inet_sk(sk)->inet_num;
+=======
+	if (!bp->port) {
+		bp->port = inet_sk(sk)->inet_num;
+		sctp_auto_asconf_init(sp);
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	/* Add the address to the bind address list.
 	 * Use GFP_ATOMIC since BHs will be disabled.
@@ -1043,7 +1130,11 @@ out:
  */
 static int __sctp_connect(struct sock *sk,
 			  struct sockaddr *kaddrs,
+<<<<<<< HEAD
 			  int addrs_size,
+=======
+			  int addrs_size, int flags,
+>>>>>>> common/deprecated/android-3.18
 			  sctp_assoc_t *assoc_id)
 {
 	struct net *net = sock_net(sk);
@@ -1061,7 +1152,10 @@ static int __sctp_connect(struct sock *sk,
 	union sctp_addr *sa_addr = NULL;
 	void *addr_buf;
 	unsigned short port;
+<<<<<<< HEAD
 	unsigned int f_flags = 0;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	sp = sctp_sk(sk);
 	ep = sp->ep;
@@ -1209,6 +1303,7 @@ static int __sctp_connect(struct sock *sk,
 	sp->pf->to_sk_daddr(sa_addr, sk);
 	sk->sk_err = 0;
 
+<<<<<<< HEAD
 	/* in-kernel sockets don't generally have a file allocated to them
 	 * if all they do is call sock_create_kern().
 	 */
@@ -1220,6 +1315,16 @@ static int __sctp_connect(struct sock *sk,
 	err = sctp_wait_for_connect(asoc, &timeo);
 	if ((err == 0 || err == -EINPROGRESS) && assoc_id)
 		*assoc_id = asoc->assoc_id;
+=======
+	timeo = sock_sndtimeo(sk, flags & O_NONBLOCK);
+
+	if (assoc_id)
+		*assoc_id = asoc->assoc_id;
+	err = sctp_wait_for_connect(asoc, &timeo);
+	/* Note: the asoc may be freed after the return of
+	 * sctp_wait_for_connect.
+	 */
+>>>>>>> common/deprecated/android-3.18
 
 	/* Don't free association on exit. */
 	asoc = NULL;
@@ -1306,7 +1411,11 @@ static int __sctp_setsockopt_connectx(struct sock *sk,
 				      int addrs_size,
 				      sctp_assoc_t *assoc_id)
 {
+<<<<<<< HEAD
 	int err = 0;
+=======
+	int err = 0, flags = 0;
+>>>>>>> common/deprecated/android-3.18
 	struct sockaddr *kaddrs;
 
 	pr_debug("%s: sk:%p addrs:%p addrs_size:%d\n",
@@ -1325,11 +1434,26 @@ static int __sctp_setsockopt_connectx(struct sock *sk,
 		return -ENOMEM;
 
 	if (__copy_from_user(kaddrs, addrs, addrs_size)) {
+<<<<<<< HEAD
 		err = -EFAULT;
 	} else {
 		err = __sctp_connect(sk, kaddrs, addrs_size, assoc_id);
 	}
 
+=======
+		kfree(kaddrs);
+		return -EFAULT;
+	}
+
+	/* in-kernel sockets don't generally have a file allocated to them
+	 * if all they do is call sock_create_kern().
+	 */
+	if (sk->sk_socket->file)
+		flags = sk->sk_socket->file->f_flags;
+
+	err = __sctp_connect(sk, kaddrs, addrs_size, flags, assoc_id);
+
+>>>>>>> common/deprecated/android-3.18
 	kfree(kaddrs);
 
 	return err;
@@ -1485,7 +1609,11 @@ static void sctp_close(struct sock *sk, long timeout)
 
 	pr_debug("%s: sk:%p, timeout:%ld\n", __func__, sk, timeout);
 
+<<<<<<< HEAD
 	lock_sock(sk);
+=======
+	lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
+>>>>>>> common/deprecated/android-3.18
 	sk->sk_shutdown = SHUTDOWN_MASK;
 	sk->sk_state = SCTP_SS_CLOSING;
 
@@ -1518,8 +1646,12 @@ static void sctp_close(struct sock *sk, long timeout)
 			struct sctp_chunk *chunk;
 
 			chunk = sctp_make_abort_user(asoc, NULL, 0);
+<<<<<<< HEAD
 			if (chunk)
 				sctp_primitive_ABORT(net, asoc, chunk);
+=======
+			sctp_primitive_ABORT(net, asoc, chunk);
+>>>>>>> common/deprecated/android-3.18
 		} else
 			sctp_primitive_SHUTDOWN(net, asoc, NULL);
 	}
@@ -1533,9 +1665,17 @@ static void sctp_close(struct sock *sk, long timeout)
 
 	/* Supposedly, no process has access to the socket, but
 	 * the net layers still may.
+<<<<<<< HEAD
 	 */
 	local_bh_disable();
 	bh_lock_sock(sk);
+=======
+	 * Also, sctp_destroy_sock() needs to be called with addr_wq_lock
+	 * held and that should be grabbed before socket lock.
+	 */
+	spin_lock_bh(&net->sctp.addr_wq_lock);
+	bh_lock_sock_nested(sk);
+>>>>>>> common/deprecated/android-3.18
 
 	/* Hold the sock, since sk_common_release() will put sock_put()
 	 * and we have just a little more cleanup.
@@ -1544,7 +1684,11 @@ static void sctp_close(struct sock *sk, long timeout)
 	sk_common_release(sk);
 
 	bh_unlock_sock(sk);
+<<<<<<< HEAD
 	local_bh_enable();
+=======
+	spin_unlock_bh(&net->sctp.addr_wq_lock);
+>>>>>>> common/deprecated/android-3.18
 
 	sock_put(sk);
 
@@ -1603,7 +1747,11 @@ static int sctp_sendmsg(struct kiocb *iocb, struct sock *sk,
 	sctp_assoc_t associd = 0;
 	sctp_cmsgs_t cmsgs = { NULL };
 	sctp_scope_t scope;
+<<<<<<< HEAD
 	bool fill_sinfo_ttl = false;
+=======
+	bool fill_sinfo_ttl = false, wait_connect = false;
+>>>>>>> common/deprecated/android-3.18
 	struct sctp_datamsg *datamsg;
 	int msg_flags = msg->msg_flags;
 	__u16 sinfo_flags = 0;
@@ -1918,9 +2066,22 @@ static int sctp_sendmsg(struct kiocb *iocb, struct sock *sk,
 
 	timeo = sock_sndtimeo(sk, msg->msg_flags & MSG_DONTWAIT);
 	if (!sctp_wspace(asoc)) {
+<<<<<<< HEAD
 		err = sctp_wait_for_sndbuf(asoc, &timeo, msg_len);
 		if (err)
 			goto out_free;
+=======
+		/* sk can be changed by peel off when waiting for buf. */
+		err = sctp_wait_for_sndbuf(asoc, &timeo, msg_len);
+		if (err) {
+			if (err == -ESRCH) {
+				/* asoc is already dead. */
+				new_asoc = NULL;
+				err = -EPIPE;
+			}
+			goto out_free;
+		}
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/* If an address is passed with the sendto/sendmsg call, it is used
@@ -1943,6 +2104,10 @@ static int sctp_sendmsg(struct kiocb *iocb, struct sock *sk,
 		if (err < 0)
 			goto out_free;
 
+<<<<<<< HEAD
+=======
+		wait_connect = true;
+>>>>>>> common/deprecated/android-3.18
 		pr_debug("%s: we associated primitively\n", __func__);
 	}
 
@@ -1980,6 +2145,14 @@ static int sctp_sendmsg(struct kiocb *iocb, struct sock *sk,
 	sctp_datamsg_put(datamsg);
 	err = msg_len;
 
+<<<<<<< HEAD
+=======
+	if (unlikely(wait_connect)) {
+		timeo = sock_sndtimeo(sk, msg_flags & MSG_DONTWAIT);
+		sctp_wait_for_connect(asoc, &timeo);
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	/* If we are already past ASSOCIATE, the lower
 	 * layers are responsible for association cleanup.
 	 */
@@ -3581,6 +3754,10 @@ static int sctp_setsockopt_auto_asconf(struct sock *sk, char __user *optval,
 	if ((val && sp->do_auto_asconf) || (!val && !sp->do_auto_asconf))
 		return 0;
 
+<<<<<<< HEAD
+=======
+	spin_lock_bh(&sock_net(sk)->sctp.addr_wq_lock);
+>>>>>>> common/deprecated/android-3.18
 	if (val == 0 && sp->do_auto_asconf) {
 		list_del(&sp->auto_asconf_list);
 		sp->do_auto_asconf = 0;
@@ -3589,6 +3766,10 @@ static int sctp_setsockopt_auto_asconf(struct sock *sk, char __user *optval,
 		    &sock_net(sk)->sctp.auto_asconf_splist);
 		sp->do_auto_asconf = 1;
 	}
+<<<<<<< HEAD
+=======
+	spin_unlock_bh(&sock_net(sk)->sctp.addr_wq_lock);
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -3862,6 +4043,7 @@ out_nounlock:
  * len: the size of the address.
  */
 static int sctp_connect(struct sock *sk, struct sockaddr *addr,
+<<<<<<< HEAD
 			int addr_len)
 {
 	int err = 0;
@@ -3869,11 +4051,20 @@ static int sctp_connect(struct sock *sk, struct sockaddr *addr,
 
 	lock_sock(sk);
 
+=======
+			int addr_len, int flags)
+{
+	struct sctp_af *af;
+	int err = -EINVAL;
+
+	lock_sock(sk);
+>>>>>>> common/deprecated/android-3.18
 	pr_debug("%s: sk:%p, sockaddr:%p, addr_len:%d\n", __func__, sk,
 		 addr, addr_len);
 
 	/* Validate addr_len before calling common connect/connectx routine. */
 	af = sctp_get_af_specific(addr->sa_family);
+<<<<<<< HEAD
 	if (!af || addr_len < af->sockaddr_len) {
 		err = -EINVAL;
 	} else {
@@ -3882,11 +4073,30 @@ static int sctp_connect(struct sock *sk, struct sockaddr *addr,
 		 */
 		err = __sctp_connect(sk, addr, af->sockaddr_len, NULL);
 	}
+=======
+	if (af && addr_len >= af->sockaddr_len)
+		err = __sctp_connect(sk, addr, af->sockaddr_len, flags, NULL);
+>>>>>>> common/deprecated/android-3.18
 
 	release_sock(sk);
 	return err;
 }
 
+<<<<<<< HEAD
+=======
+int sctp_inet_connect(struct socket *sock, struct sockaddr *uaddr,
+		      int addr_len, int flags)
+{
+	if (addr_len < sizeof(uaddr->sa_family))
+		return -EINVAL;
+
+	if (uaddr->sa_family == AF_UNSPEC)
+		return -EOPNOTSUPP;
+
+	return sctp_connect(sock->sk, uaddr, addr_len, flags);
+}
+
+>>>>>>> common/deprecated/android-3.18
 /* FIXME: Write comments. */
 static int sctp_disconnect(struct sock *sk, int flags)
 {
@@ -4120,6 +4330,7 @@ static int sctp_init_sock(struct sock *sk)
 	SCTP_DBG_OBJCNT_INC(sock);
 
 	local_bh_disable();
+<<<<<<< HEAD
 	percpu_counter_inc(&sctp_sockets_allocated);
 	sock_prot_inuse_add(net, sk->sk_prot, 1);
 	if (net->sctp.default_auto_asconf) {
@@ -4128,12 +4339,23 @@ static int sctp_init_sock(struct sock *sk)
 		sp->do_auto_asconf = 1;
 	} else
 		sp->do_auto_asconf = 0;
+=======
+	sk_sockets_allocated_inc(sk);
+	sock_prot_inuse_add(net, sk->sk_prot, 1);
+
+>>>>>>> common/deprecated/android-3.18
 	local_bh_enable();
 
 	return 0;
 }
 
+<<<<<<< HEAD
 /* Cleanup any SCTP per socket resources.  */
+=======
+/* Cleanup any SCTP per socket resources. Must be called with
+ * sock_net(sk)->sctp.addr_wq_lock held if sp->do_auto_asconf is true
+ */
+>>>>>>> common/deprecated/android-3.18
 static void sctp_destroy_sock(struct sock *sk)
 {
 	struct sctp_sock *sp;
@@ -4154,7 +4376,11 @@ static void sctp_destroy_sock(struct sock *sk)
 	}
 	sctp_endpoint_free(sp->ep);
 	local_bh_disable();
+<<<<<<< HEAD
 	percpu_counter_dec(&sctp_sockets_allocated);
+=======
+	sk_sockets_allocated_dec(sk);
+>>>>>>> common/deprecated/android-3.18
 	sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
 	local_bh_enable();
 }
@@ -4372,7 +4598,11 @@ static int sctp_getsockopt_disable_fragments(struct sock *sk, int len,
 static int sctp_getsockopt_events(struct sock *sk, int len, char __user *optval,
 				  int __user *optlen)
 {
+<<<<<<< HEAD
 	if (len <= 0)
+=======
+	if (len == 0)
+>>>>>>> common/deprecated/android-3.18
 		return -EINVAL;
 	if (len > sizeof(struct sctp_event_subscribe))
 		len = sizeof(struct sctp_event_subscribe);
@@ -4404,7 +4634,11 @@ static int sctp_getsockopt_autoclose(struct sock *sk, int len, char __user *optv
 	len = sizeof(int);
 	if (put_user(len, optlen))
 		return -EFAULT;
+<<<<<<< HEAD
 	if (copy_to_user(optval, &sctp_sk(sk)->autoclose, sizeof(int)))
+=======
+	if (copy_to_user(optval, &sctp_sk(sk)->autoclose, len))
+>>>>>>> common/deprecated/android-3.18
 		return -EFAULT;
 	return 0;
 }
@@ -4981,6 +5215,12 @@ copy_getaddrs:
 		err = -EFAULT;
 		goto out;
 	}
+<<<<<<< HEAD
+=======
+	/* XXX: We should have accounted for sizeof(struct sctp_getaddrs) too,
+	 * but we can't change it anymore.
+	 */
+>>>>>>> common/deprecated/android-3.18
 	if (put_user(bytes_copied, optlen))
 		err = -EFAULT;
 out:
@@ -5417,7 +5657,11 @@ static int sctp_getsockopt_maxseg(struct sock *sk, int len,
 		params.assoc_id = 0;
 	} else if (len >= sizeof(struct sctp_assoc_value)) {
 		len = sizeof(struct sctp_assoc_value);
+<<<<<<< HEAD
 		if (copy_from_user(&params, optval, sizeof(params)))
+=======
+		if (copy_from_user(&params, optval, len))
+>>>>>>> common/deprecated/android-3.18
 			return -EFAULT;
 	} else
 		return -EINVAL;
@@ -5547,6 +5791,10 @@ static int sctp_getsockopt_hmac_ident(struct sock *sk, int len,
 	struct sctp_hmac_algo_param *hmacs;
 	__u16 data_len = 0;
 	u32 num_idents;
+<<<<<<< HEAD
+=======
+	int i;
+>>>>>>> common/deprecated/android-3.18
 
 	if (!ep->auth_enable)
 		return -EACCES;
@@ -5564,8 +5812,17 @@ static int sctp_getsockopt_hmac_ident(struct sock *sk, int len,
 		return -EFAULT;
 	if (put_user(num_idents, &p->shmac_num_idents))
 		return -EFAULT;
+<<<<<<< HEAD
 	if (copy_to_user(p->shmac_idents, hmacs->hmac_ids, data_len))
 		return -EFAULT;
+=======
+	for (i = 0; i < num_idents; i++) {
+		__u16 hmacid = ntohs(hmacs->hmac_ids[i]);
+
+		if (copy_to_user(&p->shmac_idents[i], &hmacid, sizeof(__u16)))
+			return -EFAULT;
+	}
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -5581,7 +5838,13 @@ static int sctp_getsockopt_active_key(struct sock *sk, int len,
 
 	if (len < sizeof(struct sctp_authkeyid))
 		return -EINVAL;
+<<<<<<< HEAD
 	if (copy_from_user(&val, optval, sizeof(struct sctp_authkeyid)))
+=======
+
+	len = sizeof(struct sctp_authkeyid);
+	if (copy_from_user(&val, optval, len))
+>>>>>>> common/deprecated/android-3.18
 		return -EFAULT;
 
 	asoc = sctp_id2assoc(sk, val.scact_assoc_id);
@@ -5593,7 +5856,10 @@ static int sctp_getsockopt_active_key(struct sock *sk, int len,
 	else
 		val.scact_keynumber = ep->active_key_id;
 
+<<<<<<< HEAD
 	len = sizeof(struct sctp_authkeyid);
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (put_user(len, optlen))
 		return -EFAULT;
 	if (copy_to_user(optval, &val, len))
@@ -5619,7 +5885,11 @@ static int sctp_getsockopt_peer_auth_chunks(struct sock *sk, int len,
 	if (len < sizeof(struct sctp_authchunks))
 		return -EINVAL;
 
+<<<<<<< HEAD
 	if (copy_from_user(&val, optval, sizeof(struct sctp_authchunks)))
+=======
+	if (copy_from_user(&val, optval, sizeof(val)))
+>>>>>>> common/deprecated/android-3.18
 		return -EFAULT;
 
 	to = p->gauth_chunks;
@@ -5664,7 +5934,11 @@ static int sctp_getsockopt_local_auth_chunks(struct sock *sk, int len,
 	if (len < sizeof(struct sctp_authchunks))
 		return -EINVAL;
 
+<<<<<<< HEAD
 	if (copy_from_user(&val, optval, sizeof(struct sctp_authchunks)))
+=======
+	if (copy_from_user(&val, optval, sizeof(val)))
+>>>>>>> common/deprecated/android-3.18
 		return -EFAULT;
 
 	to = p->gauth_chunks;
@@ -5972,6 +6246,12 @@ static int sctp_getsockopt(struct sock *sk, int level, int optname,
 	if (get_user(len, optlen))
 		return -EFAULT;
 
+<<<<<<< HEAD
+=======
+	if (len < 0)
+		return -EINVAL;
+
+>>>>>>> common/deprecated/android-3.18
 	lock_sock(sk);
 
 	switch (optname) {
@@ -6146,8 +6426,11 @@ static long sctp_get_port_local(struct sock *sk, union sctp_addr *addr)
 
 	pr_debug("%s: begins, snum:%d\n", __func__, snum);
 
+<<<<<<< HEAD
 	local_bh_disable();
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (snum == 0) {
 		/* Search for an available port. */
 		int low, high, remaining, index;
@@ -6166,20 +6449,33 @@ static long sctp_get_port_local(struct sock *sk, union sctp_addr *addr)
 				continue;
 			index = sctp_phashfn(sock_net(sk), rover);
 			head = &sctp_port_hashtable[index];
+<<<<<<< HEAD
 			spin_lock(&head->lock);
+=======
+			spin_lock_bh(&head->lock);
+>>>>>>> common/deprecated/android-3.18
 			sctp_for_each_hentry(pp, &head->chain)
 				if ((pp->port == rover) &&
 				    net_eq(sock_net(sk), pp->net))
 					goto next;
 			break;
 		next:
+<<<<<<< HEAD
 			spin_unlock(&head->lock);
+=======
+			spin_unlock_bh(&head->lock);
+			cond_resched();
+>>>>>>> common/deprecated/android-3.18
 		} while (--remaining > 0);
 
 		/* Exhausted local port range during search? */
 		ret = 1;
 		if (remaining <= 0)
+<<<<<<< HEAD
 			goto fail;
+=======
+			return ret;
+>>>>>>> common/deprecated/android-3.18
 
 		/* OK, here is the one we will use.  HEAD (the port
 		 * hash table list entry) is non-NULL and we hold it's
@@ -6194,7 +6490,11 @@ static long sctp_get_port_local(struct sock *sk, union sctp_addr *addr)
 		 * port iterator, pp being NULL.
 		 */
 		head = &sctp_port_hashtable[sctp_phashfn(sock_net(sk), snum)];
+<<<<<<< HEAD
 		spin_lock(&head->lock);
+=======
+		spin_lock_bh(&head->lock);
+>>>>>>> common/deprecated/android-3.18
 		sctp_for_each_hentry(pp, &head->chain) {
 			if ((pp->port == snum) && net_eq(pp->net, sock_net(sk)))
 				goto pp_found;
@@ -6278,10 +6578,14 @@ success:
 	ret = 0;
 
 fail_unlock:
+<<<<<<< HEAD
 	spin_unlock(&head->lock);
 
 fail:
 	local_bh_enable();
+=======
+	spin_unlock_bh(&head->lock);
+>>>>>>> common/deprecated/android-3.18
 	return ret;
 }
 
@@ -6382,6 +6686,12 @@ int sctp_inet_listen(struct socket *sock, int backlog)
 	if (sock->state != SS_UNCONNECTED)
 		goto out;
 
+<<<<<<< HEAD
+=======
+	if (!sctp_sstate(sk, LISTENING) && !sctp_sstate(sk, CLOSED))
+		goto out;
+
+>>>>>>> common/deprecated/android-3.18
 	/* If backlog is zero, disable listening. */
 	if (!backlog) {
 		if (sctp_sstate(sk, CLOSED))
@@ -6646,6 +6956,10 @@ static int sctp_msghdr_parse(const struct msghdr *msg, sctp_cmsgs_t *cmsgs)
 
 			if (cmsgs->srinfo->sinfo_flags &
 			    ~(SCTP_UNORDERED | SCTP_ADDR_OVER |
+<<<<<<< HEAD
+=======
+			      SCTP_SACK_IMMEDIATELY |
+>>>>>>> common/deprecated/android-3.18
 			      SCTP_ABORT | SCTP_EOF))
 				return -EINVAL;
 			break;
@@ -6669,6 +6983,10 @@ static int sctp_msghdr_parse(const struct msghdr *msg, sctp_cmsgs_t *cmsgs)
 
 			if (cmsgs->sinfo->snd_flags &
 			    ~(SCTP_UNORDERED | SCTP_ADDR_OVER |
+<<<<<<< HEAD
+=======
+			      SCTP_SACK_IMMEDIATELY |
+>>>>>>> common/deprecated/android-3.18
 			      SCTP_ABORT | SCTP_EOF))
 				return -EINVAL;
 			break;
@@ -6924,9 +7242,15 @@ static int sctp_wait_for_sndbuf(struct sctp_association *asoc, long *timeo_p,
 				size_t msg_len)
 {
 	struct sock *sk = asoc->base.sk;
+<<<<<<< HEAD
 	int err = 0;
 	long current_timeo = *timeo_p;
 	DEFINE_WAIT(wait);
+=======
+	long current_timeo = *timeo_p;
+	DEFINE_WAIT(wait);
+	int err = 0;
+>>>>>>> common/deprecated/android-3.18
 
 	pr_debug("%s: asoc:%p, timeo:%ld, msg_len:%zu\n", __func__, asoc,
 		 *timeo_p, msg_len);
@@ -6938,10 +7262,18 @@ static int sctp_wait_for_sndbuf(struct sctp_association *asoc, long *timeo_p,
 	for (;;) {
 		prepare_to_wait_exclusive(&asoc->wait, &wait,
 					  TASK_INTERRUPTIBLE);
+<<<<<<< HEAD
 		if (!*timeo_p)
 			goto do_nonblock;
 		if (sk->sk_err || asoc->state >= SCTP_STATE_SHUTDOWN_PENDING ||
 		    asoc->base.dead)
+=======
+		if (asoc->base.dead)
+			goto do_dead;
+		if (!*timeo_p)
+			goto do_nonblock;
+		if (sk->sk_err || asoc->state >= SCTP_STATE_SHUTDOWN_PENDING)
+>>>>>>> common/deprecated/android-3.18
 			goto do_error;
 		if (signal_pending(current))
 			goto do_interrupted;
@@ -6953,9 +7285,15 @@ static int sctp_wait_for_sndbuf(struct sctp_association *asoc, long *timeo_p,
 		 */
 		release_sock(sk);
 		current_timeo = schedule_timeout(current_timeo);
+<<<<<<< HEAD
 		if (sk != asoc->base.sk)
 			goto do_error;
 		lock_sock(sk);
+=======
+		lock_sock(sk);
+		if (sk != asoc->base.sk)
+			goto do_error;
+>>>>>>> common/deprecated/android-3.18
 
 		*timeo_p = current_timeo;
 	}
@@ -6968,6 +7306,13 @@ out:
 
 	return err;
 
+<<<<<<< HEAD
+=======
+do_dead:
+	err = -ESRCH;
+	goto out;
+
+>>>>>>> common/deprecated/android-3.18
 do_error:
 	err = -EPIPE;
 	goto out;
@@ -7172,6 +7517,10 @@ void sctp_copy_sock(struct sock *newsk, struct sock *sk,
 	newsk->sk_type = sk->sk_type;
 	newsk->sk_bound_dev_if = sk->sk_bound_dev_if;
 	newsk->sk_flags = sk->sk_flags;
+<<<<<<< HEAD
+=======
+	newsk->sk_tsflags = sk->sk_tsflags;
+>>>>>>> common/deprecated/android-3.18
 	newsk->sk_no_check_tx = sk->sk_no_check_tx;
 	newsk->sk_no_check_rx = sk->sk_no_check_rx;
 	newsk->sk_reuse = sk->sk_reuse;
@@ -7197,13 +7546,36 @@ void sctp_copy_sock(struct sock *newsk, struct sock *sk,
 	newinet->inet_rcv_saddr = inet->inet_rcv_saddr;
 	newinet->inet_dport = htons(asoc->peer.port);
 	newinet->pmtudisc = inet->pmtudisc;
+<<<<<<< HEAD
 	newinet->inet_id = asoc->next_tsn ^ jiffies;
+=======
+	newinet->inet_id = prandom_u32();
+>>>>>>> common/deprecated/android-3.18
 
 	newinet->uc_ttl = inet->uc_ttl;
 	newinet->mc_loop = 1;
 	newinet->mc_ttl = 1;
 	newinet->mc_index = 0;
 	newinet->mc_list = NULL;
+<<<<<<< HEAD
+=======
+
+	if (newsk->sk_flags & SK_FLAGS_TIMESTAMP)
+		net_enable_timestamp();
+}
+
+static inline void sctp_copy_descendant(struct sock *sk_to,
+					const struct sock *sk_from)
+{
+	int ancestor_size = sizeof(struct inet_sock) +
+			    sizeof(struct sctp_sock) -
+			    offsetof(struct sctp_sock, auto_asconf_list);
+
+	if (sk_from->sk_family == PF_INET6)
+		ancestor_size += sizeof(struct ipv6_pinfo);
+
+	__inet_sk_copy_descendant(sk_to, sk_from, ancestor_size);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /* Populate the fields of the newsk from the oldsk and migrate the assoc
@@ -7220,7 +7592,10 @@ static void sctp_sock_migrate(struct sock *oldsk, struct sock *newsk,
 	struct sk_buff *skb, *tmp;
 	struct sctp_ulpevent *event;
 	struct sctp_bind_hashbucket *head;
+<<<<<<< HEAD
 	struct list_head tmplist;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	/* Migrate socket buffer sizes and all the socket level options to the
 	 * new socket.
@@ -7228,12 +7603,16 @@ static void sctp_sock_migrate(struct sock *oldsk, struct sock *newsk,
 	newsk->sk_sndbuf = oldsk->sk_sndbuf;
 	newsk->sk_rcvbuf = oldsk->sk_rcvbuf;
 	/* Brute force copy old sctp opt. */
+<<<<<<< HEAD
 	if (oldsp->do_auto_asconf) {
 		memcpy(&tmplist, &newsp->auto_asconf_list, sizeof(tmplist));
 		inet_sk_copy_descendant(newsk, oldsk);
 		memcpy(&newsp->auto_asconf_list, &tmplist, sizeof(tmplist));
 	} else
 		inet_sk_copy_descendant(newsk, oldsk);
+=======
+	sctp_copy_descendant(newsk, oldsk);
+>>>>>>> common/deprecated/android-3.18
 
 	/* Restore the ep value that was overwritten with the above structure
 	 * copy.
@@ -7259,6 +7638,11 @@ static void sctp_sock_migrate(struct sock *oldsk, struct sock *newsk,
 	sctp_bind_addr_dup(&newsp->ep->base.bind_addr,
 				&oldsp->ep->base.bind_addr, GFP_KERNEL);
 
+<<<<<<< HEAD
+=======
+	sctp_auto_asconf_init(newsp);
+
+>>>>>>> common/deprecated/android-3.18
 	/* Move any messages in the old socket's receive queue that are for the
 	 * peeled off association to the new socket's receive queue.
 	 */
@@ -7331,7 +7715,13 @@ static void sctp_sock_migrate(struct sock *oldsk, struct sock *newsk,
 	 * paths won't try to lock it and then oldsk.
 	 */
 	lock_sock_nested(newsk, SINGLE_DEPTH_NESTING);
+<<<<<<< HEAD
 	sctp_assoc_migrate(assoc, newsk);
+=======
+	sctp_for_each_tx_datachunk(assoc, sctp_clear_owner_w);
+	sctp_assoc_migrate(assoc, newsk);
+	sctp_for_each_tx_datachunk(assoc, sctp_set_owner_w);
+>>>>>>> common/deprecated/android-3.18
 
 	/* If the association on the newsk is already closed before accept()
 	 * is called, set RCV_SHUTDOWN flag.
@@ -7349,7 +7739,10 @@ struct proto sctp_prot = {
 	.name        =	"SCTP",
 	.owner       =	THIS_MODULE,
 	.close       =	sctp_close,
+<<<<<<< HEAD
 	.connect     =	sctp_connect,
+=======
+>>>>>>> common/deprecated/android-3.18
 	.disconnect  =	sctp_disconnect,
 	.accept      =	sctp_accept,
 	.ioctl       =	sctp_ioctl,
@@ -7364,7 +7757,11 @@ struct proto sctp_prot = {
 	.backlog_rcv =	sctp_backlog_rcv,
 	.hash        =	sctp_hash,
 	.unhash      =	sctp_unhash,
+<<<<<<< HEAD
 	.get_port    =	sctp_get_port,
+=======
+	.no_autobind =	true,
+>>>>>>> common/deprecated/android-3.18
 	.obj_size    =  sizeof(struct sctp_sock),
 	.sysctl_mem  =  sysctl_sctp_mem,
 	.sysctl_rmem =  sysctl_sctp_rmem,
@@ -7377,16 +7774,33 @@ struct proto sctp_prot = {
 
 #if IS_ENABLED(CONFIG_IPV6)
 
+<<<<<<< HEAD
+=======
+#include <net/transp_v6.h>
+static void sctp_v6_destroy_sock(struct sock *sk)
+{
+	sctp_destroy_sock(sk);
+	inet6_destroy_sock(sk);
+}
+
+>>>>>>> common/deprecated/android-3.18
 struct proto sctpv6_prot = {
 	.name		= "SCTPv6",
 	.owner		= THIS_MODULE,
 	.close		= sctp_close,
+<<<<<<< HEAD
 	.connect	= sctp_connect,
+=======
+>>>>>>> common/deprecated/android-3.18
 	.disconnect	= sctp_disconnect,
 	.accept		= sctp_accept,
 	.ioctl		= sctp_ioctl,
 	.init		= sctp_init_sock,
+<<<<<<< HEAD
 	.destroy	= sctp_destroy_sock,
+=======
+	.destroy	= sctp_v6_destroy_sock,
+>>>>>>> common/deprecated/android-3.18
 	.shutdown	= sctp_shutdown,
 	.setsockopt	= sctp_setsockopt,
 	.getsockopt	= sctp_getsockopt,
@@ -7396,7 +7810,11 @@ struct proto sctpv6_prot = {
 	.backlog_rcv	= sctp_backlog_rcv,
 	.hash		= sctp_hash,
 	.unhash		= sctp_unhash,
+<<<<<<< HEAD
 	.get_port	= sctp_get_port,
+=======
+	.no_autobind	= true,
+>>>>>>> common/deprecated/android-3.18
 	.obj_size	= sizeof(struct sctp6_sock),
 	.sysctl_mem	= sysctl_sctp_mem,
 	.sysctl_rmem	= sysctl_sctp_rmem,

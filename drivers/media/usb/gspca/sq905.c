@@ -172,7 +172,11 @@ static int
 sq905_read_data(struct gspca_dev *gspca_dev, u8 *data, int size, int need_lock)
 {
 	int ret;
+<<<<<<< HEAD
 	int act_len;
+=======
+	int act_len = 0;
+>>>>>>> common/deprecated/android-3.18
 
 	gspca_dev->usb_buf[0] = '\0';
 	if (need_lock)

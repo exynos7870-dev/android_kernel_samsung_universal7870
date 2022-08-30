@@ -445,6 +445,11 @@
 		DRVDD-supply = <&vmmc2>;
 		IOVDD-supply = <&vio>;
 		DVDD-supply = <&vio>;
+<<<<<<< HEAD
+=======
+
+		ai3x-micbias-vg = <1>;
+>>>>>>> common/deprecated/android-3.18
 	};
 
 	tlv320aic3x_aux: tlv320aic3x@19 {
@@ -456,6 +461,11 @@
 		DRVDD-supply = <&vmmc2>;
 		IOVDD-supply = <&vio>;
 		DVDD-supply = <&vio>;
+<<<<<<< HEAD
+=======
+
+		ai3x-micbias-vg = <2>;
+>>>>>>> common/deprecated/android-3.18
 	};
 
 	tsl2563: tsl2563@29 {
@@ -578,6 +588,11 @@
 	vmmc_aux-supply = <&vsim>;
 	bus-width = <8>;
 	non-removable;
+<<<<<<< HEAD
+=======
+	no-sdio;
+	no-sd;
+>>>>>>> common/deprecated/android-3.18
 };
 
 &mmc3 {

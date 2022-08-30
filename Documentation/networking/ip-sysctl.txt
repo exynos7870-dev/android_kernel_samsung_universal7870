@@ -223,6 +223,17 @@ tcp_base_mss - INTEGER
 	Path MTU discovery (MTU probing).  If MTU probing is enabled,
 	this is the initial MSS used by the connection.
 
+<<<<<<< HEAD
+=======
+tcp_min_snd_mss - INTEGER
+	TCP SYN and SYNACK messages usually advertise an ADVMSS option,
+	as described in RFC 1122 and RFC 6691.
+	If this ADVMSS option is smaller than tcp_min_snd_mss,
+	it is silently capped to tcp_min_snd_mss.
+
+	Default : 48 (at least 8 bytes of payload per segment)
+
+>>>>>>> common/deprecated/android-3.18
 tcp_congestion_control - STRING
 	Set the congestion control algorithm to be used for new
 	connections. The algorithm "reno" is always available, but
@@ -789,12 +800,21 @@ icmp_ratelimit - INTEGER
 icmp_msgs_per_sec - INTEGER
 	Limit maximal number of ICMP packets sent per second from this host.
 	Only messages whose type matches icmp_ratemask (see below) are
+<<<<<<< HEAD
 	controlled by this limit.
+=======
+	controlled by this limit. For security reasons, the precise count
+	of messages per second is randomized.
+>>>>>>> common/deprecated/android-3.18
 	Default: 1000
 
 icmp_msgs_burst - INTEGER
 	icmp_msgs_per_sec controls number of ICMP packets sent per second,
 	while icmp_msgs_burst controls the burst size of these packets.
+<<<<<<< HEAD
+=======
+	For security reasons, the precise burst size is randomized.
+>>>>>>> common/deprecated/android-3.18
 	Default: 50
 
 icmp_ratemask - INTEGER

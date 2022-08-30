@@ -26,7 +26,10 @@
 #include <linux/hardirq.h>
 #include <linux/task_work.h>
 #include <linux/ima.h>
+<<<<<<< HEAD
 #include <linux/task_integrity.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #include <linux/atomic.h>
 
@@ -204,7 +207,10 @@ static void __fput(struct file *file)
 		if (file->f_op->fasync)
 			file->f_op->fasync(-1, file, 0);
 	}
+<<<<<<< HEAD
 	five_file_free(file);
+=======
+>>>>>>> common/deprecated/android-3.18
 	ima_file_free(file);
 	if (file->f_op->release)
 		file->f_op->release(inode, file);

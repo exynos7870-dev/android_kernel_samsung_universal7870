@@ -4,6 +4,16 @@
 #include <linux/compiler.h>
 #include <linux/types.h>
 
+<<<<<<< HEAD
+=======
+/* Built-in __init functions needn't be compiled with retpoline */
+#if defined(RETPOLINE) && !defined(MODULE)
+#define __noretpoline __attribute__((indirect_branch("keep")))
+#else
+#define __noretpoline
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 /* These macros are used to mark some functions or 
  * initialized data (doesn't apply to uninitialized data)
  * as `initialization' functions. The kernel can take this
@@ -39,7 +49,11 @@
 
 /* These are for everybody (although not all archs will actually
    discard it in modules) */
+<<<<<<< HEAD
 #define __init		__section(.init.text) __cold notrace
+=======
+#define __init		__section(.init.text) __cold notrace __noretpoline
+>>>>>>> common/deprecated/android-3.18
 #define __initdata	__section(.init.data)
 #define __initconst	__constsection(.init.rodata)
 #define __exitdata	__section(.exit.data)
@@ -91,6 +105,7 @@
 
 #define __exit          __section(.exit.text) __exitused __cold notrace
 
+<<<<<<< HEAD
 /* Used for HOTPLUG */
 #define __devinit        __section(.devinit.text) __cold notrace
 #define __devinitdata    __section(.devinit.data)
@@ -99,6 +114,8 @@
 #define __devexitdata    __section(.devexit.data)
 #define __devexitconst   __section(.devexit.rodata)
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /* temporary, until all users are removed */
 #define __cpuinit
 #define __cpuinitdata
@@ -124,10 +141,13 @@
 #define __INITRODATA	.section	".init.rodata","a",%progbits
 #define __FINITDATA	.previous
 
+<<<<<<< HEAD
 #define __DEVINIT        .section	".devinit.text", "ax"
 #define __DEVINITDATA    .section	".devinit.data", "aw"
 #define __DEVINITRODATA  .section	".devinit.rodata", "a"
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /* temporary, until all users are removed */
 #define __CPUINIT
 
@@ -165,6 +185,13 @@ void prepare_namespace(void);
 void __init load_default_modules(void);
 int __init init_rootfs(void);
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_DEBUG_RODATA
+void mark_rodata_ro(void);
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 extern void (*late_time_init)(void);
 
 extern bool initcall_debug;
@@ -339,13 +366,21 @@ void __init parse_early_options(char *cmdline);
 #define module_init(initfn)					\
 	static inline initcall_t __inittest(void)		\
 	{ return initfn; }					\
+<<<<<<< HEAD
 	int init_module(void) __attribute__((alias(#initfn)));
+=======
+	int init_module(void) __copy(initfn) __attribute__((alias(#initfn)));
+>>>>>>> common/deprecated/android-3.18
 
 /* This is only required if you want to be unloadable. */
 #define module_exit(exitfn)					\
 	static inline exitcall_t __exittest(void)		\
 	{ return exitfn; }					\
+<<<<<<< HEAD
 	void cleanup_module(void) __attribute__((alias(#exitfn)));
+=======
+	void cleanup_module(void) __copy(exitfn) __attribute__((alias(#exitfn)));
+>>>>>>> common/deprecated/android-3.18
 
 #define __setup_param(str, unique_id, fn)	/* nothing */
 #define __setup(str, func) 			/* nothing */
@@ -372,6 +407,7 @@ void __init parse_early_options(char *cmdline);
 #define __INITRODATA_OR_MODULE __INITRODATA
 #endif /*CONFIG_MODULES*/
 
+<<<<<<< HEAD
 /* Functions marked as __devexit may be discarded at kernel link time, depending
    on config options.  Newer versions of binutils detect references from
    retained sections to discarded sections and flag an error.  Pointers to
@@ -384,6 +420,8 @@ void __init parse_early_options(char *cmdline);
 #define __devexit_p(x) NULL
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #ifdef MODULE
 #define __exit_p(x) x
 #else

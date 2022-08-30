@@ -34,13 +34,21 @@
 #include "s3c2412-i2s.h"
 
 static struct s3c_dma_params s3c2412_i2s_pcm_stereo_out = {
+<<<<<<< HEAD
 	.channel	= DMACH_I2S_OUT,
+=======
+	.slave		= (void *)(uintptr_t)DMACH_I2S_OUT,
+>>>>>>> common/deprecated/android-3.18
 	.ch_name	= "tx",
 	.dma_size	= 4,
 };
 
 static struct s3c_dma_params s3c2412_i2s_pcm_stereo_in = {
+<<<<<<< HEAD
 	.channel	= DMACH_I2S_IN,
+=======
+	.slave		= (void *)(uintptr_t)DMACH_I2S_IN,
+>>>>>>> common/deprecated/android-3.18
 	.ch_name	= "rx",
 	.dma_size	= 4,
 };

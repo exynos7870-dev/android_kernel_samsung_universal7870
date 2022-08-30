@@ -737,8 +737,13 @@ static int mvs_task_prep(struct sas_task *task, struct mvs_info *mvi, int is_tmf
 			mv_dprintk("device %016llx not ready.\n",
 				SAS_ADDR(dev->sas_addr));
 
+<<<<<<< HEAD
 			rc = SAS_PHY_DOWN;
 			return rc;
+=======
+		rc = SAS_PHY_DOWN;
+		return rc;
+>>>>>>> common/deprecated/android-3.18
 	}
 	tei.port = dev->port->lldd_port;
 	if (tei.port && !tei.port->port_attached && !tmf) {
@@ -988,6 +993,11 @@ static void mvs_slot_free(struct mvs_info *mvi, u32 rx_desc)
 static void mvs_slot_task_free(struct mvs_info *mvi, struct sas_task *task,
 			  struct mvs_slot_info *slot, u32 slot_idx)
 {
+<<<<<<< HEAD
+=======
+	if (!slot)
+		return;
+>>>>>>> common/deprecated/android-3.18
 	if (!slot->task)
 		return;
 	if (!sas_protocol_ata(task->task_proto))

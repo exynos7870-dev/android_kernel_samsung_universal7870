@@ -323,6 +323,7 @@ config HAVE_ARCH_SECCOMP_FILTER
 	    results in the system call being skipped immediately.
 	  - seccomp syscall wired up
 
+<<<<<<< HEAD
 	  For best performance, an arch should use seccomp_phase1 and
 	  seccomp_phase2 directly.  It should call seccomp_phase1 for all
 	  syscalls if TIF_SECCOMP is set, but seccomp_phase1 does not
@@ -334,6 +335,8 @@ config HAVE_ARCH_SECCOMP_FILTER
 	  directly to seccomp_phase1; this avoids multiple calls
 	  to the syscall_xyz helpers for every syscall.
 
+=======
+>>>>>>> common/deprecated/android-3.18
 config SECCOMP_FILTER
 	def_bool y
 	depends on HAVE_ARCH_SECCOMP_FILTER && SECCOMP && NET

@@ -198,7 +198,11 @@ static struct sk_buff *udp4_ufo_fragment(struct sk_buff *skb,
 	if (uh->check == 0)
 		uh->check = CSUM_MANGLED_0;
 
+<<<<<<< HEAD
 	skb->ip_summed = CHECKSUM_NONE;
+=======
+	skb->ip_summed = CHECKSUM_UNNECESSARY;
+>>>>>>> common/deprecated/android-3.18
 
 	/* Fragment the skb. IP headers of the fragments are updated in
 	 * inet_gso_segment()
@@ -267,7 +271,11 @@ struct sk_buff **udp_gro_receive(struct sk_buff **head, struct sk_buff *skb,
 	int flush = 1;
 
 	if (NAPI_GRO_CB(skb)->encap_mark ||
+<<<<<<< HEAD
 	    (skb->ip_summed != CHECKSUM_PARTIAL &&
+=======
+	    (uh->check && skb->ip_summed != CHECKSUM_PARTIAL &&
+>>>>>>> common/deprecated/android-3.18
 	     NAPI_GRO_CB(skb)->csum_cnt == 0 &&
 	     !NAPI_GRO_CB(skb)->csum_valid))
 		goto out;

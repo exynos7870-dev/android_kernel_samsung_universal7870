@@ -16,6 +16,11 @@
 #include <linux/module.h>
 #include <linux/vmalloc.h>
 #include <linux/uaccess.h>
+<<<<<<< HEAD
+=======
+#include <asm/i387.h> /* For use_eager_fpu.  Ugh! */
+#include <asm/fpu-internal.h> /* For use_eager_fpu.  Ugh! */
+>>>>>>> common/deprecated/android-3.18
 #include <asm/user.h>
 #include <asm/xsave.h>
 #include "cpuid.h"
@@ -88,6 +93,11 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
 			xstate_required_size(vcpu->arch.xcr0);
 	}
 
+<<<<<<< HEAD
+=======
+	vcpu->arch.eager_fpu = guest_cpuid_has_mpx(vcpu);
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * The existing code assumes virtual address is 48-bit in the canonical
 	 * address checks; exit if it is ever changed.
@@ -328,7 +338,11 @@ static inline int __do_cpuid_ent(struct kvm_cpuid_entry2 *entry, u32 function,
 
 	r = -E2BIG;
 
+<<<<<<< HEAD
 	if (*nent >= maxnent)
+=======
+	if (WARN_ON(*nent >= maxnent))
+>>>>>>> common/deprecated/android-3.18
 		goto out;
 
 	do_cpuid_1_ent(entry, function, index);
@@ -571,6 +585,12 @@ out:
 static int do_cpuid_ent(struct kvm_cpuid_entry2 *entry, u32 func,
 			u32 idx, int *nent, int maxnent, unsigned int type)
 {
+<<<<<<< HEAD
+=======
+	if (*nent >= maxnent)
+		return -E2BIG;
+
+>>>>>>> common/deprecated/android-3.18
 	if (type == KVM_GET_EMULATED_CPUID)
 		return __do_cpuid_ent_emulated(entry, func, idx, nent, maxnent);
 
@@ -687,6 +707,7 @@ out:
 static int move_to_next_stateful_cpuid_entry(struct kvm_vcpu *vcpu, int i)
 {
 	struct kvm_cpuid_entry2 *e = &vcpu->arch.cpuid_entries[i];
+<<<<<<< HEAD
 	int j, nent = vcpu->arch.cpuid_nent;
 
 	e->flags &= ~KVM_CPUID_FLAG_STATE_READ_NEXT;
@@ -699,6 +720,22 @@ static int move_to_next_stateful_cpuid_entry(struct kvm_vcpu *vcpu, int i)
 		}
 	}
 	return 0; /* silence gcc, even though control never reaches here */
+=======
+	struct kvm_cpuid_entry2 *ej;
+	int j = i;
+	int nent = vcpu->arch.cpuid_nent;
+
+	e->flags &= ~KVM_CPUID_FLAG_STATE_READ_NEXT;
+	/* when no next entry is found, the current entry[i] is reselected */
+	do {
+		j = (j + 1) % nent;
+		ej = &vcpu->arch.cpuid_entries[j];
+	} while (ej->function != e->function);
+
+	ej->flags |= KVM_CPUID_FLAG_STATE_READ_NEXT;
+
+	return j;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /* find an entry with matching function, matching index (if needed), and that
@@ -783,12 +820,15 @@ void kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx, u32 *ecx, u32 *edx)
 	if (!best)
 		best = check_cpuid_limit(vcpu, function, index);
 
+<<<<<<< HEAD
 	/*
 	 * Perfmon not yet supported for L2 guest.
 	 */
 	if (is_guest_mode(vcpu) && function == 0xa)
 		best = NULL;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (best) {
 		*eax = best->eax;
 		*ebx = best->ebx;

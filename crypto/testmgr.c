@@ -39,6 +39,7 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
 	return 0;
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 bool in_fips_err()
 {
@@ -47,6 +48,8 @@ bool in_fips_err()
 EXPORT_SYMBOL_GPL(in_fips_err);
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #else
 
 #include "testmgr.h"
@@ -74,12 +77,15 @@ EXPORT_SYMBOL_GPL(in_fips_err);
 #define ENCRYPT 1
 #define DECRYPT 0
 
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 #define FIPS_ERR 1
 #define FIPS_NO_ERR 0
 static int IN_FIPS_ERROR = FIPS_NO_ERR;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 struct tcrypt_result {
 	struct completion completion;
 	int err;
@@ -147,6 +153,7 @@ struct alg_test_desc {
 
 static unsigned int IDX[8] = { IDX1, IDX2, IDX3, IDX4, IDX5, IDX6, IDX7, IDX8 };
 
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 bool in_fips_err()
 {
@@ -167,6 +174,9 @@ void hexdump(unsigned char *buf, unsigned int len)
 #else
 static void hexdump(unsigned char *buf, unsigned int len)
 #endif
+=======
+static void hexdump(unsigned char *buf, unsigned int len)
+>>>>>>> common/deprecated/android-3.18
 {
 	print_hex_dump(KERN_CONT, "", DUMP_PREFIX_OFFSET,
 			16, 1,
@@ -464,7 +474,11 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
 	struct scatterlist *sgout;
 	const char *e, *d;
 	struct tcrypt_result result;
+<<<<<<< HEAD
 	unsigned int authsize;
+=======
+	unsigned int authsize, iv_len;
+>>>>>>> common/deprecated/android-3.18
 	void *input;
 	void *output;
 	void *assoc;
@@ -515,6 +529,11 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
 	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
 				  tcrypt_complete, &result);
 
+<<<<<<< HEAD
+=======
+	iv_len = crypto_aead_ivsize(tfm);
+
+>>>>>>> common/deprecated/android-3.18
 	for (i = 0, j = 0; i < tcount; i++) {
 		if (template[i].np)
 			continue;
@@ -535,10 +554,18 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
 
 		memcpy(input, template[i].input, template[i].ilen);
 		memcpy(assoc, template[i].assoc, template[i].alen);
+<<<<<<< HEAD
 		if (template[i].iv)
 			memcpy(iv, template[i].iv, MAX_IVLEN);
 		else
 			memset(iv, 0, MAX_IVLEN);
+=======
+		iv_len = crypto_aead_ivsize(tfm);
+		if (template[i].iv)
+			memcpy(iv, template[i].iv, iv_len);
+		else
+			memset(iv, 0, iv_len);
+>>>>>>> common/deprecated/android-3.18
 
 		crypto_aead_clear_flags(tfm, ~0);
 		if (template[i].wk)
@@ -640,7 +667,11 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
 		j++;
 
 		if (template[i].iv)
+<<<<<<< HEAD
 			memcpy(iv, template[i].iv, MAX_IVLEN);
+=======
+			memcpy(iv, template[i].iv, iv_len);
+>>>>>>> common/deprecated/android-3.18
 		else
 			memset(iv, 0, MAX_IVLEN);
 
@@ -1855,12 +1886,15 @@ static int alg_test_drbg(const struct alg_test_desc *desc, const char *driver,
 static int alg_test_null(const struct alg_test_desc *desc,
 			     const char *driver, u32 type, u32 mask)
 {
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
         if (desc && desc->fips_allowed) {
                 if (unlikely(in_fips_err()))
                         return -1;
         }
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -3703,7 +3737,11 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
 {
 	int i;
 	int j;
+<<<<<<< HEAD
 	int rc = 0;
+=======
+	int rc;
+>>>>>>> common/deprecated/android-3.18
 
 	alg_test_descs_check_order();
 
@@ -3715,7 +3753,10 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
 			return -ENAMETOOLONG;
 
 		i = alg_find_test(nalg);
+<<<<<<< HEAD
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		if (i < 0)
 			goto notest;
 
@@ -3726,6 +3767,7 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
 		goto test_done;
 	}
 
+<<<<<<< HEAD
 	// Test skipped for QCrypto QCOM stuff	
 #ifdef CONFIG_CRYPTO_FIPS	
 	if(strncmp(driver,"qcrypto",strlen("qcrypto")) == 0){
@@ -3747,6 +3789,13 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
 		printk(KERN_INFO "FIPS: %s: %s alg self test START in fips mode!\n",
 			driver, alg);
 #endif
+=======
+	i = alg_find_test(alg);
+	j = alg_find_test(driver);
+	if (i < 0 && j < 0)
+		goto notest;
+
+>>>>>>> common/deprecated/android-3.18
 	if (fips_enabled && ((i >= 0 && !alg_test_descs[i].fips_allowed) ||
 			     (j >= 0 && !alg_test_descs[j].fips_allowed)))
 		goto non_fips_alg;
@@ -3760,6 +3809,7 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
 					     type, mask);
 
 test_done:
+<<<<<<< HEAD
 	if (fips_enabled && rc) {
 		printk(KERN_INFO
 			"FIPS: %s: %s alg self test failed\n",
@@ -3799,6 +3849,24 @@ int testmgr_crypto_proc_init(void)
 }
 EXPORT_SYMBOL_GPL(testmgr_crypto_proc_init);
 
+=======
+	if (fips_enabled && rc)
+		panic("%s: %s alg self test failed in fips mode!\n", driver, alg);
+
+	if (fips_enabled && !rc)
+		pr_info(KERN_INFO "alg: self-tests for %s (%s) passed\n",
+			driver, alg);
+
+	return rc;
+
+notest:
+	printk(KERN_INFO "alg: No test for %s (%s)\n", alg, driver);
+	return 0;
+non_fips_alg:
+	return -EINVAL;
+}
+
+>>>>>>> common/deprecated/android-3.18
 #endif /* CONFIG_CRYPTO_MANAGER_DISABLE_TESTS */
 
 EXPORT_SYMBOL_GPL(alg_test);

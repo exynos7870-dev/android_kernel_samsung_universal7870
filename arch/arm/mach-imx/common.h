@@ -121,6 +121,7 @@ void imx_cpu_die(unsigned int cpu);
 int imx_cpu_kill(unsigned int cpu);
 
 #ifdef CONFIG_SUSPEND
+<<<<<<< HEAD
 void v7_cpu_resume(void);
 void imx6_suspend(void __iomem *ocram_vbase);
 #else
@@ -128,6 +129,15 @@ static inline void v7_cpu_resume(void) {}
 static inline void imx6_suspend(void __iomem *ocram_vbase) {}
 #endif
 
+=======
+void imx6_suspend(void __iomem *ocram_vbase);
+#else
+static inline void imx6_suspend(void __iomem *ocram_vbase) {}
+#endif
+
+void v7_cpu_resume(void);
+
+>>>>>>> common/deprecated/android-3.18
 void imx6q_pm_init(void);
 void imx6dl_pm_init(void);
 void imx6sl_pm_init(void);

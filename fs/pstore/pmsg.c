@@ -16,6 +16,7 @@
 #include <linux/fs.h>
 #include <linux/uaccess.h>
 #include <linux/vmalloc.h>
+<<<<<<< HEAD
 #include <linux/exynos-ss.h>
 
 #include "internal.h"
@@ -23,16 +24,27 @@
 static DEFINE_MUTEX(pmsg_lock);
 static char *pmsg_buffer;
 #define PMSG_MAX_BOUNCE_BUFFER_SIZE (2*PAGE_SIZE)
+=======
+#include "internal.h"
+
+static DEFINE_MUTEX(pmsg_lock);
+>>>>>>> common/deprecated/android-3.18
 
 static ssize_t write_pmsg(struct file *file, const char __user *buf,
 			  size_t count, loff_t *ppos)
 {
+<<<<<<< HEAD
 	size_t i, buffer_size;
 	char *buffer = pmsg_buffer;
+=======
+	u64 id;
+	int ret;
+>>>>>>> common/deprecated/android-3.18
 
 	if (!count)
 		return 0;
 
+<<<<<<< HEAD
 	if (!access_ok(VERIFY_READ, buf, count))
 		return -EFAULT;
 
@@ -65,6 +77,17 @@ static ssize_t write_pmsg(struct file *file, const char __user *buf,
 
 	mutex_unlock(&pmsg_lock);
 	return count;
+=======
+	/* check outside lock, page in any data. write_buf_user also checks */
+	if (!access_ok(VERIFY_READ, buf, count))
+		return -EFAULT;
+
+	mutex_lock(&pmsg_lock);
+	ret = psinfo->write_buf_user(PSTORE_TYPE_PMSG, 0, &id, 0, buf, 0, count,
+				     psinfo);
+	mutex_unlock(&pmsg_lock);
+	return ret ? ret : count;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static const struct file_operations pmsg_fops = {
@@ -109,6 +132,7 @@ void pstore_register_pmsg(void)
 		pr_err("failed to create device\n");
 		goto err_device;
 	}
+<<<<<<< HEAD
 
 	pmsg_buffer = vmalloc(PMSG_MAX_BOUNCE_BUFFER_SIZE);
 
@@ -116,6 +140,8 @@ void pstore_register_pmsg(void)
 		pr_err("failed to create pmsg buffer\n");
 		goto err_device;
 	}
+=======
+>>>>>>> common/deprecated/android-3.18
 	return;
 
 err_device:

@@ -196,6 +196,10 @@ static int xo15_sci_remove(struct acpi_device *device)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_PM_SLEEP
+>>>>>>> common/deprecated/android-3.18
 static int xo15_sci_resume(struct device *dev)
 {
 	/* Enable all EC events */
@@ -207,6 +211,10 @@ static int xo15_sci_resume(struct device *dev)
 
 	return 0;
 }
+<<<<<<< HEAD
+=======
+#endif
+>>>>>>> common/deprecated/android-3.18
 
 static SIMPLE_DEV_PM_OPS(xo15_sci_pm, NULL, xo15_sci_resume);
 

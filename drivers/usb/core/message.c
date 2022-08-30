@@ -147,6 +147,13 @@ int usb_control_msg(struct usb_device *dev, unsigned int pipe, __u8 request,
 
 	ret = usb_internal_control_msg(dev, pipe, dr, data, size, timeout);
 
+<<<<<<< HEAD
+=======
+	/* Linger a bit, prior to the next control message. */
+	if (dev->quirks & USB_QUIRK_DELAY_CTRL_MSG)
+		msleep(200);
+
+>>>>>>> common/deprecated/android-3.18
 	kfree(dr);
 
 	return ret;
@@ -302,9 +309,16 @@ static void sg_complete(struct urb *urb)
 		 */
 		spin_unlock(&io->lock);
 		for (i = 0, found = 0; i < io->entries; i++) {
+<<<<<<< HEAD
 			if (!io->urbs[i] || !io->urbs[i]->dev)
 				continue;
 			if (found) {
+=======
+			if (!io->urbs[i])
+				continue;
+			if (found) {
+				usb_block_urb(io->urbs[i]);
+>>>>>>> common/deprecated/android-3.18
 				retval = usb_unlink_urb(io->urbs[i]);
 				if (retval != -EINPROGRESS &&
 				    retval != -ENODEV &&
@@ -515,12 +529,19 @@ void usb_sg_wait(struct usb_sg_request *io)
 		int retval;
 
 		io->urbs[i]->dev = io->dev;
+<<<<<<< HEAD
 		retval = usb_submit_urb(io->urbs[i], GFP_ATOMIC);
 
 		/* after we submit, let completions or cancellations fire;
 		 * we handshake using io->status.
 		 */
 		spin_unlock_irq(&io->lock);
+=======
+		spin_unlock_irq(&io->lock);
+
+		retval = usb_submit_urb(io->urbs[i], GFP_NOIO);
+
+>>>>>>> common/deprecated/android-3.18
 		switch (retval) {
 			/* maybe we retrying will recover */
 		case -ENXIO:	/* hc didn't queue this one */
@@ -578,6 +599,7 @@ EXPORT_SYMBOL_GPL(usb_sg_wait);
 void usb_sg_cancel(struct usb_sg_request *io)
 {
 	unsigned long flags;
+<<<<<<< HEAD
 
 	spin_lock_irqsave(&io->lock, flags);
 
@@ -602,6 +624,36 @@ void usb_sg_cancel(struct usb_sg_request *io)
 		}
 		spin_lock(&io->lock);
 	}
+=======
+	int i, retval;
+
+	spin_lock_irqsave(&io->lock, flags);
+	if (io->status || io->count == 0) {
+		spin_unlock_irqrestore(&io->lock, flags);
+		return;
+	}
+	/* shut everything down */
+	io->status = -ECONNRESET;
+	io->count++;		/* Keep the request alive until we're done */
+	spin_unlock_irqrestore(&io->lock, flags);
+
+	for (i = io->entries - 1; i >= 0; --i) {
+		usb_block_urb(io->urbs[i]);
+
+		retval = usb_unlink_urb(io->urbs[i]);
+		if (retval != -EINPROGRESS
+		    && retval != -ENODEV
+		    && retval != -EBUSY
+		    && retval != -EIDRM)
+			dev_warn(&io->dev->dev, "%s, unlink --> %d\n",
+				 __func__, retval);
+	}
+
+	spin_lock_irqsave(&io->lock, flags);
+	io->count--;
+	if (!io->count)
+		complete(&io->complete);
+>>>>>>> common/deprecated/android-3.18
 	spin_unlock_irqrestore(&io->lock, flags);
 }
 EXPORT_SYMBOL_GPL(usb_sg_cancel);
@@ -816,9 +868,17 @@ int usb_string(struct usb_device *dev, int index, char *buf, size_t size)
 
 	if (dev->state == USB_STATE_SUSPENDED)
 		return -EHOSTUNREACH;
+<<<<<<< HEAD
 	if (size <= 0 || !buf || !index)
 		return -EINVAL;
 	buf[0] = 0;
+=======
+	if (size <= 0 || !buf)
+		return -EINVAL;
+	buf[0] = 0;
+	if (index <= 0 || index >= 256)
+		return -EINVAL;
+>>>>>>> common/deprecated/android-3.18
 	tbuf = kmalloc(256, GFP_NOIO);
 	if (!tbuf)
 		return -ENOMEM;
@@ -1071,11 +1131,19 @@ void usb_disable_endpoint(struct usb_device *dev, unsigned int epaddr,
 
 	if (usb_endpoint_out(epaddr)) {
 		ep = dev->ep_out[epnum];
+<<<<<<< HEAD
 		if (reset_hardware)
 			dev->ep_out[epnum] = NULL;
 	} else {
 		ep = dev->ep_in[epnum];
 		if (reset_hardware)
+=======
+		if (reset_hardware && epnum != 0)
+			dev->ep_out[epnum] = NULL;
+	} else {
+		ep = dev->ep_in[epnum];
+		if (reset_hardware && epnum != 0)
+>>>>>>> common/deprecated/android-3.18
 			dev->ep_in[epnum] = NULL;
 	}
 	if (ep) {
@@ -1132,6 +1200,37 @@ void usb_disable_interface(struct usb_device *dev, struct usb_interface *intf,
 	}
 }
 
+<<<<<<< HEAD
+=======
+/*
+ * usb_disable_device_endpoints -- Disable all endpoints for a device
+ * @dev: the device whose endpoints are being disabled
+ * @skip_ep0: 0 to disable endpoint 0, 1 to skip it.
+ */
+static void usb_disable_device_endpoints(struct usb_device *dev, int skip_ep0)
+{
+	struct usb_hcd *hcd = bus_to_hcd(dev->bus);
+	int i;
+
+	if (hcd->driver->check_bandwidth) {
+		/* First pass: Cancel URBs, leave endpoint pointers intact. */
+		for (i = skip_ep0; i < 16; ++i) {
+			usb_disable_endpoint(dev, i, false);
+			usb_disable_endpoint(dev, i + USB_DIR_IN, false);
+		}
+		/* Remove endpoints from the host controller internal state */
+		mutex_lock(hcd->bandwidth_mutex);
+		usb_hcd_alloc_bandwidth(dev, NULL, NULL, NULL);
+		mutex_unlock(hcd->bandwidth_mutex);
+	}
+	/* Second pass: remove endpoint pointers */
+	for (i = skip_ep0; i < 16; ++i) {
+		usb_disable_endpoint(dev, i, true);
+		usb_disable_endpoint(dev, i + USB_DIR_IN, true);
+	}
+}
+
+>>>>>>> common/deprecated/android-3.18
 /**
  * usb_disable_device - Disable all the endpoints for a USB device
  * @dev: the device whose endpoints are being disabled
@@ -1145,6 +1244,7 @@ void usb_disable_interface(struct usb_device *dev, struct usb_interface *intf,
 void usb_disable_device(struct usb_device *dev, int skip_ep0)
 {
 	int i;
+<<<<<<< HEAD
 	struct usb_hcd *hcd = bus_to_hcd(dev->bus);
 
 #ifdef CONFIG_USB_EXTERNAL_DETECT
@@ -1153,6 +1253,8 @@ void usb_disable_device(struct usb_device *dev, int skip_ep0)
 		usb_disable_endpoint(dev, i + USB_DIR_IN, false);
 	}
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	/* getting rid of interfaces will disconnect
 	 * any drivers bound to them (a key side effect)
@@ -1199,6 +1301,7 @@ void usb_disable_device(struct usb_device *dev, int skip_ep0)
 
 	dev_dbg(&dev->dev, "%s nuking %s URBs\n", __func__,
 		skip_ep0 ? "non-ep0" : "all");
+<<<<<<< HEAD
 	if (hcd->driver->check_bandwidth) {
 		/* First pass: Cancel URBs, leave endpoint pointers intact. */
 		for (i = skip_ep0; i < 16; ++i) {
@@ -1215,6 +1318,10 @@ void usb_disable_device(struct usb_device *dev, int skip_ep0)
 		usb_disable_endpoint(dev, i, true);
 		usb_disable_endpoint(dev, i + USB_DIR_IN, true);
 	}
+=======
+
+	usb_disable_device_endpoints(dev, skip_ep0);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -1285,6 +1392,14 @@ void usb_enable_interface(struct usb_device *dev,
  * is submitted that needs that bandwidth.  Some other operating systems
  * allocate bandwidth early, when a configuration is chosen.
  *
+<<<<<<< HEAD
+=======
+ * xHCI reserves bandwidth and configures the alternate setting in
+ * usb_hcd_alloc_bandwidth(). If it fails the original interface altsetting
+ * may be disabled. Drivers cannot rely on any particular alternate
+ * setting being in effect after a failure.
+ *
+>>>>>>> common/deprecated/android-3.18
  * This call is synchronous, and may not be used in an interrupt context.
  * Also, drivers must not change altsettings while urbs are scheduled for
  * endpoints in that interface; all such urbs must first be completed
@@ -1320,6 +1435,15 @@ int usb_set_interface(struct usb_device *dev, int interface, int alternate)
 			 alternate);
 		return -EINVAL;
 	}
+<<<<<<< HEAD
+=======
+	/*
+	 * usb3 hosts configure the interface in usb_hcd_alloc_bandwidth,
+	 * including freeing dropped endpoint ring buffers.
+	 * Make sure the interface endpoints are flushed before that
+	 */
+	usb_disable_interface(dev, iface, false);
+>>>>>>> common/deprecated/android-3.18
 
 	/* Make sure we have enough bandwidth for this alternate interface.
 	 * Remove the current alt setting and add the new alt setting.
@@ -1448,6 +1572,12 @@ EXPORT_SYMBOL_GPL(usb_set_interface);
  * The caller must own the device lock.
  *
  * Return: Zero on success, else a negative error code.
+<<<<<<< HEAD
+=======
+ *
+ * If this routine fails the device will probably be in an unusable state
+ * with endpoints disabled, and interfaces only partially enabled.
+>>>>>>> common/deprecated/android-3.18
  */
 int usb_reset_configuration(struct usb_device *dev)
 {
@@ -1463,10 +1593,14 @@ int usb_reset_configuration(struct usb_device *dev)
 	 * calls during probe() are fine
 	 */
 
+<<<<<<< HEAD
 	for (i = 1; i < 16; ++i) {
 		usb_disable_endpoint(dev, i, true);
 		usb_disable_endpoint(dev, i + USB_DIR_IN, true);
 	}
+=======
+	usb_disable_device_endpoints(dev, 1); /* skip ep0*/
+>>>>>>> common/deprecated/android-3.18
 
 	config = dev->actconfig;
 	retval = 0;
@@ -1479,6 +1613,7 @@ int usb_reset_configuration(struct usb_device *dev)
 		mutex_unlock(hcd->bandwidth_mutex);
 		return -ENOMEM;
 	}
+<<<<<<< HEAD
 	/* Make sure we have enough bandwidth for each alternate setting 0 */
 	for (i = 0; i < config->desc.bNumInterfaces; i++) {
 		struct usb_interface *intf = config->interface[i];
@@ -1507,6 +1642,12 @@ reset_old_alts:
 				usb_hcd_alloc_bandwidth(dev, NULL,
 						alt, intf->cur_altsetting);
 		}
+=======
+
+	/* xHCI adds all endpoints in usb_hcd_alloc_bandwidth */
+	retval = usb_hcd_alloc_bandwidth(dev, config, NULL, NULL);
+	if (retval < 0) {
+>>>>>>> common/deprecated/android-3.18
 		usb_enable_lpm(dev);
 		mutex_unlock(hcd->bandwidth_mutex);
 		return retval;
@@ -1515,8 +1656,17 @@ reset_old_alts:
 			USB_REQ_SET_CONFIGURATION, 0,
 			config->desc.bConfigurationValue, 0,
 			NULL, 0, USB_CTRL_SET_TIMEOUT);
+<<<<<<< HEAD
 	if (retval < 0)
 		goto reset_old_alts;
+=======
+	if (retval < 0) {
+		usb_hcd_alloc_bandwidth(dev, NULL, NULL, NULL);
+		usb_enable_lpm(dev);
+		mutex_unlock(hcd->bandwidth_mutex);
+		return retval;
+	}
+>>>>>>> common/deprecated/android-3.18
 	mutex_unlock(hcd->bandwidth_mutex);
 
 	/* re-init hc/hcd interface/endpoint state */
@@ -1905,11 +2055,14 @@ free_interfaces:
 				dev_name(&intf->dev), ret);
 			continue;
 		}
+<<<<<<< HEAD
 #ifdef CONFIG_HOST_COMPLIANT_TEST
 		if (usb_get_intfdata(intf) == NULL)
 			dev_info(&intf->dev, "%s : match interface failed\n",
 					__func__);
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 		create_intf_ep_devs(intf);
 	}
 

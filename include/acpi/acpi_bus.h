@@ -338,6 +338,15 @@ struct acpi_device_physical_node {
 	bool put_online:1;
 };
 
+<<<<<<< HEAD
+=======
+/* ACPI Device Specific Data (_DSD) */
+struct acpi_device_data {
+	const union acpi_object *pointer;
+	const union acpi_object *properties;
+};
+
+>>>>>>> common/deprecated/android-3.18
 /* Device */
 struct acpi_device {
 	int device_type;
@@ -354,6 +363,10 @@ struct acpi_device {
 	struct acpi_device_wakeup wakeup;
 	struct acpi_device_perf performance;
 	struct acpi_device_dir dir;
+<<<<<<< HEAD
+=======
+	struct acpi_device_data data;
+>>>>>>> common/deprecated/android-3.18
 	struct acpi_scan_handler *handler;
 	struct acpi_hotplug_context *hp;
 	struct acpi_driver *driver;

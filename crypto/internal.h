@@ -27,6 +27,7 @@
 #include <linux/slab.h>
 #include <linux/fips.h>
 
+<<<<<<< HEAD
 /*
  * Use this only for FIPS Functional Test with CMT Lab.
  * FIPS_FUNC_TEST 1 will make self algorithm test (ecb aes) fail
@@ -49,6 +50,8 @@
 #define FIPS_FUNC_TEST 0
 
 #define SKC_VERSION_TEXT "SKC v1.7.1"
+=======
+>>>>>>> common/deprecated/android-3.18
 /* Crypto notification events. */
 enum {
 	CRYPTO_MSG_ALG_REQUEST,
@@ -73,6 +76,7 @@ extern struct rw_semaphore crypto_alg_sem;
 extern struct blocking_notifier_head crypto_chain;
 
 #ifdef CONFIG_PROC_FS
+<<<<<<< HEAD
 
 #ifdef CONFIG_CRYPTO_FIPS
 bool in_fips_err(void);
@@ -83,6 +87,9 @@ int testmgr_crypto_proc_init(void);
 #else
 void __init crypto_init_proc(void);
 #endif
+=======
+void __init crypto_init_proc(void);
+>>>>>>> common/deprecated/android-3.18
 void __exit crypto_exit_proc(void);
 #else
 static inline void crypto_init_proc(void)
@@ -119,7 +126,10 @@ void crypto_alg_tested(const char *name, int err);
 void crypto_remove_spawns(struct crypto_alg *alg, struct list_head *list,
 			  struct crypto_alg *nalg);
 void crypto_remove_final(struct list_head *list);
+<<<<<<< HEAD
 void crypto_shoot_alg(struct crypto_alg *alg);
+=======
+>>>>>>> common/deprecated/android-3.18
 struct crypto_tfm *__crypto_alloc_tfm(struct crypto_alg *alg, u32 type,
 				      u32 mask);
 void *crypto_create_tfm(struct crypto_alg *alg,

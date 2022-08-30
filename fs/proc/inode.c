@@ -424,7 +424,11 @@ const struct inode_operations proc_link_inode_operations = {
 
 struct inode *proc_get_inode(struct super_block *sb, struct proc_dir_entry *de)
 {
+<<<<<<< HEAD
 	struct inode *inode = new_inode_pseudo(sb);
+=======
+	struct inode *inode = new_inode(sb);
+>>>>>>> common/deprecated/android-3.18
 
 	if (inode) {
 		inode->i_ino = de->low_ino;

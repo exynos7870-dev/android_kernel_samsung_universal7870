@@ -134,13 +134,25 @@ static int rfkill_gpio_probe(struct platform_device *pdev)
 
 	ret = rfkill_register(rfkill->rfkill_dev);
 	if (ret < 0)
+<<<<<<< HEAD
 		return ret;
+=======
+		goto err_destroy;
+>>>>>>> common/deprecated/android-3.18
 
 	platform_set_drvdata(pdev, rfkill);
 
 	dev_info(&pdev->dev, "%s device registered.\n", rfkill->name);
 
 	return 0;
+<<<<<<< HEAD
+=======
+
+err_destroy:
+	rfkill_destroy(rfkill->rfkill_dev);
+
+	return ret;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int rfkill_gpio_remove(struct platform_device *pdev)

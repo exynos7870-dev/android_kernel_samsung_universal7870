@@ -14,5 +14,9 @@ struct ifla_vf_info {
 	__u32 linkstate;
 	__u32 min_tx_rate;
 	__u32 max_tx_rate;
+<<<<<<< HEAD
+=======
+	__u32 rss_query_en;
+>>>>>>> common/deprecated/android-3.18
 };
 #endif /* _LINUX_IF_LINK_H */

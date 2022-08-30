@@ -203,10 +203,19 @@ int ima_appraise_measurement(int func, struct integrity_iint_cache *iint,
 
 		cause = "missing-hash";
 		status = INTEGRITY_NOLABEL;
+<<<<<<< HEAD
 		if (opened & FILE_CREATED) {
 			iint->flags |= IMA_NEW_FILE;
 			status = INTEGRITY_PASS;
 		}
+=======
+		if (opened & FILE_CREATED)
+			iint->flags |= IMA_NEW_FILE;
+		if ((iint->flags & IMA_NEW_FILE) &&
+		    (!(iint->flags & IMA_DIGSIG_REQUIRED) ||
+		     (inode->i_size == 0)))
+			status = INTEGRITY_PASS;
+>>>>>>> common/deprecated/android-3.18
 		goto out;
 	}
 
@@ -296,6 +305,12 @@ void ima_update_xattr(struct integrity_iint_cache *iint, struct file *file)
 	if (iint->flags & IMA_DIGSIG)
 		return;
 
+<<<<<<< HEAD
+=======
+	if (iint->ima_file_status != INTEGRITY_PASS)
+		return;
+
+>>>>>>> common/deprecated/android-3.18
 	rc = ima_collect_measurement(iint, file, NULL, NULL);
 	if (rc < 0)
 		return;

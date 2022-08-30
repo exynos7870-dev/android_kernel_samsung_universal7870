@@ -242,7 +242,10 @@ source "net/vmw_vsock/Kconfig"
 source "net/netlink/Kconfig"
 source "net/mpls/Kconfig"
 source "net/hsr/Kconfig"
+<<<<<<< HEAD
 source "net/ncm/Kconfig"
+=======
+>>>>>>> common/deprecated/android-3.18
 
 config RPS
 	boolean "RPS"
@@ -386,14 +389,24 @@ source "net/ceph/Kconfig"
 source "net/nfc/Kconfig"
 
 
+<<<<<<< HEAD
+=======
+config DST_CACHE
+	bool
+	default n
+
+>>>>>>> common/deprecated/android-3.18
 endif   # if NET
 
 # Used by archs to tell that they support BPF_JIT
 config HAVE_BPF_JIT
 	bool
+<<<<<<< HEAD
 
 # Network Pacemaker
 config NETPM
 	bool "Network Pacemaker"
 	---help---
 	This feature implements Network Pacemaker (NETPM)
+=======
+>>>>>>> common/deprecated/android-3.18

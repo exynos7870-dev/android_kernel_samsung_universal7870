@@ -53,6 +53,13 @@ static struct sk_buff *udp6_ufo_fragment(struct sk_buff *skb,
 
 		skb_shinfo(skb)->gso_segs = DIV_ROUND_UP(skb->len, mss);
 
+<<<<<<< HEAD
+=======
+		/* Set the IPv6 fragment id if not set yet */
+		if (!skb_shinfo(skb)->ip6_frag_id)
+			ipv6_proxy_select_ident(dev_net(skb->dev), skb);
+
+>>>>>>> common/deprecated/android-3.18
 		segs = NULL;
 		goto out;
 	}
@@ -82,7 +89,11 @@ static struct sk_buff *udp6_ufo_fragment(struct sk_buff *skb,
 		if (uh->check == 0)
 			uh->check = CSUM_MANGLED_0;
 
+<<<<<<< HEAD
 		skb->ip_summed = CHECKSUM_NONE;
+=======
+		skb->ip_summed = CHECKSUM_UNNECESSARY;
+>>>>>>> common/deprecated/android-3.18
 
 		/* Check if there is enough headroom to insert fragment header. */
 		tnl_hlen = skb_tnl_header_len(skb);
@@ -112,6 +123,11 @@ static struct sk_buff *udp6_ufo_fragment(struct sk_buff *skb,
 		fptr = (struct frag_hdr *)(skb_network_header(skb) + unfrag_ip6hlen);
 		fptr->nexthdr = nexthdr;
 		fptr->reserved = 0;
+<<<<<<< HEAD
+=======
+		if (!skb_shinfo(skb)->ip6_frag_id)
+			ipv6_proxy_select_ident(dev_net(skb->dev), skb);
+>>>>>>> common/deprecated/android-3.18
 		fptr->identification = skb_shinfo(skb)->ip6_frag_id;
 
 		/* Fragment the skb. ipv6 header and the remaining fields of the

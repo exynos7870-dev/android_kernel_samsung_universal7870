@@ -179,11 +179,19 @@ static const char emac_version_string[] = "TI DaVinci EMAC Linux v6.1";
 /* EMAC mac_status register */
 #define EMAC_MACSTATUS_TXERRCODE_MASK	(0xF00000)
 #define EMAC_MACSTATUS_TXERRCODE_SHIFT	(20)
+<<<<<<< HEAD
 #define EMAC_MACSTATUS_TXERRCH_MASK	(0x7)
 #define EMAC_MACSTATUS_TXERRCH_SHIFT	(16)
 #define EMAC_MACSTATUS_RXERRCODE_MASK	(0xF000)
 #define EMAC_MACSTATUS_RXERRCODE_SHIFT	(12)
 #define EMAC_MACSTATUS_RXERRCH_MASK	(0x7)
+=======
+#define EMAC_MACSTATUS_TXERRCH_MASK	(0x70000)
+#define EMAC_MACSTATUS_TXERRCH_SHIFT	(16)
+#define EMAC_MACSTATUS_RXERRCODE_MASK	(0xF000)
+#define EMAC_MACSTATUS_RXERRCODE_SHIFT	(12)
+#define EMAC_MACSTATUS_RXERRCH_MASK	(0x700)
+>>>>>>> common/deprecated/android-3.18
 #define EMAC_MACSTATUS_RXERRCH_SHIFT	(8)
 
 /* EMAC RX register masks */
@@ -1509,11 +1517,25 @@ static int emac_devioctl(struct net_device *ndev, struct ifreq *ifrq, int cmd)
 
 	/* TODO: Add phy read and write and private statistics get feature */
 
+<<<<<<< HEAD
 	return phy_mii_ioctl(priv->phydev, ifrq, cmd);
+=======
+	if (priv->phydev)
+		return phy_mii_ioctl(priv->phydev, ifrq, cmd);
+	else
+		return -EOPNOTSUPP;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int match_first_device(struct device *dev, void *data)
 {
+<<<<<<< HEAD
+=======
+	if (dev->parent && dev->parent->of_node)
+		return of_device_is_compatible(dev->parent->of_node,
+					       "ti,davinci_mdio");
+
+>>>>>>> common/deprecated/android-3.18
 	return !strncmp(dev_name(dev), "davinci_mdio", 12);
 }
 
@@ -1843,8 +1865,11 @@ davinci_emac_of_get_pdata(struct platform_device *pdev, struct emac_priv *priv)
 		pdata->hw_ram_addr = auxdata->hw_ram_addr;
 	}
 
+<<<<<<< HEAD
 	pdev->dev.platform_data = pdata;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	return  pdata;
 }
 
@@ -2033,6 +2058,10 @@ static int davinci_emac_remove(struct platform_device *pdev)
 	cpdma_ctlr_destroy(priv->dma);
 
 	unregister_netdev(ndev);
+<<<<<<< HEAD
+=======
+	of_node_put(priv->phy_node);
+>>>>>>> common/deprecated/android-3.18
 	free_netdev(ndev);
 
 	return 0;

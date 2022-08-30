@@ -1750,16 +1750,24 @@ void dlm_lowcomms_stop(void)
 	mutex_lock(&connections_lock);
 	dlm_allow_conn = 0;
 	foreach_conn(stop_conn);
+<<<<<<< HEAD
+=======
+	clean_writequeues();
+	foreach_conn(free_conn);
+>>>>>>> common/deprecated/android-3.18
 	mutex_unlock(&connections_lock);
 
 	work_stop();
 
+<<<<<<< HEAD
 	mutex_lock(&connections_lock);
 	clean_writequeues();
 
 	foreach_conn(free_conn);
 
 	mutex_unlock(&connections_lock);
+=======
+>>>>>>> common/deprecated/android-3.18
 	kmem_cache_destroy(con_cache);
 }
 

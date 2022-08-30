@@ -199,6 +199,10 @@ void rsi_mac80211_detach(struct rsi_hw *adapter)
 		ieee80211_stop_queues(hw);
 		ieee80211_unregister_hw(hw);
 		ieee80211_free_hw(hw);
+<<<<<<< HEAD
+=======
+		adapter->hw = NULL;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	rsi_remove_dbgfs(adapter);

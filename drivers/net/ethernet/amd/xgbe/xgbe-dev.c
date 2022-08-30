@@ -2469,8 +2469,15 @@ static int xgbe_init(struct xgbe_prv_data *pdata)
 
 	/* Flush Tx queues */
 	ret = xgbe_flush_tx_queues(pdata);
+<<<<<<< HEAD
 	if (ret)
 		return ret;
+=======
+	if (ret) {
+		netdev_err(pdata->netdev, "error flushing TX queues\n");
+		return ret;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * Initialize DMA related features

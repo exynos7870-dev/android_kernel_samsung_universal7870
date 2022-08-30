@@ -1641,6 +1641,10 @@ static int queue_cache_init(void)
 					  CWQ_ENTRY_SIZE, 0, NULL);
 	if (!queue_cache[HV_NCS_QTYPE_CWQ - 1]) {
 		kmem_cache_destroy(queue_cache[HV_NCS_QTYPE_MAU - 1]);
+<<<<<<< HEAD
+=======
+		queue_cache[HV_NCS_QTYPE_MAU - 1] = NULL;
+>>>>>>> common/deprecated/android-3.18
 		return -ENOMEM;
 	}
 	return 0;
@@ -1650,6 +1654,11 @@ static void queue_cache_destroy(void)
 {
 	kmem_cache_destroy(queue_cache[HV_NCS_QTYPE_MAU - 1]);
 	kmem_cache_destroy(queue_cache[HV_NCS_QTYPE_CWQ - 1]);
+<<<<<<< HEAD
+=======
+	queue_cache[HV_NCS_QTYPE_MAU - 1] = NULL;
+	queue_cache[HV_NCS_QTYPE_CWQ - 1] = NULL;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int spu_queue_register(struct spu_queue *p, unsigned long q_type)

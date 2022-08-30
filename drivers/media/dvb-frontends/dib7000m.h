@@ -40,7 +40,11 @@ struct dib7000m_config {
 
 #define DEFAULT_DIB7000M_I2C_ADDRESS 18
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_DIB7000M)
+=======
+#if IS_REACHABLE(CONFIG_DVB_DIB7000M)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend *dib7000m_attach(struct i2c_adapter *i2c_adap,
 					    u8 i2c_addr,
 					    struct dib7000m_config *cfg);

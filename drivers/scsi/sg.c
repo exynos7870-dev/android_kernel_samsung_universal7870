@@ -51,6 +51,11 @@ static int sg_version_num = 30536;	/* 2 digits for each component */
 #include <linux/mutex.h>
 #include <linux/atomic.h>
 #include <linux/ratelimit.h>
+<<<<<<< HEAD
+=======
+#include <linux/sizes.h>
+#include <linux/cred.h> /* for sg_check_file_access() */
+>>>>>>> common/deprecated/android-3.18
 
 #include "scsi.h"
 #include <scsi/scsi_dbg.h>
@@ -133,7 +138,11 @@ struct sg_device;		/* forward declarations */
 struct sg_fd;
 
 typedef struct sg_request {	/* SG_MAX_QUEUE requests outstanding per file */
+<<<<<<< HEAD
 	struct sg_request *nextrp;	/* NULL -> tail request (slist) */
+=======
+	struct list_head entry;	/* list entry */
+>>>>>>> common/deprecated/android-3.18
 	struct sg_fd *parentfp;	/* NULL -> not in use */
 	Sg_scatter_hold data;	/* hold buffer, perhaps scatter list */
 	sg_io_hdr_t header;	/* scsi command+info, see <scsi/sg.h> */
@@ -153,6 +162,7 @@ typedef struct sg_fd {		/* holds the state of a file descriptor */
 	struct sg_device *parentdp;	/* owning device */
 	wait_queue_head_t read_wait;	/* queue read until command done */
 	rwlock_t rq_list_lock;	/* protect access to list in req_arr */
+<<<<<<< HEAD
 	int timeout;		/* defaults to SG_DEFAULT_TIMEOUT      */
 	int timeout_user;	/* defaults to SG_DEFAULT_TIMEOUT_USER */
 	Sg_scatter_hold reserve;	/* buffer held for this file descriptor */
@@ -161,11 +171,24 @@ typedef struct sg_fd {		/* holds the state of a file descriptor */
 	struct fasync_struct *async_qp;	/* used by asynchronous notification */
 	Sg_request req_arr[SG_MAX_QUEUE];	/* used as singly-linked list */
 	char low_dma;		/* as in parent but possibly overridden to 1 */
+=======
+	struct mutex f_mutex;	/* protect against changes in this fd */
+	int timeout;		/* defaults to SG_DEFAULT_TIMEOUT      */
+	int timeout_user;	/* defaults to SG_DEFAULT_TIMEOUT_USER */
+	Sg_scatter_hold reserve;	/* buffer held for this file descriptor */
+	struct list_head rq_list; /* head of request list */
+	struct fasync_struct *async_qp;	/* used by asynchronous notification */
+	Sg_request req_arr[SG_MAX_QUEUE];	/* used as singly-linked list */
+>>>>>>> common/deprecated/android-3.18
 	char force_packid;	/* 1 -> pack_id input to read(), 0 -> ignored */
 	char cmd_q;		/* 1 -> allow command queuing, 0 -> don't */
 	unsigned char next_cmd_len; /* 0: automatic, >0: use on next write() */
 	char keep_orphan;	/* 0 -> drop orphan (def), 1 -> keep for read() */
 	char mmap_called;	/* 0 -> mmap() never called on this fd */
+<<<<<<< HEAD
+=======
+	char res_in_use;	/* 1 -> 'reserve' array in use */
+>>>>>>> common/deprecated/android-3.18
 	struct kref f_ref;
 	struct execute_work ew;
 } Sg_fd;
@@ -209,7 +232,10 @@ static void sg_remove_sfp(struct kref *);
 static Sg_request *sg_get_rq_mark(Sg_fd * sfp, int pack_id);
 static Sg_request *sg_add_request(Sg_fd * sfp);
 static int sg_remove_request(Sg_fd * sfp, Sg_request * srp);
+<<<<<<< HEAD
 static int sg_res_in_use(Sg_fd * sfp);
+=======
+>>>>>>> common/deprecated/android-3.18
 static Sg_device *sg_get_dev(int dev);
 static void sg_device_destroy(struct kref *kref);
 
@@ -222,6 +248,36 @@ static void sg_device_destroy(struct kref *kref);
 	sdev_printk(prefix, (sdp)->device, "[%s] " fmt, \
 		    (sdp)->disk->disk_name, ##a)
 
+<<<<<<< HEAD
+=======
+/*
+ * The SCSI interfaces that use read() and write() as an asynchronous variant of
+ * ioctl(..., SG_IO, ...) are fundamentally unsafe, since there are lots of ways
+ * to trigger read() and write() calls from various contexts with elevated
+ * privileges. This can lead to kernel memory corruption (e.g. if these
+ * interfaces are called through splice()) and privilege escalation inside
+ * userspace (e.g. if a process with access to such a device passes a file
+ * descriptor to a SUID binary as stdin/stdout/stderr).
+ *
+ * This function provides protection for the legacy API by restricting the
+ * calling context.
+ */
+static int sg_check_file_access(struct file *filp, const char *caller)
+{
+	if (filp->f_cred != current_real_cred()) {
+		pr_err_once("%s: process %d (%s) changed security contexts after opening file descriptor, this is not allowed.\n",
+			caller, task_tgid_vnr(current), current->comm);
+		return -EPERM;
+	}
+	if (unlikely(segment_eq(get_fs(), KERNEL_DS))) {
+		pr_err_once("%s: process %d (%s) called from kernel context, this is not allowed.\n",
+			caller, task_tgid_vnr(current), current->comm);
+		return -EACCES;
+	}
+	return 0;
+}
+
+>>>>>>> common/deprecated/android-3.18
 static int sg_allow_access(struct file *filp, unsigned char *cmd)
 {
 	struct sg_fd *sfp = filp->private_data;
@@ -406,8 +462,18 @@ sg_read(struct file *filp, char __user *buf, size_t count, loff_t * ppos)
 	struct sg_header *old_hdr = NULL;
 	int retval = 0;
 
+<<<<<<< HEAD
 	if (unlikely(segment_eq(get_fs(), KERNEL_DS)))
 		return -EINVAL;
+=======
+	/*
+	 * This could cause a response to be stranded. Close the associated
+	 * file descriptor to free up any resources being held.
+	 */
+	retval = sg_check_file_access(filp, __func__);
+	if (retval)
+		return retval;
+>>>>>>> common/deprecated/android-3.18
 
 	if ((!(sfp = (Sg_fd *) filp->private_data)) || (!(sdp = sfp->parentdp)))
 		return -ENXIO;
@@ -513,7 +579,11 @@ sg_read(struct file *filp, char __user *buf, size_t count, loff_t * ppos)
 		old_hdr->result = EIO;
 		break;
 	case DID_ERROR:
+<<<<<<< HEAD
 		old_hdr->result = (srp->sense_b[0] == 0 &&
+=======
+		old_hdr->result = (srp->sense_b[0] == 0 && 
+>>>>>>> common/deprecated/android-3.18
 				  hp->masked_status == GOOD) ? 0 : EIO;
 		break;
 	default:
@@ -539,6 +609,10 @@ sg_read(struct file *filp, char __user *buf, size_t count, loff_t * ppos)
 	} else
 		count = (old_hdr->result == 0) ? 0 : -EIO;
 	sg_finish_rem_req(srp);
+<<<<<<< HEAD
+=======
+	sg_remove_request(sfp, srp);
+>>>>>>> common/deprecated/android-3.18
 	retval = count;
 free_old_hdr:
 	kfree(old_hdr);
@@ -579,6 +653,10 @@ sg_new_read(Sg_fd * sfp, char __user *buf, size_t count, Sg_request * srp)
 	}
 err_out:
 	err2 = sg_finish_rem_req(srp);
+<<<<<<< HEAD
+=======
+	sg_remove_request(sfp, srp);
+>>>>>>> common/deprecated/android-3.18
 	return err ? : err2 ? : count;
 }
 
@@ -594,6 +672,14 @@ sg_write(struct file *filp, const char __user *buf, size_t count, loff_t * ppos)
 	struct sg_header old_hdr;
 	sg_io_hdr_t *hp;
 	unsigned char cmnd[SG_MAX_CDB_SIZE];
+<<<<<<< HEAD
+=======
+	int retval;
+
+	retval = sg_check_file_access(filp, __func__);
+	if (retval)
+		return retval;
+>>>>>>> common/deprecated/android-3.18
 
 	if ((!(sfp = (Sg_fd *) filp->private_data)) || (!(sdp = sfp->parentdp)))
 		return -ENXIO;
@@ -625,6 +711,10 @@ sg_write(struct file *filp, const char __user *buf, size_t count, loff_t * ppos)
 	}
 	buf += SZ_SG_HEADER;
 	__get_user(opcode, buf);
+<<<<<<< HEAD
+=======
+	mutex_lock(&sfp->f_mutex);
+>>>>>>> common/deprecated/android-3.18
 	if (sfp->next_cmd_len > 0) {
 		cmd_size = sfp->next_cmd_len;
 		sfp->next_cmd_len = 0;	/* reset so only this write() effected */
@@ -633,6 +723,10 @@ sg_write(struct file *filp, const char __user *buf, size_t count, loff_t * ppos)
 		if ((opcode >= 0xc0) && old_hdr.twelve_byte)
 			cmd_size = 12;
 	}
+<<<<<<< HEAD
+=======
+	mutex_unlock(&sfp->f_mutex);
+>>>>>>> common/deprecated/android-3.18
 	SCSI_LOG_TIMEOUT(4, sg_printk(KERN_INFO, sdp,
 		"sg_write:   scsi opcode=0x%02x, cmd_size=%d\n", (int) opcode, cmd_size));
 /* Determine buffer size.  */
@@ -655,7 +749,12 @@ sg_write(struct file *filp, const char __user *buf, size_t count, loff_t * ppos)
 	else
 		hp->dxfer_direction = (mxsize > 0) ? SG_DXFER_FROM_DEV : SG_DXFER_NONE;
 	hp->dxfer_len = mxsize;
+<<<<<<< HEAD
 	if (hp->dxfer_direction == SG_DXFER_TO_DEV)
+=======
+	if ((hp->dxfer_direction == SG_DXFER_TO_DEV) ||
+	    (hp->dxfer_direction == SG_DXFER_TO_FROM_DEV))
+>>>>>>> common/deprecated/android-3.18
 		hp->dxferp = (char __user *)buf + cmd_size;
 	else
 		hp->dxferp = NULL;
@@ -664,14 +763,22 @@ sg_write(struct file *filp, const char __user *buf, size_t count, loff_t * ppos)
 	hp->flags = input_size;	/* structure abuse ... */
 	hp->pack_id = old_hdr.pack_id;
 	hp->usr_ptr = NULL;
+<<<<<<< HEAD
 	if (__copy_from_user(cmnd, buf, cmd_size))
 		return -EFAULT;
+=======
+	if (__copy_from_user(cmnd, buf, cmd_size)) {
+		sg_remove_request(sfp, srp);
+		return -EFAULT;
+	}
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * SG_DXFER_TO_FROM_DEV is functionally equivalent to SG_DXFER_FROM_DEV,
 	 * but is is possible that the app intended SG_DXFER_TO_DEV, because there
 	 * is a non-zero input_size, so emit a warning.
 	 */
 	if (hp->dxfer_direction == SG_DXFER_TO_FROM_DEV) {
+<<<<<<< HEAD
 		static char cmd[TASK_COMM_LEN];
 		if (strcmp(current->comm, cmd)) {
 			printk_ratelimited(KERN_WARNING
@@ -684,6 +791,16 @@ sg_write(struct file *filp, const char __user *buf, size_t count, loff_t * ppos)
 					   current->comm);
 			strcpy(cmd, current->comm);
 		}
+=======
+		printk_ratelimited(KERN_WARNING
+				   "sg_write: data in/out %d/%d bytes "
+				   "for SCSI command 0x%x-- guessing "
+				   "data in;\n   program %s not setting "
+				   "count and/or reply_len properly\n",
+				   old_hdr.reply_len - (int)SZ_SG_HEADER,
+				   input_size, (unsigned int) cmnd[0],
+				   current->comm);
+>>>>>>> common/deprecated/android-3.18
 	}
 	k = sg_common_write(sfp, srp, cmnd, sfp->timeout, blocking);
 	return (k < 0) ? k : count;
@@ -731,7 +848,11 @@ sg_new_write(Sg_fd *sfp, struct file *file, const char __user *buf,
 			sg_remove_request(sfp, srp);
 			return -EINVAL;	/* either MMAP_IO or DIRECT_IO (not both) */
 		}
+<<<<<<< HEAD
 		if (sg_res_in_use(sfp)) {
+=======
+		if (sfp->res_in_use) {
+>>>>>>> common/deprecated/android-3.18
 			sg_remove_request(sfp, srp);
 			return -EBUSY;	/* reserve buffer already being used */
 		}
@@ -782,17 +903,42 @@ sg_common_write(Sg_fd * sfp, Sg_request * srp,
 			"sg_common_write:  scsi opcode=0x%02x, cmd_size=%d\n",
 			(int) cmnd[0], (int) hp->cmd_len));
 
+<<<<<<< HEAD
+=======
+	if (hp->dxfer_len >= SZ_256M) {
+		sg_remove_request(sfp, srp);
+		return -EINVAL;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	k = sg_start_req(srp, cmnd);
 	if (k) {
 		SCSI_LOG_TIMEOUT(1, sg_printk(KERN_INFO, sfp->parentdp,
 			"sg_common_write: start_req err=%d\n", k));
 		sg_finish_rem_req(srp);
+<<<<<<< HEAD
 		return k;	/* probably out of space --> ENOMEM */
 	}
 	if (atomic_read(&sdp->detaching)) {
 		if (srp->bio)
 			blk_end_request_all(srp->rq, -EIO);
 		sg_finish_rem_req(srp);
+=======
+		sg_remove_request(sfp, srp);
+		return k;	/* probably out of space --> ENOMEM */
+	}
+	if (atomic_read(&sdp->detaching)) {
+		if (srp->bio) {
+			if (srp->rq->cmd != srp->rq->__cmd)
+				kfree(srp->rq->cmd);
+
+			blk_end_request_all(srp->rq, -EIO);
+			srp->rq = NULL;
+		}
+
+		sg_finish_rem_req(srp);
+		sg_remove_request(sfp, srp);
+>>>>>>> common/deprecated/android-3.18
 		return -ENODEV;
 	}
 
@@ -845,6 +991,42 @@ static int max_sectors_bytes(struct request_queue *q)
 	return max_sectors << 9;
 }
 
+<<<<<<< HEAD
+=======
+static void
+sg_fill_request_table(Sg_fd *sfp, sg_req_info_t *rinfo)
+{
+	Sg_request *srp;
+	int val;
+	unsigned int ms;
+
+	val = 0;
+	list_for_each_entry(srp, &sfp->rq_list, entry) {
+		if (val >= SG_MAX_QUEUE)
+			break;
+		rinfo[val].req_state = srp->done + 1;
+		rinfo[val].problem =
+			srp->header.masked_status &
+			srp->header.host_status &
+			srp->header.driver_status;
+		if (srp->done)
+			rinfo[val].duration =
+				srp->header.duration;
+		else {
+			ms = jiffies_to_msecs(jiffies);
+			rinfo[val].duration =
+				(ms > srp->header.duration) ?
+				(ms - srp->header.duration) : 0;
+		}
+		rinfo[val].orphan = srp->orphan;
+		rinfo[val].sg_io_owned = srp->sg_io_owned;
+		rinfo[val].pack_id = srp->header.pack_id;
+		rinfo[val].usr_ptr = srp->header.usr_ptr;
+		val++;
+	}
+}
+
+>>>>>>> common/deprecated/android-3.18
 static long
 sg_ioctl(struct file *filp, unsigned int cmd_in, unsigned long arg)
 {
@@ -871,10 +1053,15 @@ sg_ioctl(struct file *filp, unsigned int cmd_in, unsigned long arg)
 			return -ENXIO;
 		if (!access_ok(VERIFY_WRITE, p, SZ_SG_IO_HDR))
 			return -EFAULT;
+<<<<<<< HEAD
 		mutex_lock(&sfp->parentdp->open_rel_lock);
 		result = sg_new_write(sfp, filp, p, SZ_SG_IO_HDR,
 				 1, read_only, 1, &srp);
 		mutex_unlock(&sfp->parentdp->open_rel_lock);
+=======
+		result = sg_new_write(sfp, filp, p, SZ_SG_IO_HDR,
+				 1, read_only, 1, &srp);
+>>>>>>> common/deprecated/android-3.18
 		if (result < 0)
 			return result;
 		result = wait_event_interruptible(sfp->read_wait,
@@ -907,6 +1094,7 @@ sg_ioctl(struct file *filp, unsigned int cmd_in, unsigned long arg)
 				/* strange ..., for backward compatibility */
 		return sfp->timeout_user;
 	case SG_SET_FORCE_LOW_DMA:
+<<<<<<< HEAD
 		result = get_user(val, ip);
 		if (result)
 			return result;
@@ -927,6 +1115,16 @@ sg_ioctl(struct file *filp, unsigned int cmd_in, unsigned long arg)
 		return 0;
 	case SG_GET_LOW_DMA:
 		return put_user((int) sfp->low_dma, ip);
+=======
+		/*
+		 * N.B. This ioctl never worked properly, but failed to
+		 * return an error value. So returning '0' to keep compability
+		 * with legacy applications.
+		 */
+		return 0;
+	case SG_GET_LOW_DMA:
+		return put_user((int) sdp->device->host->unchecked_isa_dma, ip);
+>>>>>>> common/deprecated/android-3.18
 	case SG_GET_SCSI_ID:
 		if (!access_ok(VERIFY_WRITE, p, sizeof (sg_scsi_id_t)))
 			return -EFAULT;
@@ -960,7 +1158,11 @@ sg_ioctl(struct file *filp, unsigned int cmd_in, unsigned long arg)
 		if (!access_ok(VERIFY_WRITE, ip, sizeof (int)))
 			return -EFAULT;
 		read_lock_irqsave(&sfp->rq_list_lock, iflags);
+<<<<<<< HEAD
 		for (srp = sfp->headrp; srp; srp = srp->nextrp) {
+=======
+		list_for_each_entry(srp, &sfp->rq_list, entry) {
+>>>>>>> common/deprecated/android-3.18
 			if ((1 == srp->done) && (!srp->sg_io_owned)) {
 				read_unlock_irqrestore(&sfp->rq_list_lock,
 						       iflags);
@@ -973,7 +1175,12 @@ sg_ioctl(struct file *filp, unsigned int cmd_in, unsigned long arg)
 		return 0;
 	case SG_GET_NUM_WAITING:
 		read_lock_irqsave(&sfp->rq_list_lock, iflags);
+<<<<<<< HEAD
 		for (val = 0, srp = sfp->headrp; srp; srp = srp->nextrp) {
+=======
+		val = 0;
+		list_for_each_entry(srp, &sfp->rq_list, entry) {
+>>>>>>> common/deprecated/android-3.18
 			if ((1 == srp->done) && (!srp->sg_io_owned))
 				++val;
 		}
@@ -989,6 +1196,7 @@ sg_ioctl(struct file *filp, unsigned int cmd_in, unsigned long arg)
                         return -EINVAL;
 		val = min_t(int, val,
 			    max_sectors_bytes(sdp->device->request_queue));
+<<<<<<< HEAD
 		if (val != sfp->reserve.bufflen) {
 			if (sg_res_in_use(sfp) || sfp->mmap_called)
 				return -EBUSY;
@@ -997,6 +1205,20 @@ sg_ioctl(struct file *filp, unsigned int cmd_in, unsigned long arg)
 			sg_build_reserve(sfp, val);
 			mutex_unlock(&sfp->parentdp->open_rel_lock);
 		}
+=======
+		mutex_lock(&sfp->f_mutex);
+		if (val != sfp->reserve.bufflen) {
+			if (sfp->mmap_called ||
+			    sfp->res_in_use) {
+				mutex_unlock(&sfp->f_mutex);
+				return -EBUSY;
+			}
+
+			sg_remove_scat(sfp, &sfp->reserve);
+			sg_build_reserve(sfp, val);
+		}
+		mutex_unlock(&sfp->f_mutex);
+>>>>>>> common/deprecated/android-3.18
 		return 0;
 	case SG_GET_RESERVED_SIZE:
 		val = min_t(int, sfp->reserve.bufflen,
@@ -1022,6 +1244,11 @@ sg_ioctl(struct file *filp, unsigned int cmd_in, unsigned long arg)
 		result = get_user(val, ip);
 		if (result)
 			return result;
+<<<<<<< HEAD
+=======
+		if (val > SG_MAX_CDB_SIZE)
+			return -ENOMEM;
+>>>>>>> common/deprecated/android-3.18
 		sfp->next_cmd_len = (val > 0) ? val : 0;
 		return 0;
 	case SG_GET_VERSION_NUM:
@@ -1035,6 +1262,7 @@ sg_ioctl(struct file *filp, unsigned int cmd_in, unsigned long arg)
 			return -EFAULT;
 		else {
 			sg_req_info_t *rinfo;
+<<<<<<< HEAD
 			unsigned int ms;
 
 			rinfo = kmalloc(SZ_SG_REQ_INFO * SG_MAX_QUEUE,
@@ -1069,6 +1297,15 @@ sg_ioctl(struct file *filp, unsigned int cmd_in, unsigned long arg)
 							srp->header.usr_ptr;
 				}
 			}
+=======
+
+			rinfo = kzalloc(SZ_SG_REQ_INFO * SG_MAX_QUEUE,
+					GFP_KERNEL);
+			if (!rinfo)
+				return -ENOMEM;
+			read_lock_irqsave(&sfp->rq_list_lock, iflags);
+			sg_fill_request_table(sfp, rinfo);
+>>>>>>> common/deprecated/android-3.18
 			read_unlock_irqrestore(&sfp->rq_list_lock, iflags);
 			result = __copy_to_user(p, rinfo,
 						SZ_SG_REQ_INFO * SG_MAX_QUEUE);
@@ -1172,14 +1409,22 @@ static long sg_compat_ioctl(struct file *filp, unsigned int cmd_in, unsigned lon
 		return -ENXIO;
 
 	sdev = sdp->device;
+<<<<<<< HEAD
 	if (sdev->host->hostt->compat_ioctl) {
+=======
+	if (sdev->host->hostt->compat_ioctl) { 
+>>>>>>> common/deprecated/android-3.18
 		int ret;
 
 		ret = sdev->host->hostt->compat_ioctl(sdev, cmd_in, (void __user *)arg);
 
 		return ret;
 	}
+<<<<<<< HEAD
 
+=======
+	
+>>>>>>> common/deprecated/android-3.18
 	return -ENOIOCTLCMD;
 }
 #endif
@@ -1202,7 +1447,11 @@ sg_poll(struct file *filp, poll_table * wait)
 		return POLLERR;
 	poll_wait(filp, &sfp->read_wait, wait);
 	read_lock_irqsave(&sfp->rq_list_lock, iflags);
+<<<<<<< HEAD
 	for (srp = sfp->headrp; srp; srp = srp->nextrp) {
+=======
+	list_for_each_entry(srp, &sfp->rq_list, entry) {
+>>>>>>> common/deprecated/android-3.18
 		/* if any read waiting, flag it */
 		if ((0 == res) && (1 == srp->done) && (!srp->sg_io_owned))
 			res = POLLIN | POLLRDNORM;
@@ -1283,6 +1532,10 @@ sg_mmap(struct file *filp, struct vm_area_struct *vma)
 	unsigned long req_sz, len, sa;
 	Sg_scatter_hold *rsv_schp;
 	int k, length;
+<<<<<<< HEAD
+=======
+	int ret = 0;
+>>>>>>> common/deprecated/android-3.18
 
 	if ((!filp) || (!vma) || (!(sfp = (Sg_fd *) filp->private_data)))
 		return -ENXIO;
@@ -1293,8 +1546,16 @@ sg_mmap(struct file *filp, struct vm_area_struct *vma)
 	if (vma->vm_pgoff)
 		return -EINVAL;	/* want no offset */
 	rsv_schp = &sfp->reserve;
+<<<<<<< HEAD
 	if (req_sz > rsv_schp->bufflen)
 		return -ENOMEM;	/* cannot map more than reserved buffer */
+=======
+	mutex_lock(&sfp->f_mutex);
+	if (req_sz > rsv_schp->bufflen) {
+		ret = -ENOMEM;	/* cannot map more than reserved buffer */
+		goto out;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	sa = vma->vm_start;
 	length = 1 << (PAGE_SHIFT + rsv_schp->page_order);
@@ -1305,10 +1566,19 @@ sg_mmap(struct file *filp, struct vm_area_struct *vma)
 	}
 
 	sfp->mmap_called = 1;
+<<<<<<< HEAD
 	vma->vm_flags |= VM_DONTEXPAND | VM_DONTDUMP;
 	vma->vm_private_data = sfp;
 	vma->vm_ops = &sg_mmap_vm_ops;
 	return 0;
+=======
+	vma->vm_flags |= VM_IO | VM_DONTEXPAND | VM_DONTDUMP;
+	vma->vm_private_data = sfp;
+	vma->vm_ops = &sg_mmap_vm_ops;
+out:
+	mutex_unlock(&sfp->f_mutex);
+	return ret;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void
@@ -1318,6 +1588,10 @@ sg_rq_end_io_usercontext(struct work_struct *work)
 	struct sg_fd *sfp = srp->parentfp;
 
 	sg_finish_rem_req(srp);
+<<<<<<< HEAD
+=======
+	sg_remove_request(sfp, srp);
+>>>>>>> common/deprecated/android-3.18
 	kref_put(&sfp->f_ref, sg_remove_sfp);
 }
 
@@ -1666,7 +1940,11 @@ init_sg(void)
 	else
 		def_reserved_size = sg_big_buff;
 
+<<<<<<< HEAD
 	rc = register_chrdev_region(MKDEV(SCSI_GENERIC_MAJOR, 0),
+=======
+	rc = register_chrdev_region(MKDEV(SCSI_GENERIC_MAJOR, 0), 
+>>>>>>> common/deprecated/android-3.18
 				    SG_MAX_DEVS, "sg");
 	if (rc)
 		return rc;
@@ -1775,6 +2053,7 @@ sg_start_req(Sg_request *srp, unsigned char *cmd)
 		md = &map_data;
 
 	if (md) {
+<<<<<<< HEAD
 		if (!sg_res_in_use(sfp) && dxfer_len <= rsv_schp->bufflen)
 			sg_link_reserve(sfp, srp, dxfer_len);
 		else {
@@ -1782,6 +2061,27 @@ sg_start_req(Sg_request *srp, unsigned char *cmd)
 			if (res)
 				return res;
 		}
+=======
+		mutex_lock(&sfp->f_mutex);
+		if (dxfer_len <= rsv_schp->bufflen &&
+		    !sfp->res_in_use) {
+			sfp->res_in_use = 1;
+			sg_link_reserve(sfp, srp, dxfer_len);
+		} else if (hp->flags & SG_FLAG_MMAP_IO) {
+			res = -EBUSY; /* sfp->res_in_use == 1 */
+			if (dxfer_len > rsv_schp->bufflen)
+				res = -ENOMEM;
+			mutex_unlock(&sfp->f_mutex);
+			return res;
+		} else {
+			res = sg_build_indirect(req_schp, sfp, dxfer_len);
+			if (res) {
+				mutex_unlock(&sfp->f_mutex);
+				return res;
+			}
+		}
+		mutex_unlock(&sfp->f_mutex);
+>>>>>>> common/deprecated/android-3.18
 
 		md->pages = req_schp->pages;
 		md->page_order = req_schp->page_order;
@@ -1855,8 +2155,11 @@ sg_finish_rem_req(Sg_request *srp)
 	else
 		sg_remove_scat(sfp, req_schp);
 
+<<<<<<< HEAD
 	sg_remove_request(sfp, srp);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	return ret;
 }
 
@@ -1880,6 +2183,10 @@ sg_build_indirect(Sg_scatter_hold * schp, Sg_fd * sfp, int buff_size)
 	int sg_tablesize = sfp->parentdp->sg_tablesize;
 	int blk_size = buff_size, order;
 	gfp_t gfp_mask = GFP_ATOMIC | __GFP_COMP | __GFP_NOWARN;
+<<<<<<< HEAD
+=======
+	struct sg_device *sdp = sfp->parentdp;
+>>>>>>> common/deprecated/android-3.18
 
 	if (blk_size < 0)
 		return -EFAULT;
@@ -1905,7 +2212,11 @@ sg_build_indirect(Sg_scatter_hold * schp, Sg_fd * sfp, int buff_size)
 			scatter_elem_sz_prev = num;
 	}
 
+<<<<<<< HEAD
 	if (sfp->low_dma)
+=======
+	if (sdp->device->host->unchecked_isa_dma)
+>>>>>>> common/deprecated/android-3.18
 		gfp_mask |= GFP_DMA;
 
 	if (!capable(CAP_SYS_ADMIN) || !capable(CAP_SYS_RAWIO))
@@ -1921,7 +2232,11 @@ retry:
 		num = (rem_sz > scatter_elem_sz_prev) ?
 			scatter_elem_sz_prev : rem_sz;
 
+<<<<<<< HEAD
 		schp->pages[k] = alloc_pages(gfp_mask, order);
+=======
+		schp->pages[k] = alloc_pages(gfp_mask | __GFP_ZERO, order);
+>>>>>>> common/deprecated/android-3.18
 		if (!schp->pages[k])
 			goto out;
 
@@ -2075,8 +2390,14 @@ sg_unlink_reserve(Sg_fd * sfp, Sg_request * srp)
 	req_schp->pages = NULL;
 	req_schp->page_order = 0;
 	req_schp->sglist_len = 0;
+<<<<<<< HEAD
 	sfp->save_scat_len = 0;
 	srp->res_used = 0;
+=======
+	srp->res_used = 0;
+	/* Called without mutex lock to avoid deadlock */
+	sfp->res_in_use = 0;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static Sg_request *
@@ -2086,7 +2407,11 @@ sg_get_rq_mark(Sg_fd * sfp, int pack_id)
 	unsigned long iflags;
 
 	write_lock_irqsave(&sfp->rq_list_lock, iflags);
+<<<<<<< HEAD
 	for (resp = sfp->headrp; resp; resp = resp->nextrp) {
+=======
+	list_for_each_entry(resp, &sfp->rq_list, entry) {
+>>>>>>> common/deprecated/android-3.18
 		/* look for requests that are ready + not SG_IO owned */
 		if ((1 == resp->done) && (!resp->sg_io_owned) &&
 		    ((-1 == pack_id) || (resp->header.pack_id == pack_id))) {
@@ -2105,6 +2430,7 @@ sg_add_request(Sg_fd * sfp)
 {
 	int k;
 	unsigned long iflags;
+<<<<<<< HEAD
 	Sg_request *resp;
 	Sg_request *rp = sfp->req_arr;
 
@@ -2140,12 +2466,38 @@ sg_add_request(Sg_fd * sfp)
 	}
 	write_unlock_irqrestore(&sfp->rq_list_lock, iflags);
 	return resp;
+=======
+	Sg_request *rp = sfp->req_arr;
+
+	write_lock_irqsave(&sfp->rq_list_lock, iflags);
+	if (!list_empty(&sfp->rq_list)) {
+		if (!sfp->cmd_q)
+			goto out_unlock;
+
+		for (k = 0; k < SG_MAX_QUEUE; ++k, ++rp) {
+			if (!rp->parentfp)
+				break;
+		}
+		if (k >= SG_MAX_QUEUE)
+			goto out_unlock;
+	}
+	memset(rp, 0, sizeof (Sg_request));
+	rp->parentfp = sfp;
+	rp->header.duration = jiffies_to_msecs(jiffies);
+	list_add_tail(&rp->entry, &sfp->rq_list);
+	write_unlock_irqrestore(&sfp->rq_list_lock, iflags);
+	return rp;
+out_unlock:
+	write_unlock_irqrestore(&sfp->rq_list_lock, iflags);
+	return NULL;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /* Return of 1 for found; 0 for not found */
 static int
 sg_remove_request(Sg_fd * sfp, Sg_request * srp)
 {
+<<<<<<< HEAD
 	Sg_request *prev_rp;
 	Sg_request *rp;
 	unsigned long iflags;
@@ -2169,6 +2521,18 @@ sg_remove_request(Sg_fd * sfp, Sg_request * srp)
 			}
 			prev_rp = rp;
 		}
+=======
+	unsigned long iflags;
+	int res = 0;
+
+	if (!sfp || !srp || list_empty(&sfp->rq_list))
+		return res;
+	write_lock_irqsave(&sfp->rq_list_lock, iflags);
+	if (!list_empty(&srp->entry)) {
+		list_del(&srp->entry);
+		srp->parentfp = NULL;
+		res = 1;
+>>>>>>> common/deprecated/android-3.18
 	}
 	write_unlock_irqrestore(&sfp->rq_list_lock, iflags);
 	return res;
@@ -2187,6 +2551,7 @@ sg_add_sfp(Sg_device * sdp)
 
 	init_waitqueue_head(&sfp->read_wait);
 	rwlock_init(&sfp->rq_list_lock);
+<<<<<<< HEAD
 
 	kref_init(&sfp->f_ref);
 	sfp->timeout = SG_DEFAULT_TIMEOUT;
@@ -2194,12 +2559,24 @@ sg_add_sfp(Sg_device * sdp)
 	sfp->force_packid = SG_DEF_FORCE_PACK_ID;
 	sfp->low_dma = (SG_DEF_FORCE_LOW_DMA == 0) ?
 	    sdp->device->host->unchecked_isa_dma : 1;
+=======
+	INIT_LIST_HEAD(&sfp->rq_list);
+	kref_init(&sfp->f_ref);
+	mutex_init(&sfp->f_mutex);
+	sfp->timeout = SG_DEFAULT_TIMEOUT;
+	sfp->timeout_user = SG_DEFAULT_TIMEOUT_USER;
+	sfp->force_packid = SG_DEF_FORCE_PACK_ID;
+>>>>>>> common/deprecated/android-3.18
 	sfp->cmd_q = SG_DEF_COMMAND_Q;
 	sfp->keep_orphan = SG_DEF_KEEP_ORPHAN;
 	sfp->parentdp = sdp;
 	write_lock_irqsave(&sdp->sfd_lock, iflags);
 	if (atomic_read(&sdp->detaching)) {
 		write_unlock_irqrestore(&sdp->sfd_lock, iflags);
+<<<<<<< HEAD
+=======
+		kfree(sfp);
+>>>>>>> common/deprecated/android-3.18
 		return ERR_PTR(-ENODEV);
 	}
 	list_add_tail(&sfp->sfd_siblings, &sdp->sfds);
@@ -2227,10 +2604,25 @@ sg_remove_sfp_usercontext(struct work_struct *work)
 {
 	struct sg_fd *sfp = container_of(work, struct sg_fd, ew.work);
 	struct sg_device *sdp = sfp->parentdp;
+<<<<<<< HEAD
 
 	/* Cleanup any responses which were never read(). */
 	while (sfp->headrp)
 		sg_finish_rem_req(sfp->headrp);
+=======
+	Sg_request *srp;
+	unsigned long iflags;
+
+	/* Cleanup any responses which were never read(). */
+	write_lock_irqsave(&sfp->rq_list_lock, iflags);
+	while (!list_empty(&sfp->rq_list)) {
+		srp = list_first_entry(&sfp->rq_list, Sg_request, entry);
+		sg_finish_rem_req(srp);
+		list_del(&srp->entry);
+		srp->parentfp = NULL;
+	}
+	write_unlock_irqrestore(&sfp->rq_list_lock, iflags);
+>>>>>>> common/deprecated/android-3.18
 
 	if (sfp->reserve.bufflen > 0) {
 		SCSI_LOG_TIMEOUT(6, sg_printk(KERN_INFO, sdp,
@@ -2264,6 +2656,7 @@ sg_remove_sfp(struct kref *kref)
 	schedule_work(&sfp->ew.work);
 }
 
+<<<<<<< HEAD
 static int
 sg_res_in_use(Sg_fd * sfp)
 {
@@ -2278,6 +2671,8 @@ sg_res_in_use(Sg_fd * sfp)
 	return srp ? 1 : 0;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #ifdef CONFIG_SCSI_PROC_FS
 static int
 sg_idr_max_id(int id, void *p, void *data)
@@ -2352,7 +2747,11 @@ static const struct file_operations adio_fops = {
 };
 
 static int sg_proc_single_open_dressz(struct inode *inode, struct file *file);
+<<<<<<< HEAD
 static ssize_t sg_proc_write_dressz(struct file *filp,
+=======
+static ssize_t sg_proc_write_dressz(struct file *filp, 
+>>>>>>> common/deprecated/android-3.18
 		const char __user *buffer, size_t count, loff_t *off);
 static const struct file_operations dressz_fops = {
 	.owner = THIS_MODULE,
@@ -2492,7 +2891,11 @@ static int sg_proc_single_open_adio(struct inode *inode, struct file *file)
 	return single_open(file, sg_proc_seq_show_int, &sg_allow_dio);
 }
 
+<<<<<<< HEAD
 static ssize_t
+=======
+static ssize_t 
+>>>>>>> common/deprecated/android-3.18
 sg_proc_write_adio(struct file *filp, const char __user *buffer,
 		   size_t count, loff_t *off)
 {
@@ -2513,7 +2916,11 @@ static int sg_proc_single_open_dressz(struct inode *inode, struct file *file)
 	return single_open(file, sg_proc_seq_show_int, &sg_big_buff);
 }
 
+<<<<<<< HEAD
 static ssize_t
+=======
+static ssize_t 
+>>>>>>> common/deprecated/android-3.18
 sg_proc_write_dressz(struct file *filp, const char __user *buffer,
 		     size_t count, loff_t *off)
 {
@@ -2647,7 +3054,11 @@ static int sg_proc_seq_show_devstrs(struct seq_file *s, void *v)
 /* must be called while holding sg_index_lock */
 static void sg_proc_debug_helper(struct seq_file *s, Sg_device * sdp)
 {
+<<<<<<< HEAD
 	int k, m, new_interface, blen, usg;
+=======
+	int k, new_interface, blen, usg;
+>>>>>>> common/deprecated/android-3.18
 	Sg_request *srp;
 	Sg_fd *fp;
 	const sg_io_hdr_t *hp;
@@ -2663,6 +3074,7 @@ static void sg_proc_debug_helper(struct seq_file *s, Sg_device * sdp)
 			   jiffies_to_msecs(fp->timeout),
 			   fp->reserve.bufflen,
 			   (int) fp->reserve.k_use_sg,
+<<<<<<< HEAD
 			   (int) fp->low_dma);
 		seq_printf(s, "   cmd_q=%d f_packid=%d k_orphan=%d closed=0\n",
 			   (int) fp->cmd_q, (int) fp->force_packid,
@@ -2670,6 +3082,13 @@ static void sg_proc_debug_helper(struct seq_file *s, Sg_device * sdp)
 		for (m = 0, srp = fp->headrp;
 				srp != NULL;
 				++m, srp = srp->nextrp) {
+=======
+			   (int) sdp->device->host->unchecked_isa_dma);
+		seq_printf(s, "   cmd_q=%d f_packid=%d k_orphan=%d closed=0\n",
+			   (int) fp->cmd_q, (int) fp->force_packid,
+			   (int) fp->keep_orphan);
+		list_for_each_entry(srp, &fp->rq_list, entry) {
+>>>>>>> common/deprecated/android-3.18
 			hp = &srp->header;
 			new_interface = (hp->interface_id == '\0') ? 0 : 1;
 			if (srp->res_used) {
@@ -2704,7 +3123,11 @@ static void sg_proc_debug_helper(struct seq_file *s, Sg_device * sdp)
 			seq_printf(s, "ms sgat=%d op=0x%02x\n", usg,
 				   (int) srp->data.cmd_opcode);
 		}
+<<<<<<< HEAD
 		if (0 == m)
+=======
+		if (list_empty(&fp->rq_list))
+>>>>>>> common/deprecated/android-3.18
 			seq_puts(s, "     No requests active\n");
 		read_unlock(&fp->rq_list_lock);
 	}

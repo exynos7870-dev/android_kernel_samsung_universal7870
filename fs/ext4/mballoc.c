@@ -26,6 +26,10 @@
 #include <linux/log2.h>
 #include <linux/module.h>
 #include <linux/slab.h>
+<<<<<<< HEAD
+=======
+#include <linux/nospec.h>
+>>>>>>> common/deprecated/android-3.18
 #include <trace/events/ext4.h>
 
 #ifdef CONFIG_EXT4_DEBUG
@@ -366,6 +370,11 @@ static void ext4_mb_generate_from_pa(struct super_block *sb, void *bitmap,
 					ext4_group_t group);
 static void ext4_mb_generate_from_freelist(struct super_block *sb, void *bitmap,
 						ext4_group_t group);
+<<<<<<< HEAD
+=======
+static void ext4_free_data_callback(struct super_block *sb,
+				struct ext4_journal_cb_entry *jce, int rc);
+>>>>>>> common/deprecated/android-3.18
 
 static inline void *mb_correct_addr_and_bit(int *bit, void *addr)
 {
@@ -666,7 +675,11 @@ static void ext4_mb_mark_free_simple(struct super_block *sb,
 	ext4_grpblk_t min;
 	ext4_grpblk_t max;
 	ext4_grpblk_t chunk;
+<<<<<<< HEAD
 	unsigned short border;
+=======
+	unsigned int border;
+>>>>>>> common/deprecated/android-3.18
 
 	BUG_ON(len > EXT4_CLUSTERS_PER_GROUP(sb));
 
@@ -749,6 +762,7 @@ void ext4_mb_generate_buddy(struct super_block *sb,
 	grp->bb_fragments = fragments;
 
 	if (free != grp->bb_free) {
+<<<<<<< HEAD
 		/* for more specific debugging, sangwoo2.lee */
 		struct ext4_group_desc *desc;
 		ext4_fsblk_t bitmap_blk;
@@ -759,6 +773,8 @@ void ext4_mb_generate_buddy(struct super_block *sb,
 		print_block_data(sb, bitmap_blk, bitmap, 0, EXT4_BLOCK_SIZE(sb));
 		/* for more specific debugging */
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		ext4_grp_locked_error(sb, group, 0, 0,
 				      "block bitmap and bg descriptor "
 				      "inconsistent: %u vs %u free clusters",
@@ -822,7 +838,11 @@ static void mb_regenerate_buddy(struct ext4_buddy *e4b)
  * for this page; do not hold this lock when calling this routine!
  */
 
+<<<<<<< HEAD
 static int ext4_mb_init_cache(struct page *page, char *incore)
+=======
+static int ext4_mb_init_cache(struct page *page, char *incore, gfp_t gfp)
+>>>>>>> common/deprecated/android-3.18
 {
 	ext4_group_t ngroups;
 	int blocksize;
@@ -855,7 +875,11 @@ static int ext4_mb_init_cache(struct page *page, char *incore)
 	/* allocate buffer_heads to read bitmaps */
 	if (groups_per_page > 1) {
 		i = sizeof(struct buffer_head *) * groups_per_page;
+<<<<<<< HEAD
 		bh = kzalloc(i, GFP_NOFS);
+=======
+		bh = kzalloc(i, gfp);
+>>>>>>> common/deprecated/android-3.18
 		if (bh == NULL) {
 			err = -ENOMEM;
 			goto out;
@@ -980,7 +1004,11 @@ out:
  * are on the same page e4b->bd_buddy_page is NULL and return value is 0.
  */
 static int ext4_mb_get_buddy_page_lock(struct super_block *sb,
+<<<<<<< HEAD
 		ext4_group_t group, struct ext4_buddy *e4b)
+=======
+		ext4_group_t group, struct ext4_buddy *e4b, gfp_t gfp)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct inode *inode = EXT4_SB(sb)->s_buddy_cache;
 	int block, pnum, poff;
@@ -999,7 +1027,11 @@ static int ext4_mb_get_buddy_page_lock(struct super_block *sb,
 	block = group * 2;
 	pnum = block / blocks_per_page;
 	poff = block % blocks_per_page;
+<<<<<<< HEAD
 	page = find_or_create_page(inode->i_mapping, pnum, GFP_NOFS);
+=======
+	page = find_or_create_page(inode->i_mapping, pnum, gfp);
+>>>>>>> common/deprecated/android-3.18
 	if (!page)
 		return -ENOMEM;
 	BUG_ON(page->mapping != inode->i_mapping);
@@ -1013,7 +1045,11 @@ static int ext4_mb_get_buddy_page_lock(struct super_block *sb,
 
 	block++;
 	pnum = block / blocks_per_page;
+<<<<<<< HEAD
 	page = find_or_create_page(inode->i_mapping, pnum, GFP_NOFS);
+=======
+	page = find_or_create_page(inode->i_mapping, pnum, gfp);
+>>>>>>> common/deprecated/android-3.18
 	if (!page)
 		return -ENOMEM;
 	BUG_ON(page->mapping != inode->i_mapping);
@@ -1039,7 +1075,11 @@ static void ext4_mb_put_buddy_page_lock(struct ext4_buddy *e4b)
  * calling this routine!
  */
 static noinline_for_stack
+<<<<<<< HEAD
 int ext4_mb_init_group(struct super_block *sb, ext4_group_t group)
+=======
+int ext4_mb_init_group(struct super_block *sb, ext4_group_t group, gfp_t gfp)
+>>>>>>> common/deprecated/android-3.18
 {
 
 	struct ext4_group_info *this_grp;
@@ -1059,7 +1099,11 @@ int ext4_mb_init_group(struct super_block *sb, ext4_group_t group)
 	 * The call to ext4_mb_get_buddy_page_lock will mark the
 	 * page accessed.
 	 */
+<<<<<<< HEAD
 	ret = ext4_mb_get_buddy_page_lock(sb, group, &e4b);
+=======
+	ret = ext4_mb_get_buddy_page_lock(sb, group, &e4b, gfp);
+>>>>>>> common/deprecated/android-3.18
 	if (ret || !EXT4_MB_GRP_NEED_INIT(this_grp)) {
 		/*
 		 * somebody initialized the group
@@ -1069,7 +1113,11 @@ int ext4_mb_init_group(struct super_block *sb, ext4_group_t group)
 	}
 
 	page = e4b.bd_bitmap_page;
+<<<<<<< HEAD
 	ret = ext4_mb_init_cache(page, NULL);
+=======
+	ret = ext4_mb_init_cache(page, NULL, gfp);
+>>>>>>> common/deprecated/android-3.18
 	if (ret)
 		goto err;
 	if (!PageUptodate(page)) {
@@ -1088,7 +1136,11 @@ int ext4_mb_init_group(struct super_block *sb, ext4_group_t group)
 	}
 	/* init buddy cache */
 	page = e4b.bd_buddy_page;
+<<<<<<< HEAD
 	ret = ext4_mb_init_cache(page, e4b.bd_bitmap);
+=======
+	ret = ext4_mb_init_cache(page, e4b.bd_bitmap, gfp);
+>>>>>>> common/deprecated/android-3.18
 	if (ret)
 		goto err;
 	if (!PageUptodate(page)) {
@@ -1106,8 +1158,13 @@ err:
  * calling this routine!
  */
 static noinline_for_stack int
+<<<<<<< HEAD
 ext4_mb_load_buddy(struct super_block *sb, ext4_group_t group,
 					struct ext4_buddy *e4b)
+=======
+ext4_mb_load_buddy_gfp(struct super_block *sb, ext4_group_t group,
+		       struct ext4_buddy *e4b, gfp_t gfp)
+>>>>>>> common/deprecated/android-3.18
 {
 	int blocks_per_page;
 	int block;
@@ -1137,7 +1194,11 @@ ext4_mb_load_buddy(struct super_block *sb, ext4_group_t group,
 		 * we need full data about the group
 		 * to make a good selection
 		 */
+<<<<<<< HEAD
 		ret = ext4_mb_init_group(sb, group);
+=======
+		ret = ext4_mb_init_group(sb, group, gfp);
+>>>>>>> common/deprecated/android-3.18
 		if (ret)
 			return ret;
 	}
@@ -1165,11 +1226,19 @@ ext4_mb_load_buddy(struct super_block *sb, ext4_group_t group,
 			 * wait for it to initialize.
 			 */
 			page_cache_release(page);
+<<<<<<< HEAD
 		page = find_or_create_page(inode->i_mapping, pnum, GFP_NOFS);
 		if (page) {
 			BUG_ON(page->mapping != inode->i_mapping);
 			if (!PageUptodate(page)) {
 				ret = ext4_mb_init_cache(page, NULL);
+=======
+		page = find_or_create_page(inode->i_mapping, pnum, gfp);
+		if (page) {
+			BUG_ON(page->mapping != inode->i_mapping);
+			if (!PageUptodate(page)) {
+				ret = ext4_mb_init_cache(page, NULL, gfp);
+>>>>>>> common/deprecated/android-3.18
 				if (ret) {
 					unlock_page(page);
 					goto err;
@@ -1201,11 +1270,20 @@ ext4_mb_load_buddy(struct super_block *sb, ext4_group_t group,
 	if (page == NULL || !PageUptodate(page)) {
 		if (page)
 			page_cache_release(page);
+<<<<<<< HEAD
 		page = find_or_create_page(inode->i_mapping, pnum, GFP_NOFS);
 		if (page) {
 			BUG_ON(page->mapping != inode->i_mapping);
 			if (!PageUptodate(page)) {
 				ret = ext4_mb_init_cache(page, e4b->bd_bitmap);
+=======
+		page = find_or_create_page(inode->i_mapping, pnum, gfp);
+		if (page) {
+			BUG_ON(page->mapping != inode->i_mapping);
+			if (!PageUptodate(page)) {
+				ret = ext4_mb_init_cache(page, e4b->bd_bitmap,
+							 gfp);
+>>>>>>> common/deprecated/android-3.18
 				if (ret) {
 					unlock_page(page);
 					goto err;
@@ -1244,6 +1322,15 @@ err:
 	return ret;
 }
 
+<<<<<<< HEAD
+=======
+static int ext4_mb_load_buddy(struct super_block *sb, ext4_group_t group,
+			      struct ext4_buddy *e4b)
+{
+	return ext4_mb_load_buddy_gfp(sb, group, e4b, GFP_NOFS);
+}
+
+>>>>>>> common/deprecated/android-3.18
 static void ext4_mb_unload_buddy(struct ext4_buddy *e4b)
 {
 	if (e4b->bd_bitmap_page)
@@ -1256,6 +1343,10 @@ static void ext4_mb_unload_buddy(struct ext4_buddy *e4b)
 static int mb_find_order_for_block(struct ext4_buddy *e4b, int block)
 {
 	int order = 1;
+<<<<<<< HEAD
+=======
+	int bb_incr = 1 << (e4b->bd_blkbits - 1);
+>>>>>>> common/deprecated/android-3.18
 	void *bb;
 
 	BUG_ON(e4b->bd_bitmap == e4b->bd_buddy);
@@ -1268,7 +1359,12 @@ static int mb_find_order_for_block(struct ext4_buddy *e4b, int block)
 			/* this block is part of buddy of order 'order' */
 			return order;
 		}
+<<<<<<< HEAD
 		bb += 1 << (e4b->bd_blkbits - order);
+=======
+		bb += bb_incr;
+		bb_incr >>= 1;
+>>>>>>> common/deprecated/android-3.18
 		order++;
 	}
 	return 0;
@@ -1446,6 +1542,7 @@ static void mb_free_blocks(struct inode *inode, struct ext4_buddy *e4b,
 
 	if (unlikely(block != -1)) {
 		struct ext4_sb_info *sbi = EXT4_SB(sb);
+<<<<<<< HEAD
 		/* for debugging, sangwoo2.lee */
 		struct ext4_group_desc *desc;
 		ext4_fsblk_t blocknr, bitmap_blk;
@@ -1459,6 +1556,12 @@ static void mb_free_blocks(struct inode *inode, struct ext4_buddy *e4b,
 		print_block_data(sb, bitmap_blk, e4b->bd_bitmap, 0
 			, EXT4_BLOCK_SIZE(sb));
 		/* for debugging */
+=======
+		ext4_fsblk_t blocknr;
+
+		blocknr = ext4_group_first_block_no(sb, e4b->bd_group);
+		blocknr += EXT4_C2B(EXT4_SB(sb), block);
+>>>>>>> common/deprecated/android-3.18
 		ext4_grp_locked_error(sb, e4b->bd_group,
 				      inode ? inode->i_ino : 0,
 				      blocknr,
@@ -1940,7 +2043,12 @@ void ext4_mb_complex_scan_group(struct ext4_allocation_context *ac,
 	int free;
 
 	free = e4b->bd_info->bb_free;
+<<<<<<< HEAD
 	BUG_ON(free <= 0);
+=======
+	if (WARN_ON(free <= 0))
+		return;
+>>>>>>> common/deprecated/android-3.18
 
 	i = e4b->bd_info->bb_first_free;
 
@@ -1961,7 +2069,12 @@ void ext4_mb_complex_scan_group(struct ext4_allocation_context *ac,
 		}
 
 		mb_find_extent(e4b, i, ac->ac_g_ex.fe_len, &ex);
+<<<<<<< HEAD
 		BUG_ON(ex.fe_len <= 0);
+=======
+		if (WARN_ON(ex.fe_len <= 0))
+			break;
+>>>>>>> common/deprecated/android-3.18
 		if (free < ex.fe_len) {
 			ext4_grp_locked_error(sb, e4b->bd_group, 0, 0,
 					"%d free clusters as per "
@@ -2046,7 +2159,11 @@ static int ext4_mb_good_group(struct ext4_allocation_context *ac,
 
 	/* We only do this if the grp has never been initialized */
 	if (unlikely(EXT4_MB_GRP_NEED_INIT(grp))) {
+<<<<<<< HEAD
 		int ret = ext4_mb_init_group(ac->ac_sb, group);
+=======
+		int ret = ext4_mb_init_group(ac->ac_sb, group, GFP_NOFS);
+>>>>>>> common/deprecated/android-3.18
 		if (ret)
 			return 0;
 	}
@@ -2128,13 +2245,25 @@ ext4_mb_regular_allocator(struct ext4_allocation_context *ac)
 	 * We search using buddy data only if the order of the request
 	 * is greater than equal to the sbi_s_mb_order2_reqs
 	 * You can tune it via /sys/fs/ext4/<partition>/mb_order2_req
+<<<<<<< HEAD
 	 */
 	if (i >= sbi->s_mb_order2_reqs) {
+=======
+	 * We also support searching for power-of-two requests only for
+	 * requests upto maximum buddy size we have constructed.
+	 */
+	if (i >= sbi->s_mb_order2_reqs && i <= sb->s_blocksize_bits + 2) {
+>>>>>>> common/deprecated/android-3.18
 		/*
 		 * This should tell if fe_len is exactly power of 2
 		 */
 		if ((ac->ac_g_ex.fe_len & (~(1 << (i - 1)))) == 0)
+<<<<<<< HEAD
 			ac->ac_2order = i - 1;
+=======
+			ac->ac_2order = array_index_nospec(i - 1,
+							   sb->s_blocksize_bits + 2);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/* if stream allocation is enabled, use global goal */
@@ -2191,7 +2320,11 @@ repeat:
 			}
 
 			ac->ac_groups_scanned++;
+<<<<<<< HEAD
 			if (cr == 0 && ac->ac_2order < sb->s_blocksize_bits+2)
+=======
+			if (cr == 0)
+>>>>>>> common/deprecated/android-3.18
 				ext4_mb_simple_scan_group(ac, &e4b);
 			else if (cr == 1 && sbi->s_stripe &&
 					!(ac->ac_g_ex.fe_len % sbi->s_stripe))
@@ -2269,7 +2402,11 @@ static int ext4_mb_seq_groups_show(struct seq_file *seq, void *v)
 	struct ext4_group_info *grinfo;
 	struct sg {
 		struct ext4_group_info info;
+<<<<<<< HEAD
 		ext4_grpblk_t counters[16];
+=======
+		ext4_grpblk_t counters[EXT4_MAX_BLOCK_LOG_SIZE + 2];
+>>>>>>> common/deprecated/android-3.18
 	} sg;
 
 	group--;
@@ -2342,6 +2479,7 @@ static const struct file_operations ext4_mb_seq_groups_fops = {
 	.release	= seq_release,
 };
 
+<<<<<<< HEAD
 ssize_t ext4_mb_freefrag_show(struct ext4_sb_info *sbi, char *buf)
 {
 #define EXT4_FREEFRAG_COLUMN 14 /* sb->s_blocksize_bits + 2 */
@@ -2391,6 +2529,8 @@ out:
 	return strlen(buf);
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static struct kmem_cache *get_groupinfo_cache(int blocksize_bits)
 {
 	int cache_index = blocksize_bits - EXT4_MIN_BLOCK_LOG_SIZE;
@@ -2408,7 +2548,11 @@ int ext4_mb_alloc_groupinfo(struct super_block *sb, ext4_group_t ngroups)
 {
 	struct ext4_sb_info *sbi = EXT4_SB(sb);
 	unsigned size;
+<<<<<<< HEAD
 	struct ext4_group_info ***new_groupinfo;
+=======
+	struct ext4_group_info ***old_groupinfo, ***new_groupinfo;
+>>>>>>> common/deprecated/android-3.18
 
 	size = (ngroups + EXT4_DESC_PER_BLOCK(sb) - 1) >>
 		EXT4_DESC_PER_BLOCK_BITS(sb);
@@ -2421,6 +2565,7 @@ int ext4_mb_alloc_groupinfo(struct super_block *sb, ext4_group_t ngroups)
 		ext4_msg(sb, KERN_ERR, "can't allocate buddy meta group");
 		return -ENOMEM;
 	}
+<<<<<<< HEAD
 	if (sbi->s_group_info) {
 		memcpy(new_groupinfo, sbi->s_group_info,
 		       sbi->s_group_info_size * sizeof(*sbi->s_group_info));
@@ -2428,6 +2573,18 @@ int ext4_mb_alloc_groupinfo(struct super_block *sb, ext4_group_t ngroups)
 	}
 	sbi->s_group_info = new_groupinfo;
 	sbi->s_group_info_size = size / sizeof(*sbi->s_group_info);
+=======
+	rcu_read_lock();
+	old_groupinfo = rcu_dereference(sbi->s_group_info);
+	if (old_groupinfo)
+		memcpy(new_groupinfo, old_groupinfo,
+		       sbi->s_group_info_size * sizeof(*sbi->s_group_info));
+	rcu_read_unlock();
+	rcu_assign_pointer(sbi->s_group_info, new_groupinfo);
+	sbi->s_group_info_size = size / sizeof(*sbi->s_group_info);
+	if (old_groupinfo)
+		ext4_kvfree_array_rcu(old_groupinfo);
+>>>>>>> common/deprecated/android-3.18
 	ext4_debug("allocated s_groupinfo array for %d meta_bg's\n", 
 		   sbi->s_group_info_size);
 	return 0;
@@ -2439,6 +2596,10 @@ int ext4_mb_add_groupinfo(struct super_block *sb, ext4_group_t group,
 {
 	int i;
 	int metalen = 0;
+<<<<<<< HEAD
+=======
+	int idx = group >> EXT4_DESC_PER_BLOCK_BITS(sb);
+>>>>>>> common/deprecated/android-3.18
 	struct ext4_sb_info *sbi = EXT4_SB(sb);
 	struct ext4_group_info **meta_group_info;
 	struct kmem_cache *cachep = get_groupinfo_cache(sb->s_blocksize_bits);
@@ -2457,12 +2618,21 @@ int ext4_mb_add_groupinfo(struct super_block *sb, ext4_group_t group,
 				 "for a buddy group");
 			goto exit_meta_group_info;
 		}
+<<<<<<< HEAD
 		sbi->s_group_info[group >> EXT4_DESC_PER_BLOCK_BITS(sb)] =
 			meta_group_info;
 	}
 
 	meta_group_info =
 		sbi->s_group_info[group >> EXT4_DESC_PER_BLOCK_BITS(sb)];
+=======
+		rcu_read_lock();
+		rcu_dereference(sbi->s_group_info)[idx] = meta_group_info;
+		rcu_read_unlock();
+	}
+
+	meta_group_info = sbi_array_rcu_deref(sbi, s_group_info, idx);
+>>>>>>> common/deprecated/android-3.18
 	i = group & (EXT4_DESC_PER_BLOCK(sb) - 1);
 
 	meta_group_info[i] = kmem_cache_zalloc(cachep, GFP_KERNEL);
@@ -2477,7 +2647,12 @@ int ext4_mb_add_groupinfo(struct super_block *sb, ext4_group_t group,
 	 * initialize bb_free to be able to skip
 	 * empty groups without initialization
 	 */
+<<<<<<< HEAD
 	if (desc->bg_flags & cpu_to_le16(EXT4_BG_BLOCK_UNINIT)) {
+=======
+	if (ext4_has_group_desc_csum(sb) &&
+	    (desc->bg_flags & cpu_to_le16(EXT4_BG_BLOCK_UNINIT))) {
+>>>>>>> common/deprecated/android-3.18
 		meta_group_info[i]->bb_free =
 			ext4_free_clusters_after_init(sb, group, desc);
 	} else {
@@ -2509,8 +2684,18 @@ int ext4_mb_add_groupinfo(struct super_block *sb, ext4_group_t group,
 exit_group_info:
 	/* If a meta_group_info table has been allocated, release it now */
 	if (group % EXT4_DESC_PER_BLOCK(sb) == 0) {
+<<<<<<< HEAD
 		kfree(sbi->s_group_info[group >> EXT4_DESC_PER_BLOCK_BITS(sb)]);
 		sbi->s_group_info[group >> EXT4_DESC_PER_BLOCK_BITS(sb)] = NULL;
+=======
+		struct ext4_group_info ***group_info;
+
+		rcu_read_lock();
+		group_info = rcu_dereference(sbi->s_group_info);
+		kfree(group_info[idx]);
+		group_info[idx] = NULL;
+		rcu_read_unlock();
+>>>>>>> common/deprecated/android-3.18
 	}
 exit_meta_group_info:
 	return -ENOMEM;
@@ -2523,6 +2708,10 @@ static int ext4_mb_init_backend(struct super_block *sb)
 	struct ext4_sb_info *sbi = EXT4_SB(sb);
 	int err;
 	struct ext4_group_desc *desc;
+<<<<<<< HEAD
+=======
+	struct ext4_group_info ***group_info;
+>>>>>>> common/deprecated/android-3.18
 	struct kmem_cache *cachep;
 
 	err = ext4_mb_alloc_groupinfo(sb, ngroups);
@@ -2557,11 +2746,24 @@ err_freebuddy:
 	while (i-- > 0)
 		kmem_cache_free(cachep, ext4_get_group_info(sb, i));
 	i = sbi->s_group_info_size;
+<<<<<<< HEAD
 	while (i-- > 0)
 		kfree(sbi->s_group_info[i]);
 	iput(sbi->s_buddy_cache);
 err_freesgi:
 	ext4_kvfree(sbi->s_group_info);
+=======
+	rcu_read_lock();
+	group_info = rcu_dereference(sbi->s_group_info);
+	while (i-- > 0)
+		kfree(group_info[i]);
+	rcu_read_unlock();
+	iput(sbi->s_buddy_cache);
+err_freesgi:
+	rcu_read_lock();
+	kvfree(rcu_dereference(sbi->s_group_info));
+	rcu_read_unlock();
+>>>>>>> common/deprecated/android-3.18
 	return -ENOMEM;
 }
 
@@ -2619,7 +2821,11 @@ int ext4_mb_init(struct super_block *sb)
 {
 	struct ext4_sb_info *sbi = EXT4_SB(sb);
 	unsigned i, j;
+<<<<<<< HEAD
 	unsigned offset;
+=======
+	unsigned offset, offset_incr;
+>>>>>>> common/deprecated/android-3.18
 	unsigned max;
 	int ret;
 
@@ -2648,18 +2854,30 @@ int ext4_mb_init(struct super_block *sb)
 
 	i = 1;
 	offset = 0;
+<<<<<<< HEAD
+=======
+	offset_incr = 1 << (sb->s_blocksize_bits - 1);
+>>>>>>> common/deprecated/android-3.18
 	max = sb->s_blocksize << 2;
 	do {
 		sbi->s_mb_offsets[i] = offset;
 		sbi->s_mb_maxs[i] = max;
+<<<<<<< HEAD
 		offset += 1 << (sb->s_blocksize_bits - i);
+=======
+		offset += offset_incr;
+		offset_incr = offset_incr >> 1;
+>>>>>>> common/deprecated/android-3.18
 		max = max >> 1;
 		i++;
 	} while (i <= sb->s_blocksize_bits + 1);
 
 	spin_lock_init(&sbi->s_md_lock);
 	spin_lock_init(&sbi->s_bal_lock);
+<<<<<<< HEAD
 	INIT_LIST_HEAD(&sbi->s_freed_data_list);
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	sbi->s_mb_max_to_scan = MB_DEFAULT_MAX_TO_SCAN;
 	sbi->s_mb_min_to_scan = MB_DEFAULT_MIN_TO_SCAN;
@@ -2752,7 +2970,11 @@ int ext4_mb_release(struct super_block *sb)
 	ext4_group_t ngroups = ext4_get_groups_count(sb);
 	ext4_group_t i;
 	int num_meta_group_infos;
+<<<<<<< HEAD
 	struct ext4_group_info *grinfo;
+=======
+	struct ext4_group_info *grinfo, ***group_info;
+>>>>>>> common/deprecated/android-3.18
 	struct ext4_sb_info *sbi = EXT4_SB(sb);
 	struct kmem_cache *cachep = get_groupinfo_cache(sb->s_blocksize_bits);
 
@@ -2773,9 +2995,18 @@ int ext4_mb_release(struct super_block *sb)
 		num_meta_group_infos = (ngroups +
 				EXT4_DESC_PER_BLOCK(sb) - 1) >>
 			EXT4_DESC_PER_BLOCK_BITS(sb);
+<<<<<<< HEAD
 		for (i = 0; i < num_meta_group_infos; i++)
 			kfree(sbi->s_group_info[i]);
 		ext4_kvfree(sbi->s_group_info);
+=======
+		rcu_read_lock();
+		group_info = rcu_dereference(sbi->s_group_info);
+		for (i = 0; i < num_meta_group_infos; i++)
+			kfree(group_info[i]);
+		kvfree(group_info);
+		rcu_read_unlock();
+>>>>>>> common/deprecated/android-3.18
 	}
 	kfree(sbi->s_mb_offsets);
 	kfree(sbi->s_mb_maxs);
@@ -2812,7 +3043,11 @@ int ext4_mb_release(struct super_block *sb)
 
 static inline int ext4_issue_discard(struct super_block *sb,
 		ext4_group_t block_group, ext4_grpblk_t cluster, int count,
+<<<<<<< HEAD
 		unsigned long flags, struct bio **biop)
+=======
+		unsigned long flags)
+>>>>>>> common/deprecated/android-3.18
 {
 	ext4_fsblk_t discard_block;
 
@@ -2821,6 +3056,7 @@ static inline int ext4_issue_discard(struct super_block *sb,
 	count = EXT4_C2B(EXT4_SB(sb), count);
 	trace_ext4_discard_blocks(sb,
 			(unsigned long long) discard_block, count);
+<<<<<<< HEAD
 	if (biop) {
 		return __blkdev_issue_discard(sb->s_bdev,
 			(sector_t)discard_block << (sb->s_blocksize_bits - 9),
@@ -2834,6 +3070,20 @@ static inline int ext4_issue_discard(struct super_block *sb,
 static void ext4_free_data_in_buddy(struct super_block *sb,
 				    struct ext4_free_data *entry)
 {
+=======
+	return sb_issue_discard(sb, discard_block, count, GFP_NOFS, flags);
+}
+
+/*
+ * This function is called by the jbd2 layer once the commit has finished,
+ * so we know we can free the blocks that were released with that commit.
+ */
+static void ext4_free_data_callback(struct super_block *sb,
+				    struct ext4_journal_cb_entry *jce,
+				    int rc)
+{
+	struct ext4_free_data *entry = (struct ext4_free_data *)jce;
+>>>>>>> common/deprecated/android-3.18
 	struct ext4_buddy e4b;
 	struct ext4_group_info *db;
 	int err, count = 0, count2 = 0;
@@ -2841,10 +3091,29 @@ static void ext4_free_data_in_buddy(struct super_block *sb,
 	mb_debug(1, "gonna free %u blocks in group %u (0x%p):",
 		 entry->efd_count, entry->efd_group, entry);
 
+<<<<<<< HEAD
+=======
+	if (test_opt(sb, DISCARD)) {
+		err = ext4_issue_discard(sb, entry->efd_group,
+					 entry->efd_start_cluster,
+					 entry->efd_count, 0);
+		if (err && err != -EOPNOTSUPP)
+			ext4_msg(sb, KERN_WARNING, "discard request in"
+				 " group:%d block:%d count:%d failed"
+				 " with %d", entry->efd_group,
+				 entry->efd_start_cluster,
+				 entry->efd_count, err);
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	err = ext4_mb_load_buddy(sb, entry->efd_group, &e4b);
 	/* we expect to find existing buddy because it's pinned */
 	BUG_ON(err != 0);
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> common/deprecated/android-3.18
 	db = e4b.bd_info;
 	/* there are blocks to put in buddy to make them really free */
 	count += entry->efd_count;
@@ -2877,6 +3146,7 @@ static void ext4_free_data_in_buddy(struct super_block *sb,
 	mb_debug(1, "freed %u blocks in %u structures\n", count, count2);
 }
 
+<<<<<<< HEAD
 /*
  * This function is called by the jbd2 layer once the commit has finished,
  * so we know we can free the blocks that were released with that commit.
@@ -2931,6 +3201,8 @@ void ext4_process_freed_data(struct super_block *sb, tid_t commit_tid)
 		ext4_free_data_in_buddy(sb, entry);
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 int __init ext4_init_mballoc(void)
 {
 	ext4_pspace_cachep = KMEM_CACHE(ext4_prealloc_space,
@@ -3017,11 +3289,19 @@ ext4_mb_mark_diskspace_used(struct ext4_allocation_context *ac,
 	block = ext4_grp_offs_to_block(sb, &ac->ac_b_ex);
 
 	len = EXT4_C2B(sbi, ac->ac_b_ex.fe_len);
+<<<<<<< HEAD
 	if (!ext4_data_block_valid(sbi, block, len)) {
 		ext4_error(sb, "Allocating blocks %llu-%llu which overlap "
 			   "fs metadata", block, block+len);
 		/* File system mounted not to panic on error
 		 * Fix the bitmap and repeat the block allocation
+=======
+	if (!ext4_inode_block_valid(ac->ac_inode, block, len)) {
+		ext4_error(sb, "Allocating blocks %llu-%llu which overlap "
+			   "fs metadata", block, block+len);
+		/* File system mounted not to panic on error
+		 * Fix the bitmap and return EFSCORRUPTED
+>>>>>>> common/deprecated/android-3.18
 		 * We leak some of the blocks here.
 		 */
 		ext4_lock_group(sb, ac->ac_b_ex.fe_group);
@@ -3030,7 +3310,11 @@ ext4_mb_mark_diskspace_used(struct ext4_allocation_context *ac,
 		ext4_unlock_group(sb, ac->ac_b_ex.fe_group);
 		err = ext4_handle_dirty_metadata(handle, NULL, bitmap_bh);
 		if (!err)
+<<<<<<< HEAD
 			err = -EAGAIN;
+=======
+			err = -EFSCORRUPTED;
+>>>>>>> common/deprecated/android-3.18
 		goto out_err;
 	}
 
@@ -3046,7 +3330,12 @@ ext4_mb_mark_diskspace_used(struct ext4_allocation_context *ac,
 #endif
 	ext4_set_bits(bitmap_bh->b_data, ac->ac_b_ex.fe_start,
 		      ac->ac_b_ex.fe_len);
+<<<<<<< HEAD
 	if (gdp->bg_flags & cpu_to_le16(EXT4_BG_BLOCK_UNINIT)) {
+=======
+	if (ext4_has_group_desc_csum(sb) &&
+	    (gdp->bg_flags & cpu_to_le16(EXT4_BG_BLOCK_UNINIT))) {
+>>>>>>> common/deprecated/android-3.18
 		gdp->bg_flags &= cpu_to_le16(~EXT4_BG_BLOCK_UNINIT);
 		ext4_free_group_clusters_set(sb, gdp,
 					     ext4_free_clusters_after_init(sb,
@@ -3071,7 +3360,12 @@ ext4_mb_mark_diskspace_used(struct ext4_allocation_context *ac,
 		ext4_group_t flex_group = ext4_flex_group(sbi,
 							  ac->ac_b_ex.fe_group);
 		atomic64_sub(ac->ac_b_ex.fe_len,
+<<<<<<< HEAD
 			     &sbi->s_flex_groups[flex_group].free_clusters);
+=======
+			     &sbi_array_rcu_deref(sbi, s_flex_groups,
+						  flex_group)->free_clusters);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	err = ext4_handle_dirty_metadata(handle, NULL, bitmap_bh);
@@ -3202,6 +3496,16 @@ ext4_mb_normalize_request(struct ext4_allocation_context *ac,
 	if (ar->pright && start + size - 1 >= ar->lright)
 		size -= start + size - ar->lright;
 
+<<<<<<< HEAD
+=======
+	/*
+	 * Trim allocation request for filesystems with artificially small
+	 * groups.
+	 */
+	if (size > EXT4_BLOCKS_PER_GROUP(ac->ac_sb))
+		size = EXT4_BLOCKS_PER_GROUP(ac->ac_sb);
+
+>>>>>>> common/deprecated/android-3.18
 	end = start + size;
 
 	/* check we don't cross already preallocated blocks */
@@ -3945,7 +4249,12 @@ ext4_mb_discard_group_preallocations(struct super_block *sb,
 
 	err = ext4_mb_load_buddy(sb, group, &e4b);
 	if (err) {
+<<<<<<< HEAD
 		ext4_error(sb, "Error loading buddy information for %u", group);
+=======
+		ext4_warning(sb, "Error %d loading buddy information for %u",
+			     err, group);
+>>>>>>> common/deprecated/android-3.18
 		put_bh(bitmap_bh);
 		return 0;
 	}
@@ -4102,10 +4411,18 @@ repeat:
 		BUG_ON(pa->pa_type != MB_INODE_PA);
 		group = ext4_get_group_number(sb, pa->pa_pstart);
 
+<<<<<<< HEAD
 		err = ext4_mb_load_buddy(sb, group, &e4b);
 		if (err) {
 			ext4_error(sb, "Error loading buddy information for %u",
 					group);
+=======
+		err = ext4_mb_load_buddy_gfp(sb, group, &e4b,
+					     GFP_NOFS|__GFP_NOFAIL);
+		if (err) {
+			ext4_error(sb, "Error %d loading buddy information for %u",
+				   err, group);
+>>>>>>> common/deprecated/android-3.18
 			continue;
 		}
 
@@ -4360,11 +4677,22 @@ ext4_mb_discard_lg_preallocations(struct super_block *sb,
 	spin_unlock(&lg->lg_prealloc_lock);
 
 	list_for_each_entry_safe(pa, tmp, &discard_list, u.pa_tmp_list) {
+<<<<<<< HEAD
 
 		group = ext4_get_group_number(sb, pa->pa_pstart);
 		if (ext4_mb_load_buddy(sb, group, &e4b)) {
 			ext4_error(sb, "Error loading buddy information for %u",
 					group);
+=======
+		int err;
+
+		group = ext4_get_group_number(sb, pa->pa_pstart);
+		err = ext4_mb_load_buddy_gfp(sb, group, &e4b,
+					     GFP_NOFS|__GFP_NOFAIL);
+		if (err) {
+			ext4_error(sb, "Error %d loading buddy information for %u",
+				   err, group);
+>>>>>>> common/deprecated/android-3.18
 			continue;
 		}
 		ext4_lock_group(sb, group);
@@ -4519,9 +4847,12 @@ ext4_fsblk_t ext4_mb_new_blocks(handle_t *handle,
 	if (IS_NOQUOTA(ar->inode))
 		ar->flags |= EXT4_MB_USE_ROOT_BLOCKS;
 
+<<<<<<< HEAD
 	if (ext4_test_inode_flag(ar->inode, EXT4_INODE_CORE_FILE))
 		ar->flags |= EXT4_MB_USE_EXTRA_ROOT_BLOCKS;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if ((ar->flags & EXT4_MB_DELALLOC_RESERVED) == 0) {
 		/* Without delayed allocation we need to verify
 		 * there is enough free blocks to do block allocation
@@ -4595,6 +4926,7 @@ repeat:
 	}
 	if (likely(ac->ac_status == AC_STATUS_FOUND)) {
 		*errp = ext4_mb_mark_diskspace_used(ac, handle, reserv_clstrs);
+<<<<<<< HEAD
 		if (*errp == -EAGAIN) {
 			/*
 			 * drop the reference that we took
@@ -4607,6 +4939,9 @@ repeat:
 			ac->ac_status = AC_STATUS_CONTINUE;
 			goto repeat;
 		} else if (*errp) {
+=======
+		if (*errp) {
+>>>>>>> common/deprecated/android-3.18
 			ext4_discard_allocated_blocks(ac);
 			goto errout;
 		} else {
@@ -4649,6 +4984,7 @@ out:
  * are contiguous, AND the extents were freed by the same transaction,
  * AND the blocks are associated with the same group.
  */
+<<<<<<< HEAD
 static void ext4_try_merge_freed_extent(struct ext4_sb_info *sbi,
 					struct ext4_free_data *entry,
 					struct ext4_free_data *new_entry,
@@ -4671,6 +5007,16 @@ static void ext4_try_merge_freed_extent(struct ext4_sb_info *sbi,
 	spin_unlock(&sbi->s_md_lock);
 	rb_erase(&entry->efd_node, entry_rb_root);
 	kmem_cache_free(ext4_free_data_cachep, entry);
+=======
+static int can_merge(struct ext4_free_data *entry1,
+			struct ext4_free_data *entry2)
+{
+	if ((entry1->efd_tid == entry2->efd_tid) &&
+	    (entry1->efd_group == entry2->efd_group) &&
+	    ((entry1->efd_start_cluster + entry1->efd_count) == entry2->efd_start_cluster))
+		return 1;
+	return 0;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static noinline_for_stack int
@@ -4714,6 +5060,10 @@ ext4_mb_free_metadata(handle_t *handle, struct ext4_buddy *e4b,
 				ext4_group_first_block_no(sb, group) +
 				EXT4_C2B(sbi, cluster),
 				"Block already on to-be-freed list");
+<<<<<<< HEAD
+=======
+			kmem_cache_free(ext4_free_data_cachep, new_entry);
+>>>>>>> common/deprecated/android-3.18
 			return 0;
 		}
 	}
@@ -4725,13 +5075,24 @@ ext4_mb_free_metadata(handle_t *handle, struct ext4_buddy *e4b,
 	node = rb_prev(new_node);
 	if (node) {
 		entry = rb_entry(node, struct ext4_free_data, efd_node);
+<<<<<<< HEAD
 		ext4_try_merge_freed_extent(sbi, entry, new_entry,
 					    &(db->bb_free_root));
+=======
+		if (can_merge(entry, new_entry) &&
+		    ext4_journal_callback_try_del(handle, &entry->efd_jce)) {
+			new_entry->efd_start_cluster = entry->efd_start_cluster;
+			new_entry->efd_count += entry->efd_count;
+			rb_erase(node, &(db->bb_free_root));
+			kmem_cache_free(ext4_free_data_cachep, entry);
+		}
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	node = rb_next(new_node);
 	if (node) {
 		entry = rb_entry(node, struct ext4_free_data, efd_node);
+<<<<<<< HEAD
 		ext4_try_merge_freed_extent(sbi, entry, new_entry,
 					    &(db->bb_free_root));
 	}
@@ -4740,6 +5101,18 @@ ext4_mb_free_metadata(handle_t *handle, struct ext4_buddy *e4b,
 	list_add_tail(&new_entry->efd_list, &sbi->s_freed_data_list);
 	spin_unlock(&sbi->s_md_lock);
 
+=======
+		if (can_merge(new_entry, entry) &&
+		    ext4_journal_callback_try_del(handle, &entry->efd_jce)) {
+			new_entry->efd_count += entry->efd_count;
+			rb_erase(node, &(db->bb_free_root));
+			kmem_cache_free(ext4_free_data_cachep, entry);
+		}
+	}
+	/* Add the extent to transaction's private list */
+	ext4_journal_callback_add(handle, ext4_free_data_callback,
+				  &new_entry->efd_jce);
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -4778,7 +5151,11 @@ void ext4_free_blocks(handle_t *handle, struct inode *inode,
 
 	sbi = EXT4_SB(sb);
 	if (!(flags & EXT4_FREE_BLOCKS_VALIDATED) &&
+<<<<<<< HEAD
 	    !ext4_data_block_valid(sbi, block, count)) {
+=======
+	    !ext4_inode_block_valid(inode, block, count)) {
+>>>>>>> common/deprecated/android-3.18
 		ext4_error(sb, "Freeing blocks not in datazone - "
 			   "block = %llu, count = %lu", block, count);
 		goto error_return;
@@ -4912,7 +5289,13 @@ do_more:
 #endif
 	trace_ext4_mballoc_free(sb, inode, block_group, bit, count_clusters);
 
+<<<<<<< HEAD
 	err = ext4_mb_load_buddy(sb, block_group, &e4b);
+=======
+	/* __GFP_NOFAIL: retry infinitely, ignore TIF_MEMDIE and memcg limit. */
+	err = ext4_mb_load_buddy_gfp(sb, block_group, &e4b,
+				     GFP_NOFS|__GFP_NOFAIL);
+>>>>>>> common/deprecated/android-3.18
 	if (err)
 		goto error_return;
 
@@ -4921,6 +5304,7 @@ do_more:
 		/*
 		 * blocks being freed are metadata. these blocks shouldn't
 		 * be used until this transaction is committed
+<<<<<<< HEAD
 		 */
 	retry:
 		new_entry = kmem_cache_alloc(ext4_free_data_cachep, GFP_NOFS);
@@ -4933,6 +5317,14 @@ do_more:
 			congestion_wait(BLK_RW_ASYNC, HZ/50);
 			goto retry;
 		}
+=======
+		 *
+		 * We use __GFP_NOFAIL because ext4_free_blocks() is not allowed
+		 * to fail.
+		 */
+		new_entry = kmem_cache_alloc(ext4_free_data_cachep,
+				GFP_NOFS|__GFP_NOFAIL);
+>>>>>>> common/deprecated/android-3.18
 		new_entry->efd_start_cluster = bit;
 		new_entry->efd_group = block_group;
 		new_entry->efd_count = count_clusters;
@@ -4948,7 +5340,11 @@ do_more:
 		 */
 		if (test_opt(sb, DISCARD)) {
 			err = ext4_issue_discard(sb, block_group, bit, count,
+<<<<<<< HEAD
 						 0, NULL);
+=======
+						 0);
+>>>>>>> common/deprecated/android-3.18
 			if (err && err != -EOPNOTSUPP)
 				ext4_msg(sb, KERN_WARNING, "discard request in"
 					 " group:%d block:%d count:%lu failed"
@@ -4971,7 +5367,12 @@ do_more:
 	if (sbi->s_log_groups_per_flex) {
 		ext4_group_t flex_group = ext4_flex_group(sbi, block_group);
 		atomic64_add(count_clusters,
+<<<<<<< HEAD
 			     &sbi->s_flex_groups[flex_group].free_clusters);
+=======
+			     &sbi_array_rcu_deref(sbi, s_flex_groups,
+						  flex_group)->free_clusters);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (!(flags & EXT4_FREE_BLOCKS_NO_QUOT_UPDATE))
@@ -5115,7 +5516,12 @@ int ext4_group_add_blocks(handle_t *handle, struct super_block *sb,
 	if (sbi->s_log_groups_per_flex) {
 		ext4_group_t flex_group = ext4_flex_group(sbi, block_group);
 		atomic64_add(EXT4_NUM_B2C(sbi, blocks_freed),
+<<<<<<< HEAD
 			     &sbi->s_flex_groups[flex_group].free_clusters);
+=======
+			     &sbi_array_rcu_deref(sbi, s_flex_groups,
+						  flex_group)->free_clusters);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	ext4_mb_unload_buddy(&e4b);
@@ -5172,7 +5578,11 @@ __acquires(bitlock)
 	 */
 	mb_mark_used(e4b, &ex);
 	ext4_unlock_group(sb, group);
+<<<<<<< HEAD
 	ret = ext4_issue_discard(sb, group, start, count, blkdev_flags, NULL);
+=======
+	ret = ext4_issue_discard(sb, group, start, count, blkdev_flags);
+>>>>>>> common/deprecated/android-3.18
 	ext4_lock_group(sb, group);
 	mb_free_blocks(NULL, e4b, start, ex.fe_len);
 	return ret;
@@ -5211,8 +5621,13 @@ ext4_trim_all_free(struct super_block *sb, ext4_group_t group,
 
 	ret = ext4_mb_load_buddy(sb, group, &e4b);
 	if (ret) {
+<<<<<<< HEAD
 		ext4_error(sb, "Error in loading buddy "
 				"information for %u", group);
+=======
+		ext4_warning(sb, "Error %d loading buddy information for %u",
+			     ret, group);
+>>>>>>> common/deprecated/android-3.18
 		return ret;
 	}
 	bitmap = e4b.bd_bitmap;
@@ -5326,7 +5741,11 @@ int ext4_trim_fs(struct super_block *sb, struct fstrim_range *range,
 		grp = ext4_get_group_info(sb, group);
 		/* We only do this if the grp has never been initialized */
 		if (unlikely(EXT4_MB_GRP_NEED_INIT(grp))) {
+<<<<<<< HEAD
 			ret = ext4_mb_init_group(sb, group);
+=======
+			ret = ext4_mb_init_group(sb, group, GFP_NOFS);
+>>>>>>> common/deprecated/android-3.18
 			if (ret)
 				break;
 		}

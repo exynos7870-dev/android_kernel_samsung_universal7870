@@ -42,7 +42,11 @@ struct nxt200x_config
 	int (*set_ts_params)(struct dvb_frontend* fe, int is_punctured);
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_NXT200X)
+=======
+#if IS_REACHABLE(CONFIG_DVB_NXT200X)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend* nxt200x_attach(const struct nxt200x_config* config,
 					   struct i2c_adapter* i2c);
 #else

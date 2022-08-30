@@ -125,9 +125,12 @@ struct kvm_vcpu_arch {
 	 * Anything that is not used directly from assembly code goes
 	 * here.
 	 */
+<<<<<<< HEAD
 	/* dcache set/way operation pending */
 	int last_pcpu;
 	cpumask_t require_dcache_flush;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	/* Don't run the guest on this vcpu */
 	bool pause;

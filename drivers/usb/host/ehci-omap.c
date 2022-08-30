@@ -130,8 +130,13 @@ static int ehci_hcd_omap_probe(struct platform_device *pdev)
 
 	irq = platform_get_irq(pdev, 0);
 	if (irq < 0) {
+<<<<<<< HEAD
 		dev_err(dev, "EHCI irq failed\n");
 		return -ENODEV;
+=======
+		dev_err(dev, "EHCI irq failed: %d\n", irq);
+		return irq;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	res =  platform_get_resource(pdev, IORESOURCE_MEM, 0);
@@ -237,6 +242,10 @@ static int ehci_hcd_omap_probe(struct platform_device *pdev)
 
 err_pm_runtime:
 	pm_runtime_put_sync(dev);
+<<<<<<< HEAD
+=======
+	pm_runtime_disable(dev);
+>>>>>>> common/deprecated/android-3.18
 
 err_phy:
 	for (i = 0; i < omap->nports; i++) {

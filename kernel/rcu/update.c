@@ -509,7 +509,11 @@ static void check_holdout_task(struct task_struct *t,
 	if (!needreport)
 		return;
 	if (*firstreport) {
+<<<<<<< HEAD
 		pr_auto(ASL1, "INFO: rcu_tasks detected stalls on tasks:\n");
+=======
+		pr_err("INFO: rcu_tasks detected stalls on tasks:\n");
+>>>>>>> common/deprecated/android-3.18
 		*firstreport = false;
 	}
 	cpu = task_cpu(t);

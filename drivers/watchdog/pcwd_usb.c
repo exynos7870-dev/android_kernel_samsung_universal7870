@@ -630,6 +630,12 @@ static int usb_pcwd_probe(struct usb_interface *interface,
 		return -ENODEV;
 	}
 
+<<<<<<< HEAD
+=======
+	if (iface_desc->desc.bNumEndpoints < 1)
+		return -ENODEV;
+
+>>>>>>> common/deprecated/android-3.18
 	/* check out the endpoint: it has to be Interrupt & IN */
 	endpoint = &iface_desc->endpoint[0].desc;
 

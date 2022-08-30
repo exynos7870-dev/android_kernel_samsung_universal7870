@@ -944,11 +944,18 @@ EXPORT_SYMBOL_GPL(devm_regmap_init);
 static void regmap_field_init(struct regmap_field *rm_field,
 	struct regmap *regmap, struct reg_field reg_field)
 {
+<<<<<<< HEAD
 	int field_bits = reg_field.msb - reg_field.lsb + 1;
 	rm_field->regmap = regmap;
 	rm_field->reg = reg_field.reg;
 	rm_field->shift = reg_field.lsb;
 	rm_field->mask = ((BIT(field_bits) - 1) << reg_field.lsb);
+=======
+	rm_field->regmap = regmap;
+	rm_field->reg = reg_field.reg;
+	rm_field->shift = reg_field.lsb;
+	rm_field->mask = GENMASK(reg_field.msb, reg_field.lsb);
+>>>>>>> common/deprecated/android-3.18
 	rm_field->id_size = reg_field.id_size;
 	rm_field->id_offset = reg_field.id_offset;
 }
@@ -1102,7 +1109,11 @@ static int dev_get_regmap_match(struct device *dev, void *res, void *data)
 
 	/* If the user didn't specify a name match any */
 	if (data)
+<<<<<<< HEAD
 		return (*r)->name == data;
+=======
+		return !strcmp((*r)->name, data);
+>>>>>>> common/deprecated/android-3.18
 	else
 		return 1;
 }
@@ -1354,6 +1365,11 @@ int _regmap_raw_write(struct regmap *map, unsigned int reg,
 					     map->format.reg_bytes +
 					     map->format.pad_bytes,
 					     val, val_len);
+<<<<<<< HEAD
+=======
+	else
+		ret = -ENOTSUPP;
+>>>>>>> common/deprecated/android-3.18
 
 	/* If that didn't work fall back on linearising by hand. */
 	if (ret == -ENOTSUPP) {
@@ -2317,7 +2333,11 @@ int regmap_bulk_read(struct regmap *map, unsigned int reg, void *val,
 					  &ival);
 			if (ret != 0)
 				return ret;
+<<<<<<< HEAD
 			memcpy(val + (i * val_bytes), &ival, val_bytes);
+=======
+			map->format.format_val(val + (i * val_bytes), ival, 0);
+>>>>>>> common/deprecated/android-3.18
 		}
 	}
 

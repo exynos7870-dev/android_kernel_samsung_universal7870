@@ -175,12 +175,17 @@ config INPUT_APMPOWER
 	  module will be called apm-power.
 
 config INPUT_KEYRESET
+<<<<<<< HEAD
 	tristate "Reset key"
+=======
+	bool "Reset key"
+>>>>>>> common/deprecated/android-3.18
 	depends on INPUT
 	select INPUT_KEYCOMBO
 	---help---
 	  Say Y here if you want to reboot when some keys are pressed;
 
+<<<<<<< HEAD
 	  To compile this driver as a module, choose M here: the
 	  module will be called keyreset.
 
@@ -205,6 +210,8 @@ config INPUT_TOUCHSCREEN_TCLMV2
 
 	  If unsure, say N.
 
+=======
+>>>>>>> common/deprecated/android-3.18
 config INPUT_KEYCOMBO
 	tristate "Key combo"
 	depends on INPUT
@@ -214,6 +221,7 @@ config INPUT_KEYCOMBO
 	  To compile this driver as a module, choose M here: the
 	  module will be called keycombo.
 
+<<<<<<< HEAD
 config HALL
 	tristate "Enable HALL"
 	default n
@@ -258,6 +266,8 @@ config SEC_AUTO_INPUT
 	  To compile this driver as a module, choose M here: the
 	  module will be called autoinput.
 
+=======
+>>>>>>> common/deprecated/android-3.18
 comment "Input Device Drivers"
 
 source "drivers/input/keyboard/Kconfig"
@@ -270,8 +280,11 @@ source "drivers/input/tablet/Kconfig"
 
 source "drivers/input/touchscreen/Kconfig"
 
+<<<<<<< HEAD
 source "drivers/input/wacom/Kconfig"
 
+=======
+>>>>>>> common/deprecated/android-3.18
 source "drivers/input/misc/Kconfig"
 
 endif

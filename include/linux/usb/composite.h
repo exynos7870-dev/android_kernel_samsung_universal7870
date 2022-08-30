@@ -53,6 +53,12 @@
 /* big enough to hold our biggest descriptor */
 #define USB_COMP_EP0_BUFSIZ	1024
 
+<<<<<<< HEAD
+=======
+/* OS feature descriptor length <= 4kB */
+#define USB_COMP_EP0_OS_DESC_BUFSIZ	4096
+
+>>>>>>> common/deprecated/android-3.18
 #define USB_MS_TO_HS_INTERVAL(x)	(ilog2((x * 1000 / 125)) + 1)
 struct usb_configuration;
 
@@ -196,11 +202,15 @@ struct usb_function {
 	 * we can't restructure things to avoid mismatching.
 	 * Related:  unbind() may kfree() but bind() won't...
 	 */
+<<<<<<< HEAD
 #ifdef CONFIG_USB_ANDROID_SAMSUNG_COMPOSITE
 	int (*set_intf_num)(struct usb_function *f,
 			int intf_num, int index_num);
 	int (*set_config_desc)(int conf_num);
 #endif
+=======
+
+>>>>>>> common/deprecated/android-3.18
 	/* configuration management:  bind/unbind */
 	int			(*bind)(struct usb_configuration *,
 					struct usb_function *);
@@ -209,12 +219,15 @@ struct usb_function {
 	void			(*free_func)(struct usb_function *f);
 	struct module		*mod;
 
+<<<<<<< HEAD
 #ifdef CONFIG_USB_CONFIGFS_UEVENT
 	/* Optional function for vendor specific processing */
 	int			(*ctrlrequest)(struct usb_function *,
 					const struct usb_ctrlrequest *);
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* runtime state management */
 	int			(*set_alt)(struct usb_function *,
 					unsigned interface, unsigned alt);
@@ -223,8 +236,11 @@ struct usb_function {
 	void			(*disable)(struct usb_function *);
 	int			(*setup)(struct usb_function *,
 					const struct usb_ctrlrequest *);
+<<<<<<< HEAD
 	bool			(*req_match)(struct usb_function *,
 					const struct usb_ctrlrequest *);
+=======
+>>>>>>> common/deprecated/android-3.18
 	void			(*suspend)(struct usb_function *);
 	void			(*resume)(struct usb_function *);
 
@@ -237,8 +253,11 @@ struct usb_function {
 	struct list_head		list;
 	DECLARE_BITMAP(endpoints, 32);
 	const struct usb_function_instance *fi;
+<<<<<<< HEAD
 
 	unsigned int		bind_deactivated:1;
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 int usb_add_function(struct usb_configuration *, struct usb_function *);
@@ -500,6 +519,7 @@ struct usb_composite_dev {
 	 */
 	int				delayed_status;
 
+<<<<<<< HEAD
 #ifdef CONFIG_USB_ANDROID_SAMSUNG_COMPOSITE
 		/* used by enable_store function of android.c
 		 * to avoid signalling switch changes
@@ -513,6 +533,10 @@ struct usb_composite_dev {
 
 	unsigned			setup_pending:1;
 	unsigned			os_desc_pending:1;
+=======
+	/* protects deactivations and delayed_status counts*/
+	spinlock_t			lock;
+>>>>>>> common/deprecated/android-3.18
 };
 
 extern int usb_string_id(struct usb_composite_dev *c);

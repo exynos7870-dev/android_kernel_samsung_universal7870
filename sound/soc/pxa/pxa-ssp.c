@@ -840,3 +840,7 @@ module_platform_driver(asoc_ssp_driver);
 MODULE_AUTHOR("Mark Brown <broonie@opensource.wolfsonmicro.com>");
 MODULE_DESCRIPTION("PXA SSP/PCM SoC Interface");
 MODULE_LICENSE("GPL");
+<<<<<<< HEAD
+=======
+MODULE_ALIAS("platform:pxa-ssp-dai");
+>>>>>>> common/deprecated/android-3.18

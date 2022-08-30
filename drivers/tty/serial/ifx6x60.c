@@ -1242,6 +1242,12 @@ static int ifx_spi_spi_remove(struct spi_device *spi)
 	struct ifx_spi_device *ifx_dev = spi_get_drvdata(spi);
 	/* stop activity */
 	tasklet_kill(&ifx_dev->io_work_tasklet);
+<<<<<<< HEAD
+=======
+
+	pm_runtime_disable(&spi->dev);
+
+>>>>>>> common/deprecated/android-3.18
 	/* free irq */
 	free_irq(gpio_to_irq(ifx_dev->gpio.reset_out), (void *)ifx_dev);
 	free_irq(gpio_to_irq(ifx_dev->gpio.srdy), (void *)ifx_dev);
@@ -1379,9 +1385,15 @@ static struct spi_driver ifx_spi_driver = {
 static void __exit ifx_spi_exit(void)
 {
 	/* unregister */
+<<<<<<< HEAD
 	tty_unregister_driver(tty_drv);
 	put_tty_driver(tty_drv);
 	spi_unregister_driver((void *)&ifx_spi_driver);
+=======
+	spi_unregister_driver((void *)&ifx_spi_driver);
+	tty_unregister_driver(tty_drv);
+	put_tty_driver(tty_drv);
+>>>>>>> common/deprecated/android-3.18
 	unregister_reboot_notifier(&ifx_modem_reboot_notifier_block);
 }
 

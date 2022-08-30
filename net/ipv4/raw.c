@@ -158,6 +158,10 @@ static int icmp_filter(const struct sock *sk, const struct sk_buff *skb)
  */
 static int raw_v4_input(struct sk_buff *skb, const struct iphdr *iph, int hash)
 {
+<<<<<<< HEAD
+=======
+	int dif = inet_iif(skb);
+>>>>>>> common/deprecated/android-3.18
 	struct sock *sk;
 	struct hlist_head *head;
 	int delivered = 0;
@@ -170,8 +174,12 @@ static int raw_v4_input(struct sk_buff *skb, const struct iphdr *iph, int hash)
 
 	net = dev_net(skb->dev);
 	sk = __raw_v4_lookup(net, __sk_head(head), iph->protocol,
+<<<<<<< HEAD
 			     iph->saddr, iph->daddr,
 			     skb->dev->ifindex);
+=======
+			     iph->saddr, iph->daddr, dif);
+>>>>>>> common/deprecated/android-3.18
 
 	while (sk) {
 		delivered = 1;
@@ -186,7 +194,11 @@ static int raw_v4_input(struct sk_buff *skb, const struct iphdr *iph, int hash)
 		}
 		sk = __raw_v4_lookup(net, sk_next(sk), iph->protocol,
 				     iph->saddr, iph->daddr,
+<<<<<<< HEAD
 				     skb->dev->ifindex);
+=======
+				     dif);
+>>>>>>> common/deprecated/android-3.18
 	}
 out:
 	read_unlock(&raw_v4_hashinfo.lock);
@@ -397,7 +409,11 @@ static int raw_send_hdrinc(struct sock *sk, struct flowi4 *fl4,
 		iph->check   = 0;
 		iph->tot_len = htons(length);
 		if (!iph->id)
+<<<<<<< HEAD
 			ip_select_ident(skb, NULL);
+=======
+			ip_select_ident(net, skb, NULL);
+>>>>>>> common/deprecated/android-3.18
 
 		iph->check = ip_fast_csum((unsigned char *)iph, iph->ihl);
 	}
@@ -490,9 +506,17 @@ static int raw_sendmsg(struct kiocb *iocb, struct sock *sk, struct msghdr *msg,
 		goto out;
 
 	/* hdrincl should be READ_ONCE(inet->hdrincl)
+<<<<<<< HEAD
 	 * but READ_ONCE() doesn't work with bit fields
 	 */
 	hdrincl = inet->hdrincl;
+=======
+	 * but READ_ONCE() doesn't work with bit fields.
+	 * Doing this indirectly yields the same result.
+	 */
+	hdrincl = inet->hdrincl;
+	hdrincl = READ_ONCE(hdrincl);
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 *	Check the flags.
 	 */
@@ -538,8 +562,15 @@ static int raw_sendmsg(struct kiocb *iocb, struct sock *sk, struct msghdr *msg,
 
 	if (msg->msg_controllen) {
 		err = ip_cmsg_send(sock_net(sk), msg, &ipc, false);
+<<<<<<< HEAD
 		if (err)
 			goto out;
+=======
+		if (unlikely(err)) {
+			kfree(ipc.opt);
+			goto out;
+		}
+>>>>>>> common/deprecated/android-3.18
 		if (ipc.opt)
 			free = 1;
 	}

@@ -298,9 +298,15 @@ static void addrconf_mod_rs_timer(struct inet6_dev *idev,
 static void addrconf_mod_dad_work(struct inet6_ifaddr *ifp,
 				   unsigned long delay)
 {
+<<<<<<< HEAD
 	if (!delayed_work_pending(&ifp->dad_work))
 		in6_ifa_hold(ifp);
 	mod_delayed_work(addrconf_wq, &ifp->dad_work, delay);
+=======
+	in6_ifa_hold(ifp);
+	if (mod_delayed_work(addrconf_wq, &ifp->dad_work, delay))
+		in6_ifa_put(ifp);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int snmp6_alloc_dev(struct inet6_dev *idev)
@@ -425,6 +431,10 @@ static struct inet6_dev *ipv6_add_dev(struct net_device *dev)
 	if (err) {
 		ipv6_mc_destroy_dev(ndev);
 		del_timer(&ndev->regen_timer);
+<<<<<<< HEAD
+=======
+		snmp6_unregister_dev(ndev);
+>>>>>>> common/deprecated/android-3.18
 		goto err_release;
 	}
 	/* protected by rtnl_lock */
@@ -531,7 +541,11 @@ void inet6_netconf_notify_devconf(struct net *net, int type, int ifindex,
 	struct sk_buff *skb;
 	int err = -ENOBUFS;
 
+<<<<<<< HEAD
 	skb = nlmsg_new(inet6_netconf_msgsize_devconf(type), GFP_ATOMIC);
+=======
+	skb = nlmsg_new(inet6_netconf_msgsize_devconf(type), GFP_KERNEL);
+>>>>>>> common/deprecated/android-3.18
 	if (skb == NULL)
 		goto errout;
 
@@ -543,7 +557,11 @@ void inet6_netconf_notify_devconf(struct net *net, int type, int ifindex,
 		kfree_skb(skb);
 		goto errout;
 	}
+<<<<<<< HEAD
 	rtnl_notify(skb, net, 0, RTNLGRP_IPV6_NETCONF, NULL, GFP_ATOMIC);
+=======
+	rtnl_notify(skb, net, 0, RTNLGRP_IPV6_NETCONF, NULL, GFP_KERNEL);
+>>>>>>> common/deprecated/android-3.18
 	return;
 errout:
 	rtnl_set_sk_err(net, RTNLGRP_IPV6_NETCONF, err);
@@ -573,7 +591,11 @@ static int inet6_netconf_get_devconf(struct sk_buff *in_skb,
 	if (err < 0)
 		goto errout;
 
+<<<<<<< HEAD
 	err = EINVAL;
+=======
+	err = -EINVAL;
+>>>>>>> common/deprecated/android-3.18
 	if (!tb[NETCONFA_IFINDEX])
 		goto errout;
 
@@ -761,7 +783,18 @@ static int addrconf_fixup_forwarding(struct ctl_table *table, int *p, int newf)
 	}
 
 	if (p == &net->ipv6.devconf_all->forwarding) {
+<<<<<<< HEAD
 		net->ipv6.devconf_dflt->forwarding = newf;
+=======
+		int old_dflt = net->ipv6.devconf_dflt->forwarding;
+
+		net->ipv6.devconf_dflt->forwarding = newf;
+		if ((!newf) ^ (!old_dflt))
+			inet6_netconf_notify_devconf(net, NETCONFA_FORWARDING,
+						     NETCONFA_IFINDEX_DEFAULT,
+						     net->ipv6.devconf_dflt);
+
+>>>>>>> common/deprecated/android-3.18
 		addrconf_forward_change(net, newf);
 		if ((!newf) ^ (!old))
 			inet6_netconf_notify_devconf(net, NETCONFA_FORWARDING,
@@ -891,7 +924,14 @@ ipv6_add_addr(struct inet6_dev *idev, const struct in6_addr *addr,
 	INIT_HLIST_NODE(&ifa->addr_lst);
 	ifa->scope = scope;
 	ifa->prefix_len = pfxlen;
+<<<<<<< HEAD
 	ifa->flags = flags | IFA_F_TENTATIVE;
+=======
+	ifa->flags = flags;
+	/* No need to add the TENTATIVE flag for addresses with NODAD */
+	if (!(flags & IFA_F_NODAD))
+		ifa->flags |= IFA_F_TENTATIVE;
+>>>>>>> common/deprecated/android-3.18
 	ifa->valid_lft = valid_lft;
 	ifa->prefered_lft = prefered_lft;
 	ifa->cstamp = ifa->tstamp = jiffies;
@@ -937,6 +977,7 @@ out:
 	goto out2;
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_NETPM
 struct net_device *ip6_dev_find(struct net *net, const struct in6_addr *addr)
 {
@@ -972,6 +1013,8 @@ struct net_device *ip6_dev_find(struct net *net, const struct in6_addr *addr)
 }
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 enum cleanup_prefix_rt_t {
 	CLEANUP_PREFIX_RT_NOP,    /* no cleanup action for prefix route */
 	CLEANUP_PREFIX_RT_DEL,    /* delete the prefix route */
@@ -1009,7 +1052,12 @@ check_cleanup_prefix_route(struct inet6_ifaddr *ifp, unsigned long *expires)
 	list_for_each_entry(ifa, &idev->addr_list, if_list) {
 		if (ifa == ifp)
 			continue;
+<<<<<<< HEAD
 		if (!ipv6_prefix_equal(&ifa->addr, &ifp->addr,
+=======
+		if (ifa->prefix_len != ifp->prefix_len ||
+		    !ipv6_prefix_equal(&ifa->addr, &ifp->addr,
+>>>>>>> common/deprecated/android-3.18
 				       ifp->prefix_len))
 			continue;
 		if (ifa->flags & (IFA_F_PERMANENT | IFA_F_NOPREFIXROUTE))
@@ -1741,6 +1789,7 @@ struct inet6_ifaddr *ipv6_get_ifaddr(struct net *net, const struct in6_addr *add
 
 static void addrconf_dad_stop(struct inet6_ifaddr *ifp, int dad_failed)
 {
+<<<<<<< HEAD
 	if (ifp->flags&IFA_F_PERMANENT) {
 		spin_lock_bh(&ifp->lock);
 		addrconf_del_dad_work(ifp);
@@ -1752,6 +1801,9 @@ static void addrconf_dad_stop(struct inet6_ifaddr *ifp, int dad_failed)
 			ipv6_ifa_notify(0, ifp);
 		in6_ifa_put(ifp);
 	} else if (ifp->flags&IFA_F_TEMPORARY) {
+=======
+	if (ifp->flags&IFA_F_TEMPORARY) {
+>>>>>>> common/deprecated/android-3.18
 		struct inet6_ifaddr *ifpub;
 		spin_lock_bh(&ifp->lock);
 		ifpub = ifp->ifpub;
@@ -1764,6 +1816,19 @@ static void addrconf_dad_stop(struct inet6_ifaddr *ifp, int dad_failed)
 			spin_unlock_bh(&ifp->lock);
 		}
 		ipv6_del_addr(ifp);
+<<<<<<< HEAD
+=======
+	} else if (ifp->flags&IFA_F_PERMANENT || !dad_failed) {
+		spin_lock_bh(&ifp->lock);
+		addrconf_del_dad_work(ifp);
+		ifp->flags |= IFA_F_TENTATIVE;
+		if (dad_failed)
+			ifp->flags |= IFA_F_DADFAILED;
+		spin_unlock_bh(&ifp->lock);
+		if (dad_failed)
+			ipv6_ifa_notify(0, ifp);
+		in6_ifa_put(ifp);
+>>>>>>> common/deprecated/android-3.18
 	} else {
 		ipv6_del_addr(ifp);
 	}
@@ -1817,6 +1882,10 @@ void addrconf_dad_failure(struct inet6_ifaddr *ifp)
 	spin_unlock_bh(&ifp->state_lock);
 
 	addrconf_mod_dad_work(ifp, 0);
+<<<<<<< HEAD
+=======
+	in6_ifa_put(ifp);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /* Join to solicited addr multicast group.
@@ -1984,7 +2053,10 @@ static int addrconf_ifid_ip6tnl(u8 *eui, struct net_device *dev)
 
 static int ipv6_generate_eui64(u8 *eui, struct net_device *dev)
 {
+<<<<<<< HEAD
 	pr_crit("%s: dev type: %d\n", __func__, dev->type);
+=======
+>>>>>>> common/deprecated/android-3.18
 	switch (dev->type) {
 	case ARPHRD_ETHER:
 	case ARPHRD_FDDI:
@@ -2004,6 +2076,7 @@ static int ipv6_generate_eui64(u8 *eui, struct net_device *dev)
 		return addrconf_ifid_ieee1394(eui, dev);
 	case ARPHRD_TUNNEL6:
 		return addrconf_ifid_ip6tnl(eui, dev);
+<<<<<<< HEAD
 	case ARPHRD_RAWIP:
 	case ARPHRD_PPP: {
 		struct in6_addr lladdr;
@@ -2015,6 +2088,8 @@ static int ipv6_generate_eui64(u8 *eui, struct net_device *dev)
 
 		return 0;
 	}
+=======
+>>>>>>> common/deprecated/android-3.18
 	}
 	return -1;
 }
@@ -2211,6 +2286,10 @@ static void addrconf_add_mroute(struct net_device *dev)
 		.fc_dst_len = 8,
 		.fc_flags = RTF_UP,
 		.fc_nlinfo.nl_net = dev_net(dev),
+<<<<<<< HEAD
+=======
+		.fc_protocol = RTPROT_KERNEL,
+>>>>>>> common/deprecated/android-3.18
 	};
 
 	ipv6_addr_set(&cfg.fc_dst, htonl(0xFF000000), 0, 0, 0);
@@ -2860,7 +2939,11 @@ static void init_loopback(struct net_device *dev)
 				 * lo device down, release this obsolete dst and
 				 * reallocate a new router for ifa.
 				 */
+<<<<<<< HEAD
 				if (sp_ifa->rt->dst.obsolete > 0) {
+=======
+				if (!atomic_read(&sp_ifa->rt->rt6i_ref)) {
+>>>>>>> common/deprecated/android-3.18
 					ip6_rt_put(sp_ifa->rt);
 					sp_ifa->rt = NULL;
 				} else {
@@ -2927,8 +3010,11 @@ static void addrconf_dev_config(struct net_device *dev)
 	if ((dev->type != ARPHRD_ETHER) &&
 	    (dev->type != ARPHRD_FDDI) &&
 	    (dev->type != ARPHRD_ARCNET) &&
+<<<<<<< HEAD
 	    (dev->type != ARPHRD_RAWIP) &&
 	    (dev->type != ARPHRD_PPP) &&
+=======
+>>>>>>> common/deprecated/android-3.18
 	    (dev->type != ARPHRD_INFINIBAND) &&
 	    (dev->type != ARPHRD_IEEE802154) &&
 	    (dev->type != ARPHRD_IEEE1394) &&
@@ -2996,6 +3082,10 @@ static int addrconf_notify(struct notifier_block *this, unsigned long event,
 {
 	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
 	struct inet6_dev *idev = __in6_dev_get(dev);
+<<<<<<< HEAD
+=======
+	struct net *net = dev_net(dev);
+>>>>>>> common/deprecated/android-3.18
 	int run_pending = 0;
 	int err;
 
@@ -3038,9 +3128,21 @@ static int addrconf_notify(struct notifier_block *this, unsigned long event,
 			}
 
 			if (idev) {
+<<<<<<< HEAD
 				if (idev->if_flags & IF_READY)
 					/* device is already configured. */
 					break;
+=======
+				if (idev->if_flags & IF_READY) {
+					/* device is already configured -
+					 * but resend MLD reports, we might
+					 * have roamed and need to update
+					 * multicast snooping switches
+					 */
+					ipv6_mc_up(idev);
+					break;
+				}
+>>>>>>> common/deprecated/android-3.18
 				idev->if_flags |= IF_READY;
 			}
 
@@ -3092,7 +3194,11 @@ static int addrconf_notify(struct notifier_block *this, unsigned long event,
 			 * IPV6_MIN_MTU stop IPv6 on this interface.
 			 */
 			if (dev->mtu < IPV6_MIN_MTU)
+<<<<<<< HEAD
 				addrconf_ifdown(dev, 1);
+=======
+				addrconf_ifdown(dev, dev != net->loopback_dev);
+>>>>>>> common/deprecated/android-3.18
 		}
 		break;
 
@@ -3151,6 +3257,10 @@ static int addrconf_notify(struct notifier_block *this, unsigned long event,
  */
 static struct notifier_block ipv6_dev_notf = {
 	.notifier_call = addrconf_notify,
+<<<<<<< HEAD
+=======
+	.priority = ADDRCONF_NOTIFY_PRIORITY,
+>>>>>>> common/deprecated/android-3.18
 };
 
 static void addrconf_type_change(struct net_device *dev, unsigned long event)
@@ -3457,6 +3567,10 @@ static void addrconf_dad_work(struct work_struct *w)
 		addrconf_dad_begin(ifp);
 		goto out;
 	} else if (action == DAD_ABORT) {
+<<<<<<< HEAD
+=======
+		in6_ifa_hold(ifp);
+>>>>>>> common/deprecated/android-3.18
 		addrconf_dad_stop(ifp, 1);
 		goto out;
 	}
@@ -3622,7 +3736,10 @@ static struct inet6_ifaddr *if6_get_first(struct seq_file *seq, loff_t pos)
 				p++;
 				continue;
 			}
+<<<<<<< HEAD
 			state->offset++;
+=======
+>>>>>>> common/deprecated/android-3.18
 			return ifa;
 		}
 
@@ -3646,13 +3763,21 @@ static struct inet6_ifaddr *if6_get_next(struct seq_file *seq,
 		return ifa;
 	}
 
+<<<<<<< HEAD
 	while (++state->bucket < IN6_ADDR_HSIZE) {
 		state->offset = 0;
+=======
+	state->offset = 0;
+	while (++state->bucket < IN6_ADDR_HSIZE) {
+>>>>>>> common/deprecated/android-3.18
 		hlist_for_each_entry_rcu_bh(ifa,
 				     &inet6_addr_lst[state->bucket], addr_lst) {
 			if (!net_eq(dev_net(ifa->idev->dev), net))
 				continue;
+<<<<<<< HEAD
 			state->offset++;
+=======
+>>>>>>> common/deprecated/android-3.18
 			return ifa;
 		}
 	}
@@ -4274,8 +4399,13 @@ static int in6_dump_addrs(struct inet6_dev *idev, struct sk_buff *skb,
 
 		/* unicast address incl. temp addr */
 		list_for_each_entry(ifa, &idev->addr_list, if_list) {
+<<<<<<< HEAD
 			if (++ip_idx < s_ip_idx)
 				continue;
+=======
+			if (ip_idx < s_ip_idx)
+				goto next;
+>>>>>>> common/deprecated/android-3.18
 			err = inet6_fill_ifaddr(skb, ifa,
 						NETLINK_CB(cb->skb).portid,
 						cb->nlh->nlmsg_seq,
@@ -4284,6 +4414,11 @@ static int in6_dump_addrs(struct inet6_dev *idev, struct sk_buff *skb,
 			if (err <= 0)
 				break;
 			nl_dump_check_consistent(cb, nlmsg_hdr(skb));
+<<<<<<< HEAD
+=======
+next:
+			ip_idx++;
+>>>>>>> common/deprecated/android-3.18
 		}
 		break;
 	}
@@ -4966,7 +5101,11 @@ static void __ipv6_ifa_notify(int event, struct inet6_ifaddr *ifp)
 		 * our DAD process, so we don't need
 		 * to do it again
 		 */
+<<<<<<< HEAD
 		if (!(ifp->rt->rt6i_node))
+=======
+		if (!rcu_access_pointer(ifp->rt->rt6i_node))
+>>>>>>> common/deprecated/android-3.18
 			ip6_ins_rt(ifp->rt);
 		if (ifp->idev->cnf.forwarding)
 			addrconf_join_anycast(ifp);
@@ -5033,6 +5172,24 @@ int addrconf_sysctl_forward(struct ctl_table *ctl, int write,
 	return ret;
 }
 
+<<<<<<< HEAD
+=======
+static
+int addrconf_sysctl_mtu(struct ctl_table *ctl, int write,
+			void __user *buffer, size_t *lenp, loff_t *ppos)
+{
+	struct inet6_dev *idev = ctl->extra1;
+	int min_mtu = IPV6_MIN_MTU;
+	struct ctl_table lctl;
+
+	lctl = *ctl;
+	lctl.extra1 = &min_mtu;
+	lctl.extra2 = idev ? &idev->dev->mtu : NULL;
+
+	return proc_dointvec_minmax(&lctl, write, buffer, lenp, ppos);
+}
+
+>>>>>>> common/deprecated/android-3.18
 static void dev_disable_change(struct inet6_dev *idev)
 {
 	struct netdev_notifier_info info;
@@ -5052,8 +5209,12 @@ static void addrconf_disable_change(struct net *net, __s32 newf)
 	struct net_device *dev;
 	struct inet6_dev *idev;
 
+<<<<<<< HEAD
 	rcu_read_lock();
 	for_each_netdev_rcu(net, dev) {
+=======
+	for_each_netdev(net, dev) {
+>>>>>>> common/deprecated/android-3.18
 		idev = __in6_dev_get(dev);
 		if (idev) {
 			int changed = (!idev->cnf.disable_ipv6) ^ (!newf);
@@ -5062,7 +5223,10 @@ static void addrconf_disable_change(struct net *net, __s32 newf)
 				dev_disable_change(idev);
 		}
 	}
+<<<<<<< HEAD
 	rcu_read_unlock();
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int addrconf_disable_ipv6(struct ctl_table *table, int *p, int newf)
@@ -5184,7 +5348,11 @@ static struct addrconf_sysctl_table
 			.data		= &ipv6_devconf.mtu6,
 			.maxlen		= sizeof(int),
 			.mode		= 0644,
+<<<<<<< HEAD
 			.proc_handler	= proc_dointvec,
+=======
+			.proc_handler	= addrconf_sysctl_mtu,
+>>>>>>> common/deprecated/android-3.18
 		},
 		{
 			.procname	= "accept_ra",
@@ -5650,6 +5818,11 @@ int __init addrconf_init(void)
 		goto errlo;
 	}
 
+<<<<<<< HEAD
+=======
+	ip6_route_init_special_entries();
+
+>>>>>>> common/deprecated/android-3.18
 	for (i = 0; i < IN6_ADDR_HSIZE; i++)
 		INIT_HLIST_HEAD(&inet6_addr_lst[i]);
 

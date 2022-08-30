@@ -40,6 +40,9 @@ config IIO_ADIS_LIB_BUFFER
 	help
 	  A set of buffer helper functions for the Analog Devices ADIS* device
 	  family.
+<<<<<<< HEAD
 
 source "drivers/iio/imu/inv_mpu6515/Kconfig"
 
+=======
+>>>>>>> common/deprecated/android-3.18

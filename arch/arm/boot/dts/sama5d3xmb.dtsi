@@ -176,7 +176,11 @@
 			"Headphone Jack", "HPOUTR",
 			"IN2L", "Line In Jack",
 			"IN2R", "Line In Jack",
+<<<<<<< HEAD
 			"MICBIAS", "IN1L",
+=======
+			"Mic", "MICBIAS",
+>>>>>>> common/deprecated/android-3.18
 			"IN1L", "Mic";
 
 		atmel,ssc-controller = <&ssc0>;

@@ -243,6 +243,7 @@ config BT_WILINK
 	  Say Y here to compile support for Texas Instrument's WiLink7 driver
 	  into the kernel or say M to compile it as module (btwilink).
 
+<<<<<<< HEAD
 config BT_QCA9377
 	bool "Enable QCA9377 driver"
 	default n
@@ -271,4 +272,6 @@ config FM_DTV_CTRL
 	  This enables Antenna switch for DTV model.      
 	  default is n.
 
+=======
+>>>>>>> common/deprecated/android-3.18
 endmenu

@@ -49,7 +49,11 @@ static inline bool ceph_can_shift_osds(struct ceph_pg_pool_info *pool)
 	case CEPH_POOL_TYPE_EC:
 		return false;
 	default:
+<<<<<<< HEAD
 		BUG_ON(1);
+=======
+		BUG();
+>>>>>>> common/deprecated/android-3.18
 	}
 }
 

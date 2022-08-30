@@ -392,7 +392,11 @@ static int pcf857x_probe(struct i2c_client *client,
 	 * reset state.  Otherwise it flags pins to be driven low.
 	 */
 	gpio->out = ~n_latch;
+<<<<<<< HEAD
 	gpio->status = gpio->out;
+=======
+	gpio->status = gpio->read(gpio->client);
+>>>>>>> common/deprecated/android-3.18
 
 	status = gpiochip_add(&gpio->chip);
 	if (status < 0)

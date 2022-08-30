@@ -42,7 +42,11 @@
 
 #include <linux/atomic.h>
 
+<<<<<<< HEAD
 #include <linux/clocksource.h>
+=======
+#include <linux/timecounter.h>
+>>>>>>> common/deprecated/android-3.18
 
 #define MAX_MSIX_P_PORT		17
 #define MAX_MSIX		64

@@ -643,7 +643,11 @@
 		timer@fffec600 {
 			compatible = "arm,cortex-a9-twd-timer";
 			reg = <0xfffec600 0x100>;
+<<<<<<< HEAD
 			interrupts = <1 13 0xf04>;
+=======
+			interrupts = <1 13 0xf01>;
+>>>>>>> common/deprecated/android-3.18
 			clocks = <&mpu_periph_clk>;
 		};
 

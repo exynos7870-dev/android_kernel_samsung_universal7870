@@ -69,8 +69,14 @@ static int hash_walk_new_entry(struct crypto_hash_walk *walk)
 	struct scatterlist *sg;
 
 	sg = walk->sg;
+<<<<<<< HEAD
 	walk->pg = sg_page(sg);
 	walk->offset = sg->offset;
+=======
+	walk->offset = sg->offset;
+	walk->pg = sg_page(walk->sg) + (walk->offset >> PAGE_SHIFT);
+	walk->offset = offset_in_page(walk->offset);
+>>>>>>> common/deprecated/android-3.18
 	walk->entrylen = sg->length;
 
 	if (walk->entrylen > walk->total)
@@ -83,6 +89,7 @@ static int hash_walk_new_entry(struct crypto_hash_walk *walk)
 int crypto_hash_walk_done(struct crypto_hash_walk *walk, int err)
 {
 	unsigned int alignmask = walk->alignmask;
+<<<<<<< HEAD
 	unsigned int nbytes = walk->entrylen;
 
 #ifdef CONFIG_CRYPTO_FIPS
@@ -101,6 +108,22 @@ int crypto_hash_walk_done(struct crypto_hash_walk *walk, int err)
 		walk->entrylen -= nbytes;
 
 		return nbytes;
+=======
+
+	walk->data -= walk->offset;
+
+	if (walk->entrylen && (walk->offset & alignmask) && !err) {
+		unsigned int nbytes;
+
+		walk->offset = ALIGN(walk->offset, alignmask + 1);
+		nbytes = min(walk->entrylen,
+			     (unsigned int)(PAGE_SIZE - walk->offset));
+		if (nbytes) {
+			walk->entrylen -= nbytes;
+			walk->data += walk->offset;
+			return nbytes;
+		}
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (walk->flags & CRYPTO_ALG_ASYNC)
@@ -117,7 +140,11 @@ int crypto_hash_walk_done(struct crypto_hash_walk *walk, int err)
 	if (err)
 		return err;
 
+<<<<<<< HEAD
 	if (nbytes) {
+=======
+	if (walk->entrylen) {
+>>>>>>> common/deprecated/android-3.18
 		walk->offset = 0;
 		walk->pg++;
 		return hash_walk_next(walk);
@@ -135,12 +162,15 @@ EXPORT_SYMBOL_GPL(crypto_hash_walk_done);
 int crypto_hash_walk_first(struct ahash_request *req,
 			   struct crypto_hash_walk *walk)
 {
+<<<<<<< HEAD
 
 #ifdef CONFIG_CRYPTO_FIPS
 	if (unlikely(in_fips_err()))
 		return -EACCES;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	walk->total = req->nbytes;
 
 	if (!walk->total) {
@@ -181,11 +211,14 @@ int crypto_hash_walk_first_compat(struct hash_desc *hdesc,
 				  struct crypto_hash_walk *walk,
 				  struct scatterlist *sg, unsigned int len)
 {
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 	if (unlikely(in_fips_err()))
 		return -EACCES;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	walk->total = len;
 
 	if (!walk->total) {
@@ -311,8 +344,14 @@ static void ahash_restore_req(struct ahash_request *req, int err)
 
 	/* Restore the original crypto request. */
 	req->result = priv->result;
+<<<<<<< HEAD
 	ahash_request_set_callback(req, priv->flags,
 							   priv->complete, priv->data);
+=======
+
+	ahash_request_set_callback(req, priv->flags,
+				   priv->complete, priv->data);
+>>>>>>> common/deprecated/android-3.18
 	req->priv = NULL;
 
 	/* Free the req->priv.priv from the ADJUSTED request. */
@@ -334,8 +373,13 @@ static void ahash_op_unaligned_done(struct crypto_async_request *req, int err)
 	struct ahash_request *areq = req->data;
 
 	if (err == -EINPROGRESS) {
+<<<<<<< HEAD
 			ahash_notify_einprogress(areq);
 			return;
+=======
+		ahash_notify_einprogress(areq);
+		return;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/*
@@ -365,9 +409,15 @@ static int ahash_op_unaligned(struct ahash_request *req,
 
 	err = op(req);
 	if (err == -EINPROGRESS ||
+<<<<<<< HEAD
 		(err == -EBUSY && (ahash_request_flags(req) &
 						   CRYPTO_TFM_REQ_MAY_BACKLOG)))
 			return err;
+=======
+	    (err == -EBUSY && (ahash_request_flags(req) &
+			       CRYPTO_TFM_REQ_MAY_BACKLOG)))
+		return err;
+>>>>>>> common/deprecated/android-3.18
 
 	ahash_restore_req(req, err);
 
@@ -380,11 +430,14 @@ static int crypto_ahash_op(struct ahash_request *req,
 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
 	unsigned long alignmask = crypto_ahash_alignmask(tfm);
 
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 	if (unlikely(in_fips_err()))
 		return -EACCES;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if ((unsigned long)req->result & alignmask)
 		return ahash_op_unaligned(req, op);
 
@@ -430,9 +483,15 @@ static int ahash_def_finup_finish1(struct ahash_request *req, int err)
 
 	err = crypto_ahash_reqtfm(req)->final(req);
 	if (err == -EINPROGRESS ||
+<<<<<<< HEAD
 		(err == -EBUSY && (ahash_request_flags(req) &
 						   CRYPTO_TFM_REQ_MAY_BACKLOG)))
 			return err;
+=======
+	    (err == -EBUSY && (ahash_request_flags(req) &
+			       CRYPTO_TFM_REQ_MAY_BACKLOG)))
+		return err;
+>>>>>>> common/deprecated/android-3.18
 
 out:
 	ahash_restore_req(req, err);
@@ -444,15 +503,24 @@ static void ahash_def_finup_done1(struct crypto_async_request *req, int err)
 	struct ahash_request *areq = req->data;
 
 	if (err == -EINPROGRESS) {
+<<<<<<< HEAD
 			ahash_notify_einprogress(areq);
 			return;
+=======
+		ahash_notify_einprogress(areq);
+		return;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	areq->base.flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
 
 	err = ahash_def_finup_finish1(areq, err);
 	if (areq->priv)
+<<<<<<< HEAD
 			return;
+=======
+		return;
+>>>>>>> common/deprecated/android-3.18
 
 	areq->base.complete(&areq->base, err);
 }
@@ -468,9 +536,15 @@ static int ahash_def_finup(struct ahash_request *req)
 
 	err = tfm->update(req);
 	if (err == -EINPROGRESS ||
+<<<<<<< HEAD
 		(err == -EBUSY && (ahash_request_flags(req) &
 						   CRYPTO_TFM_REQ_MAY_BACKLOG)))
 			return err;
+=======
+	    (err == -EBUSY && (ahash_request_flags(req) &
+			       CRYPTO_TFM_REQ_MAY_BACKLOG)))
+		return err;
+>>>>>>> common/deprecated/android-3.18
 
 	return ahash_def_finup_finish1(req, err);
 }
@@ -490,12 +564,17 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
 	struct crypto_ahash *hash = __crypto_ahash_cast(tfm);
 	struct ahash_alg *alg = crypto_ahash_alg(hash);
 
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 	if (unlikely(in_fips_err()))
 		return -EACCES;
 #endif
 
 	hash->setkey = ahash_nosetkey;
+=======
+	hash->setkey = ahash_nosetkey;
+	hash->has_setkey = false;
+>>>>>>> common/deprecated/android-3.18
 	hash->export = ahash_no_export;
 	hash->import = ahash_no_import;
 
@@ -508,8 +587,15 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
 	hash->finup = alg->finup ?: ahash_def_finup;
 	hash->digest = alg->digest;
 
+<<<<<<< HEAD
 	if (alg->setkey)
 		hash->setkey = alg->setkey;
+=======
+	if (alg->setkey) {
+		hash->setkey = alg->setkey;
+		hash->has_setkey = true;
+	}
+>>>>>>> common/deprecated/android-3.18
 	if (alg->export)
 		hash->export = alg->export;
 	if (alg->import)
@@ -589,7 +675,12 @@ static int ahash_prepare_alg(struct ahash_alg *alg)
 	struct crypto_alg *base = &alg->halg.base;
 
 	if (alg->halg.digestsize > PAGE_SIZE / 8 ||
+<<<<<<< HEAD
 	    alg->halg.statesize > PAGE_SIZE / 8)
+=======
+	    alg->halg.statesize > PAGE_SIZE / 8 ||
+	    alg->halg.statesize == 0)
+>>>>>>> common/deprecated/android-3.18
 		return -EINVAL;
 
 	base->cra_type = &crypto_ahash_type;
@@ -623,11 +714,14 @@ int ahash_register_instance(struct crypto_template *tmpl,
 {
 	int err;
 
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 	if (unlikely(in_fips_err()))
 		return -EACCES;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	err = ahash_prepare_alg(&inst->alg);
 	if (err)
 		return err;
@@ -661,5 +755,19 @@ struct hash_alg_common *ahash_attr_alg(struct rtattr *rta, u32 type, u32 mask)
 }
 EXPORT_SYMBOL_GPL(ahash_attr_alg);
 
+<<<<<<< HEAD
+=======
+bool crypto_hash_alg_has_setkey(struct hash_alg_common *halg)
+{
+	struct crypto_alg *alg = &halg->base;
+
+	if (alg->cra_type != &crypto_ahash_type)
+		return crypto_shash_alg_has_setkey(__crypto_shash_alg(alg));
+
+	return __crypto_ahash_alg(alg)->setkey != NULL;
+}
+EXPORT_SYMBOL_GPL(crypto_hash_alg_has_setkey);
+
+>>>>>>> common/deprecated/android-3.18
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Asynchronous cryptographic hash type");

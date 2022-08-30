@@ -50,4 +50,8 @@ generic-y += types.h
 generic-y += ucontext.h
 generic-y += user.h
 generic-y += vga.h
+<<<<<<< HEAD
+=======
+generic-y += word-at-a-time.h
+>>>>>>> common/deprecated/android-3.18
 generic-y += xor.h

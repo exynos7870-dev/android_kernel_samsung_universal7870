@@ -83,6 +83,10 @@ static struct i2c_algo_bit_data ioc_data = {
 
 static struct i2c_adapter ioc_ops = {
 	.nr			= 0,
+<<<<<<< HEAD
+=======
+	.name			= "ioc",
+>>>>>>> common/deprecated/android-3.18
 	.algo_data		= &ioc_data,
 };
 

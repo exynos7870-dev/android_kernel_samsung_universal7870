@@ -582,7 +582,11 @@ static inline int pmd_large(pmd_t pmd)
 	return (pmd_val(pmd) & _SEGMENT_ENTRY_LARGE) != 0;
 }
 
+<<<<<<< HEAD
 static inline int pmd_pfn(pmd_t pmd)
+=======
+static inline unsigned long pmd_pfn(pmd_t pmd)
+>>>>>>> common/deprecated/android-3.18
 {
 	unsigned long origin_mask;
 
@@ -863,6 +867,11 @@ static inline void set_pte_at(struct mm_struct *mm, unsigned long addr,
 {
 	pgste_t pgste;
 
+<<<<<<< HEAD
+=======
+	if (pte_present(entry))
+		pte_val(entry) &= ~_PAGE_UNUSED;
+>>>>>>> common/deprecated/android-3.18
 	if (mm_has_pgste(mm)) {
 		pgste = pgste_get_lock(ptep);
 		pgste_val(pgste) &= ~_PGSTE_GPS_ZERO;

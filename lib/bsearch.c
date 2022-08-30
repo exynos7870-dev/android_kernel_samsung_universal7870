@@ -11,6 +11,10 @@
 
 #include <linux/export.h>
 #include <linux/bsearch.h>
+<<<<<<< HEAD
+=======
+#include <linux/kprobes.h>
+>>>>>>> common/deprecated/android-3.18
 
 /*
  * bsearch - binary search an array of elements
@@ -51,3 +55,7 @@ void *bsearch(const void *key, const void *base, size_t num, size_t size,
 	return NULL;
 }
 EXPORT_SYMBOL(bsearch);
+<<<<<<< HEAD
+=======
+NOKPROBE_SYMBOL(bsearch);
+>>>>>>> common/deprecated/android-3.18

@@ -89,6 +89,7 @@
 #include <asm/smp.h>
 #endif
 
+<<<<<<< HEAD
 #ifdef CONFIG_TIMA_RKP
 #include <linux/vmm.h>
 #include <linux/rkp_entry.h> 
@@ -97,11 +98,14 @@
 #include <linux/sec_ext.h>
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static int kernel_init(void *);
 
 extern void init_IRQ(void);
 extern void fork_init(unsigned long);
 extern void radix_tree_init(void);
+<<<<<<< HEAD
 #ifndef CONFIG_DEBUG_RODATA
 static inline void mark_rodata_ro(void) { }
 #endif
@@ -109,6 +113,9 @@ static inline void mark_rodata_ro(void) { }
 int boot_mode_security;
 EXPORT_SYMBOL(boot_mode_security);
 #endif
+=======
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Debug helper: via this flag we know that we are in 'early bootup code'
  * where only the boot processor is running with IRQ disabled.  This means
@@ -444,6 +451,7 @@ static int __init do_early_param(char *param, char *val, const char *unused)
 		}
 	}
 	/* We accept everything at this stage. */
+<<<<<<< HEAD
 #ifdef CONFIG_KNOX_KAP
 	if ((strncmp(param, "androidboot.security_mode", 26) == 0)) {
 		pr_warn("val = %d\n",*val);
@@ -453,6 +461,8 @@ static int __init do_early_param(char *param, char *val, const char *unused)
 			}
 	}
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -516,6 +526,7 @@ static void __init mm_init(void)
 	pgtable_init();
 	vmalloc_init();
 }
+<<<<<<< HEAD
 #ifdef	CONFIG_TIMA_RKP
 #ifdef CONFIG_TIMA_RKP_4G
 __attribute__((section(".rkp.bitmap"))) u8 rkp_pgt_bitmap_arr[0x20000] = {0};
@@ -558,6 +569,8 @@ static void rkp_init(void)
 	return;
 }
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 asmlinkage __visible void __init start_kernel(void)
 {
@@ -601,8 +614,14 @@ asmlinkage __visible void __init start_kernel(void)
 	page_alloc_init();
 
 	pr_notice("Kernel command line: %s\n", boot_command_line);
+<<<<<<< HEAD
 	parse_early_param();
 
+=======
+	/* parameters may set static keys */
+	jump_label_init();
+	parse_early_param();
+>>>>>>> common/deprecated/android-3.18
 	after_dashes = parse_args("Booting kernel",
 				  static_command_line, __start___param,
 				  __stop___param - __start___param,
@@ -611,6 +630,7 @@ asmlinkage __visible void __init start_kernel(void)
 		parse_args("Setting init args", after_dashes, NULL, 0, -1, -1,
 			   set_init_arg);
 
+<<<<<<< HEAD
 #ifdef CONFIG_TIMA_RKP
 #ifdef CONFIG_KNOX_KAP
 	if (boot_mode_security)
@@ -624,6 +644,8 @@ asmlinkage __visible void __init start_kernel(void)
 
 	jump_label_init();
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * These use large bootmem allocations and must precede
 	 * kmem_cache_init()
@@ -651,6 +673,13 @@ asmlinkage __visible void __init start_kernel(void)
 		local_irq_disable();
 	idr_init_cache();
 	rcu_init();
+<<<<<<< HEAD
+=======
+
+	/* trace_printk() and trace points may be used after this */
+	trace_init();
+
+>>>>>>> common/deprecated/android-3.18
 	context_tracking_init();
 	radix_tree_init();
 	/* init some links before init_ISA_irqs() */
@@ -722,6 +751,7 @@ asmlinkage __visible void __init start_kernel(void)
 	init_espfix_bsp();
 #endif
 	thread_info_cache_init();
+<<<<<<< HEAD
 #ifdef CONFIG_TIMA_RKP
 
 #ifdef CONFIG_KNOX_KAP
@@ -730,6 +760,8 @@ asmlinkage __visible void __init start_kernel(void)
 		rkp_init();
 
 #endif /* CONFIG_TIMA_RKP */
+=======
+>>>>>>> common/deprecated/android-3.18
 	cred_init();
 	fork_init(totalram_pages);
 	proc_caches_init();
@@ -749,6 +781,10 @@ asmlinkage __visible void __init start_kernel(void)
 
 	check_bugs();
 
+<<<<<<< HEAD
+=======
+	acpi_subsystem_init();
+>>>>>>> common/deprecated/android-3.18
 	sfi_init_late();
 
 	if (efi_enabled(EFI_RUNTIME_SERVICES)) {
@@ -760,6 +796,11 @@ asmlinkage __visible void __init start_kernel(void)
 
 	/* Do the rest non-__init'ed, we're now alive */
 	rest_init();
+<<<<<<< HEAD
+=======
+
+	prevent_tail_call_optimization();
+>>>>>>> common/deprecated/android-3.18
 }
 
 /* Call all constructor functions linked into the kernel. */
@@ -846,12 +887,17 @@ static int __init_or_module do_one_initcall_debug(initcall_t fn)
 	unsigned long long duration;
 	int ret;
 
+<<<<<<< HEAD
 	pr_debug("calling  %pF @ %i\n", fn, task_pid_nr(current));
+=======
+	printk(KERN_DEBUG "calling  %pF @ %i\n", fn, task_pid_nr(current));
+>>>>>>> common/deprecated/android-3.18
 	calltime = ktime_get();
 	ret = fn();
 	rettime = ktime_get();
 	delta = ktime_sub(rettime, calltime);
 	duration = (unsigned long long) ktime_to_ns(delta) >> 10;
+<<<<<<< HEAD
 	pr_debug("initcall %pF returned %d after %lld usecs\n",
 		 fn, ret, duration);
 
@@ -860,6 +906,11 @@ static int __init_or_module do_one_initcall_debug(initcall_t fn)
 		sec_initcall_debug_add(fn, duration);
 #endif
 
+=======
+	printk(KERN_DEBUG "initcall %pF returned %d after %lld usecs\n",
+		 fn, ret, duration);
+
+>>>>>>> common/deprecated/android-3.18
 	return ret;
 }
 
@@ -872,14 +923,21 @@ int __init_or_module do_one_initcall(initcall_t fn)
 	if (initcall_blacklisted(fn))
 		return -EPERM;
 
+<<<<<<< HEAD
 #ifdef CONFIG_SEC_INITCALL_DEBUG
 	ret = do_one_initcall_debug(fn);
 #else
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (initcall_debug)
 		ret = do_one_initcall_debug(fn);
 	else
 		ret = fn();
+<<<<<<< HEAD
 #endif
+=======
+
+>>>>>>> common/deprecated/android-3.18
 	msgbuf[0] = 0;
 
 	if (preempt_count() != count) {
@@ -944,10 +1002,13 @@ static void __init do_initcall_level(int level)
 
 	for (fn = initcall_levels[level]; fn < initcall_levels[level+1]; fn++)
 		do_one_initcall(*fn);
+<<<<<<< HEAD
 
 #ifdef CONFIG_SEC_BOOTSTAT
 	sec_bootstat_add_initcall(initcall_level_names[level]);
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void __init do_initcalls(void)
@@ -1019,17 +1080,45 @@ static int try_to_run_init_process(const char *init_filename)
 	return ret;
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_SEC_GPIO_DVS
 extern void gpio_dvs_check_initgpio(void);
 #endif
  
 static noinline void __init kernel_init_freeable(void);
 
+=======
+static noinline void __init kernel_init_freeable(void);
+
+#ifdef CONFIG_DEBUG_RODATA
+static bool rodata_enabled = true;
+static int __init set_debug_rodata(char *str)
+{
+	return strtobool(str, &rodata_enabled);
+}
+__setup("rodata=", set_debug_rodata);
+
+static void mark_readonly(void)
+{
+	if (rodata_enabled)
+		mark_rodata_ro();
+	else
+		pr_info("Kernel memory protection disabled.\n");
+}
+#else
+static inline void mark_readonly(void)
+{
+	pr_warn("This architecture does not have kernel memory protection.\n");
+}
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 static int __ref kernel_init(void *unused)
 {
 	int ret;
 
 	kernel_init_freeable();
+<<<<<<< HEAD
 #ifdef CONFIG_SEC_GPIO_DVS
 	/************************ Caution !!! ****************************/
 	/* This function must be located in appropriate INIT position
@@ -1043,6 +1132,12 @@ static int __ref kernel_init(void *unused)
 	async_synchronize_full();
 	free_initmem();
 	mark_rodata_ro();
+=======
+	/* need to finish all async __init code before freeing the memory */
+	async_synchronize_full();
+	free_initmem();
+	mark_readonly();
+>>>>>>> common/deprecated/android-3.18
 	system_state = SYSTEM_RUNNING;
 	numa_default_policy();
 
@@ -1098,7 +1193,11 @@ static noinline void __init kernel_init_freeable(void)
 	 */
 	set_cpus_allowed_ptr(current, cpu_all_mask);
 
+<<<<<<< HEAD
 	cad_pid = task_pid(current);
+=======
+	cad_pid = get_pid(task_pid(current));
+>>>>>>> common/deprecated/android-3.18
 
 	smp_prepare_cpus(setup_max_cpus);
 

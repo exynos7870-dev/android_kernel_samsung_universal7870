@@ -56,7 +56,10 @@
 #include <linux/random.h>
 #include <linux/ftrace_event.h>
 #include <linux/suspend.h>
+<<<<<<< HEAD
 #include <linux/exynos-ss.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #include "tree.h"
 #include "rcu.h"
@@ -1071,12 +1074,17 @@ static void print_other_cpu_stall(struct rcu_state *rsp)
 	 * See Documentation/RCU/stallwarn.txt for info on how to debug
 	 * RCU CPU stall warnings.
 	 */
+<<<<<<< HEAD
 	exynos_ss_save_context(NULL);
 	exynos_ss_set_enable("log_kevents", false);
 
 	pr_auto(ASL1, "INFO: %s detected stalls on CPUs/tasks:",
 	       rsp->name);
 
+=======
+	pr_err("INFO: %s detected stalls on CPUs/tasks:",
+	       rsp->name);
+>>>>>>> common/deprecated/android-3.18
 	print_cpu_stall_info_begin();
 	rcu_for_each_leaf_node(rsp, rnp) {
 		raw_spin_lock_irqsave(&rnp->lock, flags);
@@ -1131,11 +1139,15 @@ static void print_cpu_stall(struct rcu_state *rsp)
 	 * See Documentation/RCU/stallwarn.txt for info on how to debug
 	 * RCU CPU stall warnings.
 	 */
+<<<<<<< HEAD
 	exynos_ss_save_context(NULL);
 	exynos_ss_set_enable("log_kevents", false);
 
 	pr_auto(ASL1, "INFO: %s self-detected stall on CPU", rsp->name);
 
+=======
+	pr_err("INFO: %s self-detected stall on CPU", rsp->name);
+>>>>>>> common/deprecated/android-3.18
 	print_cpu_stall_info_begin();
 	print_cpu_stall_info(rsp, smp_processor_id());
 	print_cpu_stall_info_end();
@@ -1408,6 +1420,7 @@ static int rcu_future_gp_cleanup(struct rcu_state *rsp, struct rcu_node *rnp)
 }
 
 /*
+<<<<<<< HEAD
  * Awaken the grace-period kthread for the specified flavor of RCU.
  * Don't do a self-awaken, and don't bother awakening when there is
  * nothing for the grace-period kthread to do (as in several CPUs
@@ -1417,6 +1430,25 @@ static int rcu_future_gp_cleanup(struct rcu_state *rsp, struct rcu_node *rnp)
 static void rcu_gp_kthread_wake(struct rcu_state *rsp)
 {
 	if (current == rsp->gp_kthread ||
+=======
+ * Awaken the grace-period kthread.  Don't do a self-awaken (unless in
+ * an interrupt or softirq handler), and don't bother awakening when there
+ * is nothing for the grace-period kthread to do (as in several CPUs raced
+ * to awaken, and we lost), and finally don't try to awaken a kthread that
+ * has not yet been created.  If all those checks are passed, track some
+ * debug information and awaken.
+ *
+ * So why do the self-wakeup when in an interrupt or softirq handler
+ * in the grace-period kthread's context?  Because the kthread might have
+ * been interrupted just as it was going to sleep, and just after the final
+ * pre-sleep check of the awaken condition.  In this case, a wakeup really
+ * is required, and is therefore supplied.
+ */
+static void rcu_gp_kthread_wake(struct rcu_state *rsp)
+{
+	if ((current == rsp->gp_kthread &&
+	     !in_interrupt() && !in_serving_softirq()) ||
+>>>>>>> common/deprecated/android-3.18
 	    !ACCESS_ONCE(rsp->gp_flags) ||
 	    !rsp->gp_kthread)
 		return;
@@ -2949,11 +2981,14 @@ static int synchronize_sched_expedited_cpu_stop(void *data)
  * restructure your code to batch your updates, and then use a single
  * synchronize_sched() instead.
  *
+<<<<<<< HEAD
  * Note that it is illegal to call this function while holding any lock
  * that is acquired by a CPU-hotplug notifier.  And yes, it is also illegal
  * to call this function from a CPU-hotplug notifier.  Failing to observe
  * these restriction will result in deadlock.
  *
+=======
+>>>>>>> common/deprecated/android-3.18
  * This implementation can be thought of as an application of ticket
  * locking to RCU, with sync_sched_expedited_started and
  * sync_sched_expedited_done taking on the roles of the halves
@@ -3003,7 +3038,16 @@ void synchronize_sched_expedited(void)
 	 */
 	snap = atomic_long_inc_return(&rsp->expedited_start);
 	firstsnap = snap;
+<<<<<<< HEAD
 	get_online_cpus();
+=======
+	if (!try_get_online_cpus()) {
+		/* CPU hotplug operation in flight, fall back to normal GP. */
+		wait_rcu_gp(call_rcu_sched);
+		atomic_long_inc(&rsp->expedited_normal);
+		return;
+	}
+>>>>>>> common/deprecated/android-3.18
 	WARN_ON_ONCE(cpu_is_offline(raw_smp_processor_id()));
 
 	/*
@@ -3050,7 +3094,16 @@ void synchronize_sched_expedited(void)
 		 * and they started after our first try, so their grace
 		 * period works for us.
 		 */
+<<<<<<< HEAD
 		get_online_cpus();
+=======
+		if (!try_get_online_cpus()) {
+			/* CPU hotplug operation in flight, use normal GP. */
+			wait_rcu_gp(call_rcu_sched);
+			atomic_long_inc(&rsp->expedited_normal);
+			return;
+		}
+>>>>>>> common/deprecated/android-3.18
 		snap = atomic_long_read(&rsp->expedited_start);
 		smp_mb(); /* ensure read is before try_stop_cpus(). */
 	}

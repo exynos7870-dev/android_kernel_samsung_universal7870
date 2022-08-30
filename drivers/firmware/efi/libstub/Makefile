@@ -8,21 +8,32 @@ cflags-$(CONFIG_X86_32)		:= -march=i386
 cflags-$(CONFIG_X86_64)		:= -mcmodel=small
 cflags-$(CONFIG_X86)		+= -m$(BITS) -D__KERNEL__ $(LINUX_INCLUDE) -O2 \
 				   -fPIC -fno-strict-aliasing -mno-red-zone \
+<<<<<<< HEAD
 				   -mno-mmx -mno-sse -DDISABLE_BRANCH_PROFILING
+=======
+				   -mno-mmx -mno-sse
+>>>>>>> common/deprecated/android-3.18
 
 cflags-$(CONFIG_ARM64)		:= $(subst -pg,,$(KBUILD_CFLAGS))
 cflags-$(CONFIG_ARM)		:= $(subst -pg,,$(KBUILD_CFLAGS)) \
 				   -fno-builtin -fpic -mno-single-pic-base
 
+<<<<<<< HEAD
 KBUILD_CFLAGS			:= $(cflags-y) \
+=======
+KBUILD_CFLAGS			:= $(cflags-y) -DDISABLE_BRANCH_PROFILING \
+>>>>>>> common/deprecated/android-3.18
 				   $(call cc-option,-ffreestanding) \
 				   $(call cc-option,-fno-stack-protector)
 
 GCOV_PROFILE			:= n
 
+<<<<<<< HEAD
 # Prevents link failures: __sanitizer_cov_trace_pc() is not linked in.
 KCOV_INSTRUMENT			:= n
 
+=======
+>>>>>>> common/deprecated/android-3.18
 lib-y				:= efi-stub-helper.o
 lib-$(CONFIG_EFI_ARMSTUB)	+= arm-stub.o fdt.o
 

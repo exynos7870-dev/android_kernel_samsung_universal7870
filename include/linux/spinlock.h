@@ -56,7 +56,11 @@
 #include <linux/stringify.h>
 #include <linux/bottom_half.h>
 #include <asm/barrier.h>
+<<<<<<< HEAD
 #include <linux/exynos-ss.h>
+=======
+
+>>>>>>> common/deprecated/android-3.18
 
 /*
  * Must define these before including other files, inline functions need them

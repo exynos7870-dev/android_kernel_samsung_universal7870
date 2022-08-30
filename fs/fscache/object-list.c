@@ -330,6 +330,16 @@ static void fscache_objlist_config(struct fscache_objlist_data *data)
 	rcu_read_lock();
 
 	confkey = key->payload.data;
+<<<<<<< HEAD
+=======
+	if (!confkey) {
+		/* key was revoked */
+		rcu_read_unlock();
+		key_put(key);
+		goto no_config;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	buf = confkey->data;
 
 	for (len = confkey->datalen - 1; len >= 0; len--) {

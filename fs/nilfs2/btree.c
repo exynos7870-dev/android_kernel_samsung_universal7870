@@ -388,7 +388,11 @@ static int nilfs_btree_root_broken(const struct nilfs_btree_node *node,
 	nchildren = nilfs_btree_node_get_nchildren(node);
 
 	if (unlikely(level < NILFS_BTREE_LEVEL_NODE_MIN ||
+<<<<<<< HEAD
 		     level > NILFS_BTREE_LEVEL_MAX ||
+=======
+		     level >= NILFS_BTREE_LEVEL_MAX ||
+>>>>>>> common/deprecated/android-3.18
 		     nchildren < 0 ||
 		     nchildren > NILFS_BTREE_ROOT_NCHILDREN_MAX)) {
 		pr_crit("NILFS: bad btree root (inode number=%lu): level = %d, flags = 0x%x, nchildren = %d\n",
@@ -2093,8 +2097,13 @@ static void nilfs_btree_lookup_dirty_buffers(struct nilfs_bmap *btree,
 
 	pagevec_init(&pvec, 0);
 
+<<<<<<< HEAD
 	while (pagevec_lookup_tag(&pvec, btcache, &index, PAGECACHE_TAG_DIRTY,
 				  PAGEVEC_SIZE)) {
+=======
+	while (pagevec_lookup_tag(&pvec, btcache, &index,
+					PAGECACHE_TAG_DIRTY)) {
+>>>>>>> common/deprecated/android-3.18
 		for (i = 0; i < pagevec_count(&pvec); i++) {
 			bh = head = page_buffers(pvec.pages[i]);
 			do {

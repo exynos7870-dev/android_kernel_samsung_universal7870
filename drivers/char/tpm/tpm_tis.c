@@ -235,7 +235,12 @@ static int recv_data(struct tpm_chip *chip, u8 *buf, size_t count)
 static int tpm_tis_recv(struct tpm_chip *chip, u8 *buf, size_t count)
 {
 	int size = 0;
+<<<<<<< HEAD
 	int expected, status;
+=======
+	int status;
+	u32 expected;
+>>>>>>> common/deprecated/android-3.18
 
 	if (count < TPM_HEADER_SIZE) {
 		size = -EIO;
@@ -250,7 +255,11 @@ static int tpm_tis_recv(struct tpm_chip *chip, u8 *buf, size_t count)
 	}
 
 	expected = be32_to_cpu(*(__be32 *) (buf + 2));
+<<<<<<< HEAD
 	if (expected > count) {
+=======
+	if (expected > count || expected < TPM_HEADER_SIZE) {
+>>>>>>> common/deprecated/android-3.18
 		size = -EIO;
 		goto out;
 	}

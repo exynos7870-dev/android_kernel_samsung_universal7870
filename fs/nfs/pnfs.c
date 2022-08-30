@@ -1535,6 +1535,10 @@ int pnfs_write_done_resend_to_mds(struct nfs_pgio_header *hdr)
 	/* Resend all requests through the MDS */
 	nfs_pageio_init_write(&pgio, hdr->inode, FLUSH_STABLE, true,
 			      hdr->completion_ops);
+<<<<<<< HEAD
+=======
+	set_bit(NFS_CONTEXT_RESEND_WRITES, &hdr->args.context->flags);
+>>>>>>> common/deprecated/android-3.18
 	return nfs_pageio_resend(&pgio, hdr);
 }
 EXPORT_SYMBOL_GPL(pnfs_write_done_resend_to_mds);
@@ -1575,7 +1579,11 @@ pnfs_write_through_mds(struct nfs_pageio_descriptor *desc,
 		nfs_pageio_reset_write_mds(desc);
 		desc->pg_recoalesce = 1;
 	}
+<<<<<<< HEAD
 	nfs_pgio_data_destroy(hdr);
+=======
+	hdr->completion_ops->completion(hdr);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static enum pnfs_try_status
@@ -1691,7 +1699,11 @@ pnfs_read_through_mds(struct nfs_pageio_descriptor *desc,
 		nfs_pageio_reset_read_mds(desc);
 		desc->pg_recoalesce = 1;
 	}
+<<<<<<< HEAD
 	nfs_pgio_data_destroy(hdr);
+=======
+	hdr->completion_ops->completion(hdr);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*

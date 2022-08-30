@@ -26,7 +26,11 @@
 #include <linux/dvb/frontend.h>
 #include "dvb_frontend.h"
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_DUMMY_FE)
+=======
+#if IS_REACHABLE(CONFIG_DVB_DUMMY_FE)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend* dvb_dummy_fe_ofdm_attach(void);
 extern struct dvb_frontend* dvb_dummy_fe_qpsk_attach(void);
 extern struct dvb_frontend* dvb_dummy_fe_qam_attach(void);

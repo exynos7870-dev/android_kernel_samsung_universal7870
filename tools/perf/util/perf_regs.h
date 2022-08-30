@@ -16,7 +16,11 @@ int perf_reg_value(u64 *valp, struct regs_dump *regs, int id);
 
 static inline const char *perf_reg_name(int id __maybe_unused)
 {
+<<<<<<< HEAD
 	return NULL;
+=======
+	return "unknown";
+>>>>>>> common/deprecated/android-3.18
 }
 
 static inline int perf_reg_value(u64 *valp __maybe_unused,

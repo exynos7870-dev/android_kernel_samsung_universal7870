@@ -216,14 +216,24 @@ static inline int gpio_to_irq(unsigned gpio)
 	return -EINVAL;
 }
 
+<<<<<<< HEAD
 static inline int gpio_lock_as_irq(struct gpio_chip *chip, unsigned int offset)
+=======
+static inline int gpiochip_lock_as_irq(struct gpio_chip *chip,
+				       unsigned int offset)
+>>>>>>> common/deprecated/android-3.18
 {
 	WARN_ON(1);
 	return -EINVAL;
 }
 
+<<<<<<< HEAD
 static inline void gpio_unlock_as_irq(struct gpio_chip *chip,
 				      unsigned int offset)
+=======
+static inline void gpiochip_unlock_as_irq(struct gpio_chip *chip,
+					  unsigned int offset)
+>>>>>>> common/deprecated/android-3.18
 {
 	WARN_ON(1);
 }
@@ -235,6 +245,7 @@ static inline int irq_to_gpio(unsigned irq)
 	return -EINVAL;
 }
 
+<<<<<<< HEAD
 static inline int
 gpiochip_add_pin_range(struct gpio_chip *chip, const char *pinctl_name,
 		       unsigned int gpio_offset, unsigned int pin_offset,
@@ -259,6 +270,8 @@ gpiochip_remove_pin_ranges(struct gpio_chip *chip)
 	WARN_ON(1);
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static inline int devm_gpio_request(struct device *dev, unsigned gpio,
 				    const char *label)
 {

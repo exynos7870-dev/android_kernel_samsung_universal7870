@@ -39,7 +39,12 @@
 
 #ifdef CONFIG_SMP
 
+<<<<<<< HEAD
 #ifdef __SUBARCH_HAS_LWSYNC
+=======
+/* The sub-arch has lwsync */
+#if defined(__powerpc64__) || defined(CONFIG_PPC_E500MC)
+>>>>>>> common/deprecated/android-3.18
 #    define SMPWMB      LWSYNC
 #else
 #    define SMPWMB      eieio

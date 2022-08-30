@@ -511,6 +511,12 @@ static void modem_pm(struct uart_port *port, unsigned int state, unsigned old)
 {
 	struct modem_private_data *priv = port->private_data;
 
+<<<<<<< HEAD
+=======
+	if (!priv)
+		return;
+
+>>>>>>> common/deprecated/android-3.18
 	if (IS_ERR(priv->regulator))
 		return;
 

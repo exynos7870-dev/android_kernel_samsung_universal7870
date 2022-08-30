@@ -242,7 +242,11 @@ static void pgd_mop_up_pmds(struct mm_struct *mm, pgd_t *pgdp)
 		if (pgd_val(pgd) != 0) {
 			pmd_t *pmd = (pmd_t *)pgd_page_vaddr(pgd);
 
+<<<<<<< HEAD
 			pgdp[i] = native_make_pgd(0);
+=======
+			pgd_clear(&pgdp[i]);
+>>>>>>> common/deprecated/android-3.18
 
 			paravirt_release_pmd(pgd_val(pgd) >> PAGE_SHIFT);
 			pmd_free(mm, pmd);
@@ -333,7 +337,11 @@ int ptep_set_access_flags(struct vm_area_struct *vma,
 	int changed = !pte_same(*ptep, entry);
 
 	if (changed && dirty) {
+<<<<<<< HEAD
 		*ptep = entry;
+=======
+		set_pte(ptep, entry);
+>>>>>>> common/deprecated/android-3.18
 		pte_update_defer(vma->vm_mm, address, ptep);
 	}
 
@@ -350,7 +358,11 @@ int pmdp_set_access_flags(struct vm_area_struct *vma,
 	VM_BUG_ON(address & ~HPAGE_PMD_MASK);
 
 	if (changed && dirty) {
+<<<<<<< HEAD
 		*pmdp = entry;
+=======
+		set_pmd(pmdp, entry);
+>>>>>>> common/deprecated/android-3.18
 		pmd_update_defer(vma->vm_mm, address, pmdp);
 		/*
 		 * We had a write-protection fault here and changed the pmd
@@ -476,8 +488,13 @@ void __native_set_fixmap(enum fixed_addresses idx, pte_t pte)
 	fixmaps_set++;
 }
 
+<<<<<<< HEAD
 void native_set_fixmap(enum fixed_addresses idx, phys_addr_t phys,
 		       pgprot_t flags)
+=======
+void native_set_fixmap(unsigned /* enum fixed_addresses */ idx,
+		       phys_addr_t phys, pgprot_t flags)
+>>>>>>> common/deprecated/android-3.18
 {
 	__native_set_fixmap(idx, pfn_pte(phys >> PAGE_SHIFT, flags));
 }

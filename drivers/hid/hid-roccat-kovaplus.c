@@ -37,6 +37,11 @@ static uint kovaplus_convert_event_cpi(uint value)
 static void kovaplus_profile_activated(struct kovaplus_device *kovaplus,
 		uint new_profile_index)
 {
+<<<<<<< HEAD
+=======
+	if (new_profile_index >= ARRAY_SIZE(kovaplus->profile_settings))
+		return;
+>>>>>>> common/deprecated/android-3.18
 	kovaplus->actual_profile = new_profile_index;
 	kovaplus->actual_cpi = kovaplus->profile_settings[new_profile_index].cpi_startup_level;
 	kovaplus->actual_x_sensitivity = kovaplus->profile_settings[new_profile_index].sensitivity_x;

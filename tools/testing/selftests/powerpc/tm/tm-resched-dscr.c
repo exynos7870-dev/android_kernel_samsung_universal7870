@@ -45,12 +45,19 @@ int test_body(void)
 	printf("Check DSCR TM context switch: ");
 	fflush(stdout);
 	for (;;) {
+<<<<<<< HEAD
 		rv = 1;
+=======
+>>>>>>> common/deprecated/android-3.18
 		asm __volatile__ (
 			/* set a known value into the DSCR */
 			"ld      3, %[dscr1];"
 			"mtspr   %[sprn_dscr], 3;"
 
+<<<<<<< HEAD
+=======
+			"li      %[rv], 1;"
+>>>>>>> common/deprecated/android-3.18
 			/* start and suspend a transaction */
 			TBEGIN
 			"beq     1f;"

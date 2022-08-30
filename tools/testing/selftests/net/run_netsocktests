@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 #!/bin/bash
+=======
+#!/bin/sh
+>>>>>>> common/deprecated/android-3.18
 
 echo "--------------------"
 echo "running socket test"
@@ -6,7 +10,14 @@ echo "--------------------"
 ./socket
 if [ $? -ne 0 ]; then
 	echo "[FAIL]"
+<<<<<<< HEAD
 else
 	echo "[PASS]"
 fi
 
+=======
+	exit 1
+else
+	echo "[PASS]"
+fi
+>>>>>>> common/deprecated/android-3.18

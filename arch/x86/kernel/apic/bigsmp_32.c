@@ -37,6 +37,7 @@ static int bigsmp_early_logical_apicid(int cpu)
 	return early_per_cpu(x86_cpu_to_apicid, cpu);
 }
 
+<<<<<<< HEAD
 static inline unsigned long calculate_ldr(int cpu)
 {
 	unsigned long val, id;
@@ -63,6 +64,14 @@ static void bigsmp_init_apic_ldr(void)
 	apic_write(APIC_DFR, APIC_DFR_FLAT);
 	val = calculate_ldr(cpu);
 	apic_write(APIC_LDR, val);
+=======
+/*
+ * bigsmp enables physical destination mode
+ * and doesn't use LDR and DFR
+ */
+static void bigsmp_init_apic_ldr(void)
+{
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void bigsmp_setup_apic_routing(void)

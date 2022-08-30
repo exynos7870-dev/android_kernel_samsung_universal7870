@@ -1,4 +1,8 @@
 #include "symbol.h"
+<<<<<<< HEAD
+=======
+#include <assert.h>
+>>>>>>> common/deprecated/android-3.18
 #include <errno.h>
 #include <inttypes.h>
 #include <limits.h>
@@ -679,6 +683,11 @@ int map_groups__fixup_overlappings(struct map_groups *mg, struct map *map,
 			}
 
 			after->start = map->end;
+<<<<<<< HEAD
+=======
+			after->pgoff += map->end - pos->start;
+			assert(pos->map_ip(pos, map->end) == after->map_ip(after, map->end));
+>>>>>>> common/deprecated/android-3.18
 			map_groups__insert(mg, after);
 			if (verbose >= 2)
 				map__fprintf(after, fp);

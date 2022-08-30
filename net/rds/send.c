@@ -425,12 +425,23 @@ void rds_rdma_send_complete(struct rds_message *rm, int status)
 	struct rm_rdma_op *ro;
 	struct rds_notifier *notifier;
 	unsigned long flags;
+<<<<<<< HEAD
 
 	spin_lock_irqsave(&rm->m_rs_lock, flags);
 
 	ro = &rm->rdma;
 	if (test_bit(RDS_MSG_ON_SOCK, &rm->m_flags) &&
 	    ro->op_active && ro->op_notify && ro->op_notifier) {
+=======
+	unsigned int notify = 0;
+
+	spin_lock_irqsave(&rm->m_rs_lock, flags);
+
+	notify =  rm->rdma.op_notify | rm->data.op_notify;
+	ro = &rm->rdma;
+	if (test_bit(RDS_MSG_ON_SOCK, &rm->m_flags) &&
+	    ro->op_active && notify && ro->op_notifier) {
+>>>>>>> common/deprecated/android-3.18
 		notifier = ro->op_notifier;
 		rs = rm->m_rs;
 		sock_hold(rds_rs_to_sk(rs));
@@ -901,6 +912,14 @@ static int rds_cmsg_send(struct rds_sock *rs, struct rds_message *rm,
 			ret = rds_cmsg_rdma_map(rs, rm, cmsg);
 			if (!ret)
 				*allocated_mr = 1;
+<<<<<<< HEAD
+=======
+			else if (ret == -ENODEV)
+				/* Accommodate the get_mr() case which can fail
+				 * if connection isn't established yet.
+				 */
+				ret = -EAGAIN;
+>>>>>>> common/deprecated/android-3.18
 			break;
 		case RDS_CMSG_ATOMIC_CSWP:
 		case RDS_CMSG_ATOMIC_FADD:
@@ -1009,8 +1028,17 @@ int rds_sendmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg,
 
 	/* Parse any control messages the user may have included. */
 	ret = rds_cmsg_send(rs, rm, msg, &allocated_mr);
+<<<<<<< HEAD
 	if (ret)
 		goto out;
+=======
+	if (ret) {
+		/* Trigger connection so that its ready for the next retry */
+		if (ret ==  -EAGAIN)
+			rds_conn_connect_if_down(conn);
+		goto out;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	if (rm->rdma.op_active && !conn->c_trans->xmit_rdma) {
 		printk_ratelimited(KERN_NOTICE "rdma_op %p conn xmit_rdma %p\n",

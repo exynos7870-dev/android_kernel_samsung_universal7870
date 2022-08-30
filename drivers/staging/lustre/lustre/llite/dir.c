@@ -642,7 +642,11 @@ static int ll_send_mgc_param(struct obd_export *mgc, char *string)
 	if (!msp)
 		return -ENOMEM;
 
+<<<<<<< HEAD
 	strncpy(msp->mgs_param, string, MGS_PARAM_MAXLEN);
+=======
+	strlcpy(msp->mgs_param, string, sizeof(msp->mgs_param));
+>>>>>>> common/deprecated/android-3.18
 	rc = obd_set_info_async(NULL, mgc, sizeof(KEY_SET_INFO), KEY_SET_INFO,
 				sizeof(struct mgs_send_param), msp, NULL);
 	if (rc)

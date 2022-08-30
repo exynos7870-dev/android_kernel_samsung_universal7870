@@ -2,10 +2,13 @@
 # Makefile for local APIC drivers and for the IO-APIC code
 #
 
+<<<<<<< HEAD
 # Leads to non-deterministic coverage that is not a function of syscall inputs.
 # In particualr, smp_apic_timer_interrupt() is called in random places.
 KCOV_INSTRUMENT		:= n
 
+=======
+>>>>>>> common/deprecated/android-3.18
 obj-$(CONFIG_X86_LOCAL_APIC)	+= apic.o apic_noop.o ipi.o
 obj-y				+= hw_nmi.o
 

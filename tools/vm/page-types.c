@@ -151,12 +151,15 @@ static const char * const page_flag_names[] = {
 };
 
 
+<<<<<<< HEAD
 static const char * const debugfs_known_mountpoints[] = {
 	"/sys/kernel/debug",
 	"/debug",
 	0,
 };
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * data structures
  */

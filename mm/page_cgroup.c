@@ -368,6 +368,12 @@ static int swap_cgroup_prepare(int type)
 		if (!page)
 			goto not_enough_page;
 		ctrl->map[idx] = page;
+<<<<<<< HEAD
+=======
+
+		if (!(idx % SWAP_CLUSTER_MAX))
+			cond_resched();
+>>>>>>> common/deprecated/android-3.18
 	}
 	return 0;
 not_enough_page:

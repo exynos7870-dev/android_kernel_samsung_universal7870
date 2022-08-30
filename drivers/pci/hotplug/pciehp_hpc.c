@@ -176,6 +176,7 @@ static void pcie_wait_cmd(struct controller *ctrl)
 			  jiffies_to_msecs(jiffies - ctrl->cmd_started));
 }
 
+<<<<<<< HEAD
 /**
  * pcie_write_cmd - Issue controller command
  * @ctrl: controller to which the command is issued
@@ -183,13 +184,23 @@ static void pcie_wait_cmd(struct controller *ctrl)
  * @mask: bitmask of slot control register to be modified
  */
 static void pcie_write_cmd(struct controller *ctrl, u16 cmd, u16 mask)
+=======
+static void pcie_do_write_cmd(struct controller *ctrl, u16 cmd,
+			      u16 mask, bool wait)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct pci_dev *pdev = ctrl_dev(ctrl);
 	u16 slot_ctrl;
 
 	mutex_lock(&ctrl->ctrl_lock);
 
+<<<<<<< HEAD
 	/* Wait for any previous command that might still be in progress */
+=======
+	/*
+	 * Always wait for any previous command that might still be in progress
+	 */
+>>>>>>> common/deprecated/android-3.18
 	pcie_wait_cmd(ctrl);
 
 	pcie_capability_read_word(pdev, PCI_EXP_SLTCTL, &slot_ctrl);
@@ -201,9 +212,39 @@ static void pcie_write_cmd(struct controller *ctrl, u16 cmd, u16 mask)
 	ctrl->cmd_started = jiffies;
 	ctrl->slot_ctrl = slot_ctrl;
 
+<<<<<<< HEAD
 	mutex_unlock(&ctrl->ctrl_lock);
 }
 
+=======
+	/*
+	 * Optionally wait for the hardware to be ready for a new command,
+	 * indicating completion of the above issued command.
+	 */
+	if (wait)
+		pcie_wait_cmd(ctrl);
+
+	mutex_unlock(&ctrl->ctrl_lock);
+}
+
+/**
+ * pcie_write_cmd - Issue controller command
+ * @ctrl: controller to which the command is issued
+ * @cmd:  command value written to slot control register
+ * @mask: bitmask of slot control register to be modified
+ */
+static void pcie_write_cmd(struct controller *ctrl, u16 cmd, u16 mask)
+{
+	pcie_do_write_cmd(ctrl, cmd, mask, true);
+}
+
+/* Same as above without waiting for the hardware to latch */
+static void pcie_write_cmd_nowait(struct controller *ctrl, u16 cmd, u16 mask)
+{
+	pcie_do_write_cmd(ctrl, cmd, mask, false);
+}
+
+>>>>>>> common/deprecated/android-3.18
 bool pciehp_check_link_active(struct controller *ctrl)
 {
 	struct pci_dev *pdev = ctrl_dev(ctrl);
@@ -422,7 +463,11 @@ void pciehp_set_attention_status(struct slot *slot, u8 value)
 	default:
 		return;
 	}
+<<<<<<< HEAD
 	pcie_write_cmd(ctrl, slot_cmd, PCI_EXP_SLTCTL_AIC);
+=======
+	pcie_write_cmd_nowait(ctrl, slot_cmd, PCI_EXP_SLTCTL_AIC);
+>>>>>>> common/deprecated/android-3.18
 	ctrl_dbg(ctrl, "%s: SLOTCTRL %x write cmd %x\n", __func__,
 		 pci_pcie_cap(ctrl->pcie->port) + PCI_EXP_SLTCTL, slot_cmd);
 }
@@ -434,7 +479,12 @@ void pciehp_green_led_on(struct slot *slot)
 	if (!PWR_LED(ctrl))
 		return;
 
+<<<<<<< HEAD
 	pcie_write_cmd(ctrl, PCI_EXP_SLTCTL_PWR_IND_ON, PCI_EXP_SLTCTL_PIC);
+=======
+	pcie_write_cmd_nowait(ctrl, PCI_EXP_SLTCTL_PWR_IND_ON,
+			      PCI_EXP_SLTCTL_PIC);
+>>>>>>> common/deprecated/android-3.18
 	ctrl_dbg(ctrl, "%s: SLOTCTRL %x write cmd %x\n", __func__,
 		 pci_pcie_cap(ctrl->pcie->port) + PCI_EXP_SLTCTL,
 		 PCI_EXP_SLTCTL_PWR_IND_ON);
@@ -447,7 +497,12 @@ void pciehp_green_led_off(struct slot *slot)
 	if (!PWR_LED(ctrl))
 		return;
 
+<<<<<<< HEAD
 	pcie_write_cmd(ctrl, PCI_EXP_SLTCTL_PWR_IND_OFF, PCI_EXP_SLTCTL_PIC);
+=======
+	pcie_write_cmd_nowait(ctrl, PCI_EXP_SLTCTL_PWR_IND_OFF,
+			      PCI_EXP_SLTCTL_PIC);
+>>>>>>> common/deprecated/android-3.18
 	ctrl_dbg(ctrl, "%s: SLOTCTRL %x write cmd %x\n", __func__,
 		 pci_pcie_cap(ctrl->pcie->port) + PCI_EXP_SLTCTL,
 		 PCI_EXP_SLTCTL_PWR_IND_OFF);
@@ -460,7 +515,12 @@ void pciehp_green_led_blink(struct slot *slot)
 	if (!PWR_LED(ctrl))
 		return;
 
+<<<<<<< HEAD
 	pcie_write_cmd(ctrl, PCI_EXP_SLTCTL_PWR_IND_BLINK, PCI_EXP_SLTCTL_PIC);
+=======
+	pcie_write_cmd_nowait(ctrl, PCI_EXP_SLTCTL_PWR_IND_BLINK,
+			      PCI_EXP_SLTCTL_PIC);
+>>>>>>> common/deprecated/android-3.18
 	ctrl_dbg(ctrl, "%s: SLOTCTRL %x write cmd %x\n", __func__,
 		 pci_pcie_cap(ctrl->pcie->port) + PCI_EXP_SLTCTL,
 		 PCI_EXP_SLTCTL_PWR_IND_BLINK);
@@ -578,7 +638,11 @@ static irqreturn_t pcie_isr(int irq, void *dev_id)
 	return IRQ_HANDLED;
 }
 
+<<<<<<< HEAD
 void pcie_enable_notification(struct controller *ctrl)
+=======
+static void pcie_enable_notification(struct controller *ctrl)
+>>>>>>> common/deprecated/android-3.18
 {
 	u16 cmd, mask;
 
@@ -613,11 +677,29 @@ void pcie_enable_notification(struct controller *ctrl)
 		PCI_EXP_SLTCTL_HPIE | PCI_EXP_SLTCTL_CCIE |
 		PCI_EXP_SLTCTL_DLLSCE);
 
+<<<<<<< HEAD
 	pcie_write_cmd(ctrl, cmd, mask);
+=======
+	pcie_write_cmd_nowait(ctrl, cmd, mask);
+>>>>>>> common/deprecated/android-3.18
 	ctrl_dbg(ctrl, "%s: SLOTCTRL %x write cmd %x\n", __func__,
 		 pci_pcie_cap(ctrl->pcie->port) + PCI_EXP_SLTCTL, cmd);
 }
 
+<<<<<<< HEAD
+=======
+void pcie_reenable_notification(struct controller *ctrl)
+{
+	/*
+	 * Clear both Presence and Data Link Layer Changed to make sure
+	 * those events still fire after we have re-enabled them.
+	 */
+	pcie_capability_write_word(ctrl->pcie->port, PCI_EXP_SLTSTA,
+				   PCI_EXP_SLTSTA_PDC | PCI_EXP_SLTSTA_DLLSC);
+	pcie_enable_notification(ctrl);
+}
+
+>>>>>>> common/deprecated/android-3.18
 static void pcie_disable_notification(struct controller *ctrl)
 {
 	u16 mask;
@@ -664,7 +746,11 @@ int pciehp_reset_slot(struct slot *slot, int probe)
 	pci_reset_bridge_secondary_bus(ctrl->pcie->port);
 
 	pcie_capability_write_word(pdev, PCI_EXP_SLTSTA, stat_mask);
+<<<<<<< HEAD
 	pcie_write_cmd(ctrl, ctrl_mask, ctrl_mask);
+=======
+	pcie_write_cmd_nowait(ctrl, ctrl_mask, ctrl_mask);
+>>>>>>> common/deprecated/android-3.18
 	ctrl_dbg(ctrl, "%s: SLOTCTRL %x write cmd %x\n", __func__,
 		 pci_pcie_cap(ctrl->pcie->port) + PCI_EXP_SLTCTL, ctrl_mask);
 	if (pciehp_poll_mode)
@@ -682,7 +768,11 @@ int pcie_init_notification(struct controller *ctrl)
 	return 0;
 }
 
+<<<<<<< HEAD
 static void pcie_shutdown_notification(struct controller *ctrl)
+=======
+void pcie_shutdown_notification(struct controller *ctrl)
+>>>>>>> common/deprecated/android-3.18
 {
 	if (ctrl->notification_enabled) {
 		pcie_disable_notification(ctrl);
@@ -717,7 +807,11 @@ abort:
 static void pcie_cleanup_slot(struct controller *ctrl)
 {
 	struct slot *slot = ctrl->slot;
+<<<<<<< HEAD
 	cancel_delayed_work(&slot->work);
+=======
+
+>>>>>>> common/deprecated/android-3.18
 	destroy_workqueue(slot->wq);
 	kfree(slot);
 }
@@ -829,7 +923,10 @@ abort:
 
 void pciehp_release_ctrl(struct controller *ctrl)
 {
+<<<<<<< HEAD
 	pcie_shutdown_notification(ctrl);
+=======
+>>>>>>> common/deprecated/android-3.18
 	pcie_cleanup_slot(ctrl);
 	kfree(ctrl);
 }

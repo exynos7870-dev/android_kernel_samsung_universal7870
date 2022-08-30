@@ -83,18 +83,32 @@ void coprocessor_release_all(struct thread_info *ti)
 
 void coprocessor_flush_all(struct thread_info *ti)
 {
+<<<<<<< HEAD
 	unsigned long cpenable;
+=======
+	unsigned long cpenable, old_cpenable;
+>>>>>>> common/deprecated/android-3.18
 	int i;
 
 	preempt_disable();
 
+<<<<<<< HEAD
 	cpenable = ti->cpenable;
+=======
+	RSR_CPENABLE(old_cpenable);
+	cpenable = ti->cpenable;
+	WSR_CPENABLE(cpenable);
+>>>>>>> common/deprecated/android-3.18
 
 	for (i = 0; i < XCHAL_CP_MAX; i++) {
 		if ((cpenable & 1) != 0 && coprocessor_owner[i] == ti)
 			coprocessor_flush(ti, i);
 		cpenable >>= 1;
 	}
+<<<<<<< HEAD
+=======
+	WSR_CPENABLE(old_cpenable);
+>>>>>>> common/deprecated/android-3.18
 
 	preempt_enable();
 }

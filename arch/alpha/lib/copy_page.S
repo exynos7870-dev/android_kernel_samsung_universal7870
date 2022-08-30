@@ -3,7 +3,11 @@
  *
  * Copy an entire page.
  */
+<<<<<<< HEAD
 
+=======
+#include <asm/export.h>
+>>>>>>> common/deprecated/android-3.18
 	.text
 	.align 4
 	.global copy_page
@@ -47,3 +51,7 @@ copy_page:
 	nop
 
 	.end copy_page
+<<<<<<< HEAD
+=======
+	EXPORT_SYMBOL(copy_page)
+>>>>>>> common/deprecated/android-3.18

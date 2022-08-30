@@ -1705,6 +1705,12 @@ static void i40evf_free_all_tx_resources(struct i40evf_adapter *adapter)
 {
 	int i;
 
+<<<<<<< HEAD
+=======
+	if (!adapter->tx_rings)
+		return;
+
+>>>>>>> common/deprecated/android-3.18
 	for (i = 0; i < adapter->vsi_res->num_queue_pairs; i++)
 		if (adapter->tx_rings[i]->desc)
 			i40evf_free_tx_resources(adapter->tx_rings[i]);
@@ -1776,6 +1782,12 @@ static void i40evf_free_all_rx_resources(struct i40evf_adapter *adapter)
 {
 	int i;
 
+<<<<<<< HEAD
+=======
+	if (!adapter->rx_rings)
+		return;
+
+>>>>>>> common/deprecated/android-3.18
 	for (i = 0; i < adapter->vsi_res->num_queue_pairs; i++)
 		if (adapter->rx_rings[i]->desc)
 			i40evf_free_rx_resources(adapter->rx_rings[i]);

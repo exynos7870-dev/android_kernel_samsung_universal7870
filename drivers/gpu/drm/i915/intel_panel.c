@@ -30,6 +30,10 @@
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 
+<<<<<<< HEAD
+=======
+#include <linux/kernel.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/moduleparam.h>
 #include "intel_drv.h"
 

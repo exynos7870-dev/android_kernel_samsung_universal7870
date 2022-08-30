@@ -16,7 +16,11 @@
 #include "dm-bufio.h"
 
 #define DM_MSG_PREFIX "persistent snapshot"
+<<<<<<< HEAD
 #define DM_CHUNK_SIZE_DEFAULT_SECTORS 32	/* 16KB */
+=======
+#define DM_CHUNK_SIZE_DEFAULT_SECTORS 32U	/* 16KB */
+>>>>>>> common/deprecated/android-3.18
 
 #define DM_PREFETCH_CHUNKS		12
 
@@ -700,7 +704,11 @@ static int persistent_prepare_exception(struct dm_exception_store *store,
 }
 
 static void persistent_commit_exception(struct dm_exception_store *store,
+<<<<<<< HEAD
 					struct dm_exception *e,
+=======
+					struct dm_exception *e, int valid,
+>>>>>>> common/deprecated/android-3.18
 					void (*callback) (void *, int success),
 					void *callback_context)
 {
@@ -709,6 +717,12 @@ static void persistent_commit_exception(struct dm_exception_store *store,
 	struct core_exception ce;
 	struct commit_callback *cb;
 
+<<<<<<< HEAD
+=======
+	if (!valid)
+		ps->valid = 0;
+
+>>>>>>> common/deprecated/android-3.18
 	ce.old_chunk = e->old_chunk;
 	ce.new_chunk = e->new_chunk;
 	write_exception(ps, ps->current_committed++, &ce);

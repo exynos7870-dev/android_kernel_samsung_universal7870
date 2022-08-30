@@ -40,7 +40,13 @@
 #include <linux/swap.h>
 #include <linux/rcupdate.h>
 #include <linux/notifier.h>
+<<<<<<< HEAD
 #include <linux/delay.h>
+=======
+
+#define CREATE_TRACE_POINTS
+#include "trace/lowmemorykiller.h"
+>>>>>>> common/deprecated/android-3.18
 
 static uint32_t lowmem_debug_level = 1;
 static short lowmem_adj[6] = {
@@ -57,7 +63,10 @@ static int lowmem_minfree[6] = {
 	16 * 1024,	/* 64MB */
 };
 static int lowmem_minfree_size = 4;
+<<<<<<< HEAD
 static uint32_t lowmem_lmkcount = 0;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 static unsigned long lowmem_deathpending_timeout;
 
@@ -67,6 +76,7 @@ static unsigned long lowmem_deathpending_timeout;
 			pr_info(x);			\
 	} while (0)
 
+<<<<<<< HEAD
 #if defined(CONFIG_ZSWAP)
 extern u64 zswap_pool_pages;
 extern atomic_t zswap_stored_pages;
@@ -88,6 +98,8 @@ static int test_task_flag(struct task_struct *p, int flag)
 	return 0;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static unsigned long lowmem_count(struct shrinker *s,
 				  struct shrink_control *sc)
 {
@@ -112,12 +124,18 @@ static unsigned long lowmem_scan(struct shrinker *s, struct shrink_control *sc)
 	int other_free = global_page_state(NR_FREE_PAGES) - totalreserve_pages;
 	int other_file = global_page_state(NR_FILE_PAGES) -
 						global_page_state(NR_SHMEM) -
+<<<<<<< HEAD
 						total_swapcache_pages();
 	struct reclaim_state *reclaim_state = current->reclaim_state;
 
 #ifdef CONFIG_CMA
 	other_free -= global_page_state(NR_FREE_CMA_PAGES);
 #endif
+=======
+						global_page_state(NR_UNEVICTABLE) -
+						total_swapcache_pages();
+
+>>>>>>> common/deprecated/android-3.18
 	if (lowmem_adj_size < array_size)
 		array_size = lowmem_adj_size;
 	if (lowmem_minfree_size < array_size)
@@ -150,10 +168,13 @@ static unsigned long lowmem_scan(struct shrinker *s, struct shrink_control *sc)
 		if (tsk->flags & PF_KTHREAD)
 			continue;
 
+<<<<<<< HEAD
 #if defined(CONFIG_ARM) || defined(CONFIG_ARM64)
 		if (test_task_flag(tsk, TIF_MEMALLOC))
 			continue;
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 		p = find_lock_task_mm(tsk);
 		if (!p)
 			continue;
@@ -162,8 +183,11 @@ static unsigned long lowmem_scan(struct shrinker *s, struct shrink_control *sc)
 		    time_before_eq(jiffies, lowmem_deathpending_timeout)) {
 			task_unlock(p);
 			rcu_read_unlock();
+<<<<<<< HEAD
 			/* give the system time to free up the memory */
 			msleep_interruptible(20);
+=======
+>>>>>>> common/deprecated/android-3.18
 			return 0;
 		}
 		oom_score_adj = p->signal->oom_score_adj;
@@ -172,6 +196,7 @@ static unsigned long lowmem_scan(struct shrinker *s, struct shrink_control *sc)
 			continue;
 		}
 		tasksize = get_mm_rss(p->mm);
+<<<<<<< HEAD
 #if defined(CONFIG_ZSWAP)
 		if (atomic_read(&zswap_stored_pages)) {
 			lowmem_print(3, "shown tasksize : %d\n", tasksize);
@@ -186,6 +211,11 @@ static unsigned long lowmem_scan(struct shrinker *s, struct shrink_control *sc)
 			continue;
 		if (same_thread_group(p, current))
 			continue;
+=======
+		task_unlock(p);
+		if (tasksize <= 0)
+			continue;
+>>>>>>> common/deprecated/android-3.18
 		if (selected) {
 			if (oom_score_adj < selected_oom_score_adj)
 				continue;
@@ -200,6 +230,13 @@ static unsigned long lowmem_scan(struct shrinker *s, struct shrink_control *sc)
 			     p->comm, p->pid, oom_score_adj, tasksize);
 	}
 	if (selected) {
+<<<<<<< HEAD
+=======
+		long cache_size = other_file * (long)(PAGE_SIZE / 1024);
+		long cache_limit = minfree * (long)(PAGE_SIZE / 1024);
+		long free = other_free * (long)(PAGE_SIZE / 1024);
+		trace_lowmemory_kill(selected, cache_size, cache_limit, free);
+>>>>>>> common/deprecated/android-3.18
 		lowmem_print(1, "Killing '%s' (%d), adj %hd,\n" \
 				"   to free %ldkB on behalf of '%s' (%d) because\n" \
 				"   cache %ldkB is below limit %ldkB for oom_score_adj %hd\n" \
@@ -208,14 +245,21 @@ static unsigned long lowmem_scan(struct shrinker *s, struct shrink_control *sc)
 			     selected_oom_score_adj,
 			     selected_tasksize * (long)(PAGE_SIZE / 1024),
 			     current->comm, current->pid,
+<<<<<<< HEAD
 			     other_file * (long)(PAGE_SIZE / 1024),
 			     minfree * (long)(PAGE_SIZE / 1024),
 			     min_score_adj,
 			     other_free * (long)(PAGE_SIZE / 1024));
+=======
+			     cache_size, cache_limit,
+			     min_score_adj,
+			     free);
+>>>>>>> common/deprecated/android-3.18
 		lowmem_deathpending_timeout = jiffies + HZ;
 		set_tsk_thread_flag(selected, TIF_MEMDIE);
 		send_sig(SIGKILL, selected, 0);
 		rem += selected_tasksize;
+<<<<<<< HEAD
 		lowmem_lmkcount++;
 		rcu_read_unlock();
 		/* give the system time to free up the memory */
@@ -225,10 +269,16 @@ static unsigned long lowmem_scan(struct shrinker *s, struct shrink_control *sc)
 			reclaim_state->reclaimed_slab += selected_tasksize;
 	} else {
 		rcu_read_unlock();
+=======
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	lowmem_print(4, "lowmem_scan %lu, %x, return %lu\n",
 		     sc->nr_to_scan, sc->gfp_mask, rem);
+<<<<<<< HEAD
+=======
+	rcu_read_unlock();
+>>>>>>> common/deprecated/android-3.18
 	return rem;
 }
 
@@ -338,7 +388,10 @@ module_param_array_named(adj, lowmem_adj, short, &lowmem_adj_size,
 module_param_array_named(minfree, lowmem_minfree, uint, &lowmem_minfree_size,
 			 S_IRUGO | S_IWUSR);
 module_param_named(debug_level, lowmem_debug_level, uint, S_IRUGO | S_IWUSR);
+<<<<<<< HEAD
 module_param_named(lmkcount, lowmem_lmkcount, uint, S_IRUGO);
+=======
+>>>>>>> common/deprecated/android-3.18
 
 module_init(lowmem_init);
 module_exit(lowmem_exit);

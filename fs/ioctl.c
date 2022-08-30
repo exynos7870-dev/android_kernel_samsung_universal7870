@@ -18,9 +18,12 @@
 
 #include <asm/ioctls.h>
 
+<<<<<<< HEAD
 #include "internal.h"
 #include <linux/namei.h>
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /* So that the fiemap access checks can't overflow on 32 bit machines. */
 #define FIEMAP_MAX_EXTENTS	(UINT_MAX / sizeof(struct fiemap_extent))
 
@@ -594,6 +597,7 @@ int do_vfs_ioctl(struct file *filp, unsigned int fd, unsigned int cmd,
 	case FIGETBSZ:
 		return put_user(inode->i_sb->s_blocksize, argp);
 
+<<<<<<< HEAD
 	case FS_IOC_CI_LOOKUP: {
 		struct ci_lookup_data *data;
 		struct path p;
@@ -623,6 +627,8 @@ err:
 		return error;
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	default:
 		if (S_ISREG(inode->i_mode))
 			error = file_ioctl(filp, cmd, arg);

@@ -26,8 +26,11 @@ static int nf_ct_ipv4_gather_frags(struct sk_buff *skb, u_int32_t user)
 {
 	int err;
 
+<<<<<<< HEAD
 	skb_orphan(skb);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	local_bh_disable();
 	err = ip_defrag(skb, user);
 	local_bh_enable();

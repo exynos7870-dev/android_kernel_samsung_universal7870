@@ -13,7 +13,11 @@ BEGIN {
 	for (i = 0; i < rep; ++i) {
 		tmp = $0
 		gsub(/\$\$/, i, tmp)
+<<<<<<< HEAD
 		gsub(/\$\#/, n, tmp)
+=======
+		gsub(/\$#/, n, tmp)
+>>>>>>> common/deprecated/android-3.18
 		gsub(/\$\*/, "$", tmp)
 		print tmp
 	}

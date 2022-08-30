@@ -176,6 +176,10 @@ struct c_can_priv {
 	struct net_device *dev;
 	struct device *device;
 	atomic_t tx_active;
+<<<<<<< HEAD
+=======
+	atomic_t sie_pending;
+>>>>>>> common/deprecated/android-3.18
 	unsigned long tx_dir;
 	int last_status;
 	u16 (*read_reg) (const struct c_can_priv *priv, enum reg index);

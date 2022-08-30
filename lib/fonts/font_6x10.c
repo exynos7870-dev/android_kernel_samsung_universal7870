@@ -1,7 +1,14 @@
 #include <linux/font.h>
 
+<<<<<<< HEAD
 static const unsigned char fontdata_6x10[] = {
 
+=======
+#define FONTDATAMAX 2560
+
+static const struct font_data fontdata_6x10 = {
+	{ 0, 0, FONTDATAMAX, 0 }, {
+>>>>>>> common/deprecated/android-3.18
 	/* 0 0x00 '^@' */
 	0x00, /* 00000000 */
 	0x00, /* 00000000 */
@@ -3073,14 +3080,22 @@ static const unsigned char fontdata_6x10[] = {
 	0x00, /* 00000000 */
 	0x00, /* 00000000 */
 	0x00, /* 00000000 */
+<<<<<<< HEAD
 
 };
+=======
+} };
+>>>>>>> common/deprecated/android-3.18
 
 const struct font_desc font_6x10 = {
 	.idx	= FONT6x10_IDX,
 	.name	= "6x10",
 	.width	= 6,
 	.height	= 10,
+<<<<<<< HEAD
 	.data	= fontdata_6x10,
+=======
+	.data	= fontdata_6x10.data,
+>>>>>>> common/deprecated/android-3.18
 	.pref	= 0,
 };

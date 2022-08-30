@@ -20,7 +20,10 @@
 #include <linux/integrity.h>
 #include <linux/ima.h>
 #include <linux/evm.h>
+<<<<<<< HEAD
 #include <linux/task_integrity.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 #include <linux/fsnotify.h>
 #include <linux/mman.h>
 #include <linux/mount.h>
@@ -244,9 +247,12 @@ int security_bprm_check(struct linux_binprm *bprm)
 	ret = security_ops->bprm_check_security(bprm);
 	if (ret)
 		return ret;
+<<<<<<< HEAD
 	ret = five_bprm_check(bprm);
 	if (ret)
 		return ret;
+=======
+>>>>>>> common/deprecated/android-3.18
 	return ima_bprm_check(bprm);
 }
 
@@ -496,6 +502,10 @@ int security_path_chown(struct path *path, kuid_t uid, kgid_t gid)
 		return 0;
 	return security_ops->path_chown(path, uid, gid);
 }
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL(security_path_chown);
+>>>>>>> common/deprecated/android-3.18
 
 int security_path_chroot(struct path *path)
 {
@@ -626,9 +636,12 @@ int security_inode_setxattr(struct dentry *dentry, const char *name,
 	ret = security_ops->inode_setxattr(dentry, name, value, size, flags);
 	if (ret)
 		return ret;
+<<<<<<< HEAD
 	ret = five_inode_setxattr(dentry, name, value, size);
 	if (ret)
 		return ret;
+=======
+>>>>>>> common/deprecated/android-3.18
 	ret = ima_inode_setxattr(dentry, name, value, size);
 	if (ret)
 		return ret;
@@ -667,9 +680,12 @@ int security_inode_removexattr(struct dentry *dentry, const char *name)
 	ret = security_ops->inode_removexattr(dentry, name);
 	if (ret)
 		return ret;
+<<<<<<< HEAD
 	ret = five_inode_removexattr(dentry, name);
 	if (ret)
 		return ret;
+=======
+>>>>>>> common/deprecated/android-3.18
 	ret = ima_inode_removexattr(dentry, name);
 	if (ret)
 		return ret;
@@ -781,9 +797,12 @@ int security_mmap_file(struct file *file, unsigned long prot,
 					mmap_prot(file, prot), flags);
 	if (ret)
 		return ret;
+<<<<<<< HEAD
 	ret = five_file_mmap(file, prot);
 	if (ret)
 		return ret;
+=======
+>>>>>>> common/deprecated/android-3.18
 	return ima_file_mmap(file, prot);
 }
 
@@ -846,7 +865,10 @@ void security_task_free(struct task_struct *task)
 	yama_task_free(task);
 #endif
 	security_ops->task_free(task);
+<<<<<<< HEAD
 	five_task_free(task);
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 
 int security_cred_alloc_blank(struct cred *cred, gfp_t gfp)
@@ -856,6 +878,16 @@ int security_cred_alloc_blank(struct cred *cred, gfp_t gfp)
 
 void security_cred_free(struct cred *cred)
 {
+<<<<<<< HEAD
+=======
+	/*
+	 * There is a failure case in prepare_creds() that
+	 * may result in a call here with ->security being NULL.
+	 */
+	if (unlikely(cred->security == NULL))
+		return;
+
+>>>>>>> common/deprecated/android-3.18
 	security_ops->cred_free(cred);
 }
 

@@ -33,6 +33,13 @@ ENTRY(_start)
 jiffies = jiffies_64;
 #endif
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_SPARC64
+ASSERT((swapper_tsb == 0x0000000000408000), "Error: sparc64 early assembler too large")
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 SECTIONS
 {
 #ifdef CONFIG_SPARC64

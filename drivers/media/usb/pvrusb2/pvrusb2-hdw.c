@@ -670,6 +670,11 @@ static int ctrl_get_input(struct pvr2_ctrl *cptr,int *vp)
 
 static int ctrl_check_input(struct pvr2_ctrl *cptr,int v)
 {
+<<<<<<< HEAD
+=======
+	if (v < 0 || v > PVR2_CVAL_INPUT_MAX)
+		return 0;
+>>>>>>> common/deprecated/android-3.18
 	return ((1 << v) & cptr->hdw->input_allowed_mask) != 0;
 }
 
@@ -2731,9 +2736,14 @@ void pvr2_hdw_destroy(struct pvr2_hdw *hdw)
 		pvr2_stream_destroy(hdw->vid_stream);
 		hdw->vid_stream = NULL;
 	}
+<<<<<<< HEAD
 	pvr2_i2c_core_done(hdw);
 	v4l2_device_unregister(&hdw->v4l2_dev);
 	pvr2_hdw_remove_usb_stuff(hdw);
+=======
+	v4l2_device_unregister(&hdw->v4l2_dev);
+	pvr2_hdw_disconnect(hdw);
+>>>>>>> common/deprecated/android-3.18
 	mutex_lock(&pvr2_unit_mtx); do {
 		if ((hdw->unit_number >= 0) &&
 		    (hdw->unit_number < PVR_NUM) &&
@@ -2758,6 +2768,10 @@ void pvr2_hdw_disconnect(struct pvr2_hdw *hdw)
 {
 	pvr2_trace(PVR2_TRACE_INIT,"pvr2_hdw_disconnect(hdw=%p)",hdw);
 	LOCK_TAKE(hdw->big_lock);
+<<<<<<< HEAD
+=======
+	pvr2_i2c_core_done(hdw);
+>>>>>>> common/deprecated/android-3.18
 	LOCK_TAKE(hdw->ctl_lock);
 	pvr2_hdw_remove_usb_stuff(hdw);
 	LOCK_GIVE(hdw->ctl_lock);

@@ -211,5 +211,8 @@ void *dma_buf_vmap(struct dma_buf *);
 void dma_buf_vunmap(struct dma_buf *, void *vaddr);
 int dma_buf_debugfs_create_file(const char *name,
 				int (*write)(struct seq_file *));
+<<<<<<< HEAD
 struct dma_buf *get_dma_buf_file(struct file *);
+=======
+>>>>>>> common/deprecated/android-3.18
 #endif /* __DMA_BUF_H__ */

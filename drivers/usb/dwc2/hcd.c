@@ -1517,7 +1517,11 @@ static int dwc2_hcd_hub_control(struct dwc2_hsotg *hsotg, u16 typereq,
 			dev_dbg(hsotg->dev,
 				"ClearPortFeature USB_PORT_FEAT_SUSPEND\n");
 			writel(0, hsotg->regs + PCGCTL);
+<<<<<<< HEAD
 			usleep_range(20000, 40000);
+=======
+			msleep(USB_RESUME_TIMEOUT);
+>>>>>>> common/deprecated/android-3.18
 
 			hprt0 = dwc2_read_hprt0(hsotg);
 			hprt0 |= HPRT0_RES;
@@ -2953,7 +2957,10 @@ error3:
 error2:
 	usb_put_hcd(hcd);
 error1:
+<<<<<<< HEAD
 	kfree(hsotg->core_params);
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #ifdef CONFIG_USB_DWC2_TRACK_MISSED_SOFS
 	kfree(hsotg->last_frame_num_array);

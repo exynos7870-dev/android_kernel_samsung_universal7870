@@ -321,10 +321,19 @@ replay:
 		nlh = nlmsg_hdr(skb);
 		err = 0;
 
+<<<<<<< HEAD
 		if (nlmsg_len(nlh) < sizeof(struct nfgenmsg) ||
 		    skb->len < nlh->nlmsg_len) {
 			err = -EINVAL;
 			goto ack;
+=======
+		if (nlh->nlmsg_len < NLMSG_HDRLEN ||
+		    skb->len < nlh->nlmsg_len ||
+		    nlmsg_len(nlh) < sizeof(struct nfgenmsg)) {
+			nfnl_err_reset(&err_list);
+			success = false;
+			goto done;
+>>>>>>> common/deprecated/android-3.18
 		}
 
 		/* Only requests are handled by the kernel */
@@ -433,6 +442,10 @@ done:
 static void nfnetlink_rcv(struct sk_buff *skb)
 {
 	struct nlmsghdr *nlh = nlmsg_hdr(skb);
+<<<<<<< HEAD
+=======
+	u_int16_t res_id;
+>>>>>>> common/deprecated/android-3.18
 	int msglen;
 
 	if (nlh->nlmsg_len < NLMSG_HDRLEN ||
@@ -457,7 +470,16 @@ static void nfnetlink_rcv(struct sk_buff *skb)
 
 		nfgenmsg = nlmsg_data(nlh);
 		skb_pull(skb, msglen);
+<<<<<<< HEAD
 		nfnetlink_rcv_batch(skb, nlh, nfgenmsg->res_id);
+=======
+		/* Work around old nft using host byte order */
+		if (nfgenmsg->res_id == NFNL_SUBSYS_NFTABLES)
+			res_id = NFNL_SUBSYS_NFTABLES;
+		else
+			res_id = ntohs(nfgenmsg->res_id);
+		nfnetlink_rcv_batch(skb, nlh, res_id);
+>>>>>>> common/deprecated/android-3.18
 	} else {
 		netlink_rcv_skb(skb, &nfnetlink_rcv_msg);
 	}
@@ -478,7 +500,11 @@ static int nfnetlink_bind(int group)
 	ss = nfnetlink_get_subsys(type);
 	rcu_read_unlock();
 	if (!ss)
+<<<<<<< HEAD
 		request_module("nfnetlink-subsys-%d", type);
+=======
+		request_module_nowait("nfnetlink-subsys-%d", type);
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 #endif

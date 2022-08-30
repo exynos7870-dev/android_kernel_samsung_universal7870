@@ -19,7 +19,11 @@
 
 #include <linux/types.h>
 
+<<<<<<< HEAD
 #include <uapi/linux/ion.h>
+=======
+#include "../uapi/ion.h"
+>>>>>>> common/deprecated/android-3.18
 
 struct ion_handle;
 struct ion_device;
@@ -200,6 +204,7 @@ int ion_share_dma_buf_fd(struct ion_client *client, struct ion_handle *handle);
  */
 struct ion_handle *ion_import_dma_buf(struct ion_client *client, int fd);
 
+<<<<<<< HEAD
 /**
  * ion_cached_needsync_dmabuf() - check if a dmabuf is cacheable
  * @dmabuf: a pointer to dma_buf
@@ -223,4 +228,6 @@ int ion_secure_protect(struct ion_buffer *buffer);
 int ion_secure_unprotect(struct ion_buffer *buffer);
 bool ion_is_heap_available(struct ion_heap *heap, unsigned long flags, void *data);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #endif /* _LINUX_ION_H */

@@ -169,9 +169,12 @@ struct hid_item {
 #define HID_UP_LOGIVENDOR	0xffbc0000
 #define HID_UP_LNVENDOR		0xffa00000
 #define HID_UP_SENSOR		0x00200000
+<<<<<<< HEAD
 #ifdef CONFIG_USB_HMT_SAMSUNG_INPUT
 #define HID_UP_HMTVENDOR		0xff020000
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #define HID_USAGE		0x0000ffff
 
@@ -427,7 +430,11 @@ struct hid_report_enum {
 };
 
 #define HID_MIN_BUFFER_SIZE	64		/* make sure there is at least a packet size of space */
+<<<<<<< HEAD
 #define HID_MAX_BUFFER_SIZE	4096		/* 4kb */
+=======
+#define HID_MAX_BUFFER_SIZE	8192		/* 8kb */
+>>>>>>> common/deprecated/android-3.18
 #define HID_CONTROL_FIFO_SIZE	256		/* to init devices with >100 reports */
 #define HID_OUTPUT_FIFO_SIZE	64
 
@@ -731,11 +738,16 @@ struct hid_ll_driver {
 
 /* Applications from HID Usage Tables 4/8/99 Version 1.1 */
 /* We ignore a few input applications that are not widely used */
+<<<<<<< HEAD
 #ifdef CONFIG_USB_HMT_SAMSUNG_INPUT
 #define IS_INPUT_APPLICATION(a) (((a >= 0x00010000) && (a <= 0x00010008)) || (a == 0x00010080) || (a == 0x000c0001) || ((a >= 0x000d0002) && (a <= 0x000d0006)) || a == 0xff020001)
 #else
 #define IS_INPUT_APPLICATION(a) (((a >= 0x00010000) && (a <= 0x00010008)) || (a == 0x00010080) || (a == 0x000c0001) || ((a >= 0x000d0002) && (a <= 0x000d0006)))
 #endif
+=======
+#define IS_INPUT_APPLICATION(a) (((a >= 0x00010000) && (a <= 0x00010008)) || (a == 0x00010080) || (a == 0x000c0001) || ((a >= 0x000d0002) && (a <= 0x000d0006)))
+
+>>>>>>> common/deprecated/android-3.18
 /* HID core API */
 
 extern int hid_debug;
@@ -771,7 +783,11 @@ extern int hidinput_connect(struct hid_device *hid, unsigned int force);
 extern void hidinput_disconnect(struct hid_device *);
 
 int hid_set_field(struct hid_field *, unsigned, __s32);
+<<<<<<< HEAD
 int hid_input_report(struct hid_device *, int type, u8 *, int, int);
+=======
+int hid_input_report(struct hid_device *, int type, u8 *, u32, int);
+>>>>>>> common/deprecated/android-3.18
 int hidinput_find_field(struct hid_device *hid, unsigned int type, unsigned int code, struct hid_field **field);
 struct hid_field *hidinput_get_led_field(struct hid_device *hid);
 unsigned int hidinput_count_leds(struct hid_device *hid);
@@ -841,6 +857,7 @@ static inline void hid_device_io_stop(struct hid_device *hid) {
  * @max: maximal valid usage->code to consider later (out parameter)
  * @type: input event type (EV_KEY, EV_REL, ...)
  * @c: code which corresponds to this usage and type
+<<<<<<< HEAD
  */
 static inline void hid_map_usage(struct hid_input *hidinput,
 		struct hid_usage *usage, unsigned long **bit, int *max,
@@ -869,6 +886,51 @@ static inline void hid_map_usage(struct hid_input *hidinput,
 		*max = LED_MAX;
 		break;
 	}
+=======
+ *
+ * The value pointed to by @bit will be set to NULL if either @type is
+ * an unhandled event type, or if @c is out of range for @type. This
+ * can be used as an error condition.
+ */
+static inline void hid_map_usage(struct hid_input *hidinput,
+		struct hid_usage *usage, unsigned long **bit, int *max,
+		__u8 type, unsigned int c)
+{
+	struct input_dev *input = hidinput->input;
+	unsigned long *bmap = NULL;
+	unsigned int limit = 0;
+
+	switch (type) {
+	case EV_ABS:
+		bmap = input->absbit;
+		limit = ABS_MAX;
+		break;
+	case EV_REL:
+		bmap = input->relbit;
+		limit = REL_MAX;
+		break;
+	case EV_KEY:
+		bmap = input->keybit;
+		limit = KEY_MAX;
+		break;
+	case EV_LED:
+		bmap = input->ledbit;
+		limit = LED_MAX;
+		break;
+	}
+
+	if (unlikely(c > limit || !bmap)) {
+		pr_warn_ratelimited("%s: Invalid code %d type %d\n",
+				    input->name, c, type);
+		*bit = NULL;
+		return;
+	}
+
+	usage->type = type;
+	usage->code = c;
+	*max = limit;
+	*bit = bmap;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -882,7 +944,12 @@ static inline void hid_map_usage_clear(struct hid_input *hidinput,
 		__u8 type, __u16 c)
 {
 	hid_map_usage(hidinput, usage, bit, max, type, c);
+<<<<<<< HEAD
 	clear_bit(c, *bit);
+=======
+	if (*bit)
+		clear_bit(usage->code, *bit);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -1069,7 +1136,11 @@ static inline void hid_hw_wait(struct hid_device *hdev)
 		hdev->ll_driver->wait(hdev);
 }
 
+<<<<<<< HEAD
 int hid_report_raw_event(struct hid_device *hid, int type, u8 *data, int size,
+=======
+int hid_report_raw_event(struct hid_device *hid, int type, u8 *data, u32 size,
+>>>>>>> common/deprecated/android-3.18
 		int interrupt);
 
 /* HID quirks API */

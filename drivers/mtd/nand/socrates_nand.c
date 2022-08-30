@@ -205,7 +205,11 @@ static int socrates_nand_probe(struct platform_device *ofdev)
 	if (!res)
 		return res;
 
+<<<<<<< HEAD
 	nand_release(mtd);
+=======
+	nand_cleanup(nand_chip);
+>>>>>>> common/deprecated/android-3.18
 
 out:
 	iounmap(host->io_base);

@@ -493,15 +493,28 @@ static int ea_get(struct inode *inode, struct ea_buffer *ea_buf, int min_size)
 	if (size > PSIZE) {
 		/*
 		 * To keep the rest of the code simple.  Allocate a
+<<<<<<< HEAD
 		 * contiguous buffer to work with
 		 */
 		ea_buf->xattr = kmalloc(size, GFP_KERNEL);
+=======
+		 * contiguous buffer to work with. Make the buffer large
+		 * enough to make use of the whole extent.
+		 */
+		ea_buf->max_size = (size + sb->s_blocksize - 1) &
+		    ~(sb->s_blocksize - 1);
+
+		ea_buf->xattr = kmalloc(ea_buf->max_size, GFP_KERNEL);
+>>>>>>> common/deprecated/android-3.18
 		if (ea_buf->xattr == NULL)
 			return -ENOMEM;
 
 		ea_buf->flag = EA_MALLOC;
+<<<<<<< HEAD
 		ea_buf->max_size = (size + sb->s_blocksize - 1) &
 		    ~(sb->s_blocksize - 1);
+=======
+>>>>>>> common/deprecated/android-3.18
 
 		if (ea_size == 0)
 			return 0;

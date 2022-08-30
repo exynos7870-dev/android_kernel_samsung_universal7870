@@ -76,7 +76,11 @@ extern int kgdb_fault_expected;
 
 #define KGDB_MAX_NO_CPUS	1
 #define BUFMAX			400
+<<<<<<< HEAD
 #define NUMREGBYTES		(DBG_MAX_REG_NUM << 2)
+=======
+#define NUMREGBYTES		(GDB_MAX_REGS << 2)
+>>>>>>> common/deprecated/android-3.18
 #define NUMCRITREGBYTES		(32 << 2)
 
 #define _R0			0

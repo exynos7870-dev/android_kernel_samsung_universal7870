@@ -1260,7 +1260,11 @@ static int gfs2_atomic_open(struct inode *dir, struct dentry *dentry,
 			return finish_no_open(file, dentry);
 		}
 		dput(d);
+<<<<<<< HEAD
 		return 0;
+=======
+		return excl && (flags & O_CREAT) ? -EEXIST : 0;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	BUG_ON(d != NULL);

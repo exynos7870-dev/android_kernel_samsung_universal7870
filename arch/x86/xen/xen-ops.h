@@ -94,17 +94,27 @@ struct dom0_vga_console_info;
 
 #ifdef CONFIG_XEN_DOM0
 void __init xen_init_vga(const struct dom0_vga_console_info *, size_t size);
+<<<<<<< HEAD
 void __init xen_init_apic(void);
+=======
+>>>>>>> common/deprecated/android-3.18
 #else
 static inline void __init xen_init_vga(const struct dom0_vga_console_info *info,
 				       size_t size)
 {
 }
+<<<<<<< HEAD
 static inline void __init xen_init_apic(void)
 {
 }
 #endif
 
+=======
+#endif
+
+void __init xen_init_apic(void);
+
+>>>>>>> common/deprecated/android-3.18
 #ifdef CONFIG_XEN_EFI
 extern void xen_efi_init(void);
 #else

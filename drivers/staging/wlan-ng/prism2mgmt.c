@@ -169,7 +169,11 @@ int prism2mgmt_scan(wlandevice_t *wlandev, void *msgp)
 				     hw->ident_sta_fw.variant) >
 	    HFA384x_FIRMWARE_VERSION(1, 5, 0)) {
 		if (msg->scantype.data != P80211ENUM_scantype_active)
+<<<<<<< HEAD
 			word = cpu_to_le16(msg->maxchanneltime.data);
+=======
+			word = msg->maxchanneltime.data;
+>>>>>>> common/deprecated/android-3.18
 		else
 			word = 0;
 
@@ -940,7 +944,11 @@ int prism2mgmt_flashdl_state(wlandevice_t *wlandev, void *msgp)
 		}
 	}
 
+<<<<<<< HEAD
 	return 0;
+=======
+	return result;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*----------------------------------------------------------------

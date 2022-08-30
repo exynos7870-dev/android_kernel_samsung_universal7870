@@ -235,7 +235,11 @@ config PWM_ROCKCHIP
 
 config PWM_SAMSUNG
 	tristate "Samsung PWM support"
+<<<<<<< HEAD
 	depends on ARCH_EXYNOS
+=======
+	depends on PLAT_SAMSUNG
+>>>>>>> common/deprecated/android-3.18
 	help
 	  Generic PWM framework driver for Samsung.
 

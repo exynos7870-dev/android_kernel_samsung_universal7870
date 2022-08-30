@@ -81,6 +81,14 @@ int unregister_tcf_proto_ops(struct tcf_proto_ops *ops)
 	struct tcf_proto_ops *t;
 	int rc = -ENOENT;
 
+<<<<<<< HEAD
+=======
+	/* Wait for outstanding call_rcu()s, if any, from a
+	 * tcf_proto_ops's destroy() handler.
+	 */
+	rcu_barrier();
+
+>>>>>>> common/deprecated/android-3.18
 	write_lock(&cls_mod_lock);
 	list_for_each_entry(t, &tcf_proto_base, head) {
 		if (t == ops) {
@@ -132,13 +140,22 @@ static int tc_ctl_tfilter(struct sk_buff *skb, struct nlmsghdr *n)
 	unsigned long cl;
 	unsigned long fh;
 	int err;
+<<<<<<< HEAD
 	int tp_created = 0;
+=======
+	int tp_created;
+>>>>>>> common/deprecated/android-3.18
 
 	if ((n->nlmsg_type != RTM_GETTFILTER) &&
 	    !netlink_ns_capable(skb, net->user_ns, CAP_NET_ADMIN))
 		return -EPERM;
 
 replay:
+<<<<<<< HEAD
+=======
+	tp_created = 0;
+
+>>>>>>> common/deprecated/android-3.18
 	err = nlmsg_parse(n, sizeof(*t), tca, TCA_MAX, NULL);
 	if (err < 0)
 		return err;
@@ -308,7 +325,12 @@ replay:
 		case RTM_DELTFILTER:
 			err = tp->ops->delete(tp, fh);
 			if (err == 0)
+<<<<<<< HEAD
 				tfilter_notify(net, skb, n, tp, fh, RTM_DELTFILTER);
+=======
+				tfilter_notify(net, skb, n, tp,
+					       t->tcm_handle, RTM_DELTFILTER);
+>>>>>>> common/deprecated/android-3.18
 			goto errout;
 		case RTM_GETTFILTER:
 			err = tfilter_notify(net, skb, n, tp, fh, RTM_NEWTFILTER);
@@ -556,8 +578,14 @@ void tcf_exts_change(struct tcf_proto *tp, struct tcf_exts *dst,
 }
 EXPORT_SYMBOL(tcf_exts_change);
 
+<<<<<<< HEAD
 #define tcf_exts_first_act(ext) \
 		list_first_entry(&(exts)->actions, struct tc_action, list)
+=======
+#define tcf_exts_first_act(ext)					\
+	list_first_entry_or_null(&(exts)->actions,		\
+				 struct tc_action, list)
+>>>>>>> common/deprecated/android-3.18
 
 int tcf_exts_dump(struct sk_buff *skb, struct tcf_exts *exts)
 {
@@ -603,7 +631,11 @@ int tcf_exts_dump_stats(struct sk_buff *skb, struct tcf_exts *exts)
 {
 #ifdef CONFIG_NET_CLS_ACT
 	struct tc_action *a = tcf_exts_first_act(exts);
+<<<<<<< HEAD
 	if (tcf_action_copy_stats(skb, a, 1) < 0)
+=======
+	if (a != NULL && tcf_action_copy_stats(skb, a, 1) < 0)
+>>>>>>> common/deprecated/android-3.18
 		return -1;
 #endif
 	return 0;

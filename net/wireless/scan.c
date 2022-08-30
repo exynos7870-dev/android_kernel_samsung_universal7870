@@ -56,6 +56,22 @@
  * also linked into the probe response struct.
  */
 
+<<<<<<< HEAD
+=======
+/*
+ * Limit the number of BSS entries stored in mac80211. Each one is
+ * a bit over 4k at most, so this limits to roughly 4-5M of memory.
+ * If somebody wants to really attack this though, they'd likely
+ * use small beacons, and only one type of frame, limiting each of
+ * the entries to a much smaller size (in order to generate more
+ * entries in total, so overhead is bigger.)
+ */
+static int bss_entries_limit = 1000;
+module_param(bss_entries_limit, int, 0644);
+MODULE_PARM_DESC(bss_entries_limit,
+                 "limit to number of scan BSS entries (per wiphy, default 1000)");
+
+>>>>>>> common/deprecated/android-3.18
 #define IEEE80211_SCAN_RESULT_EXPIRE	(7 * HZ)
 
 static void bss_free(struct cfg80211_internal_bss *bss)
@@ -136,6 +152,13 @@ static bool __cfg80211_unlink_bss(struct cfg80211_registered_device *rdev,
 
 	list_del_init(&bss->list);
 	rb_erase(&bss->rbn, &rdev->bss_tree);
+<<<<<<< HEAD
+=======
+	rdev->bss_entries--;
+	WARN_ONCE((rdev->bss_entries == 0) ^ list_empty(&rdev->bss_list),
+		  "rdev bss entries[%d]/list[empty:%d] corruption\n",
+		  rdev->bss_entries, list_empty(&rdev->bss_list));
+>>>>>>> common/deprecated/android-3.18
 	bss_ref_put(rdev, bss);
 	return true;
 }
@@ -162,6 +185,43 @@ static void __cfg80211_bss_expire(struct cfg80211_registered_device *rdev,
 		rdev->bss_generation++;
 }
 
+<<<<<<< HEAD
+=======
+static bool cfg80211_bss_expire_oldest(struct cfg80211_registered_device *rdev)
+{
+	struct cfg80211_internal_bss *bss, *oldest = NULL;
+	bool ret;
+
+	lockdep_assert_held(&rdev->bss_lock);
+
+	list_for_each_entry(bss, &rdev->bss_list, list) {
+		if (atomic_read(&bss->hold))
+			continue;
+
+		if (!list_empty(&bss->hidden_list) &&
+		    !bss->pub.hidden_beacon_bss)
+			continue;
+
+		if (oldest && time_before(oldest->ts, bss->ts))
+			continue;
+		oldest = bss;
+	}
+
+	if (WARN_ON(!oldest))
+		return false;
+
+	/*
+	 * The callers make sure to increase rdev->bss_generation if anything
+	 * gets removed (and a new entry added), so there's no need to also do
+	 * it here.
+	 */
+
+	ret = __cfg80211_unlink_bss(rdev, oldest);
+	WARN_ON(!ret);
+	return ret;
+}
+
+>>>>>>> common/deprecated/android-3.18
 void ___cfg80211_scan_done(struct cfg80211_registered_device *rdev,
 			   bool send_message)
 {
@@ -437,6 +497,7 @@ static int cmp_bss(struct cfg80211_bss *a,
 	const u8 *ie2 = NULL;
 	int i, r;
 
+<<<<<<< HEAD
 #if !(defined(CONFIG_BCM4335) || defined(CONFIG_BCM4335_MODULE) \
         || defined(CONFIG_BCM4339) || defined(CONFIG_BCM4339_MODULE) \
 	|| defined(CONFIG_BCM43438) || defined(CONFIG_BCM43438_MODULE) \
@@ -448,6 +509,10 @@ static int cmp_bss(struct cfg80211_bss *a,
 	if (a->channel != b->channel)
 		return b->channel->center_freq - a->channel->center_freq;
 #endif /* CONFIG_BCM43xx */
+=======
+	if (a->channel != b->channel)
+		return b->channel->center_freq - a->channel->center_freq;
+>>>>>>> common/deprecated/android-3.18
 
 	a_ies = rcu_access_pointer(a->ies);
 	if (!a_ies)
@@ -487,6 +552,7 @@ static int cmp_bss(struct cfg80211_bss *a,
 	if (r)
 		return r;
 
+<<<<<<< HEAD
 #if (defined(CONFIG_BCM4335) || defined(CONFIG_BCM4335_MODULE) \
         || defined(CONFIG_BCM4339) || defined(CONFIG_BCM4339_MODULE) \
 	|| defined(CONFIG_BCM43438) || defined(CONFIG_BCM43438_MODULE) \
@@ -499,6 +565,8 @@ static int cmp_bss(struct cfg80211_bss *a,
 		return b->channel->center_freq - a->channel->center_freq;
 #endif /* CONFIG_BCM43xx */
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	ie1 = cfg80211_find_ie(WLAN_EID_SSID, a_ies->data, a_ies->len);
 	ie2 = cfg80211_find_ie(WLAN_EID_SSID, b_ies->data, b_ies->len);
 
@@ -652,6 +720,10 @@ static bool cfg80211_combine_bsses(struct cfg80211_registered_device *rdev,
 	const u8 *ie;
 	int i, ssidlen;
 	u8 fold = 0;
+<<<<<<< HEAD
+=======
+	u32 n_entries = 0;
+>>>>>>> common/deprecated/android-3.18
 
 	ies = rcu_access_pointer(new->pub.beacon_ies);
 	if (WARN_ON(!ies))
@@ -675,6 +747,15 @@ static bool cfg80211_combine_bsses(struct cfg80211_registered_device *rdev,
 	/* This is the bad part ... */
 
 	list_for_each_entry(bss, &rdev->bss_list, list) {
+<<<<<<< HEAD
+=======
+		/*
+		 * we're iterating all the entries anyway, so take the
+		 * opportunity to validate the list length accounting
+		 */
+		n_entries++;
+
+>>>>>>> common/deprecated/android-3.18
 		if (!ether_addr_equal(bss->pub.bssid, new->pub.bssid))
 			continue;
 		if (bss->pub.channel != new->pub.channel)
@@ -703,6 +784,13 @@ static bool cfg80211_combine_bsses(struct cfg80211_registered_device *rdev,
 				   new->pub.beacon_ies);
 	}
 
+<<<<<<< HEAD
+=======
+	WARN_ONCE(n_entries != rdev->bss_entries,
+		  "rdev bss entries[%d]/list[len:%d] corruption\n",
+		  rdev->bss_entries, n_entries);
+
+>>>>>>> common/deprecated/android-3.18
 	return true;
 }
 
@@ -854,7 +942,20 @@ cfg80211_bss_update(struct cfg80211_registered_device *rdev,
 			}
 		}
 
+<<<<<<< HEAD
 		list_add_tail(&new->list, &rdev->bss_list);
+=======
+		if (rdev->bss_entries >= bss_entries_limit &&
+		    !cfg80211_bss_expire_oldest(rdev)) {
+			if (!list_empty(&new->hidden_list))
+				list_del(&new->hidden_list);
+			kfree(new);
+			goto drop;
+		}
+
+		list_add_tail(&new->list, &rdev->bss_list);
+		rdev->bss_entries++;
+>>>>>>> common/deprecated/android-3.18
 		rb_insert_bss(rdev, new);
 		found = new;
 	}

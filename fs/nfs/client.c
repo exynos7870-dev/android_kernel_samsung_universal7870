@@ -487,7 +487,11 @@ nfs_get_client(const struct nfs_client_initdata *cl_init,
 
 	if (cl_init->hostname == NULL) {
 		WARN_ON(1);
+<<<<<<< HEAD
 		return NULL;
+=======
+		return ERR_PTR(-EINVAL);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	dprintk("--> nfs_get_client(%s,v%u)\n",
@@ -776,7 +780,11 @@ static int nfs_init_server(struct nfs_server *server,
 	server->options = data->options;
 	server->caps |= NFS_CAP_HARDLINKS|NFS_CAP_SYMLINKS|NFS_CAP_FILEID|
 		NFS_CAP_MODE|NFS_CAP_NLINK|NFS_CAP_OWNER|NFS_CAP_OWNER_GROUP|
+<<<<<<< HEAD
 		NFS_CAP_ATIME|NFS_CAP_CTIME|NFS_CAP_MTIME|NFS_CAP_CHANGE_ATTR;
+=======
+		NFS_CAP_ATIME|NFS_CAP_CTIME|NFS_CAP_MTIME;
+>>>>>>> common/deprecated/android-3.18
 
 	if (data->rsize)
 		server->rsize = nfs_block_size(data->rsize, NULL);

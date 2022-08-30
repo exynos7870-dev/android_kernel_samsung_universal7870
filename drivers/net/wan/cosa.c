@@ -901,6 +901,10 @@ static ssize_t cosa_write(struct file *file,
 			chan->tx_status = 1;
 			spin_unlock_irqrestore(&cosa->lock, flags);
 			up(&chan->wsem);
+<<<<<<< HEAD
+=======
+			kfree(kbuf);
+>>>>>>> common/deprecated/android-3.18
 			return -ERESTARTSYS;
 		}
 	}

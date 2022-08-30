@@ -116,6 +116,10 @@ int __ieee80211_suspend(struct ieee80211_hw *hw, struct cfg80211_wowlan *wowlan)
 			break;
 		}
 
+<<<<<<< HEAD
+=======
+		flush_delayed_work(&sdata->dec_tailroom_needed_wk);
+>>>>>>> common/deprecated/android-3.18
 		drv_remove_interface(local, sdata);
 	}
 

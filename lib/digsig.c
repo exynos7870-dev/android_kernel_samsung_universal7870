@@ -86,6 +86,15 @@ static int digsig_verify_rsa(struct key *key,
 	down_read(&key->sem);
 	ukp = key->payload.data;
 
+<<<<<<< HEAD
+=======
+	if (!ukp) {
+		/* key was revoked before we acquired its semaphore */
+		err = -EKEYREVOKED;
+		goto err1;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	if (ukp->datalen < sizeof(*pkh))
 		goto err1;
 

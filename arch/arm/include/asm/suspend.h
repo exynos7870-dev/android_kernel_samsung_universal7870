@@ -7,6 +7,10 @@ struct sleep_save_sp {
 };
 
 extern void cpu_resume(void);
+<<<<<<< HEAD
+=======
+extern void cpu_resume_no_hyp(void);
+>>>>>>> common/deprecated/android-3.18
 extern int cpu_suspend(unsigned long, int (*)(unsigned long));
 
 #endif

@@ -56,7 +56,11 @@
 
 /* Buffer, its dma address and lock */
 struct buf_data {
+<<<<<<< HEAD
 	u8 buf[RN_BUF_SIZE];
+=======
+	u8 buf[RN_BUF_SIZE] ____cacheline_aligned;
+>>>>>>> common/deprecated/android-3.18
 	dma_addr_t addr;
 	struct completion filled;
 	u32 hw_desc[DESC_JOB_O_LEN];

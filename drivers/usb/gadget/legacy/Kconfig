@@ -287,6 +287,10 @@ config USB_MIDI_GADGET
 	depends on SND
 	select USB_LIBCOMPOSITE
 	select SND_RAWMIDI
+<<<<<<< HEAD
+=======
+	select USB_F_MIDI
+>>>>>>> common/deprecated/android-3.18
 	help
 	  The MIDI Gadget acts as a USB Audio device, with one MIDI
 	  input and one MIDI output. These MIDI jacks appear as

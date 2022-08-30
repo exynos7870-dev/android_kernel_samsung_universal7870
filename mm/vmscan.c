@@ -81,8 +81,11 @@ struct scan_control {
 	 */
 	struct mem_cgroup *target_mem_cgroup;
 
+<<<<<<< HEAD
 	int swappiness;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* Scan (total_size >> priority) pages at once */
 	int priority;
 
@@ -265,10 +268,19 @@ late_initcall(add_shrinker_debug);
  */
 void unregister_shrinker(struct shrinker *shrinker)
 {
+<<<<<<< HEAD
+=======
+	if (!shrinker->nr_deferred)
+		return;
+>>>>>>> common/deprecated/android-3.18
 	down_write(&shrinker_rwsem);
 	list_del(&shrinker->list);
 	up_write(&shrinker_rwsem);
 	kfree(shrinker->nr_deferred);
+<<<<<<< HEAD
+=======
+	shrinker->nr_deferred = NULL;
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL(unregister_shrinker);
 
@@ -287,6 +299,10 @@ shrink_slab_node(struct shrink_control *shrinkctl, struct shrinker *shrinker,
 	int nid = shrinkctl->nid;
 	long batch_size = shrinker->batch ? shrinker->batch
 					  : SHRINK_BATCH;
+<<<<<<< HEAD
+=======
+	long scanned = 0, next_deferred;
+>>>>>>> common/deprecated/android-3.18
 
 	freeable = shrinker->count_objects(shrinker, shrinkctl);
 	if (freeable == 0)
@@ -309,7 +325,13 @@ shrink_slab_node(struct shrink_control *shrinkctl, struct shrinker *shrinker,
 		"shrink_slab: %pF negative objects to delete nr=%ld\n",
 		       shrinker->scan_objects, total_scan);
 		total_scan = freeable;
+<<<<<<< HEAD
 	}
+=======
+		next_deferred = nr;
+	} else
+		next_deferred = total_scan;
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * We need to avoid excessive windup on filesystem shrinkers
@@ -364,19 +386,37 @@ shrink_slab_node(struct shrink_control *shrinkctl, struct shrinker *shrinker,
 			break;
 		freed += ret;
 
+<<<<<<< HEAD
 		total_scan -= ret > nr_to_scan ? ret : nr_to_scan;
 		count_vm_events(SLABS_SCANNED, nr_to_scan);
+=======
+		count_vm_events(SLABS_SCANNED, nr_to_scan);
+		total_scan -= nr_to_scan;
+		scanned += nr_to_scan;
+>>>>>>> common/deprecated/android-3.18
 
 		cond_resched();
 	}
 
+<<<<<<< HEAD
+=======
+	if (next_deferred >= scanned)
+		next_deferred -= scanned;
+	else
+		next_deferred = 0;
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * move the unused scan count back into the shrinker in a
 	 * manner that handles concurrent updates. If we exhausted the
 	 * scan, there is no need to do an update.
 	 */
+<<<<<<< HEAD
 	if (total_scan > 0)
 		new_nr = atomic_long_add_return(total_scan,
+=======
+	if (next_deferred > 0)
+		new_nr = atomic_long_add_return(next_deferred,
+>>>>>>> common/deprecated/android-3.18
 						&shrinker->nr_deferred[nid]);
 	else
 		new_nr = atomic_long_read(&shrinker->nr_deferred[nid]);
@@ -940,21 +980,33 @@ static unsigned long shrink_page_list(struct list_head *page_list,
 		 *
 		 * 2) Global reclaim encounters a page, memcg encounters a
 		 *    page that is not marked for immediate reclaim or
+<<<<<<< HEAD
 		 *    the caller does not have __GFP_IO. In this case mark
 		 *    the page for immediate reclaim and continue scanning.
 		 *
 		 *    __GFP_IO is checked  because a loop driver thread might
+=======
+		 *    the caller does not have __GFP_FS (or __GFP_IO if it's
+		 *    simply going to swap, not to fs). In this case mark
+		 *    the page for immediate reclaim and continue scanning.
+		 *
+		 *    Require may_enter_fs because we would wait on fs, which
+		 *    may not have submitted IO yet. And the loop driver might
+>>>>>>> common/deprecated/android-3.18
 		 *    enter reclaim, and deadlock if it waits on a page for
 		 *    which it is needed to do the write (loop masks off
 		 *    __GFP_IO|__GFP_FS for this reason); but more thought
 		 *    would probably show more reasons.
 		 *
+<<<<<<< HEAD
 		 *    Don't require __GFP_FS, since we're not going into the
 		 *    FS, just waiting on its writeback completion. Worryingly,
 		 *    ext4 gfs2 and xfs allocate pages with
 		 *    grab_cache_page_write_begin(,,AOP_FLAG_NOFS), so testing
 		 *    may_enter_fs here is liable to OOM on them.
 		 *
+=======
+>>>>>>> common/deprecated/android-3.18
 		 * 3) memcg encounters a page that is not already marked
 		 *    PageReclaim. memcg does not have any dirty pages
 		 *    throttling so we could easily OOM just because too many
@@ -971,7 +1023,11 @@ static unsigned long shrink_page_list(struct list_head *page_list,
 
 			/* Case 2 above */
 			} else if (global_reclaim(sc) ||
+<<<<<<< HEAD
 			    !PageReclaim(page) || !(sc->gfp_mask & __GFP_IO)) {
+=======
+			    !PageReclaim(page) || !may_enter_fs) {
+>>>>>>> common/deprecated/android-3.18
 				/*
 				 * This is slightly racy - end_page_writeback()
 				 * might have just cleared PageReclaim, then
@@ -1160,7 +1216,11 @@ cull_mlocked:
 		if (PageSwapCache(page))
 			try_to_free_swap(page);
 		unlock_page(page);
+<<<<<<< HEAD
 		putback_lru_page(page);
+=======
+		list_add(&page->lru, &ret_pages);
+>>>>>>> common/deprecated/android-3.18
 		continue;
 
 activate_locked:
@@ -1261,6 +1321,10 @@ int __isolate_lru_page(struct page *page, isolate_mode_t mode)
 
 		if (PageDirty(page)) {
 			struct address_space *mapping;
+<<<<<<< HEAD
+=======
+			bool migrate_dirty;
+>>>>>>> common/deprecated/android-3.18
 
 			/* ISOLATE_CLEAN means only clean pages */
 			if (mode & ISOLATE_CLEAN)
@@ -1269,10 +1333,26 @@ int __isolate_lru_page(struct page *page, isolate_mode_t mode)
 			/*
 			 * Only pages without mappings or that have a
 			 * ->migratepage callback are possible to migrate
+<<<<<<< HEAD
 			 * without blocking
 			 */
 			mapping = page_mapping(page);
 			if (mapping && !mapping->a_ops->migratepage)
+=======
+			 * without blocking. However, we can be racing with
+			 * truncation so it's necessary to lock the page
+			 * to stabilise the mapping as truncation holds
+			 * the page lock until after the page is removed
+			 * from the page cache.
+			 */
+			if (!trylock_page(page))
+				return ret;
+
+			mapping = page_mapping(page);
+			migrate_dirty = !mapping || mapping->a_ops->migratepage;
+			unlock_page(page);
+			if (!migrate_dirty)
+>>>>>>> common/deprecated/android-3.18
 				return ret;
 		}
 	}
@@ -1509,8 +1589,11 @@ static int current_may_throttle(void)
 		bdi_write_congested(current->backing_dev_info);
 }
 
+<<<<<<< HEAD
 static inline bool need_memory_boosting(struct zone *zone);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * shrink_inactive_list() is a helper for shrink_zone().  It returns the number
  * of reclaimed pages
@@ -1532,8 +1615,11 @@ shrink_inactive_list(unsigned long nr_to_scan, struct lruvec *lruvec,
 	int file = is_file_lru(lru);
 	struct zone *zone = lruvec_zone(lruvec);
 	struct zone_reclaim_stat *reclaim_stat = &lruvec->reclaim_stat;
+<<<<<<< HEAD
 	bool force_reclaim = false;
 	enum ttu_flags ttu = TTU_UNMAP;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	while (unlikely(too_many_isolated(zone, file, sc))) {
 		congestion_wait(BLK_RW_ASYNC, HZ/10);
@@ -1570,6 +1656,7 @@ shrink_inactive_list(unsigned long nr_to_scan, struct lruvec *lruvec,
 	if (nr_taken == 0)
 		return 0;
 
+<<<<<<< HEAD
 	if (need_memory_boosting(zone)) {
 		force_reclaim = true;
 		ttu |= TTU_IGNORE_ACCESS;
@@ -1579,6 +1666,12 @@ shrink_inactive_list(unsigned long nr_to_scan, struct lruvec *lruvec,
 				&nr_dirty, &nr_unqueued_dirty, &nr_congested,
 				&nr_writeback, &nr_immediate,
 				force_reclaim);
+=======
+	nr_reclaimed = shrink_page_list(&page_list, zone, sc, TTU_UNMAP,
+				&nr_dirty, &nr_unqueued_dirty, &nr_congested,
+				&nr_writeback, &nr_immediate,
+				false);
+>>>>>>> common/deprecated/android-3.18
 
 	spin_lock_irq(&zone->lru_lock);
 
@@ -1920,6 +2013,7 @@ enum scan_balance {
 	SCAN_FILE,
 };
 
+<<<<<<< HEAD
 /* mem_boost throttles only kswapd's behavior */
 enum mem_boost {
 	NO_BOOST,
@@ -2000,6 +2094,8 @@ static inline bool need_memory_boosting(struct zone *zone)
 	return ret;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * Determine how aggressively the anon and file LRU lists should be
  * scanned.  The relative value of each set of LRU lists is determined
@@ -2091,6 +2187,7 @@ static void get_scan_count(struct lruvec *lruvec, int swappiness,
 		}
 	}
 
+<<<<<<< HEAD
 	if (current_is_kswapd() && need_memory_boosting(zone)) {
 		scan_balance = SCAN_FILE;
 		goto out;
@@ -2102,6 +2199,19 @@ static void get_scan_count(struct lruvec *lruvec, int swappiness,
 	 */
 	if (!IS_ENABLED(CONFIG_BALANCE_ANON_FILE_RECLAIM) &&
 			!inactive_file_is_low(lruvec)) {
+=======
+	/*
+	 * If there is enough inactive page cache, i.e. if the size of the
+	 * inactive list is greater than that of the active list *and* the
+	 * inactive list actually has some pages to scan on this priority, we
+	 * do not reclaim anything from the anonymous working set right now.
+	 * Without the second condition we could end up never scanning an
+	 * lruvec even if it has plenty of old anonymous pages unless the
+	 * system is under heavy pressure.
+	 */
+	if (!inactive_file_is_low(lruvec) &&
+	    get_lru_size(lruvec, LRU_INACTIVE_FILE) >> sc->priority) {
+>>>>>>> common/deprecated/android-3.18
 		scan_balance = SCAN_FILE;
 		goto out;
 	}
@@ -2837,6 +2947,7 @@ unsigned long try_to_free_pages(struct zonelist *zonelist, int order,
 		.priority = DEF_PRIORITY,
 		.may_writepage = !laptop_mode,
 		.may_unmap = 1,
+<<<<<<< HEAD
 #ifdef CONFIG_DIRECT_RECLAIM_FILE_PAGES_ONLY
 		.may_swap = 0,
 #else
@@ -2847,6 +2958,9 @@ unsigned long try_to_free_pages(struct zonelist *zonelist, int order,
 #else
 		.swappiness = vm_swappiness,
 #endif
+=======
+		.may_swap = 1,
+>>>>>>> common/deprecated/android-3.18
 	};
 
 	/*
@@ -2881,7 +2995,10 @@ unsigned long mem_cgroup_shrink_node_zone(struct mem_cgroup *memcg,
 		.may_writepage = !laptop_mode,
 		.may_unmap = 1,
 		.may_swap = !noswap,
+<<<<<<< HEAD
 		.swappiness = vm_swappiness,
+=======
+>>>>>>> common/deprecated/android-3.18
 	};
 	struct lruvec *lruvec = mem_cgroup_zone_lruvec(zone, memcg);
 	int swappiness = mem_cgroup_swappiness(memcg);
@@ -2925,7 +3042,10 @@ unsigned long try_to_free_mem_cgroup_pages(struct mem_cgroup *memcg,
 		.may_writepage = !laptop_mode,
 		.may_unmap = 1,
 		.may_swap = may_swap,
+<<<<<<< HEAD
 		.swappiness = vm_swappiness,
+=======
+>>>>>>> common/deprecated/android-3.18
 	};
 
 	/*
@@ -3036,11 +3156,15 @@ static bool pgdat_balanced(pg_data_t *pgdat, int order, int classzone_idx)
 	}
 
 	if (order)
+<<<<<<< HEAD
 #ifdef CONFIG_TIGHT_PGDAT_BALANCE
 		return balanced_pages >= (managed_pages >> 1);
 #else
 		return balanced_pages >= (managed_pages >> 2);
 #endif
+=======
+		return balanced_pages >= (managed_pages >> 2);
+>>>>>>> common/deprecated/android-3.18
 	else
 		return true;
 }
@@ -3194,7 +3318,10 @@ static unsigned long balance_pgdat(pg_data_t *pgdat, int order,
 		.may_writepage = !laptop_mode,
 		.may_unmap = 1,
 		.may_swap = 1,
+<<<<<<< HEAD
 		.swappiness = vm_swappiness,
+=======
+>>>>>>> common/deprecated/android-3.18
 	};
 	count_vm_event(PAGEOUTRUN);
 
@@ -3581,7 +3708,10 @@ unsigned long shrink_all_memory(unsigned long nr_to_reclaim)
 		.may_writepage = 1,
 		.may_unmap = 1,
 		.may_swap = 1,
+<<<<<<< HEAD
 		.swappiness = vm_swappiness,
+=======
+>>>>>>> common/deprecated/android-3.18
 		.hibernation_mode = 1,
 	};
 	struct zonelist *zonelist = node_zonelist(numa_node_id(), sc.gfp_mask);
@@ -3672,10 +3802,13 @@ static int __init kswapd_init(void)
 	for_each_node_state(nid, N_MEMORY)
  		kswapd_run(nid);
 	hotcpu_notifier(cpu_callback, 0);
+<<<<<<< HEAD
 #ifdef CONFIG_SYSFS
 	if (sysfs_create_group(mm_kobj, &mem_boost_attr_group))
 		pr_err("vmscan: register mem boost sysfs failed\n");
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -3769,7 +3902,10 @@ static int __zone_reclaim(struct zone *zone, gfp_t gfp_mask, unsigned int order)
 		.nr_to_reclaim = max(nr_pages, SWAP_CLUSTER_MAX),
 		.gfp_mask = (gfp_mask = memalloc_noio_flags(gfp_mask)),
 		.order = order,
+<<<<<<< HEAD
 		.swappiness = vm_swappiness,
+=======
+>>>>>>> common/deprecated/android-3.18
 		.priority = ZONE_RECLAIM_PRIORITY,
 		.may_writepage = !!(zone_reclaim_mode & RECLAIM_WRITE),
 		.may_unmap = !!(zone_reclaim_mode & RECLAIM_SWAP),
@@ -3906,7 +4042,17 @@ int zone_reclaim(struct zone *zone, gfp_t gfp_mask, unsigned int order)
  */
 int page_evictable(struct page *page)
 {
+<<<<<<< HEAD
 	return !mapping_unevictable(page_mapping(page)) && !PageMlocked(page);
+=======
+	int ret;
+
+	/* Prevent address_space of inode and swap cache from being freed */
+	rcu_read_lock();
+	ret = !mapping_unevictable(page_mapping(page)) && !PageMlocked(page);
+	rcu_read_unlock();
+	return ret;
+>>>>>>> common/deprecated/android-3.18
 }
 
 #ifdef CONFIG_SHMEM

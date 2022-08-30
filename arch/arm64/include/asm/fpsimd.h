@@ -41,6 +41,7 @@ struct fpsimd_state {
 	unsigned int cpu;
 };
 
+<<<<<<< HEAD
 struct fpsimd_kernel_state {
 	__uint128_t vregs[32];
 	u32 fpsr;
@@ -59,6 +60,8 @@ struct fpsimd_kernel_state {
 	atomic_t depth;
 };
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * Struct for stacking the bottom 'n' FP/SIMD registers.
  */
@@ -99,12 +102,15 @@ extern void fpsimd_save_partial_state(struct fpsimd_partial_state *state,
 				      u32 num_regs);
 extern void fpsimd_load_partial_state(struct fpsimd_partial_state *state);
 
+<<<<<<< HEAD
 void fpsimd_set_task_using(struct task_struct *t);
 void fpsimd_clr_task_using(struct task_struct *t);
 
 void fpsimd_get(void);
 void fpsimd_put(void);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #endif
 
 #endif

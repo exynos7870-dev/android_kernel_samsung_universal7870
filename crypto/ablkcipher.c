@@ -48,11 +48,14 @@ void __ablkcipher_walk_complete(struct ablkcipher_walk *walk)
 {
 	struct ablkcipher_buffer *p, *tmp;
 
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 	if (unlikely(in_fips_err()))
 		return;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	list_for_each_entry_safe(p, tmp, &walk->buffers, entry) {
 		ablkcipher_buffer_write(p);
 		list_del(&p->entry);
@@ -77,11 +80,17 @@ static inline u8 *ablkcipher_get_spot(u8 *start, unsigned int len)
 	return max(start, end_page);
 }
 
+<<<<<<< HEAD
 static inline unsigned int ablkcipher_done_slow(struct ablkcipher_walk *walk,
 						unsigned int bsize)
 {
 	unsigned int n = bsize;
 
+=======
+static inline void ablkcipher_done_slow(struct ablkcipher_walk *walk,
+					unsigned int n)
+{
+>>>>>>> common/deprecated/android-3.18
 	for (;;) {
 		unsigned int len_this_page = scatterwalk_pagelen(&walk->out);
 
@@ -93,6 +102,7 @@ static inline unsigned int ablkcipher_done_slow(struct ablkcipher_walk *walk,
 		n -= len_this_page;
 		scatterwalk_start(&walk->out, scatterwalk_sg_next(walk->out.sg));
 	}
+<<<<<<< HEAD
 
 	return bsize;
 }
@@ -104,6 +114,15 @@ static inline unsigned int ablkcipher_done_fast(struct ablkcipher_walk *walk,
 	scatterwalk_advance(&walk->out, n);
 
 	return n;
+=======
+}
+
+static inline void ablkcipher_done_fast(struct ablkcipher_walk *walk,
+					unsigned int n)
+{
+	scatterwalk_advance(&walk->in, n);
+	scatterwalk_advance(&walk->out, n);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int ablkcipher_walk_next(struct ablkcipher_request *req,
@@ -113,6 +132,7 @@ int ablkcipher_walk_done(struct ablkcipher_request *req,
 			 struct ablkcipher_walk *walk, int err)
 {
 	struct crypto_tfm *tfm = req->base.tfm;
+<<<<<<< HEAD
 	unsigned int nbytes = 0;
 
 #ifdef CONFIG_CRYPTO_FIPS
@@ -151,6 +171,42 @@ err:
 		memcpy(req->info, walk->iv, tfm->crt_ablkcipher.ivsize);
 	kfree(walk->iv_buffer);
 
+=======
+	unsigned int n; /* bytes processed */
+	bool more;
+
+	if (unlikely(err < 0))
+		goto finish;
+
+	n = walk->nbytes - err;
+	walk->total -= n;
+	more = (walk->total != 0);
+
+	if (likely(!(walk->flags & ABLKCIPHER_WALK_SLOW))) {
+		ablkcipher_done_fast(walk, n);
+	} else {
+		if (WARN_ON(err)) {
+			/* unexpected case; didn't process all bytes */
+			err = -EINVAL;
+			goto finish;
+		}
+		ablkcipher_done_slow(walk, n);
+	}
+
+	scatterwalk_done(&walk->in, 0, more);
+	scatterwalk_done(&walk->out, 1, more);
+
+	if (more) {
+		crypto_yield(req->base.flags);
+		return ablkcipher_walk_next(req, walk);
+	}
+	err = 0;
+finish:
+	walk->nbytes = 0;
+	if (walk->iv != req->info)
+		memcpy(req->info, walk->iv, tfm->crt_ablkcipher.ivsize);
+	kfree(walk->iv_buffer);
+>>>>>>> common/deprecated/android-3.18
 	return err;
 }
 EXPORT_SYMBOL_GPL(ablkcipher_walk_done);
@@ -397,6 +453,10 @@ static int crypto_ablkcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
 	strncpy(rblkcipher.type, "ablkcipher", sizeof(rblkcipher.type));
 	strncpy(rblkcipher.geniv, alg->cra_ablkcipher.geniv ?: "<default>",
 		sizeof(rblkcipher.geniv));
+<<<<<<< HEAD
+=======
+	rblkcipher.geniv[sizeof(rblkcipher.geniv) - 1] = '\0';
+>>>>>>> common/deprecated/android-3.18
 
 	rblkcipher.blocksize = alg->cra_blocksize;
 	rblkcipher.min_keysize = alg->cra_ablkcipher.min_keysize;
@@ -478,6 +538,10 @@ static int crypto_givcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
 	strncpy(rblkcipher.type, "givcipher", sizeof(rblkcipher.type));
 	strncpy(rblkcipher.geniv, alg->cra_ablkcipher.geniv ?: "<built-in>",
 		sizeof(rblkcipher.geniv));
+<<<<<<< HEAD
+=======
+	rblkcipher.geniv[sizeof(rblkcipher.geniv) - 1] = '\0';
+>>>>>>> common/deprecated/android-3.18
 
 	rblkcipher.blocksize = alg->cra_blocksize;
 	rblkcipher.min_keysize = alg->cra_ablkcipher.min_keysize;
@@ -664,11 +728,14 @@ int crypto_grab_skcipher(struct crypto_skcipher_spawn *spawn, const char *name,
 	struct crypto_alg *alg;
 	int err;
 
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 	if (unlikely(in_fips_err()))
 		return -EACCES;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	type = crypto_skcipher_type(type);
 	mask = crypto_skcipher_mask(mask);
 
@@ -710,7 +777,11 @@ struct crypto_ablkcipher *crypto_alloc_ablkcipher(const char *alg_name,
 err:
 		if (err != -EAGAIN)
 			break;
+<<<<<<< HEAD
 		if (signal_pending(current)) {
+=======
+		if (fatal_signal_pending(current)) {
+>>>>>>> common/deprecated/android-3.18
 			err = -EINTR;
 			break;
 		}

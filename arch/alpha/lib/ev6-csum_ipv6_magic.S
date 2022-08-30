@@ -52,6 +52,10 @@
  * may cause additional delay in rare cases (load-load replay traps).
  */
 
+<<<<<<< HEAD
+=======
+#include <asm/export.h>
+>>>>>>> common/deprecated/android-3.18
 	.globl csum_ipv6_magic
 	.align 4
 	.ent csum_ipv6_magic
@@ -148,3 +152,7 @@ csum_ipv6_magic:
 	ret			# L0 : L U L U
 
 	.end csum_ipv6_magic
+<<<<<<< HEAD
+=======
+	EXPORT_SYMBOL(csum_ipv6_magic)
+>>>>>>> common/deprecated/android-3.18

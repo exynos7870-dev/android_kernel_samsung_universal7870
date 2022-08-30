@@ -122,9 +122,12 @@ static u8 __mtrr_type_lookup(u64 start, u64 end, u64 *partial_end, int *repeat)
 	if (!mtrr_state.enabled)
 		return 0xFF;
 
+<<<<<<< HEAD
 	/* Make end inclusive end, instead of exclusive */
 	end--;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* Look in fixed ranges. Just return the type as per start */
 	if (mtrr_state.have_fixed && (start < 0x100000)) {
 		int idx;
@@ -230,6 +233,12 @@ u8 mtrr_type_lookup(u64 start, u64 end)
 	int repeat;
 	u64 partial_end;
 
+<<<<<<< HEAD
+=======
+	/* Make end inclusive instead of exclusive */
+	end--;
+
+>>>>>>> common/deprecated/android-3.18
 	type = __mtrr_type_lookup(start, end, &partial_end, &repeat);
 
 	/*
@@ -678,8 +687,13 @@ static void prepare_set(void) __acquires(set_atomicity_lock)
 
 	/* Save value of CR4 and clear Page Global Enable (bit 7) */
 	if (cpu_has_pge) {
+<<<<<<< HEAD
 		cr4 = read_cr4();
 		write_cr4(cr4 & ~X86_CR4_PGE);
+=======
+		cr4 = __read_cr4();
+		__write_cr4(cr4 & ~X86_CR4_PGE);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/* Flush all TLBs via a mov %cr3, %reg; mov %reg, %cr3 */
@@ -708,7 +722,11 @@ static void post_set(void) __releases(set_atomicity_lock)
 
 	/* Restore value of CR4 */
 	if (cpu_has_pge)
+<<<<<<< HEAD
 		write_cr4(cr4);
+=======
+		__write_cr4(cr4);
+>>>>>>> common/deprecated/android-3.18
 	raw_spin_unlock(&set_atomicity_lock);
 }
 
@@ -791,7 +809,11 @@ int generic_validate_add_page(unsigned long base, unsigned long size,
 	 */
 	if (is_cpu(INTEL) && boot_cpu_data.x86 == 6 &&
 	    boot_cpu_data.x86_model == 1 &&
+<<<<<<< HEAD
 	    boot_cpu_data.x86_mask <= 7) {
+=======
+	    boot_cpu_data.x86_stepping <= 7) {
+>>>>>>> common/deprecated/android-3.18
 		if (base & ((1 << (22 - PAGE_SHIFT)) - 1)) {
 			pr_warning("mtrr: base(0x%lx000) is not 4 MiB aligned\n", base);
 			return -EINVAL;

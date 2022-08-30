@@ -36,7 +36,11 @@ struct qt1010_config {
  * @param cfg  tuner hw based configuration
  * @return fe  pointer on success, NULL on failure
  */
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_MEDIA_TUNER_QT1010)
+=======
+#if IS_REACHABLE(CONFIG_MEDIA_TUNER_QT1010)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend *qt1010_attach(struct dvb_frontend *fe,
 					  struct i2c_adapter *i2c,
 					  struct qt1010_config *cfg);

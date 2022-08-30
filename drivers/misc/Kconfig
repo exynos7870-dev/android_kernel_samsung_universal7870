@@ -314,12 +314,15 @@ config ISL29003
 	  This driver can also be built as a module.  If so, the module
 	  will be called isl29003.
 
+<<<<<<< HEAD
 config KNOX_KAP
        bool "Enable KNOX KAP mode"
        default n
        help
               Knox Active Protection mode
 
+=======
+>>>>>>> common/deprecated/android-3.18
 config ISL29020
 	tristate "Intersil ISL29020 ambient light sensor"
 	depends on I2C
@@ -439,7 +442,11 @@ config ARM_CHARLCD
 	  still useful.
 
 config BMP085
+<<<<<<< HEAD
 	bool
+=======
+	tristate
+>>>>>>> common/deprecated/android-3.18
 	depends on SYSFS
 
 config BMP085_I2C
@@ -496,6 +503,7 @@ config USB_SWITCH_FSA9480
 	  stereo and mono audio, video, microphone and UART data to use
 	  a common connector port.
 
+<<<<<<< HEAD
 config SD8XXX_RFKILL
         tristate "Rfkill power control for Marvell sd8xxx wlan/bt"
         depends on MARVELL_DRIVERS
@@ -508,6 +516,8 @@ config SD8XXX_RFKILL
          Creates an rfkill entry in sysfs for power control of Marvell
          sd8xxx wlan/bt chips.
 
+=======
+>>>>>>> common/deprecated/android-3.18
 config LATTICE_ECP3_CONFIG
 	tristate "Lattice ECP3 FPGA bitstream configuration via SPI"
 	depends on SPI && SYSFS
@@ -557,6 +567,7 @@ config MEMORY_STATE_TIME
 	help
 	  Memory time statistics exported to /sys/kernel/memory_state_time
 
+<<<<<<< HEAD
 config SAMSUNG_JACK
 	bool "3.5 PI Jack driver for Samsung devices"
 	depends on INPUT && INPUT_GPIO && SWITCH
@@ -590,6 +601,8 @@ config LEDS_IRIS_FPGA_ICE40XX
 	  To compile this driver as a module, choose M here.
 	  If unsure, say N.
 
+=======
+>>>>>>> common/deprecated/android-3.18
 source "drivers/misc/c2port/Kconfig"
 source "drivers/misc/eeprom/Kconfig"
 source "drivers/misc/cb710/Kconfig"
@@ -603,10 +616,13 @@ source "drivers/misc/mic/Kconfig"
 source "drivers/misc/genwqe/Kconfig"
 source "drivers/misc/echo/Kconfig"
 source "drivers/misc/cxl/Kconfig"
+<<<<<<< HEAD
 source "drivers/misc/mcu_ipc/Kconfig"
 source "drivers/misc/uart_sel/Kconfig"
 source "drivers/misc/modem_v1/Kconfig"
 source "drivers/misc/gnss_if/Kconfig"
 source "drivers/misc/bhy/Kconfig"
 source "drivers/misc/tzdev/Kconfig"
+=======
+>>>>>>> common/deprecated/android-3.18
 endmenu

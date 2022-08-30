@@ -283,7 +283,13 @@ static int rawv6_bind(struct sock *sk, struct sockaddr *uaddr, int addr_len)
 			/* Binding to link-local address requires an interface */
 			if (!sk->sk_bound_dev_if)
 				goto out_unlock;
+<<<<<<< HEAD
 
+=======
+		}
+
+		if (sk->sk_bound_dev_if) {
+>>>>>>> common/deprecated/android-3.18
 			err = -ENODEV;
 			dev = dev_get_by_index_rcu(sock_net(sk),
 						   sk->sk_bound_dev_if);
@@ -492,7 +498,11 @@ static int rawv6_recvmsg(struct kiocb *iocb, struct sock *sk,
 			goto csum_copy_err;
 		err = skb_copy_datagram_iovec(skb, 0, msg->msg_iov, copied);
 	} else {
+<<<<<<< HEAD
 		err = skb_copy_and_csum_datagram_iovec(skb, 0, msg->msg_iov, copied);
+=======
+		err = skb_copy_and_csum_datagram_iovec(skb, 0, msg->msg_iov);
+>>>>>>> common/deprecated/android-3.18
 		if (err == -EINVAL)
 			goto csum_copy_err;
 	}
@@ -588,7 +598,15 @@ static int rawv6_push_pending_frames(struct sock *sk, struct flowi6 *fl6,
 	}
 
 	offset += skb_transport_offset(skb);
+<<<<<<< HEAD
 	BUG_ON(skb_copy_bits(skb, offset, &csum, 2));
+=======
+	err = skb_copy_bits(skb, offset, &csum, 2);
+	if (err < 0) {
+		ip6_flush_pending_frames(sk);
+		goto out;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	/* in case cksum was not initialized */
 	if (unlikely(csum))
@@ -737,6 +755,10 @@ static int rawv6_probe_proto_opt(struct flowi6 *fl6, struct msghdr *msg)
 static int rawv6_sendmsg(struct kiocb *iocb, struct sock *sk,
 		   struct msghdr *msg, size_t len)
 {
+<<<<<<< HEAD
+=======
+	struct ipv6_txoptions *opt_to_free = NULL;
+>>>>>>> common/deprecated/android-3.18
 	struct ipv6_txoptions opt_space;
 	DECLARE_SOCKADDR(struct sockaddr_in6 *, sin6, msg->msg_name);
 	struct in6_addr *daddr, *final_p, final;
@@ -843,8 +865,15 @@ static int rawv6_sendmsg(struct kiocb *iocb, struct sock *sk,
 		if (!(opt->opt_nflen|opt->opt_flen))
 			opt = NULL;
 	}
+<<<<<<< HEAD
 	if (opt == NULL)
 		opt = np->opt;
+=======
+	if (!opt) {
+		opt = txopt_get(np);
+		opt_to_free = opt;
+	}
+>>>>>>> common/deprecated/android-3.18
 	if (flowlabel)
 		opt = fl6_merge_options(&opt_space, flowlabel, opt);
 	opt = ipv6_fixup_options(&opt_space, opt);
@@ -869,7 +898,11 @@ static int rawv6_sendmsg(struct kiocb *iocb, struct sock *sk,
 		fl6.flowi6_oif = np->ucast_oif;
 	security_sk_classify_flow(sk, flowi6_to_flowi(&fl6));
 
+<<<<<<< HEAD
 	dst = ip6_dst_lookup_flow(sk, &fl6, final_p);
+=======
+	dst = ip6_dst_lookup_flow(sock_net(sk), sk, &fl6, final_p);
+>>>>>>> common/deprecated/android-3.18
 	if (IS_ERR(dst)) {
 		err = PTR_ERR(dst);
 		goto out;
@@ -905,6 +938,10 @@ done:
 	dst_release(dst);
 out:
 	fl6_sock_release(flowlabel);
+<<<<<<< HEAD
+=======
+	txopt_put(opt_to_free);
+>>>>>>> common/deprecated/android-3.18
 	return err < 0 ? err : len;
 do_confirm:
 	dst_confirm(dst);
@@ -1135,8 +1172,12 @@ static int rawv6_ioctl(struct sock *sk, int cmd, unsigned long arg)
 		spin_lock_bh(&sk->sk_receive_queue.lock);
 		skb = skb_peek(&sk->sk_receive_queue);
 		if (skb != NULL)
+<<<<<<< HEAD
 			amount = skb_tail_pointer(skb) -
 				skb_transport_header(skb);
+=======
+			amount = skb->len;
+>>>>>>> common/deprecated/android-3.18
 		spin_unlock_bh(&sk->sk_receive_queue.lock);
 		return put_user(amount, (int __user *)arg);
 	}
@@ -1293,7 +1334,11 @@ void raw6_proc_exit(void)
 #endif	/* CONFIG_PROC_FS */
 
 /* Same as inet6_dgram_ops, sans udp_poll.  */
+<<<<<<< HEAD
 static const struct proto_ops inet6_sockraw_ops = {
+=======
+const struct proto_ops inet6_sockraw_ops = {
+>>>>>>> common/deprecated/android-3.18
 	.family		   = PF_INET6,
 	.owner		   = THIS_MODULE,
 	.release	   = inet6_release,

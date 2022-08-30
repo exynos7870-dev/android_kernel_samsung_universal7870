@@ -243,8 +243,14 @@ static int ax88172a_bind(struct usbnet *dev, struct usb_interface *intf)
 
 	/* Get the MAC address */
 	ret = asix_read_cmd(dev, AX_CMD_READ_NODE_ID, 0, 0, ETH_ALEN, buf);
+<<<<<<< HEAD
 	if (ret < 0) {
 		netdev_err(dev->net, "Failed to read MAC address: %d\n", ret);
+=======
+	if (ret < ETH_ALEN) {
+		netdev_err(dev->net, "Failed to read MAC address: %d\n", ret);
+		ret = -EIO;
+>>>>>>> common/deprecated/android-3.18
 		goto free;
 	}
 	memcpy(dev->net->dev_addr, buf, ETH_ALEN);

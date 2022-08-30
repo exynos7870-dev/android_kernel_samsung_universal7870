@@ -112,6 +112,10 @@ typedef struct attrlist_cursor_kern {
  *========================================================================*/
 
 
+<<<<<<< HEAD
+=======
+/* Return 0 on success, or -errno; other state communicated via *context */
+>>>>>>> common/deprecated/android-3.18
 typedef int (*put_listent_func_t)(struct xfs_attr_list_context *, int,
 			      unsigned char *, int, int, unsigned char *);
 

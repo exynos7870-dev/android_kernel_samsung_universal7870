@@ -31,7 +31,11 @@ struct cx22700_config
 	u8 demod_address;
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_CX22700)
+=======
+#if IS_REACHABLE(CONFIG_DVB_CX22700)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend* cx22700_attach(const struct cx22700_config* config,
 					   struct i2c_adapter* i2c);
 #else

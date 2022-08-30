@@ -154,11 +154,19 @@ config HID_CHERRY
 	Support for Cherry Cymotion keyboard.
 
 config HID_CHICONY
+<<<<<<< HEAD
 	tristate "Chicony Tactical pad" if EXPERT
 	depends on HID
 	default !EXPERT
 	---help---
 	Support for Chicony Tactical pad.
+=======
+	tristate "Chicony devices" if EXPERT
+	depends on HID
+	default !EXPERT
+	---help---
+	Support for Chicony Tactical pad and special keys on Chicony keyboards.
+>>>>>>> common/deprecated/android-3.18
 
 config HID_PRODIKEYS
 	tristate "Prodikeys PC-MIDI Keyboard support"
@@ -378,6 +386,20 @@ config HID_LOGITECH_DJ
 	generic USB_HID driver and all incoming events will be multiplexed
 	into a single mouse and a single keyboard device.
 
+<<<<<<< HEAD
+=======
+config HID_LOGITECH_HIDPP
+	tristate "Logitech HID++ devices support"
+	depends on HID_LOGITECH
+	---help---
+	Support for Logitech devices relyingon the HID++ Logitech specification
+
+	Say Y if you want support for Logitech devices relying on the HID++
+	specification. Such devices are the various Logitech Touchpads (T650,
+	T651, TK820), some mice (Zone Touch mouse), or even keyboards (Solar
+	Keayboard).
+
+>>>>>>> common/deprecated/android-3.18
 config LOGITECH_FF
 	bool "Logitech force feedback support"
 	depends on HID_LOGITECH
@@ -735,6 +757,7 @@ config SMARTJOYPLUS_FF
 	Say Y here if you have a SmartJoy PLUS PS2/USB adapter and want to
 	enable force feedback support for it.
 
+<<<<<<< HEAD
 config HID_SYNAPTICS_BT
 	tristate "HID Synaptics"
 	depends on HID
@@ -742,6 +765,8 @@ config HID_SYNAPTICS_BT
 	---help---
 	For a Bluetooth HID touchpad
 
+=======
+>>>>>>> common/deprecated/android-3.18
 config HID_TIVO
 	tristate "TiVo Slide Bluetooth remote control support"
 	depends on HID

@@ -432,7 +432,14 @@ static const struct i2c_device_id fan53555_id[] = {
 		.name = "fan53555",
 		.driver_data = FAN53555_VENDOR_FAIRCHILD
 	}, {
+<<<<<<< HEAD
 		.name = "syr82x",
+=======
+		.name = "syr827",
+		.driver_data = FAN53555_VENDOR_SILERGY
+	}, {
+		.name = "syr828",
+>>>>>>> common/deprecated/android-3.18
 		.driver_data = FAN53555_VENDOR_SILERGY
 	},
 	{ },

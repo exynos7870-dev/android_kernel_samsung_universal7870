@@ -198,6 +198,10 @@ xfs_attr3_rmt_write_verify(
 }
 
 const struct xfs_buf_ops xfs_attr3_rmt_buf_ops = {
+<<<<<<< HEAD
+=======
+	.name = "xfs_attr3_rmt",
+>>>>>>> common/deprecated/android-3.18
 	.verify_read = xfs_attr3_rmt_read_verify,
 	.verify_write = xfs_attr3_rmt_write_verify,
 };

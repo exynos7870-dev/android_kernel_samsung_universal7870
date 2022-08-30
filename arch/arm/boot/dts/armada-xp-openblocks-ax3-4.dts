@@ -71,6 +71,13 @@
 		};
 
 		internal-regs {
+<<<<<<< HEAD
+=======
+			rtc@10300 {
+				/* No crystal connected to the internal RTC */
+				status = "disabled";
+			};
+>>>>>>> common/deprecated/android-3.18
 			serial@12000 {
 				status = "okay";
 			};

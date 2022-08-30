@@ -265,6 +265,10 @@
 /* #define ERRLOGMASK (CD_WARNING|CD_OPEN|CD_COUNT_TRACKS|CD_CLOSE) */
 /* #define ERRLOGMASK (CD_WARNING|CD_REG_UNREG|CD_DO_IOCTL|CD_OPEN|CD_CLOSE|CD_COUNT_TRACKS) */
 
+<<<<<<< HEAD
+=======
+#include <linux/atomic.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/module.h>
 #include <linux/fs.h>
 #include <linux/major.h>
@@ -1153,9 +1157,12 @@ int cdrom_open(struct cdrom_device_info *cdi, struct block_device *bdev,
 
 	cd_dbg(CD_OPEN, "entering cdrom_open\n");
 
+<<<<<<< HEAD
 	/* open is event synchronization point, check events first */
 	check_disk_change(bdev);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* if this was a O_NONBLOCK open and we should honor the flags,
 	 * do a quick open without drive/disc integrity checks. */
 	cdi->use_count++;
@@ -2357,7 +2364,11 @@ static int cdrom_ioctl_media_changed(struct cdrom_device_info *cdi,
 	if (!CDROM_CAN(CDC_SELECT_DISC) || arg == CDSL_CURRENT)
 		return media_changed(cdi, 1);
 
+<<<<<<< HEAD
 	if ((unsigned int)arg >= cdi->capacity)
+=======
+	if (arg >= cdi->capacity)
+>>>>>>> common/deprecated/android-3.18
 		return -EINVAL;
 
 	info = kmalloc(sizeof(*info), GFP_KERNEL);
@@ -2427,7 +2438,11 @@ static int cdrom_ioctl_select_disc(struct cdrom_device_info *cdi,
 		return -ENOSYS;
 
 	if (arg != CDSL_CURRENT && arg != CDSL_NONE) {
+<<<<<<< HEAD
 		if ((int)arg >= cdi->capacity)
+=======
+		if (arg >= cdi->capacity)
+>>>>>>> common/deprecated/android-3.18
 			return -EINVAL;
 	}
 
@@ -2528,7 +2543,11 @@ static int cdrom_ioctl_drive_status(struct cdrom_device_info *cdi,
 	if (!CDROM_CAN(CDC_SELECT_DISC) ||
 	    (arg == CDSL_CURRENT || arg == CDSL_NONE))
 		return cdi->ops->drive_status(cdi, CDSL_CURRENT);
+<<<<<<< HEAD
 	if (((int)arg >= cdi->capacity))
+=======
+	if (arg >= cdi->capacity)
+>>>>>>> common/deprecated/android-3.18
 		return -EINVAL;
 	return cdrom_slot_status(cdi, arg);
 }
@@ -3679,9 +3698,15 @@ static struct ctl_table_header *cdrom_sysctl_header;
 
 static void cdrom_sysctl_register(void)
 {
+<<<<<<< HEAD
 	static int initialized;
 
 	if (initialized == 1)
+=======
+	static atomic_t initialized = ATOMIC_INIT(0);
+
+	if (!atomic_add_unless(&initialized, 1, 1))
+>>>>>>> common/deprecated/android-3.18
 		return;
 
 	cdrom_sysctl_header = register_sysctl_table(cdrom_root_table);
@@ -3692,8 +3717,11 @@ static void cdrom_sysctl_register(void)
 	cdrom_sysctl_settings.debug = debug;
 	cdrom_sysctl_settings.lock = lockdoor;
 	cdrom_sysctl_settings.check = check_media_type;
+<<<<<<< HEAD
 
 	initialized = 1;
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void cdrom_sysctl_unregister(void)

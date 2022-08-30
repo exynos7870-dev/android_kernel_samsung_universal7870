@@ -57,8 +57,16 @@ static ssize_t debug_read_regs(struct file *file, char __user *userbuf,
 	mutex_lock(&iommu_debug_lock);
 
 	bytes = omap_iommu_dump_ctx(obj, p, count);
+<<<<<<< HEAD
 	bytes = simple_read_from_buffer(userbuf, count, ppos, buf, bytes);
 
+=======
+	if (bytes < 0)
+		goto err;
+	bytes = simple_read_from_buffer(userbuf, count, ppos, buf, bytes);
+
+err:
+>>>>>>> common/deprecated/android-3.18
 	mutex_unlock(&iommu_debug_lock);
 	kfree(buf);
 

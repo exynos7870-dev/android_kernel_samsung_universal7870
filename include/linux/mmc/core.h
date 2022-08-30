@@ -95,9 +95,13 @@ struct mmc_command {
  *              actively failing requests
  */
 
+<<<<<<< HEAD
 	unsigned int		cmd_timeout_ms;	/* in milliseconds */
 	unsigned int		busy_timeout;	/* busy detect timeout in ms */
 
+=======
+	unsigned int		busy_timeout;	/* busy detect timeout in ms */
+>>>>>>> common/deprecated/android-3.18
 	/* Set this flag only for blocking sanitize request */
 	bool			sanitize_busy;
 
@@ -137,6 +141,13 @@ struct mmc_request {
 	struct completion	completion;
 	void			(*done)(struct mmc_request *);/* completion function */
 	struct mmc_host		*host;
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_BLOCK
+	ktime_t			io_start;
+	int			lat_hist_enabled;
+#endif
+>>>>>>> common/deprecated/android-3.18
 };
 
 struct mmc_card;

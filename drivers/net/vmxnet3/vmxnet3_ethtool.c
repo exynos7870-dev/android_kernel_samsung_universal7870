@@ -589,6 +589,11 @@ vmxnet3_get_rss(struct net_device *netdev, u32 *p, u8 *key)
 	struct UPT1_RSSConf *rssConf = adapter->rss_conf;
 	unsigned int n = rssConf->indTableSize;
 
+<<<<<<< HEAD
+=======
+	if (n > UPT1_RSS_MAX_IND_TABLE_SIZE)
+		return 0;
+>>>>>>> common/deprecated/android-3.18
 	while (n--)
 		p[n] = rssConf->indTable[n];
 	return 0;

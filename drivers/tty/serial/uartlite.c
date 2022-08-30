@@ -701,7 +701,12 @@ err_uart:
 static void __exit ulite_exit(void)
 {
 	platform_driver_unregister(&ulite_platform_driver);
+<<<<<<< HEAD
 	uart_unregister_driver(&ulite_uart_driver);
+=======
+	if (ulite_uart_driver.state)
+		uart_unregister_driver(&ulite_uart_driver);
+>>>>>>> common/deprecated/android-3.18
 }
 
 module_init(ulite_init);

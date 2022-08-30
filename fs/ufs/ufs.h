@@ -30,6 +30,10 @@ struct ufs_sb_info {
 	int work_queued; /* non-zero if the delayed work is queued */
 	struct delayed_work sync_work; /* FS sync delayed work */
 	spinlock_t work_lock; /* protects sync_work and work_queued */
+<<<<<<< HEAD
+=======
+	struct mutex s_lock;
+>>>>>>> common/deprecated/android-3.18
 };
 
 struct ufs_inode_info {

@@ -31,7 +31,11 @@ struct ts2020_config {
 	u32 frequency_div;
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_TS2020)
+=======
+#if IS_REACHABLE(CONFIG_DVB_TS2020)
+>>>>>>> common/deprecated/android-3.18
 
 extern struct dvb_frontend *ts2020_attach(
 	struct dvb_frontend *fe,

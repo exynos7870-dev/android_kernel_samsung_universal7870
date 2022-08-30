@@ -181,6 +181,10 @@ struct __large_struct { unsigned long buf[100]; };
 		"2:\n"						\
 		"	.section	.fixup,\"ax\"\n"	\
 		"3:\n\t"					\
+<<<<<<< HEAD
+=======
+		"	mov		0,%1\n"			\
+>>>>>>> common/deprecated/android-3.18
 		"	mov		%3,%0\n"		\
 		"	jmp		2b\n"			\
 		"	.previous\n"				\

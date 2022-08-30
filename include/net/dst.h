@@ -312,6 +312,42 @@ static inline void skb_dst_force(struct sk_buff *skb)
 	}
 }
 
+<<<<<<< HEAD
+=======
+/**
+ * dst_hold_safe - Take a reference on a dst if possible
+ * @dst: pointer to dst entry
+ *
+ * This helper returns false if it could not safely
+ * take a reference on a dst.
+ */
+static inline bool dst_hold_safe(struct dst_entry *dst)
+{
+	if (dst->flags & DST_NOCACHE)
+		return atomic_inc_not_zero(&dst->__refcnt);
+	dst_hold(dst);
+	return true;
+}
+
+/**
+ * skb_dst_force_safe - makes sure skb dst is refcounted
+ * @skb: buffer
+ *
+ * If dst is not yet refcounted and not destroyed, grab a ref on it.
+ */
+static inline void skb_dst_force_safe(struct sk_buff *skb)
+{
+	if (skb_dst_is_noref(skb)) {
+		struct dst_entry *dst = skb_dst(skb);
+
+		if (!dst_hold_safe(dst))
+			dst = NULL;
+
+		skb->_skb_refdst = (unsigned long)dst;
+	}
+}
+
+>>>>>>> common/deprecated/android-3.18
 
 /**
  *	__skb_tunnel_rx - prepare skb for rx reinsert
@@ -430,7 +466,19 @@ static inline struct neighbour *dst_neigh_lookup(const struct dst_entry *dst, co
 static inline struct neighbour *dst_neigh_lookup_skb(const struct dst_entry *dst,
 						     struct sk_buff *skb)
 {
+<<<<<<< HEAD
 	struct neighbour *n =  dst->ops->neigh_lookup(dst, skb, NULL);
+=======
+	struct neighbour *n = NULL;
+
+	/* The packets from tunnel devices (eg bareudp) may have only
+	 * metadata in the dst pointer of skb. Hence a pointer check of
+	 * neigh_lookup is needed.
+	 */
+	if (dst->ops->neigh_lookup)
+		n = dst->ops->neigh_lookup(dst, skb, NULL);
+
+>>>>>>> common/deprecated/android-3.18
 	return IS_ERR(n) ? NULL : n;
 }
 
@@ -481,13 +529,22 @@ void dst_init(void);
 enum {
 	XFRM_LOOKUP_ICMP = 1 << 0,
 	XFRM_LOOKUP_QUEUE = 1 << 1,
+<<<<<<< HEAD
+=======
+	XFRM_LOOKUP_KEEP_DST_REF = 1 << 2,
+>>>>>>> common/deprecated/android-3.18
 };
 
 struct flowi;
 #ifndef CONFIG_XFRM
 static inline struct dst_entry *xfrm_lookup(struct net *net,
 					    struct dst_entry *dst_orig,
+<<<<<<< HEAD
 					    const struct flowi *fl, struct sock *sk,
+=======
+					    const struct flowi *fl,
+					    const struct sock *sk,
+>>>>>>> common/deprecated/android-3.18
 					    int flags)
 {
 	return dst_orig;
@@ -496,7 +553,11 @@ static inline struct dst_entry *xfrm_lookup(struct net *net,
 static inline struct dst_entry *xfrm_lookup_route(struct net *net,
 						  struct dst_entry *dst_orig,
 						  const struct flowi *fl,
+<<<<<<< HEAD
 						  struct sock *sk,
+=======
+						  const struct sock *sk,
+>>>>>>> common/deprecated/android-3.18
 						  int flags)
 {
 	return dst_orig;
@@ -509,11 +570,19 @@ static inline struct xfrm_state *dst_xfrm(const struct dst_entry *dst)
 
 #else
 struct dst_entry *xfrm_lookup(struct net *net, struct dst_entry *dst_orig,
+<<<<<<< HEAD
 			      const struct flowi *fl, struct sock *sk,
 			      int flags);
 
 struct dst_entry *xfrm_lookup_route(struct net *net, struct dst_entry *dst_orig,
 				    const struct flowi *fl, struct sock *sk,
+=======
+			      const struct flowi *fl, const struct sock *sk,
+			      int flags);
+
+struct dst_entry *xfrm_lookup_route(struct net *net, struct dst_entry *dst_orig,
+				    const struct flowi *fl, const struct sock *sk,
+>>>>>>> common/deprecated/android-3.18
 				    int flags);
 
 /* skb attached with this dst needs transformation if dst->xfrm is valid */

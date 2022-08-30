@@ -2,7 +2,10 @@
 # Makefile for the Linux ACPI interpreter
 #
 
+<<<<<<< HEAD
 ccflags-y			:= -Os
+=======
+>>>>>>> common/deprecated/android-3.18
 ccflags-$(CONFIG_ACPI_DEBUG)	+= -DACPI_DEBUG_OUTPUT
 
 #
@@ -47,6 +50,10 @@ acpi-y				+= int340x_thermal.o
 acpi-y				+= power.o
 acpi-y				+= event.o
 acpi-y				+= sysfs.o
+<<<<<<< HEAD
+=======
+acpi-y				+= property.o
+>>>>>>> common/deprecated/android-3.18
 acpi-$(CONFIG_X86)		+= acpi_cmos_rtc.o
 acpi-$(CONFIG_DEBUG_FS)		+= debugfs.o
 acpi-$(CONFIG_ACPI_NUMA)	+= numa.o

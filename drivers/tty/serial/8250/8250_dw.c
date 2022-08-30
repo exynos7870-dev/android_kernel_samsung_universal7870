@@ -202,7 +202,11 @@ static void dw8250_set_termios(struct uart_port *p, struct ktermios *termios,
 	unsigned int rate;
 	int ret;
 
+<<<<<<< HEAD
 	if (IS_ERR(d->clk) || !old)
+=======
+	if (IS_ERR(d->clk))
+>>>>>>> common/deprecated/android-3.18
 		goto out;
 
 	/* Not requesting clock rates below 1.8432Mhz */
@@ -316,10 +320,26 @@ static int dw8250_probe_of(struct uart_port *p,
 static int dw8250_probe_acpi(struct uart_8250_port *up,
 			     struct dw8250_data *data)
 {
+<<<<<<< HEAD
+=======
+	const struct acpi_device_id *id;
+>>>>>>> common/deprecated/android-3.18
 	struct uart_port *p = &up->port;
 
 	dw8250_setup_port(up);
 
+<<<<<<< HEAD
+=======
+	id = acpi_match_device(p->dev->driver->acpi_match_table, p->dev);
+	if (!id)
+		return -ENODEV;
+
+	if (!p->uartclk)
+		if (device_property_read_u32(p->dev, "clock-frequency",
+					     &p->uartclk))
+			return -EINVAL;
+
+>>>>>>> common/deprecated/android-3.18
 	p->iotype = UPIO_MEM32;
 	p->serial_in = dw8250_serial_in32;
 	p->serial_out = dw8250_serial_out32;
@@ -382,7 +402,11 @@ static int dw8250_probe(struct platform_device *pdev)
 	}
 
 	data->pclk = devm_clk_get(&pdev->dev, "apb_pclk");
+<<<<<<< HEAD
 	if (IS_ERR(data->clk) && PTR_ERR(data->clk) == -EPROBE_DEFER) {
+=======
+	if (IS_ERR(data->pclk) && PTR_ERR(data->pclk) == -EPROBE_DEFER) {
+>>>>>>> common/deprecated/android-3.18
 		err = -EPROBE_DEFER;
 		goto err_clk;
 	}
@@ -542,6 +566,11 @@ static const struct acpi_device_id dw8250_acpi_match[] = {
 	{ "INT3435", 0 },
 	{ "80860F0A", 0 },
 	{ "8086228A", 0 },
+<<<<<<< HEAD
+=======
+	{ "APMC0D08", 0},
+	{ "AMD0020", 0 },
+>>>>>>> common/deprecated/android-3.18
 	{ },
 };
 MODULE_DEVICE_TABLE(acpi, dw8250_acpi_match);

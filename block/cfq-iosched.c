@@ -30,9 +30,13 @@ static const int cfq_back_penalty = 2;
 static const int cfq_slice_sync = HZ / 10;
 static int cfq_slice_async = HZ / 25;
 static const int cfq_slice_async_rq = 2;
+<<<<<<< HEAD
 /* Explicitly set cfq_slice_idle to 0 */
 static int cfq_slice_idle = 0;
 /* static int cfq_slice_idle = HZ / 125; */
+=======
+static int cfq_slice_idle = HZ / 125;
+>>>>>>> common/deprecated/android-3.18
 static int cfq_group_idle = HZ / 125;
 static const int cfq_target_latency = HZ * 3/10; /* 300 ms */
 static const int cfq_hist_divisor = 4;
@@ -2730,7 +2734,12 @@ static void cfq_arm_slice_timer(struct cfq_data *cfqd)
 	 * for devices that support queuing, otherwise we still have a problem
 	 * with sync vs async workloads.
 	 */
+<<<<<<< HEAD
 	if (blk_queue_nonrot(cfqd->queue) && cfqd->hw_tag)
+=======
+	if (blk_queue_nonrot(cfqd->queue) && cfqd->hw_tag &&
+		!cfqd->cfq_group_idle)
+>>>>>>> common/deprecated/android-3.18
 		return;
 
 	WARN_ON(!RB_EMPTY_ROOT(&cfqq->sort_list));
@@ -2829,7 +2838,10 @@ static struct request *cfq_check_fifo(struct cfq_queue *cfqq)
 	if (time_before(jiffies, rq->fifo_time))
 		rq = NULL;
 
+<<<<<<< HEAD
 	cfq_log_cfqq(cfqq->cfqd, cfqq, "fifo=%p", rq);
+=======
+>>>>>>> common/deprecated/android-3.18
 	return rq;
 }
 
@@ -3203,6 +3215,12 @@ static bool cfq_may_dispatch(struct cfq_data *cfqd, struct cfq_queue *cfqq)
 {
 	unsigned int max_dispatch;
 
+<<<<<<< HEAD
+=======
+	if (cfq_cfqq_must_dispatch(cfqq))
+		return true;
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Drain async requests before we start sync IO
 	 */
@@ -3294,15 +3312,29 @@ static bool cfq_dispatch_request(struct cfq_data *cfqd, struct cfq_queue *cfqq)
 
 	BUG_ON(RB_EMPTY_ROOT(&cfqq->sort_list));
 
+<<<<<<< HEAD
+=======
+	rq = cfq_check_fifo(cfqq);
+	if (rq)
+		cfq_mark_cfqq_must_dispatch(cfqq);
+
+>>>>>>> common/deprecated/android-3.18
 	if (!cfq_may_dispatch(cfqd, cfqq))
 		return false;
 
 	/*
 	 * follow expired path, else get first next available
 	 */
+<<<<<<< HEAD
 	rq = cfq_check_fifo(cfqq);
 	if (!rq)
 		rq = cfqq->next_rq;
+=======
+	if (!rq)
+		rq = cfqq->next_rq;
+	else
+		cfq_log_cfqq(cfqq->cfqd, cfqq, "fifo=%p", rq);
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * insert request into driver dispatch list
@@ -3811,7 +3843,11 @@ cfq_should_preempt(struct cfq_data *cfqd, struct cfq_queue *new_cfqq,
 	 * if the new request is sync, but the currently running queue is
 	 * not, let the sync request have priority.
 	 */
+<<<<<<< HEAD
 	if (rq_is_sync(rq) && !cfq_cfqq_sync(cfqq))
+=======
+	if (rq_is_sync(rq) && !cfq_cfqq_sync(cfqq) && !cfq_cfqq_must_dispatch(cfqq))
+>>>>>>> common/deprecated/android-3.18
 		return true;
 
 	if (new_cfqq->cfqg != cfqq->cfqg)
@@ -4622,11 +4658,16 @@ static int __init cfq_init(void)
 	 */
 	if (!cfq_slice_async)
 		cfq_slice_async = 1;
+<<<<<<< HEAD
 	/* Do not touch cfq_slice_idle if it is zero */
 	/*
 	if (!cfq_slice_idle)
 		cfq_slice_idle = 1;
 	*/
+=======
+	if (!cfq_slice_idle)
+		cfq_slice_idle = 1;
+>>>>>>> common/deprecated/android-3.18
 
 #ifdef CONFIG_CFQ_GROUP_IOSCHED
 	if (!cfq_group_idle)

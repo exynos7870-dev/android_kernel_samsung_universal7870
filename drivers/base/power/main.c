@@ -37,10 +37,13 @@
 #include "../base.h"
 #include "power.h"
 
+<<<<<<< HEAD
 #ifdef CONFIG_SEC_DEBUG
 #include <linux/sec_debug.h>
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 typedef int (*pm_callback_t)(struct device *);
 
 /*
@@ -63,12 +66,15 @@ struct suspend_stats suspend_stats;
 static DEFINE_MUTEX(dpm_list_mtx);
 static pm_message_t pm_transition;
 
+<<<<<<< HEAD
 static void dpm_drv_timeout(unsigned long data);
 struct dpm_drv_wd_data {
 	struct device *dev;
 	struct task_struct *tsk;
 };
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static int async_error;
 
 static char *pm_verb(int event)
@@ -198,6 +204,7 @@ void device_pm_move_last(struct device *dev)
 	list_move_tail(&dev->power.entry, &dpm_list);
 }
 
+<<<<<<< HEAD
 /**
  * device_pm_move_first - Move device to first of the PM core's list of devices.
  * @dev: Device to move in dpm_list.
@@ -209,6 +216,8 @@ void device_pm_move_first(struct device *dev)
 	list_move(&dev->power.entry, &dpm_list);
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static ktime_t initcall_debug_start(struct device *dev)
 {
 	ktime_t calltime = ktime_set(0, 0);
@@ -407,9 +416,13 @@ static int dpm_run_callback(pm_callback_t cb, struct device *dev,
 
 	pm_dev_dbg(dev, state, info);
 	trace_device_pm_callback_start(dev, info, state.event);
+<<<<<<< HEAD
 	exynos_ss_suspend(cb, dev, ESS_FLAG_IN);
 	error = cb(dev);
 	exynos_ss_suspend(cb, dev, ESS_FLAG_OUT);
+=======
+	error = cb(dev);
+>>>>>>> common/deprecated/android-3.18
 	trace_device_pm_callback_end(dev, error);
 	suspend_report_result(cb, error);
 
@@ -441,9 +454,12 @@ static void dpm_watchdog_handler(unsigned long data)
 	struct dpm_watchdog *wd = (void *)data;
 
 	dev_emerg(wd->dev, "**** DPM device timeout ****\n");
+<<<<<<< HEAD
 #ifdef CONFIG_SEC_DEBUG_EXTRA_INFO
 	sec_debug_set_extra_info_dpm_timeout(dev_name(wd->dev));
 #endif	
+=======
+>>>>>>> common/deprecated/android-3.18
 	show_stack(wd->tsk, NULL);
 	panic("%s %s: unrecoverable failure\n",
 		dev_driver_string(wd->dev), dev_name(wd->dev));
@@ -855,6 +871,7 @@ static void async_resume(void *data, async_cookie_t cookie)
 }
 
 /**
+<<<<<<< HEAD
  *	dpm_drv_timeout - Driver suspend / resume watchdog handler
  *	@data: struct device which timed out
  *
@@ -883,6 +900,8 @@ static void dpm_drv_timeout(unsigned long data)
 }
 
 /**
+=======
+>>>>>>> common/deprecated/android-3.18
  * dpm_resume - Execute "resume" callbacks for non-sysdev devices.
  * @state: PM transition of the system being carried out.
  *
@@ -1072,6 +1091,11 @@ static int __device_suspend_noirq(struct device *dev, pm_message_t state, bool a
 	char *info = NULL;
 	int error = 0;
 
+<<<<<<< HEAD
+=======
+	dpm_wait_for_children(dev, async);
+
+>>>>>>> common/deprecated/android-3.18
 	if (async_error)
 		goto Complete;
 
@@ -1083,8 +1107,11 @@ static int __device_suspend_noirq(struct device *dev, pm_message_t state, bool a
 	if (dev->power.syscore || dev->power.direct_complete)
 		goto Complete;
 
+<<<<<<< HEAD
 	dpm_wait_for_children(dev, async);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (dev->pm_domain) {
 		info = "noirq power domain ";
 		callback = pm_noirq_op(&dev->pm_domain->ops, state);
@@ -1214,6 +1241,11 @@ static int __device_suspend_late(struct device *dev, pm_message_t state, bool as
 
 	__pm_runtime_disable(dev, false);
 
+<<<<<<< HEAD
+=======
+	dpm_wait_for_children(dev, async);
+
+>>>>>>> common/deprecated/android-3.18
 	if (async_error)
 		goto Complete;
 
@@ -1225,8 +1257,11 @@ static int __device_suspend_late(struct device *dev, pm_message_t state, bool as
 	if (dev->power.syscore || dev->power.direct_complete)
 		goto Complete;
 
+<<<<<<< HEAD
 	dpm_wait_for_children(dev, async);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (dev->pm_domain) {
 		info = "late power domain ";
 		callback = pm_late_early_op(&dev->pm_domain->ops, state);
@@ -1306,14 +1341,23 @@ int dpm_suspend_late(pm_message_t state)
 		error = device_suspend_late(dev);
 
 		mutex_lock(&dpm_list_mtx);
+<<<<<<< HEAD
+=======
+		if (!list_empty(&dev->power.entry))
+			list_move(&dev->power.entry, &dpm_late_early_list);
+
+>>>>>>> common/deprecated/android-3.18
 		if (error) {
 			pm_dev_err(dev, state, " late", error);
 			dpm_save_failed_dev(dev_name(dev));
 			put_device(dev);
 			break;
 		}
+<<<<<<< HEAD
 		if (!list_empty(&dev->power.entry))
 			list_move(&dev->power.entry, &dpm_late_early_list);
+=======
+>>>>>>> common/deprecated/android-3.18
 		put_device(dev);
 
 		if (async_error)
@@ -1391,13 +1435,17 @@ static int __device_suspend(struct device *dev, pm_message_t state, bool async)
 	pm_callback_t callback = NULL;
 	char *info = NULL;
 	int error = 0;
+<<<<<<< HEAD
 	struct timer_list timer;
 	struct dpm_drv_wd_data data;
+=======
+>>>>>>> common/deprecated/android-3.18
 	char suspend_abort[MAX_SUSPEND_ABORT_LEN];
 	DECLARE_DPM_WATCHDOG_ON_STACK(wd);
 
 	dpm_wait_for_children(dev, async);
 
+<<<<<<< HEAD
 	if (async_error)
 		goto Complete;
 
@@ -1409,17 +1457,41 @@ static int __device_suspend(struct device *dev, pm_message_t state, bool async)
 	 */
 	if (pm_runtime_barrier(dev) && device_may_wakeup(dev))
 		pm_wakeup_event(dev, 0);
+=======
+	if (async_error) {
+		dev->power.direct_complete = false;
+		goto Complete;
+	}
+
+	/*
+	 * Wait for possible runtime PM transitions of the device in progress
+	 * to complete and if there's a runtime resume request pending for it,
+	 * resume it before proceeding with invoking the system-wide suspend
+	 * callbacks for it.
+	 *
+	 * If the system-wide suspend callbacks below change the configuration
+	 * of the device, they must disable runtime PM for it or otherwise
+	 * ensure that its runtime-resume callbacks will not be confused by that
+	 * change in case they are invoked going forward.
+	 */
+	pm_runtime_barrier(dev);
+>>>>>>> common/deprecated/android-3.18
 
 	if (pm_wakeup_pending()) {
 		pm_get_active_wakeup_sources(suspend_abort,
 			MAX_SUSPEND_ABORT_LEN);
 		log_suspend_abort_reason(suspend_abort);
+<<<<<<< HEAD
+=======
+		dev->power.direct_complete = false;
+>>>>>>> common/deprecated/android-3.18
 		async_error = -EBUSY;
 		goto Complete;
 	}
 
 	if (dev->power.syscore)
 		goto Complete;
+<<<<<<< HEAD
 	
 	data.dev = dev;
 	data.tsk = get_current();
@@ -1428,6 +1500,12 @@ static int __device_suspend(struct device *dev, pm_message_t state, bool async)
 	timer.function = dpm_drv_timeout;
 	timer.data = (unsigned long)&data;
 	add_timer(&timer);
+=======
+
+	/* Avoid direct_complete to let wakeup_path propagate. */
+	if (device_may_wakeup(dev) || dev->power.wakeup_path)
+		dev->power.direct_complete = false;
+>>>>>>> common/deprecated/android-3.18
 
 	if (dev->power.direct_complete) {
 		if (pm_runtime_status_suspended(dev)) {
@@ -1508,9 +1586,12 @@ static int __device_suspend(struct device *dev, pm_message_t state, bool async)
 	device_unlock(dev);
 	dpm_watchdog_clear(&wd);
 
+<<<<<<< HEAD
 	del_timer_sync(&timer);
 	destroy_timer_on_stack(&timer);
 
+=======
+>>>>>>> common/deprecated/android-3.18
  Complete:
 	complete_all(&dev->power.completion);
 	if (error)

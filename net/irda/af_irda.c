@@ -785,6 +785,16 @@ static int irda_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
 		return -EINVAL;
 
 	lock_sock(sk);
+<<<<<<< HEAD
+=======
+
+	/* Ensure that the socket is not already bound */
+	if (self->ias_obj) {
+		err = -EINVAL;
+		goto out;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 #ifdef CONFIG_IRDA_ULTRA
 	/* Special care for Ultra sockets */
 	if ((sk->sk_type == SOCK_DGRAM) &&
@@ -842,7 +852,11 @@ static int irda_accept(struct socket *sock, struct socket *newsock, int flags)
 	struct sock *sk = sock->sk;
 	struct irda_sock *new, *self = irda_sk(sk);
 	struct sock *newsk;
+<<<<<<< HEAD
 	struct sk_buff *skb;
+=======
+	struct sk_buff *skb = NULL;
+>>>>>>> common/deprecated/android-3.18
 	int err;
 
 	IRDA_DEBUG(2, "%s()\n", __func__);
@@ -912,7 +926,10 @@ static int irda_accept(struct socket *sock, struct socket *newsock, int flags)
 	err = -EPERM; /* value does not seem to make sense. -arnd */
 	if (!new->tsap) {
 		IRDA_DEBUG(0, "%s(), dup failed!\n", __func__);
+<<<<<<< HEAD
 		kfree_skb(skb);
+=======
+>>>>>>> common/deprecated/android-3.18
 		goto out;
 	}
 
@@ -931,7 +948,10 @@ static int irda_accept(struct socket *sock, struct socket *newsock, int flags)
 	/* Clean up the original one to keep it in listen state */
 	irttp_listen(self->tsap);
 
+<<<<<<< HEAD
 	kfree_skb(skb);
+=======
+>>>>>>> common/deprecated/android-3.18
 	sk->sk_ack_backlog--;
 
 	newsock->state = SS_CONNECTED;
@@ -939,6 +959,10 @@ static int irda_accept(struct socket *sock, struct socket *newsock, int flags)
 	irda_connect_response(new);
 	err = 0;
 out:
+<<<<<<< HEAD
+=======
+	kfree_skb(skb);
+>>>>>>> common/deprecated/android-3.18
 	release_sock(sk);
 	return err;
 }
@@ -1036,8 +1060,16 @@ static int irda_connect(struct socket *sock, struct sockaddr *uaddr,
 	}
 
 	/* Check if we have opened a local TSAP */
+<<<<<<< HEAD
 	if (!self->tsap)
 		irda_open_tsap(self, LSAP_ANY, addr->sir_name);
+=======
+	if (!self->tsap) {
+		err = irda_open_tsap(self, LSAP_ANY, addr->sir_name);
+		if (err)
+			goto out;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	/* Move to connecting socket, start sending Connect Requests */
 	sock->state = SS_CONNECTING;
@@ -1098,11 +1130,19 @@ static int irda_create(struct net *net, struct socket *sock, int protocol,
 	struct sock *sk;
 	struct irda_sock *self;
 
+<<<<<<< HEAD
 	if (protocol < 0 || protocol > SK_PROTOCOL_MAX)
 		return -EINVAL;
 
 	IRDA_DEBUG(2, "%s()\n", __func__);
 
+=======
+	IRDA_DEBUG(2, "%s()\n", __func__);
+
+	if (protocol < 0 || protocol > SK_PROTOCOL_MAX)
+		return -EINVAL;
+
+>>>>>>> common/deprecated/android-3.18
 	if (net != &init_net)
 		return -EAFNOSUPPORT;
 
@@ -2041,7 +2081,15 @@ static int irda_setsockopt(struct socket *sock, int level, int optname,
 			err = -EINVAL;
 			goto out;
 		}
+<<<<<<< HEAD
 		irias_insert_object(ias_obj);
+=======
+
+		/* Only insert newly allocated objects */
+		if (free_ias)
+			irias_insert_object(ias_obj);
+
+>>>>>>> common/deprecated/android-3.18
 		kfree(ias_opt);
 		break;
 	case IRLMP_IAS_DEL:
@@ -2248,7 +2296,11 @@ static int irda_getsockopt(struct socket *sock, int level, int optname,
 {
 	struct sock *sk = sock->sk;
 	struct irda_sock *self = irda_sk(sk);
+<<<<<<< HEAD
 	struct irda_device_list list;
+=======
+	struct irda_device_list list = { 0 };
+>>>>>>> common/deprecated/android-3.18
 	struct irda_device_info *discoveries;
 	struct irda_ias_set *	ias_opt;	/* IAS get/query params */
 	struct ias_object *	ias_obj;	/* Object in IAS */

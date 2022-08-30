@@ -63,6 +63,11 @@ int nft_reject_dump(struct sk_buff *skb, const struct nft_expr *expr)
 		if (nla_put_u8(skb, NFTA_REJECT_ICMP_CODE, priv->icmp_code))
 			goto nla_put_failure;
 		break;
+<<<<<<< HEAD
+=======
+	default:
+		break;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	return 0;

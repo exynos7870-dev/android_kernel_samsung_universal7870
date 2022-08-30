@@ -21,6 +21,10 @@
 
 #include <asm/barrier.h>
 
+<<<<<<< HEAD
+=======
+#include <linux/bug.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/init.h>
 #include <linux/types.h>
 

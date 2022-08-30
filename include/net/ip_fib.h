@@ -54,11 +54,19 @@ struct fib_nh_exception {
 	int				fnhe_genid;
 	__be32				fnhe_daddr;
 	u32				fnhe_pmtu;
+<<<<<<< HEAD
+=======
+	bool				fnhe_mtu_locked;
+>>>>>>> common/deprecated/android-3.18
 	__be32				fnhe_gw;
 	unsigned long			fnhe_expires;
 	struct rtable __rcu		*fnhe_rth_input;
 	struct rtable __rcu		*fnhe_rth_output;
 	unsigned long			fnhe_stamp;
+<<<<<<< HEAD
+=======
+	struct rcu_head			rcu;
+>>>>>>> common/deprecated/android-3.18
 };
 
 struct fnhe_hash_bucket {

@@ -100,12 +100,15 @@ config BLK_DEV_THROTTLING
 
 	See Documentation/cgroups/blkio-controller.txt for more information.
 
+<<<<<<< HEAD
 config JOURNAL_DATA_TAG
        bool "Enable FS journal tagging for UFS & eMMC"
        default n
        ---help---
        Enable FS journal tagging for UFS & eMMC. If unsure, say N.
 
+=======
+>>>>>>> common/deprecated/android-3.18
 config BLK_CMDLINE_PARSER
 	bool "Block device command line partition parser"
 	default n
@@ -130,9 +133,12 @@ config BLOCK_COMPAT
 	depends on BLOCK && COMPAT
 	default y
 
+<<<<<<< HEAD
 config BLOCK_SUPPORT_STLOG
 	bool "Enable storage log"
 	depends on BLOCK && PROC_STLOG
 	default y
 
+=======
+>>>>>>> common/deprecated/android-3.18
 source block/Kconfig.iosched

@@ -1595,6 +1595,10 @@ static int ctcm_new_device(struct ccwgroup_device *cgdev)
 		if (priv->channel[direction] == NULL) {
 			if (direction == CTCM_WRITE)
 				channel_free(priv->channel[CTCM_READ]);
+<<<<<<< HEAD
+=======
+			result = -ENODEV;
+>>>>>>> common/deprecated/android-3.18
 			goto out_dev;
 		}
 		priv->channel[direction]->netdev = dev;

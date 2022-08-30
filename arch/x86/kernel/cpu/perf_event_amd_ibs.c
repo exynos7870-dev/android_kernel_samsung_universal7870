@@ -555,7 +555,11 @@ static int perf_ibs_handle_irq(struct perf_ibs *perf_ibs, struct pt_regs *iregs)
 	if (event->attr.sample_type & PERF_SAMPLE_RAW)
 		offset_max = perf_ibs->offset_max;
 	else if (check_rip)
+<<<<<<< HEAD
 		offset_max = 2;
+=======
+		offset_max = 3;
+>>>>>>> common/deprecated/android-3.18
 	else
 		offset_max = 1;
 	do {

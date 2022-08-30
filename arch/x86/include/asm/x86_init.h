@@ -1,7 +1,10 @@
 #ifndef _ASM_X86_PLATFORM_H
 #define _ASM_X86_PLATFORM_H
 
+<<<<<<< HEAD
 #include <asm/pgtable_types.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 #include <asm/bootparam.h>
 
 struct mpc_bus;

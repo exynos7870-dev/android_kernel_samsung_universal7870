@@ -347,7 +347,11 @@ static unsigned int vfs_dent_type(uint8_t type)
  */
 static int ubifs_readdir(struct file *file, struct dir_context *ctx)
 {
+<<<<<<< HEAD
 	int err;
+=======
+	int err = 0;
+>>>>>>> common/deprecated/android-3.18
 	struct qstr nm;
 	union ubifs_key key;
 	struct ubifs_dent_node *dent;
@@ -446,16 +450,32 @@ static int ubifs_readdir(struct file *file, struct dir_context *ctx)
 	}
 
 out:
+<<<<<<< HEAD
 	if (err != -ENOENT) {
 		ubifs_err("cannot find next direntry, error %d", err);
 		return err;
 	}
+=======
+	if (err != -ENOENT)
+		ubifs_err("cannot find next direntry, error %d", err);
+	else
+		/*
+		 * -ENOENT is a non-fatal error in this context, the TNC uses
+		 * it to indicate that the cursor moved past the current directory
+		 * and readdir() has to stop.
+		 */
+		err = 0;
+>>>>>>> common/deprecated/android-3.18
 
 	kfree(file->private_data);
 	file->private_data = NULL;
 	/* 2 is a special value indicating that there are no more direntries */
 	ctx->pos = 2;
+<<<<<<< HEAD
 	return 0;
+=======
+	return err;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /* Free saved readdir() state when the directory is closed */

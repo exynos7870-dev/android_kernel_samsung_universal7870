@@ -2676,6 +2676,10 @@ static const unsigned int tpu4_to2_mux[] = {
 };
 static const unsigned int tpu4_to3_pins[] = {
 	/* TO */
+<<<<<<< HEAD
+=======
+	PIN_NUMBER(6, 26),
+>>>>>>> common/deprecated/android-3.18
 };
 static const unsigned int tpu4_to3_mux[] = {
 	TPU4TO3_MARK,
@@ -2898,7 +2902,12 @@ static const char * const fsic_groups[] = {
 	"fsic_sclk_out",
 	"fsic_data_in",
 	"fsic_data_out",
+<<<<<<< HEAD
 	"fsic_spdif",
+=======
+	"fsic_spdif_0",
+	"fsic_spdif_1",
+>>>>>>> common/deprecated/android-3.18
 };
 
 static const char * const fsid_groups[] = {

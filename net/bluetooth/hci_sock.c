@@ -46,9 +46,15 @@ struct hci_pinfo {
 	unsigned short    channel;
 };
 
+<<<<<<< HEAD
 static inline int hci_test_bit(int nr, void *addr)
 {
 	return *((__u32 *) addr + (nr >> 5)) & ((__u32) 1 << (nr & 31));
+=======
+static inline int hci_test_bit(int nr, const void *addr)
+{
+	return *((const __u32 *) addr + (nr >> 5)) & ((__u32) 1 << (nr & 31));
+>>>>>>> common/deprecated/android-3.18
 }
 
 /* Security filter */
@@ -438,7 +444,11 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
 		/* Detach sockets from device */
 		read_lock(&hci_sk_list.lock);
 		sk_for_each(sk, &hci_sk_list.head) {
+<<<<<<< HEAD
 			bh_lock_sock_nested(sk);
+=======
+			lock_sock(sk);
+>>>>>>> common/deprecated/android-3.18
 			if (hci_pi(sk)->hdev == hdev) {
 				hci_pi(sk)->hdev = NULL;
 				sk->sk_err = EPIPE;
@@ -447,7 +457,11 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
 
 				hci_dev_put(hdev);
 			}
+<<<<<<< HEAD
 			bh_unlock_sock(sk);
+=======
+			release_sock(sk);
+>>>>>>> common/deprecated/android-3.18
 		}
 		read_unlock(&hci_sk_list.lock);
 	}
@@ -463,13 +477,20 @@ static int hci_sock_release(struct socket *sock)
 	if (!sk)
 		return 0;
 
+<<<<<<< HEAD
 	hdev = hci_pi(sk)->hdev;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (hci_pi(sk)->channel == HCI_CHANNEL_MONITOR)
 		atomic_dec(&monitor_promisc);
 
 	bt_sock_unlink(&hci_sk_list, sk);
 
+<<<<<<< HEAD
+=======
+	hdev = hci_pi(sk)->hdev;
+>>>>>>> common/deprecated/android-3.18
 	if (hdev) {
 		if (hci_pi(sk)->channel == HCI_CHANNEL_USER) {
 			mgmt_index_added(hdev);
@@ -909,7 +930,12 @@ static int hci_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
 	if (msg->msg_flags & MSG_OOB)
 		return -EOPNOTSUPP;
 
+<<<<<<< HEAD
 	if (msg->msg_flags & ~(MSG_DONTWAIT|MSG_NOSIGNAL|MSG_ERRQUEUE))
+=======
+	if (msg->msg_flags & ~(MSG_DONTWAIT|MSG_NOSIGNAL|MSG_ERRQUEUE|
+			       MSG_CMSG_COMPAT))
+>>>>>>> common/deprecated/android-3.18
 		return -EINVAL;
 
 	if (len < 4 || len > HCI_MAX_FRAME_SIZE)

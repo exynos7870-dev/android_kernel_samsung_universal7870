@@ -26,7 +26,12 @@
 
 static bool disable_clkrun;
 module_param(disable_clkrun, bool, 0444);
+<<<<<<< HEAD
 MODULE_PARM_DESC(disable_clkrun, "If PC card doesn't function properly, please try this option");
+=======
+MODULE_PARM_DESC(disable_clkrun,
+		 "If PC card doesn't function properly, please try this option (TI and Ricoh bridges only)");
+>>>>>>> common/deprecated/android-3.18
 
 static bool isa_probe = 1;
 module_param(isa_probe, bool, 0444);

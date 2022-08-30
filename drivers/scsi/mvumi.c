@@ -2476,6 +2476,10 @@ static int mvumi_io_attach(struct mvumi_hba *mhba)
 	if (IS_ERR(mhba->dm_thread)) {
 		dev_err(&mhba->pdev->dev,
 			"failed to create device scan thread\n");
+<<<<<<< HEAD
+=======
+		ret = PTR_ERR(mhba->dm_thread);
+>>>>>>> common/deprecated/android-3.18
 		mutex_unlock(&mhba->sas_discovery_mutex);
 		goto fail_create_thread;
 	}
@@ -2629,7 +2633,11 @@ static void mvumi_shutdown(struct pci_dev *pdev)
 	mvumi_flush_cache(mhba);
 }
 
+<<<<<<< HEAD
 static int mvumi_suspend(struct pci_dev *pdev, pm_message_t state)
+=======
+static int __maybe_unused mvumi_suspend(struct pci_dev *pdev, pm_message_t state)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct mvumi_hba *mhba = NULL;
 
@@ -2648,7 +2656,11 @@ static int mvumi_suspend(struct pci_dev *pdev, pm_message_t state)
 	return 0;
 }
 
+<<<<<<< HEAD
 static int mvumi_resume(struct pci_dev *pdev)
+=======
+static int __maybe_unused mvumi_resume(struct pci_dev *pdev)
+>>>>>>> common/deprecated/android-3.18
 {
 	int ret;
 	struct mvumi_hba *mhba = NULL;

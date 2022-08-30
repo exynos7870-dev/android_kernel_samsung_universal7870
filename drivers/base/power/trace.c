@@ -166,14 +166,22 @@ void generate_resume_trace(const void *tracedata, unsigned int user)
 }
 EXPORT_SYMBOL(generate_resume_trace);
 
+<<<<<<< HEAD
 extern char __tracedata_start, __tracedata_end;
+=======
+extern char __tracedata_start[], __tracedata_end[];
+>>>>>>> common/deprecated/android-3.18
 static int show_file_hash(unsigned int value)
 {
 	int match;
 	char *tracedata;
 
 	match = 0;
+<<<<<<< HEAD
 	for (tracedata = &__tracedata_start ; tracedata < &__tracedata_end ;
+=======
+	for (tracedata = __tracedata_start ; tracedata < __tracedata_end ;
+>>>>>>> common/deprecated/android-3.18
 			tracedata += 2 + sizeof(unsigned long)) {
 		unsigned short lineno = *(unsigned short *)tracedata;
 		const char *file = *(const char **)(tracedata + 2);

@@ -45,7 +45,11 @@ struct proto udplitev6_prot = {
 	.getsockopt	   = udpv6_getsockopt,
 	.sendmsg	   = udpv6_sendmsg,
 	.recvmsg	   = udpv6_recvmsg,
+<<<<<<< HEAD
 	.backlog_rcv	   = udpv6_queue_rcv_skb,
+=======
+	.backlog_rcv	   = __udpv6_queue_rcv_skb,
+>>>>>>> common/deprecated/android-3.18
 	.hash		   = udp_lib_hash,
 	.unhash		   = udp_lib_unhash,
 	.get_port	   = udp_v6_get_port,

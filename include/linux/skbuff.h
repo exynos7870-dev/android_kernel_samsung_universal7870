@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 /* Copyright (c) 2015 Samsung Electronics Co., Ltd. */
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  *	Definitions for the 'struct sk_buff' memory handlers.
  *
@@ -11,6 +14,7 @@
  *	as published by the Free Software Foundation; either version
  *	2 of the License, or (at your option) any later version.
  */
+<<<<<<< HEAD
 /*
  *  Changes:
  *  KwnagHyun Kim <kh0304.kim@samsung.com> 2015/07/08
@@ -19,6 +23,8 @@
  *    Add codes to share UID/PID information
  *
  */
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #ifndef _LINUX_SKBUFF_H
 #define _LINUX_SKBUFF_H
@@ -29,6 +35,10 @@
 #include <linux/time.h>
 #include <linux/bug.h>
 #include <linux/cache.h>
+<<<<<<< HEAD
+=======
+#include <linux/rbtree.h>
+>>>>>>> common/deprecated/android-3.18
 
 #include <linux/atomic.h>
 #include <asm/types.h>
@@ -41,7 +51,11 @@
 #include <linux/dma-mapping.h>
 #include <linux/netdev_features.h>
 #include <linux/sched.h>
+<<<<<<< HEAD
 #include <net/flow_keys.h>
+=======
+#include <net/flow_dissector.h>
+>>>>>>> common/deprecated/android-3.18
 
 /* A. Checksumming of received packets by device.
  *
@@ -197,6 +211,10 @@ struct sk_buff;
 #else
 #define MAX_SKB_FRAGS (65536/PAGE_SIZE + 1)
 #endif
+<<<<<<< HEAD
+=======
+extern int sysctl_max_skb_frags;
+>>>>>>> common/deprecated/android-3.18
 
 typedef struct skb_frag_struct skb_frag_t;
 
@@ -327,6 +345,7 @@ struct skb_shared_info {
 	 * remains valid until skb destructor */
 	void *		destructor_arg;
 
+<<<<<<< HEAD
  // ------------- START of KNOX_VPN ------------------//
 	uid_t uid;
 	pid_t pid;
@@ -334,6 +353,8 @@ struct skb_shared_info {
  // ------------- END of KNOX_VPN -------------------//
 
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* must be last field, see pskb_expand_head() */
 	skb_frag_t	frags[MAX_SKB_FRAGS];
 };
@@ -451,11 +472,19 @@ static inline u32 skb_mstamp_us_delta(const struct skb_mstamp *t1,
 }
 
 
+<<<<<<< HEAD
 /**
+=======
+/** 
+>>>>>>> common/deprecated/android-3.18
  *	struct sk_buff - socket buffer
  *	@next: Next buffer in list
  *	@prev: Previous buffer in list
  *	@tstamp: Time we arrived/left
+<<<<<<< HEAD
+=======
+ *	@rbnode: RB tree node, alternative to next/prev for netem/tcp
+>>>>>>> common/deprecated/android-3.18
  *	@sk: Socket we are owned by
  *	@dev: Device we arrived on/are leaving by
  *	@cb: Control buffer. Free for use by every layer. Put private vars here
@@ -490,6 +519,10 @@ static inline u32 skb_mstamp_us_delta(const struct skb_mstamp *t1,
  *	@hash: the packet hash
  *	@queue_mapping: Queue mapping for multiqueue devices
  *	@xmit_more: More SKBs are pending for this queue
+<<<<<<< HEAD
+=======
+ *	@pfmemalloc: skbuff was allocated from PFMEMALLOC reserves
+>>>>>>> common/deprecated/android-3.18
  *	@ndisc_nodetype: router type (from link layer)
  *	@ooo_okay: allow the mapping of a socket to a queue to be changed
  *	@l4_hash: indicate hash is a canonical 4-tuple hash over transport
@@ -520,6 +553,7 @@ static inline u32 skb_mstamp_us_delta(const struct skb_mstamp *t1,
  */
 
 struct sk_buff {
+<<<<<<< HEAD
 	/* These two members must be first. */
 	struct sk_buff		*next;
 	struct sk_buff		*prev;
@@ -527,6 +561,24 @@ struct sk_buff {
 	union {
 		ktime_t		tstamp;
 		struct skb_mstamp skb_mstamp;
+=======
+	union {
+		struct {
+			/* These two members must be first. */
+			struct sk_buff		*next;
+			struct sk_buff		*prev;
+
+			union {
+				ktime_t		tstamp;
+				struct skb_mstamp skb_mstamp;
+			};
+		};
+		struct rb_node	rbnode; /* used in netem & tcp stack */
+	};
+
+	union {
+		int			ip_defrag_offset;
+>>>>>>> common/deprecated/android-3.18
 	};
 
 	struct sock		*sk;
@@ -566,8 +618,13 @@ struct sk_buff {
 				fclone:2,
 				peeked:1,
 				head_frag:1,
+<<<<<<< HEAD
 				xmit_more:1;
 	/* one bit hole */
+=======
+				xmit_more:1,
+				pfmemalloc:1;
+>>>>>>> common/deprecated/android-3.18
 	kmemcheck_bitfield_end(flags1);
 
 	/* fields enclosed in headers_start/headers_end are copied
@@ -587,19 +644,31 @@ struct sk_buff {
 
 	__u8			__pkt_type_offset[0];
 	__u8			pkt_type:3;
+<<<<<<< HEAD
 	__u8			pfmemalloc:1;
 	__u8			ignore_df:1;
 	__u8			nfctinfo:3;
 
 	__u8			nf_trace:1;
+=======
+	__u8			ignore_df:1;
+	__u8			nfctinfo:3;
+	__u8			nf_trace:1;
+
+>>>>>>> common/deprecated/android-3.18
 	__u8			ip_summed:2;
 	__u8			ooo_okay:1;
 	__u8			l4_hash:1;
 	__u8			sw_hash:1;
 	__u8			wifi_acked_valid:1;
 	__u8			wifi_acked:1;
+<<<<<<< HEAD
 
 	__u8			no_fcs:1;
+=======
+	__u8			no_fcs:1;
+
+>>>>>>> common/deprecated/android-3.18
 	/* Indicates the inner headers are valid in the skbuff. */
 	__u8			encapsulation:1;
 	__u8			encap_hdr_csum:1;
@@ -607,11 +676,18 @@ struct sk_buff {
 	__u8			csum_complete_sw:1;
 	__u8			csum_level:2;
 	__u8			csum_bad:1;
+<<<<<<< HEAD
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #ifdef CONFIG_IPV6_NDISC_NODETYPE
 	__u8			ndisc_nodetype:2;
 #endif
 	__u8			ipvs_property:1;
+<<<<<<< HEAD
+=======
+
+>>>>>>> common/deprecated/android-3.18
 	__u8			inner_protocol_type:1;
 	/* 4 or 6 bit hole */
 
@@ -640,7 +716,10 @@ struct sk_buff {
 #ifdef CONFIG_NETWORK_SECMARK
 	__u32			secmark;
 #endif
+<<<<<<< HEAD
 	__u32			priomark;
+=======
+>>>>>>> common/deprecated/android-3.18
 	union {
 		__u32		mark;
 		__u32		dropcount;
@@ -672,7 +751,10 @@ struct sk_buff {
 				*data;
 	unsigned int		truesize;
 	atomic_t		users;
+<<<<<<< HEAD
 
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 #ifdef __KERNEL__
@@ -706,7 +788,11 @@ static inline bool skb_pfmemalloc(const struct sk_buff *skb)
  */
 static inline struct dst_entry *skb_dst(const struct sk_buff *skb)
 {
+<<<<<<< HEAD
 	/* If refdst was not refcounted, check we still are in a
+=======
+	/* If refdst was not refcounted, check we still are in a 
+>>>>>>> common/deprecated/android-3.18
 	 * rcu_read_lock section
 	 */
 	WARN_ON((skb->_skb_refdst & SKB_DST_NOREF) &&
@@ -862,10 +948,17 @@ struct sk_buff *skb_realloc_headroom(struct sk_buff *skb,
 				     unsigned int headroom);
 struct sk_buff *skb_copy_expand(const struct sk_buff *skb, int newheadroom,
 				int newtailroom, gfp_t priority);
+<<<<<<< HEAD
 int skb_to_sgvec_nomark(struct sk_buff *skb, struct scatterlist *sg,
 			int offset, int len);
 int skb_to_sgvec(struct sk_buff *skb, struct scatterlist *sg, int offset,
 		 int len);
+=======
+int __must_check skb_to_sgvec_nomark(struct sk_buff *skb, struct scatterlist *sg,
+				     int offset, int len);
+int __must_check skb_to_sgvec(struct sk_buff *skb, struct scatterlist *sg,
+			      int offset, int len);
+>>>>>>> common/deprecated/android-3.18
 int skb_cow_data(struct sk_buff *skb, int tailbits, struct sk_buff **trailer);
 int skb_pad(struct sk_buff *skb, int pad);
 #define dev_kfree_skb(a)	consume_skb(a)
@@ -945,6 +1038,12 @@ static inline __u32 skb_get_hash(struct sk_buff *skb)
 	return skb->hash;
 }
 
+<<<<<<< HEAD
+=======
+__u32 skb_get_hash_perturb(const struct sk_buff *skb,
+			   const siphash_key_t *perturb);
+
+>>>>>>> common/deprecated/android-3.18
 static inline __u32 skb_get_hash_raw(const struct sk_buff *skb)
 {
 	return skb->hash;
@@ -1317,6 +1416,21 @@ static inline __u32 skb_queue_len(const struct sk_buff_head *list_)
 }
 
 /**
+<<<<<<< HEAD
+=======
+ *	skb_queue_len_lockless	- get queue length
+ *	@list_: list to measure
+ *
+ *	Return the length of an &sk_buff queue.
+ *	This variant can be used in lockless contexts.
+ */
+static inline __u32 skb_queue_len_lockless(const struct sk_buff_head *list_)
+{
+	return READ_ONCE(list_->qlen);
+}
+
+/**
+>>>>>>> common/deprecated/android-3.18
  *	__skb_queue_head_init - initialize non-spinlock portions of sk_buff_head
  *	@list: queue to initialize
  *
@@ -1519,7 +1633,11 @@ static inline void __skb_unlink(struct sk_buff *skb, struct sk_buff_head *list)
 {
 	struct sk_buff *next, *prev;
 
+<<<<<<< HEAD
 	list->qlen--;
+=======
+	WRITE_ONCE(list->qlen, list->qlen - 1);
+>>>>>>> common/deprecated/android-3.18
 	next	   = skb->next;
 	prev	   = skb->prev;
 	skb->next  = skb->prev = NULL;
@@ -1794,6 +1912,33 @@ static inline void skb_reserve(struct sk_buff *skb, int len)
 	skb->tail += len;
 }
 
+<<<<<<< HEAD
+=======
+/**
+ *	skb_tailroom_reserve - adjust reserved_tailroom
+ *	@skb: buffer to alter
+ *	@mtu: maximum amount of headlen permitted
+ *	@needed_tailroom: minimum amount of reserved_tailroom
+ *
+ *	Set reserved_tailroom so that headlen can be as large as possible but
+ *	not larger than mtu and tailroom cannot be smaller than
+ *	needed_tailroom.
+ *	The required headroom should already have been reserved before using
+ *	this function.
+ */
+static inline void skb_tailroom_reserve(struct sk_buff *skb, unsigned int mtu,
+					unsigned int needed_tailroom)
+{
+	SKB_LINEAR_ASSERT(skb);
+	if (mtu < skb_tailroom(skb) - needed_tailroom)
+		/* use at most mtu */
+		skb->reserved_tailroom = skb_tailroom(skb) - mtu;
+	else
+		/* use up to all available space */
+		skb->reserved_tailroom = needed_tailroom;
+}
+
+>>>>>>> common/deprecated/android-3.18
 #define ENCAP_TYPE_ETHER	0
 #define ENCAP_TYPE_IPPROTO	1
 
@@ -1945,8 +2090,13 @@ static inline void skb_probe_transport_header(struct sk_buff *skb,
 
 	if (skb_transport_header_was_set(skb))
 		return;
+<<<<<<< HEAD
 	else if (skb_flow_dissect(skb, &keys))
 		skb_set_transport_header(skb, keys.thoff);
+=======
+	else if (skb_flow_dissect_flow_keys(skb, &keys))
+		skb_set_transport_header(skb, keys.control.thoff);
+>>>>>>> common/deprecated/android-3.18
 	else
 		skb_set_transport_header(skb, offset_hint);
 }
@@ -2141,6 +2291,11 @@ static inline void __skb_queue_purge(struct sk_buff_head *list)
 #define NETDEV_FRAG_PAGE_MAX_SIZE  (PAGE_SIZE << NETDEV_FRAG_PAGE_MAX_ORDER)
 #define NETDEV_PAGECNT_MAX_BIAS	   NETDEV_FRAG_PAGE_MAX_SIZE
 
+<<<<<<< HEAD
+=======
+unsigned int skb_rbtree_purge(struct rb_root *root);
+
+>>>>>>> common/deprecated/android-3.18
 void *netdev_alloc_frag(unsigned int fragsz);
 
 struct sk_buff *__netdev_alloc_skb(struct net_device *dev, unsigned int length,
@@ -2411,6 +2566,16 @@ static inline int skb_clone_writable(const struct sk_buff *skb, unsigned int len
 	       skb_headroom(skb) + len <= skb->hdr_len;
 }
 
+<<<<<<< HEAD
+=======
+static inline int skb_try_make_writable(struct sk_buff *skb,
+					unsigned int write_len)
+{
+	return skb_cloned(skb) && !skb_clone_writable(skb, write_len) &&
+	       pskb_expand_head(skb, 0, 0, GFP_ATOMIC);
+}
+
+>>>>>>> common/deprecated/android-3.18
 static inline int __skb_cow(struct sk_buff *skb, unsigned int headroom,
 			    int cloned)
 {
@@ -2467,7 +2632,11 @@ static inline int skb_cow_head(struct sk_buff *skb, unsigned int headroom)
  *	is untouched. Otherwise it is extended. Returns zero on
  *	success. The skb is freed on error.
  */
+<<<<<<< HEAD
 
+=======
+ 
+>>>>>>> common/deprecated/android-3.18
 static inline int skb_padto(struct sk_buff *skb, unsigned int len)
 {
 	unsigned int size = skb->len;
@@ -2567,10 +2736,21 @@ static inline void skb_postpull_rcsum(struct sk_buff *skb,
 {
 	if (skb->ip_summed == CHECKSUM_COMPLETE)
 		skb->csum = csum_sub(skb->csum, csum_partial(start, len, 0));
+<<<<<<< HEAD
+=======
+	else if (skb->ip_summed == CHECKSUM_PARTIAL &&
+		 skb_checksum_start_offset(skb) < 0)
+		skb->ip_summed = CHECKSUM_NONE;
+>>>>>>> common/deprecated/android-3.18
 }
 
 unsigned char *skb_pull_rcsum(struct sk_buff *skb, unsigned int len);
 
+<<<<<<< HEAD
+=======
+int pskb_trim_rcsum_slow(struct sk_buff *skb, unsigned int len);
+
+>>>>>>> common/deprecated/android-3.18
 /**
  *	pskb_trim_rcsum - trim received skb and update checksum
  *	@skb: buffer to trim
@@ -2584,11 +2764,23 @@ static inline int pskb_trim_rcsum(struct sk_buff *skb, unsigned int len)
 {
 	if (likely(len >= skb->len))
 		return 0;
+<<<<<<< HEAD
 	if (skb->ip_summed == CHECKSUM_COMPLETE)
 		skb->ip_summed = CHECKSUM_NONE;
 	return __pskb_trim(skb, len);
 }
 
+=======
+	return pskb_trim_rcsum_slow(skb, len);
+}
+
+#define rb_to_skb(rb) rb_entry_safe(rb, struct sk_buff, rbnode)
+#define skb_rb_first(root) rb_to_skb(rb_first(root))
+#define skb_rb_last(root)  rb_to_skb(rb_last(root))
+#define skb_rb_next(skb)   rb_to_skb(rb_next(&(skb)->rbnode))
+#define skb_rb_prev(skb)   rb_to_skb(rb_prev(&(skb)->rbnode))
+
+>>>>>>> common/deprecated/android-3.18
 #define skb_queue_walk(queue, skb) \
 		for (skb = (queue)->next;					\
 		     skb != (struct sk_buff *)(queue);				\
@@ -2651,7 +2843,11 @@ unsigned int datagram_poll(struct file *file, struct socket *sock,
 int skb_copy_datagram_iovec(const struct sk_buff *from, int offset,
 			    struct iovec *to, int size);
 int skb_copy_and_csum_datagram_iovec(struct sk_buff *skb, int hlen,
+<<<<<<< HEAD
 				     struct iovec *iov, int len);
+=======
+				     struct iovec *iov);
+>>>>>>> common/deprecated/android-3.18
 int skb_copy_datagram_from_iovec(struct sk_buff *skb, int offset,
 				 const struct iovec *from, int from_offset,
 				 int len);
@@ -3131,6 +3327,16 @@ static inline void nf_reset_trace(struct sk_buff *skb)
 #endif
 }
 
+<<<<<<< HEAD
+=======
+static inline void ipvs_reset(struct sk_buff *skb)
+{
+#if IS_ENABLED(CONFIG_IP_VS)
+	skb->ipvs_property = 0;
+#endif
+}
+
+>>>>>>> common/deprecated/android-3.18
 /* Note: This doesn't put any conntrack and bridge info in dst. */
 static inline void __nf_copy(struct sk_buff *dst, const struct sk_buff *src,
 			     bool copy)
@@ -3246,7 +3452,12 @@ struct skb_gso_cb {
 	int	encap_level;
 	__u16	csum_start;
 };
+<<<<<<< HEAD
 #define SKB_GSO_CB(skb) ((struct skb_gso_cb *)(skb)->cb)
+=======
+#define SKB_SGO_CB_OFFSET	32
+#define SKB_GSO_CB(skb) ((struct skb_gso_cb *)((skb)->cb + SKB_SGO_CB_OFFSET))
+>>>>>>> common/deprecated/android-3.18
 
 static inline int skb_tnl_header_len(const struct sk_buff *inner_skb)
 {

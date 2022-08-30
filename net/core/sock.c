@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 /* Copyright (c) 2015 Samsung Electronics Co., Ltd. */
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * INET		An implementation of the TCP/IP protocol suite for the LINUX
  *		operating system.  INET is implemented using the  BSD Socket
@@ -89,6 +92,7 @@
  *		as published by the Free Software Foundation; either version
  *		2 of the License, or (at your option) any later version.
  */
+<<<<<<< HEAD
 /*
  *  Changes:
  *  KwnagHyun Kim <kh0304.kim@samsung.com> 2015/07/08
@@ -97,6 +101,8 @@
  *    Add codes to share UID/PID information
  *
  */
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 
@@ -289,7 +295,10 @@ static const char *const af_family_slock_key_strings[AF_MAX+1] = {
   "slock-AF_IEEE802154", "slock-AF_CAIF" , "slock-AF_ALG"      ,
   "slock-AF_NFC"   , "slock-AF_VSOCK"    ,"slock-AF_MAX"
 };
+<<<<<<< HEAD
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static const char *const af_family_clock_key_strings[AF_MAX+1] = {
   "clock-AF_UNSPEC", "clock-AF_UNIX"     , "clock-AF_INET"     ,
   "clock-AF_AX25"  , "clock-AF_IPX"      , "clock-AF_APPLETALK",
@@ -311,7 +320,10 @@ static const char *const af_family_clock_key_strings[AF_MAX+1] = {
  * sk_callback_lock locking rules are per-address-family,
  * so split the lock classes by using a per-AF key:
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static struct lock_class_key af_callback_keys[AF_MAX];
 
 /* Take into consideration the size of the struct sk_buff overhead in the
@@ -433,8 +445,11 @@ static void sock_warn_obsolete_bsdism(const char *name)
 	}
 }
 
+<<<<<<< HEAD
 #define SK_FLAGS_TIMESTAMP ((1UL << SOCK_TIMESTAMP) | (1UL << SOCK_TIMESTAMPING_RX_SOFTWARE))
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static void sock_disable_timestamp(struct sock *sk, unsigned long flags)
 {
 	if (sk->sk_flags & flags) {
@@ -654,6 +669,7 @@ out:
 	return ret;
 }
 
+<<<<<<< HEAD
 /* START_OF_KNOX_VPN */
 /** The function sets the domain name associated with the socket. **/
 static int sock_set_domain_name(struct sock *sk, char __user *optval,
@@ -684,6 +700,8 @@ out:
 }
 /* END_OF_KNOX_VPN */
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static inline void sock_valbool_flag(struct sock *sk, int bit, int valbool)
 {
 	if (valbool)
@@ -732,11 +750,14 @@ int sock_setsockopt(struct socket *sock, int level, int optname,
 	if (optname == SO_BINDTODEVICE)
 		return sock_setbindtodevice(sk, optval, optlen);
 
+<<<<<<< HEAD
     /* START_OF_KNOX_VPN */
     if (optname == SO_SET_DOMAIN_NAME)
         return sock_set_domain_name(sk, optval, optlen);
     /* END_OF_KNOX_VPN */
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (optlen < sizeof(int))
 		return -EINVAL;
 
@@ -768,6 +789,10 @@ int sock_setsockopt(struct socket *sock, int level, int optname,
 		break;
 	case SO_DONTROUTE:
 		sock_valbool_flag(sk, SOCK_LOCALROUTE, valbool);
+<<<<<<< HEAD
+=======
+		sk_dst_reset(sk);
+>>>>>>> common/deprecated/android-3.18
 		break;
 	case SO_BROADCAST:
 		sock_valbool_flag(sk, SOCK_BROADCAST, valbool);
@@ -907,7 +932,12 @@ set_rcvbuf:
 		}
 		if (val & SOF_TIMESTAMPING_OPT_ID &&
 		    !(sk->sk_tsflags & SOF_TIMESTAMPING_OPT_ID)) {
+<<<<<<< HEAD
 			if (sk->sk_protocol == IPPROTO_TCP) {
+=======
+			if (sk->sk_protocol == IPPROTO_TCP &&
+			    sk->sk_type == SOCK_STREAM) {
+>>>>>>> common/deprecated/android-3.18
 				if (sk->sk_state != TCP_ESTABLISHED) {
 					ret = -EINVAL;
 					break;
@@ -1356,7 +1386,10 @@ static struct sock *sk_prot_alloc(struct proto *prot, gfp_t priority,
 		sk = kmem_cache_alloc(slab, priority & ~__GFP_ZERO);
 		if (!sk)
 			return sk;
+<<<<<<< HEAD
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		if (priority & __GFP_ZERO) {
 			if (prot->clear_sk)
 				prot->clear_sk(sk, prot->obj_size);
@@ -1375,11 +1408,14 @@ static struct sock *sk_prot_alloc(struct proto *prot, gfp_t priority,
 		if (!try_module_get(prot->owner))
 			goto out_free_sec;
 		sk_tx_queue_clear(sk);
+<<<<<<< HEAD
 
 // ------------- START of KNOX_VPN ------------------//
                 sk->knox_uid = current->cred->uid.val;
                 sk->knox_pid = current->tgid;
 // ------------- END of KNOX_VPN -------------------//
+=======
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	return sk;
@@ -1447,10 +1483,14 @@ struct sock *sk_alloc(struct net *net, int family, gfp_t priority,
 
 		sock_update_classid(sk);
 		sock_update_netprioidx(sk);
+<<<<<<< HEAD
         /* START_OF_KNOX_VPN */
         sk->knox_uid = current->cred->uid.val;
         sk->knox_pid = current->tgid;
         /* END_OF_KNOX_VPN */
+=======
+		sk_tx_queue_clear(sk);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	return sk;
@@ -1477,6 +1517,14 @@ static void __sk_free(struct sock *sk)
 		pr_debug("%s: optmem leakage (%d bytes) detected\n",
 			 __func__, atomic_read(&sk->sk_omem_alloc));
 
+<<<<<<< HEAD
+=======
+	if (sk->sk_frag.page) {
+		put_page(sk->sk_frag.page);
+		sk->sk_frag.page = NULL;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	if (sk->sk_peer_cred)
 		put_cred(sk->sk_peer_cred);
 	put_pid(sk->sk_peer_pid);
@@ -1583,6 +1631,15 @@ struct sock *sk_clone_lock(const struct sock *sk, const gfp_t priority)
 			is_charged = sk_filter_charge(newsk, filter);
 
 		if (unlikely(!is_charged || xfrm_sk_clone_policy(newsk))) {
+<<<<<<< HEAD
+=======
+			/* We need to make sure that we don't uncharge the new
+			 * socket if we couldn't charge it in the first place
+			 * as otherwise we uncharge the parent's filter.
+			 */
+			if (!is_charged)
+				RCU_INIT_POINTER(newsk->sk_filter, NULL);
+>>>>>>> common/deprecated/android-3.18
 			/* It is still raw copy of parent, so invalidate
 			 * destructor and make plain sk_free() */
 			newsk->sk_destruct = NULL;
@@ -1593,6 +1650,10 @@ struct sock *sk_clone_lock(const struct sock *sk, const gfp_t priority)
 		}
 
 		newsk->sk_err	   = 0;
+<<<<<<< HEAD
+=======
+		newsk->sk_err_soft = 0;
+>>>>>>> common/deprecated/android-3.18
 		newsk->sk_priority = 0;
 		/*
 		 * Before updating sk_refcnt, we must commit prior changes to memory
@@ -1614,6 +1675,10 @@ struct sock *sk_clone_lock(const struct sock *sk, const gfp_t priority)
 		 */
 		sk_refcnt_debug_inc(newsk);
 		sk_set_socket(newsk, NULL);
+<<<<<<< HEAD
+=======
+		sk_tx_queue_clear(newsk);
+>>>>>>> common/deprecated/android-3.18
 		newsk->sk_wq = NULL;
 
 		sk_update_clone(sk, newsk);
@@ -1681,17 +1746,29 @@ EXPORT_SYMBOL(sock_wfree);
 
 void skb_orphan_partial(struct sk_buff *skb)
 {
+<<<<<<< HEAD
 	/* TCP stack sets skb->ooo_okay based on sk_wmem_alloc,
 	 * so we do not completely orphan skb, but transfert all
 	 * accounted bytes but one, to avoid unexpected reorders.
 	 */
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (skb->destructor == sock_wfree
 #ifdef CONFIG_INET
 	    || skb->destructor == tcp_wfree
 #endif
 		) {
+<<<<<<< HEAD
 		atomic_sub(skb->truesize - 1, &skb->sk->sk_wmem_alloc);
 		skb->truesize = 1;
+=======
+		struct sock *sk = skb->sk;
+
+		if (atomic_inc_not_zero(&sk->sk_refcnt)) {
+			atomic_sub(skb->truesize, &sk->sk_wmem_alloc);
+			skb->destructor = sock_efree;
+		}
+>>>>>>> common/deprecated/android-3.18
 	} else {
 		skb_orphan(skb);
 	}
@@ -1724,6 +1801,11 @@ void sock_edemux(struct sk_buff *skb)
 
 	if (sk->sk_state == TCP_TIME_WAIT)
 		inet_twsk_put(inet_twsk(sk));
+<<<<<<< HEAD
+=======
+	else if (sk->sk_state == TCP_NEW_SYN_RECV)
+		reqsk_put(inet_reqsk(sk));
+>>>>>>> common/deprecated/android-3.18
 	else
 		sock_put(sk);
 }
@@ -2074,7 +2156,11 @@ int __sk_mem_schedule(struct sock *sk, int size, int kind)
 	}
 
 	if (sk_has_memory_pressure(sk)) {
+<<<<<<< HEAD
 		int alloc;
+=======
+		u64 alloc;
+>>>>>>> common/deprecated/android-3.18
 
 		if (!sk_under_memory_pressure(sk))
 			return 1;
@@ -2224,6 +2310,30 @@ int sock_no_mmap(struct file *file, struct socket *sock, struct vm_area_struct *
 }
 EXPORT_SYMBOL(sock_no_mmap);
 
+<<<<<<< HEAD
+=======
+/*
+ * When a file is received (via SCM_RIGHTS, etc), we must bump the
+ * various sock-based usage counts.
+ */
+void __receive_sock(struct file *file)
+{
+	struct socket *sock;
+	int error;
+
+	/*
+	 * The resulting value of "error" is ignored here since we only
+	 * need to take action when the file is a socket and testing
+	 * "sock" for NULL is sufficient.
+	 */
+	sock = sock_from_file(file, &error);
+	if (sock) {
+		sock_update_netprioidx(sock->sk);
+		sock_update_classid(sock->sk);
+	}
+}
+
+>>>>>>> common/deprecated/android-3.18
 ssize_t sock_no_sendpage(struct socket *sock, struct page *page, int offset, size_t size, int flags)
 {
 	ssize_t res;
@@ -2381,6 +2491,12 @@ void sock_init_data(struct socket *sock, struct sock *sk)
 	sk->sk_sndtimeo		=	MAX_SCHEDULE_TIMEOUT;
 
 	sk->sk_stamp = ktime_set(-1L, 0);
+<<<<<<< HEAD
+=======
+#if BITS_PER_LONG==32
+	seqlock_init(&sk->sk_stamp_seq);
+#endif
+>>>>>>> common/deprecated/android-3.18
 
 #ifdef CONFIG_NET_RX_BUSY_POLL
 	sk->sk_napi_id		=	0;
@@ -2660,11 +2776,14 @@ void sk_common_release(struct sock *sk)
 
 	sk_refcnt_debug_release(sk);
 
+<<<<<<< HEAD
 	if (sk->sk_frag.page) {
 		put_page(sk->sk_frag.page);
 		sk->sk_frag.page = NULL;
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	sock_put(sk);
 }
 EXPORT_SYMBOL(sk_common_release);

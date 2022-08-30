@@ -20,17 +20,29 @@
 #include <linux/notifier.h>
 #include <linux/irqflags.h>
 #include <linux/debugfs.h>
+<<<<<<< HEAD
+=======
+#include <linux/tracefs.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/pagemap.h>
 #include <linux/hardirq.h>
 #include <linux/linkage.h>
 #include <linux/uaccess.h>
 #include <linux/kprobes.h>
+<<<<<<< HEAD
+=======
+#include <linux/vmalloc.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/ftrace.h>
 #include <linux/module.h>
 #include <linux/percpu.h>
 #include <linux/splice.h>
 #include <linux/kdebug.h>
 #include <linux/string.h>
+<<<<<<< HEAD
+=======
+#include <linux/mount.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/rwsem.h>
 #include <linux/slab.h>
 #include <linux/ctype.h>
@@ -1024,6 +1036,15 @@ update_max_tr(struct trace_array *tr, struct task_struct *tsk, int cpu)
 
 	arch_spin_lock(&tr->max_lock);
 
+<<<<<<< HEAD
+=======
+	/* Inherit the recordable setting from trace_buffer */
+	if (ring_buffer_record_is_set_on(tr->trace_buffer.buffer))
+		ring_buffer_record_on(tr->max_buffer.buffer);
+	else
+		ring_buffer_record_off(tr->max_buffer.buffer);
+
+>>>>>>> common/deprecated/android-3.18
 	buf = tr->trace_buffer.buffer;
 	tr->trace_buffer.buffer = tr->max_buffer.buffer;
 	tr->max_buffer.buffer = buf;
@@ -1291,9 +1312,12 @@ struct saved_cmdlines_buffer {
 };
 static struct saved_cmdlines_buffer *savedcmd;
 
+<<<<<<< HEAD
 /* temporary disable recording */
 static atomic_t trace_record_cmdline_disabled __read_mostly;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static inline char *get_saved_cmdlines(int idx)
 {
 	return &savedcmd->saved_cmdlines[idx * TASK_COMM_LEN];
@@ -1495,10 +1519,20 @@ void trace_stop_cmdline_recording(void);
 
 static int trace_save_cmdline(struct task_struct *tsk)
 {
+<<<<<<< HEAD
 	unsigned pid, idx;
 
 	if (!tsk->pid || unlikely(tsk->pid > PID_MAX_DEFAULT))
 		return 0;
+=======
+	unsigned tpid, idx;
+
+	/* treat recording of idle task as a success */
+	if (!tsk->pid)
+		return 1;
+
+	tpid = tsk->pid & (PID_MAX_DEFAULT - 1);
+>>>>>>> common/deprecated/android-3.18
 
 	preempt_disable();
 	/*
@@ -1512,6 +1546,7 @@ static int trace_save_cmdline(struct task_struct *tsk)
 		return 0;
 	}
 
+<<<<<<< HEAD
 	idx = savedcmd->map_pid_to_cmdline[tsk->pid];
 	if (idx == NO_CMDLINE_MAP) {
 		idx = (savedcmd->cmdline_idx + 1) % savedcmd->cmdline_num;
@@ -1532,6 +1567,17 @@ static int trace_save_cmdline(struct task_struct *tsk)
 		savedcmd->cmdline_idx = idx;
 	}
 
+=======
+	idx = savedcmd->map_pid_to_cmdline[tpid];
+	if (idx == NO_CMDLINE_MAP) {
+		idx = (savedcmd->cmdline_idx + 1) % savedcmd->cmdline_num;
+
+		savedcmd->map_pid_to_cmdline[tpid] = idx;
+		savedcmd->cmdline_idx = idx;
+	}
+
+	savedcmd->map_cmdline_to_pid[idx] = tsk->pid;
+>>>>>>> common/deprecated/android-3.18
 	set_cmdline(idx, tsk->comm);
 	savedcmd->map_cmdline_to_tgid[idx] = tsk->tgid;
 	arch_spin_unlock(&trace_cmdline_lock);
@@ -1543,6 +1589,10 @@ static int trace_save_cmdline(struct task_struct *tsk)
 static void __trace_find_cmdline(int pid, char comm[])
 {
 	unsigned map;
+<<<<<<< HEAD
+=======
+	int tpid;
+>>>>>>> common/deprecated/android-3.18
 
 	if (!pid) {
 		strcpy(comm, "<idle>");
@@ -1554,6 +1604,7 @@ static void __trace_find_cmdline(int pid, char comm[])
 		return;
 	}
 
+<<<<<<< HEAD
 	if (pid > PID_MAX_DEFAULT) {
 		strcpy(comm, "<...>");
 		return;
@@ -1564,6 +1615,18 @@ static void __trace_find_cmdline(int pid, char comm[])
 		strcpy(comm, get_saved_cmdlines(map));
 	else
 		strcpy(comm, "<...>");
+=======
+	tpid = pid & (PID_MAX_DEFAULT - 1);
+	map = savedcmd->map_pid_to_cmdline[tpid];
+	if (map != NO_CMDLINE_MAP) {
+		tpid = savedcmd->map_cmdline_to_pid[map];
+		if (tpid == pid) {
+			strlcpy(comm, get_saved_cmdlines(map), TASK_COMM_LEN);
+			return;
+		}
+	}
+	strcpy(comm, "<...>");
+>>>>>>> common/deprecated/android-3.18
 }
 
 void trace_find_cmdline(int pid, char comm[])
@@ -1608,9 +1671,12 @@ int trace_find_tgid(int pid)
 
 void tracing_record_cmdline(struct task_struct *tsk)
 {
+<<<<<<< HEAD
 	if (atomic_read(&trace_record_cmdline_disabled) || !tracing_is_on())
 		return;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (!__this_cpu_read(trace_cmdline_save))
 		return;
 
@@ -1633,7 +1699,11 @@ tracing_generic_entry_update(struct trace_entry *entry, unsigned long flags,
 		TRACE_FLAG_IRQS_NOSUPPORT |
 #endif
 		((pc & HARDIRQ_MASK) ? TRACE_FLAG_HARDIRQ : 0) |
+<<<<<<< HEAD
 		((pc & SOFTIRQ_MASK) ? TRACE_FLAG_SOFTIRQ : 0) |
+=======
+		((pc & SOFTIRQ_OFFSET) ? TRACE_FLAG_SOFTIRQ : 0) |
+>>>>>>> common/deprecated/android-3.18
 		(tif_need_resched() ? TRACE_FLAG_NEED_RESCHED : 0) |
 		(test_preempt_need_resched() ? TRACE_FLAG_PREEMPT_RESCHED : 0);
 }
@@ -1835,7 +1905,12 @@ static void __ftrace_trace_stack(struct ring_buffer *buffer,
 	size *= sizeof(unsigned long);
 
 	event = trace_buffer_lock_reserve(buffer, TRACE_STACK,
+<<<<<<< HEAD
 					  sizeof(*entry) + size, flags, pc);
+=======
+				    (sizeof(*entry) - sizeof(entry->caller)) + size,
+				    flags, pc);
+>>>>>>> common/deprecated/android-3.18
 	if (!event)
 		goto out;
 	entry = ring_buffer_event_data(event);
@@ -2177,6 +2252,10 @@ out:
 }
 EXPORT_SYMBOL_GPL(trace_vbprintk);
 
+<<<<<<< HEAD
+=======
+__printf(3, 0)
+>>>>>>> common/deprecated/android-3.18
 static int
 __trace_array_vprintk(struct ring_buffer *buffer,
 		      unsigned long ip, const char *fmt, va_list args)
@@ -2230,12 +2309,20 @@ __trace_array_vprintk(struct ring_buffer *buffer,
 	return len;
 }
 
+<<<<<<< HEAD
+=======
+__printf(3, 0)
+>>>>>>> common/deprecated/android-3.18
 int trace_array_vprintk(struct trace_array *tr,
 			unsigned long ip, const char *fmt, va_list args)
 {
 	return __trace_array_vprintk(tr->trace_buffer.buffer, ip, fmt, args);
 }
 
+<<<<<<< HEAD
+=======
+__printf(3, 0)
+>>>>>>> common/deprecated/android-3.18
 int trace_array_printk(struct trace_array *tr,
 		       unsigned long ip, const char *fmt, ...)
 {
@@ -2245,12 +2332,22 @@ int trace_array_printk(struct trace_array *tr,
 	if (!(trace_flags & TRACE_ITER_PRINTK))
 		return 0;
 
+<<<<<<< HEAD
+=======
+	if (!tr)
+		return -ENOENT;
+
+>>>>>>> common/deprecated/android-3.18
 	va_start(ap, fmt);
 	ret = trace_array_vprintk(tr, ip, fmt, ap);
 	va_end(ap);
 	return ret;
 }
 
+<<<<<<< HEAD
+=======
+__printf(3, 4)
+>>>>>>> common/deprecated/android-3.18
 int trace_array_printk_buf(struct ring_buffer *buffer,
 			   unsigned long ip, const char *fmt, ...)
 {
@@ -2266,6 +2363,10 @@ int trace_array_printk_buf(struct ring_buffer *buffer,
 	return ret;
 }
 
+<<<<<<< HEAD
+=======
+__printf(2, 0)
+>>>>>>> common/deprecated/android-3.18
 int trace_vprintk(unsigned long ip, const char *fmt, va_list args)
 {
 	return trace_array_vprintk(&global_trace, ip, fmt, args);
@@ -2473,9 +2574,12 @@ static void *s_start(struct seq_file *m, loff_t *pos)
 		return ERR_PTR(-EBUSY);
 #endif
 
+<<<<<<< HEAD
 	if (!iter->snapshot)
 		atomic_inc(&trace_record_cmdline_disabled);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (*pos != iter->pos) {
 		iter->ent = NULL;
 		iter->cpu = 0;
@@ -2518,9 +2622,12 @@ static void s_stop(struct seq_file *m, void *p)
 		return;
 #endif
 
+<<<<<<< HEAD
 	if (!iter->snapshot)
 		atomic_dec(&trace_record_cmdline_disabled);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	trace_access_unlock(iter->cpu_file);
 	trace_event_read_unlock();
 }
@@ -3107,7 +3214,12 @@ __tracing_open(struct inode *inode, struct file *file, bool snapshot)
 	if (iter->cpu_file == RING_BUFFER_ALL_CPUS) {
 		for_each_tracing_cpu(cpu) {
 			iter->buffer_iter[cpu] =
+<<<<<<< HEAD
 				ring_buffer_read_prepare(iter->trace_buffer->buffer, cpu);
+=======
+				ring_buffer_read_prepare(iter->trace_buffer->buffer,
+							 cpu, GFP_KERNEL);
+>>>>>>> common/deprecated/android-3.18
 		}
 		ring_buffer_read_prepare_sync();
 		for_each_tracing_cpu(cpu) {
@@ -3117,7 +3229,12 @@ __tracing_open(struct inode *inode, struct file *file, bool snapshot)
 	} else {
 		cpu = iter->cpu_file;
 		iter->buffer_iter[cpu] =
+<<<<<<< HEAD
 			ring_buffer_read_prepare(iter->trace_buffer->buffer, cpu);
+=======
+			ring_buffer_read_prepare(iter->trace_buffer->buffer,
+						 cpu, GFP_KERNEL);
+>>>>>>> common/deprecated/android-3.18
 		ring_buffer_read_prepare_sync();
 		ring_buffer_read_start(iter->buffer_iter[cpu]);
 		tracing_iter_reset(iter, cpu);
@@ -3239,11 +3356,25 @@ static int tracing_open(struct inode *inode, struct file *file)
 	/* If this file was open for write, then erase contents */
 	if ((file->f_mode & FMODE_WRITE) && (file->f_flags & O_TRUNC)) {
 		int cpu = tracing_get_cpu(inode);
+<<<<<<< HEAD
 
 		if (cpu == RING_BUFFER_ALL_CPUS)
 			tracing_reset_online_cpus(&tr->trace_buffer);
 		else
 			tracing_reset(&tr->trace_buffer, cpu);
+=======
+		struct trace_buffer *trace_buf = &tr->trace_buffer;
+
+#ifdef CONFIG_TRACER_MAX_TRACE
+		if (tr->current_trace->print_max)
+			trace_buf = &tr->max_buffer;
+#endif
+
+		if (cpu == RING_BUFFER_ALL_CPUS)
+			tracing_reset_online_cpus(trace_buf);
+		else
+			tracing_reset(trace_buf, cpu);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (file->f_mode & FMODE_READ) {
@@ -3347,9 +3478,20 @@ static int show_traces_open(struct inode *inode, struct file *file)
 	if (tracing_disabled)
 		return -ENODEV;
 
+<<<<<<< HEAD
 	ret = seq_open(file, &show_traces_seq_ops);
 	if (ret)
 		return ret;
+=======
+	if (trace_array_get(tr) < 0)
+		return -ENODEV;
+
+	ret = seq_open(file, &show_traces_seq_ops);
+	if (ret) {
+		trace_array_put(tr);
+		return ret;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	m = file->private_data;
 	m->private = tr;
@@ -3357,6 +3499,17 @@ static int show_traces_open(struct inode *inode, struct file *file)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+static int show_traces_release(struct inode *inode, struct file *file)
+{
+	struct trace_array *tr = inode->i_private;
+
+	trace_array_put(tr);
+	return seq_release(inode, file);
+}
+
+>>>>>>> common/deprecated/android-3.18
 static ssize_t
 tracing_write_stub(struct file *filp, const char __user *ubuf,
 		   size_t count, loff_t *ppos)
@@ -3387,8 +3540,13 @@ static const struct file_operations tracing_fops = {
 static const struct file_operations show_traces_fops = {
 	.open		= show_traces_open,
 	.read		= seq_read,
+<<<<<<< HEAD
 	.release	= seq_release,
 	.llseek		= seq_lseek,
+=======
+	.llseek		= seq_lseek,
+	.release	= show_traces_release,
+>>>>>>> common/deprecated/android-3.18
 };
 
 /*
@@ -4506,7 +4664,10 @@ out:
 	return ret;
 
 fail:
+<<<<<<< HEAD
 	kfree(iter->trace);
+=======
+>>>>>>> common/deprecated/android-3.18
 	kfree(iter);
 	__trace_array_put(tr);
 	mutex_unlock(&trace_types_lock);
@@ -4581,7 +4742,11 @@ static int tracing_wait_pipe(struct file *filp)
 		 *
 		 * iter->pos will be 0 if we haven't read anything.
 		 */
+<<<<<<< HEAD
 		if (!tracing_is_on() && iter->pos)
+=======
+		if (!tracer_tracing_is_on(iter->tr) && iter->pos)
+>>>>>>> common/deprecated/android-3.18
 			break;
 
 		mutex_unlock(&iter->mutex);
@@ -4608,6 +4773,7 @@ tracing_read_pipe(struct file *filp, char __user *ubuf,
 	struct trace_array *tr = iter->tr;
 	ssize_t sret;
 
+<<<<<<< HEAD
 	/* return any leftover data */
 	sret = trace_seq_to_user(&iter->seq, ubuf, cnt);
 	if (sret != -EBUSY)
@@ -4615,6 +4781,8 @@ tracing_read_pipe(struct file *filp, char __user *ubuf,
 
 	trace_seq_init(&iter->seq);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* copy the tracer to avoid using a global lock all around */
 	mutex_lock(&trace_types_lock);
 	if (unlikely(iter->trace->name != tr->current_trace->name))
@@ -4627,6 +4795,17 @@ tracing_read_pipe(struct file *filp, char __user *ubuf,
 	 * is protected.
 	 */
 	mutex_lock(&iter->mutex);
+<<<<<<< HEAD
+=======
+
+	/* return any leftover data */
+	sret = trace_seq_to_user(&iter->seq, ubuf, cnt);
+	if (sret != -EBUSY)
+		goto out;
+
+	trace_seq_init(&iter->seq);
+
+>>>>>>> common/deprecated/android-3.18
 	if (iter->trace->read) {
 		sret = iter->trace->read(iter, filp, ubuf, cnt, ppos);
 		if (sret)
@@ -4652,6 +4831,10 @@ waitagain:
 	       sizeof(struct trace_iterator) -
 	       offsetof(struct trace_iterator, seq));
 	cpumask_clear(iter->started);
+<<<<<<< HEAD
+=======
+	trace_seq_init(&iter->seq);
+>>>>>>> common/deprecated/android-3.18
 	iter->pos = -1;
 
 	trace_event_read_lock();
@@ -4830,7 +5013,14 @@ static ssize_t tracing_splice_read_pipe(struct file *filp,
 
 	spd.nr_pages = i;
 
+<<<<<<< HEAD
 	ret = splice_to_pipe(pipe, &spd);
+=======
+	if (i)
+		ret = splice_to_pipe(pipe, &spd);
+	else
+		ret = 0;
+>>>>>>> common/deprecated/android-3.18
 out:
 	splice_shrink_spd(&spd);
 	return ret;
@@ -5114,7 +5304,11 @@ static int tracing_set_clock(struct trace_array *tr, const char *clockstr)
 	tracing_reset_online_cpus(&tr->trace_buffer);
 
 #ifdef CONFIG_TRACER_MAX_TRACE
+<<<<<<< HEAD
 	if (tr->flags & TRACE_ARRAY_FL_GLOBAL && tr->max_buffer.buffer)
+=======
+	if (tr->max_buffer.buffer)
+>>>>>>> common/deprecated/android-3.18
 		ring_buffer_set_clock(tr->max_buffer.buffer, trace_clocks[i].func);
 	tracing_reset_online_cpus(&tr->max_buffer);
 #endif
@@ -5259,11 +5453,23 @@ tracing_snapshot_write(struct file *filp, const char __user *ubuf, size_t cnt,
 			break;
 		}
 #endif
+<<<<<<< HEAD
 		if (!tr->allocated_snapshot) {
 			ret = alloc_snapshot(tr);
 			if (ret < 0)
 				break;
 		}
+=======
+		if (!tr->allocated_snapshot)
+			ret = resize_buffer_duplicate_size(&tr->max_buffer,
+				&tr->trace_buffer, iter->cpu_file);
+		else
+			ret = alloc_snapshot(tr);
+
+		if (ret < 0)
+			break;
+
+>>>>>>> common/deprecated/android-3.18
 		local_irq_disable();
 		/* Now, we're going to swap */
 		if (iter->cpu_file == RING_BUFFER_ALL_CPUS)
@@ -5592,12 +5798,24 @@ static void buffer_pipe_buf_release(struct pipe_inode_info *pipe,
 	buf->private = 0;
 }
 
+<<<<<<< HEAD
 static void buffer_pipe_buf_get(struct pipe_inode_info *pipe,
+=======
+static bool buffer_pipe_buf_get(struct pipe_inode_info *pipe,
+>>>>>>> common/deprecated/android-3.18
 				struct pipe_buffer *buf)
 {
 	struct buffer_ref *ref = (struct buffer_ref *)buf->private;
 
+<<<<<<< HEAD
 	ref->ref++;
+=======
+	if (ref->ref > INT_MAX/2)
+		return false;
+
+	ref->ref++;
+	return true;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /* Pipe buffer operations for a buffer. */
@@ -5644,7 +5862,11 @@ tracing_buffers_splice_read(struct file *file, loff_t *ppos,
 		.spd_release	= buffer_spd_release,
 	};
 	struct buffer_ref *ref;
+<<<<<<< HEAD
 	int entries, size, i;
+=======
+	int entries, i;
+>>>>>>> common/deprecated/android-3.18
 	ssize_t ret = 0;
 
 	mutex_lock(&trace_types_lock);
@@ -5652,6 +5874,7 @@ tracing_buffers_splice_read(struct file *file, loff_t *ppos,
 #ifdef CONFIG_TRACER_MAX_TRACE
 	if (iter->snapshot && iter->tr->current_trace->use_max_tr) {
 		ret = -EBUSY;
+<<<<<<< HEAD
 		goto out;
 	}
 #endif
@@ -5664,16 +5887,37 @@ tracing_buffers_splice_read(struct file *file, loff_t *ppos,
 	if (*ppos & (PAGE_SIZE - 1)) {
 		ret = -EINVAL;
 		goto out;
+=======
+		goto unlock;
+	}
+#endif
+
+	if (*ppos & (PAGE_SIZE - 1)) {
+		ret = -EINVAL;
+		goto unlock;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (len & (PAGE_SIZE - 1)) {
 		if (len < PAGE_SIZE) {
 			ret = -EINVAL;
+<<<<<<< HEAD
 			goto out;
+=======
+			goto unlock;
+>>>>>>> common/deprecated/android-3.18
 		}
 		len &= PAGE_MASK;
 	}
 
+<<<<<<< HEAD
+=======
+	if (splice_grow_spd(pipe, &spd)) {
+		ret = -ENOMEM;
+		goto unlock;
+	}
+
+>>>>>>> common/deprecated/android-3.18
  again:
 	trace_access_lock(iter->cpu_file);
 	entries = ring_buffer_entries_cpu(iter->trace_buffer->buffer, iter->cpu_file);
@@ -5705,6 +5949,7 @@ tracing_buffers_splice_read(struct file *file, loff_t *ppos,
 			break;
 		}
 
+<<<<<<< HEAD
 		/*
 		 * zero out any left over data, this is going to
 		 * user land.
@@ -5713,6 +5958,8 @@ tracing_buffers_splice_read(struct file *file, loff_t *ppos,
 		if (size < PAGE_SIZE)
 			memset(ref->page + size, 0, PAGE_SIZE - size);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		page = virt_to_page(ref->page);
 
 		spd.pages[i] = page;
@@ -5747,8 +5994,14 @@ tracing_buffers_splice_read(struct file *file, loff_t *ppos,
 	}
 
 	ret = splice_to_pipe(pipe, &spd);
+<<<<<<< HEAD
 	splice_shrink_spd(&spd);
 out:
+=======
+out:
+	splice_shrink_spd(&spd);
+unlock:
+>>>>>>> common/deprecated/android-3.18
 	mutex_unlock(&trace_types_lock);
 
 	return ret;
@@ -5957,11 +6210,21 @@ ftrace_trace_snapshot_callback(struct ftrace_hash *hash,
 		return ret;
 
  out_reg:
+<<<<<<< HEAD
 	ret = register_ftrace_function_probe(glob, ops, count);
 
 	if (ret >= 0)
 		alloc_snapshot(&global_trace);
 
+=======
+	ret = alloc_snapshot(&global_trace);
+	if (ret < 0)
+		goto out;
+
+	ret = register_ftrace_function_probe(glob, ops, count);
+
+ out:
+>>>>>>> common/deprecated/android-3.18
 	return ret < 0 ? ret : 0;
 }
 
@@ -5978,6 +6241,7 @@ static __init int register_snapshot_cmd(void)
 static inline __init int register_snapshot_cmd(void) { return 0; }
 #endif /* defined(CONFIG_TRACER_SNAPSHOT) && defined(CONFIG_DYNAMIC_FTRACE) */
 
+<<<<<<< HEAD
 struct dentry *tracing_init_dentry_tr(struct trace_array *tr)
 {
 	if (tr->dir)
@@ -6000,6 +6264,21 @@ struct dentry *tracing_init_dentry(void)
 	return tracing_init_dentry_tr(&global_trace);
 }
 
+=======
+static struct dentry *tracing_get_dentry(struct trace_array *tr)
+{
+	if (WARN_ON(!tr->dir))
+		return ERR_PTR(-ENODEV);
+
+	/* Top directory uses NULL as the parent */
+	if (tr->flags & TRACE_ARRAY_FL_GLOBAL)
+		return NULL;
+
+	/* All sub buffers have a descriptor */
+	return tr->dir;
+}
+
+>>>>>>> common/deprecated/android-3.18
 static struct dentry *tracing_dentry_percpu(struct trace_array *tr, int cpu)
 {
 	struct dentry *d_tracer;
@@ -6007,6 +6286,7 @@ static struct dentry *tracing_dentry_percpu(struct trace_array *tr, int cpu)
 	if (tr->percpu_dir)
 		return tr->percpu_dir;
 
+<<<<<<< HEAD
 	d_tracer = tracing_init_dentry_tr(tr);
 	if (!d_tracer)
 		return NULL;
@@ -6015,6 +6295,16 @@ static struct dentry *tracing_dentry_percpu(struct trace_array *tr, int cpu)
 
 	WARN_ONCE(!tr->percpu_dir,
 		  "Could not create debugfs directory 'per_cpu/%d'\n", cpu);
+=======
+	d_tracer = tracing_get_dentry(tr);
+	if (IS_ERR(d_tracer))
+		return NULL;
+
+	tr->percpu_dir = tracefs_create_dir("per_cpu", d_tracer);
+
+	WARN_ONCE(!tr->percpu_dir,
+		  "Could not create tracefs directory 'per_cpu/%d'\n", cpu);
+>>>>>>> common/deprecated/android-3.18
 
 	return tr->percpu_dir;
 }
@@ -6031,7 +6321,11 @@ trace_create_cpu_file(const char *name, umode_t mode, struct dentry *parent,
 }
 
 static void
+<<<<<<< HEAD
 tracing_init_debugfs_percpu(struct trace_array *tr, long cpu)
+=======
+tracing_init_tracefs_percpu(struct trace_array *tr, long cpu)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct dentry *d_percpu = tracing_dentry_percpu(tr, cpu);
 	struct dentry *d_cpu;
@@ -6041,9 +6335,15 @@ tracing_init_debugfs_percpu(struct trace_array *tr, long cpu)
 		return;
 
 	snprintf(cpu_dir, 30, "cpu%ld", cpu);
+<<<<<<< HEAD
 	d_cpu = debugfs_create_dir(cpu_dir, d_percpu);
 	if (!d_cpu) {
 		pr_warning("Could not create debugfs '%s' entry\n", cpu_dir);
+=======
+	d_cpu = tracefs_create_dir(cpu_dir, d_percpu);
+	if (!d_cpu) {
+		pr_warning("Could not create tracefs '%s' entry\n", cpu_dir);
+>>>>>>> common/deprecated/android-3.18
 		return;
 	}
 
@@ -6195,9 +6495,15 @@ struct dentry *trace_create_file(const char *name,
 {
 	struct dentry *ret;
 
+<<<<<<< HEAD
 	ret = debugfs_create_file(name, mode, parent, data, fops);
 	if (!ret)
 		pr_warning("Could not create debugfs '%s' entry\n", name);
+=======
+	ret = tracefs_create_file(name, mode, parent, data, fops);
+	if (!ret)
+		pr_warning("Could not create tracefs '%s' entry\n", name);
+>>>>>>> common/deprecated/android-3.18
 
 	return ret;
 }
@@ -6210,6 +6516,7 @@ static struct dentry *trace_options_init_dentry(struct trace_array *tr)
 	if (tr->options)
 		return tr->options;
 
+<<<<<<< HEAD
 	d_tracer = tracing_init_dentry_tr(tr);
 	if (!d_tracer)
 		return NULL;
@@ -6217,6 +6524,15 @@ static struct dentry *trace_options_init_dentry(struct trace_array *tr)
 	tr->options = debugfs_create_dir("options", d_tracer);
 	if (!tr->options) {
 		pr_warning("Could not create debugfs directory 'options'\n");
+=======
+	d_tracer = tracing_get_dentry(tr);
+	if (IS_ERR(d_tracer))
+		return NULL;
+
+	tr->options = tracefs_create_dir("options", d_tracer);
+	if (!tr->options) {
+		pr_warning("Could not create tracefs directory 'options'\n");
+>>>>>>> common/deprecated/android-3.18
 		return NULL;
 	}
 
@@ -6285,7 +6601,11 @@ destroy_trace_option_files(struct trace_option_dentry *topts)
 		return;
 
 	for (cnt = 0; topts[cnt].opt; cnt++)
+<<<<<<< HEAD
 		debugfs_remove(topts[cnt].entry);
+=======
+		tracefs_remove(topts[cnt].entry);
+>>>>>>> common/deprecated/android-3.18
 
 	kfree(topts);
 }
@@ -6346,7 +6666,13 @@ rb_simple_write(struct file *filp, const char __user *ubuf,
 
 	if (buffer) {
 		mutex_lock(&trace_types_lock);
+<<<<<<< HEAD
 		if (val) {
+=======
+		if (!!val == tracer_tracing_is_on(tr)) {
+			val = 0; /* do nothing */
+		} else if (val) {
+>>>>>>> common/deprecated/android-3.18
 			tracer_tracing_on(tr);
 			if (tr->current_trace->start)
 				tr->current_trace->start(tr);
@@ -6374,7 +6700,11 @@ static const struct file_operations rb_simple_fops = {
 struct dentry *trace_instance_dir;
 
 static void
+<<<<<<< HEAD
 init_tracer_debugfs(struct trace_array *tr, struct dentry *d_tracer);
+=======
+init_tracer_tracefs(struct trace_array *tr, struct dentry *d_tracer);
+>>>>>>> common/deprecated/android-3.18
 
 static int
 allocate_trace_buffer(struct trace_array *tr, struct trace_buffer *buf, int size)
@@ -6392,6 +6722,10 @@ allocate_trace_buffer(struct trace_array *tr, struct trace_buffer *buf, int size
 	buf->data = alloc_percpu(struct trace_array_cpu);
 	if (!buf->data) {
 		ring_buffer_free(buf->buffer);
+<<<<<<< HEAD
+=======
+		buf->buffer = NULL;
+>>>>>>> common/deprecated/android-3.18
 		return -ENOMEM;
 	}
 
@@ -6415,7 +6749,13 @@ static int allocate_trace_buffers(struct trace_array *tr, int size)
 				    allocate_snapshot ? size : 1);
 	if (WARN_ON(ret)) {
 		ring_buffer_free(tr->trace_buffer.buffer);
+<<<<<<< HEAD
 		free_percpu(tr->trace_buffer.data);
+=======
+		tr->trace_buffer.buffer = NULL;
+		free_percpu(tr->trace_buffer.data);
+		tr->trace_buffer.data = NULL;
+>>>>>>> common/deprecated/android-3.18
 		return -ENOMEM;
 	}
 	tr->allocated_snapshot = allocate_snapshot;
@@ -6426,6 +6766,22 @@ static int allocate_trace_buffers(struct trace_array *tr, int size)
 	 */
 	allocate_snapshot = false;
 #endif
+<<<<<<< HEAD
+=======
+
+	/*
+	 * Because of some magic with the way alloc_percpu() works on
+	 * x86_64, we need to synchronize the pgd of all the tables,
+	 * otherwise the trace events that happen in x86_64 page fault
+	 * handlers can't cope with accessing the chance that a
+	 * alloc_percpu()'d memory might be touched in the page fault trace
+	 * event. Oh, and we need to audit all other alloc_percpu() and vmalloc()
+	 * calls in tracing, because something might get triggered within a
+	 * page fault trace event!
+	 */
+	vmalloc_sync_mappings();
+
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -6451,7 +6807,11 @@ static void free_trace_buffers(struct trace_array *tr)
 #endif
 }
 
+<<<<<<< HEAD
 static int new_instance_create(const char *name)
+=======
+static int instance_mkdir(const char *name)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct trace_array *tr;
 	int ret;
@@ -6490,17 +6850,29 @@ static int new_instance_create(const char *name)
 	if (allocate_trace_buffers(tr, trace_buf_size) < 0)
 		goto out_free_tr;
 
+<<<<<<< HEAD
 	tr->dir = debugfs_create_dir(name, trace_instance_dir);
+=======
+	tr->dir = tracefs_create_dir(name, trace_instance_dir);
+>>>>>>> common/deprecated/android-3.18
 	if (!tr->dir)
 		goto out_free_tr;
 
 	ret = event_trace_add_tracer(tr->dir, tr);
 	if (ret) {
+<<<<<<< HEAD
 		debugfs_remove_recursive(tr->dir);
 		goto out_free_tr;
 	}
 
 	init_tracer_debugfs(tr, tr->dir);
+=======
+		tracefs_remove_recursive(tr->dir);
+		goto out_free_tr;
+	}
+
+	init_tracer_tracefs(tr, tr->dir);
+>>>>>>> common/deprecated/android-3.18
 
 	list_add(&tr->list, &ftrace_trace_arrays);
 
@@ -6521,7 +6893,11 @@ static int new_instance_create(const char *name)
 
 }
 
+<<<<<<< HEAD
 static int instance_delete(const char *name)
+=======
+static int instance_rmdir(const char *name)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct trace_array *tr;
 	int found = 0;
@@ -6548,9 +6924,16 @@ static int instance_delete(const char *name)
 	tracing_set_nop(tr);
 	event_trace_del_tracer(tr);
 	ftrace_destroy_function_files(tr);
+<<<<<<< HEAD
 	debugfs_remove_recursive(tr->dir);
 	free_trace_buffers(tr);
 
+=======
+	tracefs_remove_recursive(tr->dir);
+	free_trace_buffers(tr);
+
+	free_cpumask_var(tr->tracing_cpumask);
+>>>>>>> common/deprecated/android-3.18
 	kfree(tr->name);
 	kfree(tr);
 
@@ -6562,6 +6945,7 @@ static int instance_delete(const char *name)
 	return ret;
 }
 
+<<<<<<< HEAD
 static int instance_mkdir (struct inode *inode, struct dentry *dentry, umode_t mode)
 {
 	struct dentry *parent;
@@ -6638,6 +7022,19 @@ static __init void create_trace_instances(struct dentry *d_tracer)
 
 static void
 init_tracer_debugfs(struct trace_array *tr, struct dentry *d_tracer)
+=======
+static __init void create_trace_instances(struct dentry *d_tracer)
+{
+	trace_instance_dir = tracefs_create_instance_dir("instances", d_tracer,
+							 instance_mkdir,
+							 instance_rmdir);
+	if (WARN_ON(!trace_instance_dir))
+		return;
+}
+
+static void
+init_tracer_tracefs(struct trace_array *tr, struct dentry *d_tracer)
+>>>>>>> common/deprecated/android-3.18
 {
 	int cpu;
 
@@ -6694,21 +7091,92 @@ init_tracer_debugfs(struct trace_array *tr, struct dentry *d_tracer)
 #endif
 
 	for_each_tracing_cpu(cpu)
+<<<<<<< HEAD
 		tracing_init_debugfs_percpu(tr, cpu);
 
 }
 
 static __init int tracer_init_debugfs(void)
+=======
+		tracing_init_tracefs_percpu(tr, cpu);
+
+}
+
+static struct vfsmount *trace_automount(void *ingore)
+{
+	struct vfsmount *mnt;
+	struct file_system_type *type;
+
+	/*
+	 * To maintain backward compatibility for tools that mount
+	 * debugfs to get to the tracing facility, tracefs is automatically
+	 * mounted to the debugfs/tracing directory.
+	 */
+	type = get_fs_type("tracefs");
+	if (!type)
+		return NULL;
+	mnt = vfs_kern_mount(type, 0, "tracefs", NULL);
+	put_filesystem(type);
+	if (IS_ERR(mnt))
+		return NULL;
+	mntget(mnt);
+
+	return mnt;
+}
+
+/**
+ * tracing_init_dentry - initialize top level trace array
+ *
+ * This is called when creating files or directories in the tracing
+ * directory. It is called via fs_initcall() by any of the boot up code
+ * and expects to return the dentry of the top level tracing directory.
+ */
+struct dentry *tracing_init_dentry(void)
+{
+	struct trace_array *tr = &global_trace;
+
+	/* The top level trace array uses  NULL as parent */
+	if (tr->dir)
+		return NULL;
+
+	if (WARN_ON(!debugfs_initialized()))
+		return ERR_PTR(-ENODEV);
+
+	/*
+	 * As there may still be users that expect the tracing
+	 * files to exist in debugfs/tracing, we must automount
+	 * the tracefs file system there, so older tools still
+	 * work with the newer kerenl.
+	 */
+	tr->dir = debugfs_create_automount("tracing", NULL,
+					   trace_automount, NULL);
+	if (!tr->dir) {
+		pr_warn_once("Could not create debugfs directory 'tracing'\n");
+		return ERR_PTR(-ENOMEM);
+	}
+
+	return NULL;
+}
+
+static __init int tracer_init_tracefs(void)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct dentry *d_tracer;
 
 	trace_access_lock_init();
 
 	d_tracer = tracing_init_dentry();
+<<<<<<< HEAD
 	if (!d_tracer)
 		return 0;
 
 	init_tracer_debugfs(&global_trace, d_tracer);
+=======
+	if (IS_ERR(d_tracer))
+		return 0;
+
+	init_tracer_tracefs(&global_trace, d_tracer);
+>>>>>>> common/deprecated/android-3.18
 
 	trace_create_file("tracing_thresh", 0644, d_tracer,
 			&global_trace, &tracing_thresh_fops);
@@ -6890,12 +7358,17 @@ void ftrace_dump(enum ftrace_dump_mode oops_dump_mode)
 
 		cnt++;
 
+<<<<<<< HEAD
 		/* reset all but tr, trace, and overruns */
 		memset(&iter.seq, 0,
 		       sizeof(struct trace_iterator) -
 		       offsetof(struct trace_iterator, seq));
 		iter.iter_flags |= TRACE_FILE_LAT_FMT;
 		iter.pos = -1;
+=======
+		trace_iterator_reset(&iter);
+		iter.iter_flags |= TRACE_FILE_LAT_FMT;
+>>>>>>> common/deprecated/android-3.18
 
 		if (trace_find_next_entry_inc(&iter) != NULL) {
 			int ret;
@@ -6930,7 +7403,10 @@ __init static int tracer_alloc_buffers(void)
 	int ring_buf_size;
 	int ret = -ENOMEM;
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (!alloc_cpumask_var(&tracing_buffer_mask, GFP_KERNEL))
 		goto out;
 
@@ -6938,7 +7414,11 @@ __init static int tracer_alloc_buffers(void)
 		goto out_free_buffer_mask;
 
 	/* Only allocate trace_printk buffers if a trace_printk exists */
+<<<<<<< HEAD
 	if (__stop___trace_bprintk_fmt != __start___trace_bprintk_fmt)
+=======
+	if (&__stop___trace_bprintk_fmt != &__start___trace_bprintk_fmt)
+>>>>>>> common/deprecated/android-3.18
 		/* Must be called before global_trace.buffer is allocated */
 		trace_printk_init_buffers();
 
@@ -7028,6 +7508,16 @@ out:
 	return ret;
 }
 
+<<<<<<< HEAD
+=======
+void __init trace_init(void)
+{
+	tracer_alloc_buffers();
+	init_ftrace_syscalls();
+	trace_event_init();	
+}
+
+>>>>>>> common/deprecated/android-3.18
 __init static int clear_boot_tracer(void)
 {
 	/*
@@ -7047,6 +7537,10 @@ __init static int clear_boot_tracer(void)
 	return 0;
 }
 
+<<<<<<< HEAD
 early_initcall(tracer_alloc_buffers);
 fs_initcall(tracer_init_debugfs);
+=======
+fs_initcall(tracer_init_tracefs);
+>>>>>>> common/deprecated/android-3.18
 late_initcall(clear_boot_tracer);

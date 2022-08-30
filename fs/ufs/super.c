@@ -118,7 +118,11 @@ static struct inode *ufs_nfs_get_inode(struct super_block *sb, u64 ino, u32 gene
 	struct ufs_sb_private_info *uspi = UFS_SB(sb)->s_uspi;
 	struct inode *inode;
 
+<<<<<<< HEAD
 	if (ino < UFS_ROOTINO || ino > uspi->s_ncg * uspi->s_ipg)
+=======
+	if (ino < UFS_ROOTINO || ino > (u64)uspi->s_ncg * uspi->s_ipg)
+>>>>>>> common/deprecated/android-3.18
 		return ERR_PTR(-ESTALE);
 
 	inode = ufs_iget(sb, ino);
@@ -698,6 +702,10 @@ static int ufs_sync_fs(struct super_block *sb, int wait)
 	unsigned flags;
 
 	lock_ufs(sb);
+<<<<<<< HEAD
+=======
+	mutex_lock(&UFS_SB(sb)->s_lock);
+>>>>>>> common/deprecated/android-3.18
 
 	UFSD("ENTER\n");
 
@@ -715,6 +723,10 @@ static int ufs_sync_fs(struct super_block *sb, int wait)
 	ufs_put_cstotal(sb);
 
 	UFSD("EXIT\n");
+<<<<<<< HEAD
+=======
+	mutex_unlock(&UFS_SB(sb)->s_lock);
+>>>>>>> common/deprecated/android-3.18
 	unlock_ufs(sb);
 
 	return 0;
@@ -766,6 +778,26 @@ static void ufs_put_super(struct super_block *sb)
 	return;
 }
 
+<<<<<<< HEAD
+=======
+static u64 ufs_max_bytes(struct super_block *sb)
+{
+	struct ufs_sb_private_info *uspi = UFS_SB(sb)->s_uspi;
+	int bits = uspi->s_apbshift;
+	u64 res;
+
+	if (bits > 21)
+		res = ~0ULL;
+	else
+		res = UFS_NDADDR + (1LL << bits) + (1LL << (2*bits)) +
+			(1LL << (3*bits));
+
+	if (res >= (MAX_LFS_FILESIZE >> uspi->s_bshift))
+		return MAX_LFS_FILESIZE;
+	return res << uspi->s_bshift;
+}
+
+>>>>>>> common/deprecated/android-3.18
 static int ufs_fill_super(struct super_block *sb, void *data, int silent)
 {
 	struct ufs_sb_info * sbi;
@@ -803,6 +835,10 @@ static int ufs_fill_super(struct super_block *sb, void *data, int silent)
 	UFSD("flag %u\n", (int)(sb->s_flags & MS_RDONLY));
 	
 	mutex_init(&sbi->mutex);
+<<<<<<< HEAD
+=======
+	mutex_init(&sbi->s_lock);
+>>>>>>> common/deprecated/android-3.18
 	spin_lock_init(&sbi->work_lock);
 	INIT_DELAYED_WORK(&sbi->sync_work, delayed_sync_fs);
 	/*
@@ -1232,6 +1268,10 @@ magic_found:
 			    "fast symlink size (%u)\n", uspi->s_maxsymlinklen);
 		uspi->s_maxsymlinklen = maxsymlen;
 	}
+<<<<<<< HEAD
+=======
+	sb->s_maxbytes = ufs_max_bytes(sb);
+>>>>>>> common/deprecated/android-3.18
 	sb->s_max_links = UFS_LINK_MAX;
 
 	inode = ufs_iget(sb, UFS_ROOTINO);
@@ -1281,6 +1321,10 @@ static int ufs_remount (struct super_block *sb, int *mount_flags, char *data)
 
 	sync_filesystem(sb);
 	lock_ufs(sb);
+<<<<<<< HEAD
+=======
+	mutex_lock(&UFS_SB(sb)->s_lock);
+>>>>>>> common/deprecated/android-3.18
 	uspi = UFS_SB(sb)->s_uspi;
 	flags = UFS_SB(sb)->s_flags;
 	usb1 = ubh_get_usb_first(uspi);
@@ -1294,6 +1338,10 @@ static int ufs_remount (struct super_block *sb, int *mount_flags, char *data)
 	new_mount_opt = 0;
 	ufs_set_opt (new_mount_opt, ONERROR_LOCK);
 	if (!ufs_parse_options (data, &new_mount_opt)) {
+<<<<<<< HEAD
+=======
+		mutex_unlock(&UFS_SB(sb)->s_lock);
+>>>>>>> common/deprecated/android-3.18
 		unlock_ufs(sb);
 		return -EINVAL;
 	}
@@ -1301,12 +1349,20 @@ static int ufs_remount (struct super_block *sb, int *mount_flags, char *data)
 		new_mount_opt |= ufstype;
 	} else if ((new_mount_opt & UFS_MOUNT_UFSTYPE) != ufstype) {
 		pr_err("ufstype can't be changed during remount\n");
+<<<<<<< HEAD
+=======
+		mutex_unlock(&UFS_SB(sb)->s_lock);
+>>>>>>> common/deprecated/android-3.18
 		unlock_ufs(sb);
 		return -EINVAL;
 	}
 
 	if ((*mount_flags & MS_RDONLY) == (sb->s_flags & MS_RDONLY)) {
 		UFS_SB(sb)->s_mount_opt = new_mount_opt;
+<<<<<<< HEAD
+=======
+		mutex_unlock(&UFS_SB(sb)->s_lock);
+>>>>>>> common/deprecated/android-3.18
 		unlock_ufs(sb);
 		return 0;
 	}
@@ -1330,6 +1386,10 @@ static int ufs_remount (struct super_block *sb, int *mount_flags, char *data)
 	 */
 #ifndef CONFIG_UFS_FS_WRITE
 		pr_err("ufs was compiled with read-only support, can't be mounted as read-write\n");
+<<<<<<< HEAD
+=======
+		mutex_unlock(&UFS_SB(sb)->s_lock);
+>>>>>>> common/deprecated/android-3.18
 		unlock_ufs(sb);
 		return -EINVAL;
 #else
@@ -1339,11 +1399,19 @@ static int ufs_remount (struct super_block *sb, int *mount_flags, char *data)
 		    ufstype != UFS_MOUNT_UFSTYPE_SUNx86 &&
 		    ufstype != UFS_MOUNT_UFSTYPE_UFS2) {
 			pr_err("this ufstype is read-only supported\n");
+<<<<<<< HEAD
+=======
+			mutex_unlock(&UFS_SB(sb)->s_lock);
+>>>>>>> common/deprecated/android-3.18
 			unlock_ufs(sb);
 			return -EINVAL;
 		}
 		if (!ufs_read_cylinder_structures(sb)) {
 			pr_err("failed during remounting\n");
+<<<<<<< HEAD
+=======
+			mutex_unlock(&UFS_SB(sb)->s_lock);
+>>>>>>> common/deprecated/android-3.18
 			unlock_ufs(sb);
 			return -EPERM;
 		}
@@ -1351,6 +1419,10 @@ static int ufs_remount (struct super_block *sb, int *mount_flags, char *data)
 #endif
 	}
 	UFS_SB(sb)->s_mount_opt = new_mount_opt;
+<<<<<<< HEAD
+=======
+	mutex_unlock(&UFS_SB(sb)->s_lock);
+>>>>>>> common/deprecated/android-3.18
 	unlock_ufs(sb);
 	return 0;
 }

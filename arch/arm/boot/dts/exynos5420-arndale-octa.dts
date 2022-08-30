@@ -372,3 +372,10 @@
 &usbdrd_dwc3_1 {
 	dr_mode = "host";
 };
+<<<<<<< HEAD
+=======
+
+&cci {
+	status = "disabled";
+};
+>>>>>>> common/deprecated/android-3.18

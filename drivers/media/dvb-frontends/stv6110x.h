@@ -53,7 +53,11 @@ struct stv6110x_devctl {
 };
 
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_STV6110x)
+=======
+#if IS_REACHABLE(CONFIG_DVB_STV6110x)
+>>>>>>> common/deprecated/android-3.18
 
 extern struct stv6110x_devctl *stv6110x_attach(struct dvb_frontend *fe,
 					       const struct stv6110x_config *config,

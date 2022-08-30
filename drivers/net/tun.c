@@ -1,7 +1,10 @@
 /*
  *  TUN - Universal TUN/TAP device driver.
  *  Copyright (C) 1999-2002 Maxim Krasnyansky <maxk@qualcomm.com>
+<<<<<<< HEAD
  *  Copyright (c) 2015 Samsung Electronics Co., Ltd.
+=======
+>>>>>>> common/deprecated/android-3.18
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -34,6 +37,7 @@
  *  Daniel Podlejski <underley@underley.eu.org>
  *    Modifications for 2.3.99-pre5 kernel.
  */
+<<<<<<< HEAD
 /*
  *  Changes:
  *  KwnagHyun Kim <kh0304.kim@samsung.com> 2015/07/08
@@ -42,6 +46,8 @@
  *    Add codes to share UID/PID information
  *
  */
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 
@@ -80,6 +86,7 @@
 #include <net/rtnetlink.h>
 #include <net/sock.h>
 #include <linux/seq_file.h>
+<<<<<<< HEAD
 // ------------- START of KNOX_VPN ------------------//
 #include <linux/types.h>
 #include <linux/udp.h>
@@ -90,6 +97,16 @@
 #define META_MARK_BASE_LOWER 100
 #define META_MARK_BASE_UPPER 500
 // ------------- END of KNOX_VPN -------------------//
+=======
+#include <net/ieee802154.h>
+#include <linux/if_ltalk.h>
+#include <uapi/linux/if_fddi.h>
+#include <uapi/linux/if_hippi.h>
+#include <uapi/linux/if_fc.h>
+#include <net/ax25.h>
+#include <net/rose.h>
+#include <net/6lowpan.h>
+>>>>>>> common/deprecated/android-3.18
 
 #include <asm/uaccess.h>
 
@@ -124,6 +141,7 @@ do {								\
 
 #define GOODCOPY_LEN 128
 
+<<<<<<< HEAD
 // ------------- START of KNOX_VPN ------------------//
 /* The KNOX framework marks packets intended to a VPN client for special processing differently.
  * The marked packets hit special IP table rules and are routed back to user space using the TUN driver
@@ -146,6 +164,8 @@ struct knox_meta_param {
 #define TUN_META_MARK_OFFSET offsetof(struct knox_meta_param, uid)
 // ------------- END of KNOX_VPN -------------------//
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #define FLT_EXACT_COUNT 8
 struct tap_filter {
 	unsigned int    count;    /* Number of addrs. Zero means disabled */
@@ -540,11 +560,19 @@ static void tun_detach_all(struct net_device *dev)
 	for (i = 0; i < n; i++) {
 		tfile = rtnl_dereference(tun->tfiles[i]);
 		BUG_ON(!tfile);
+<<<<<<< HEAD
+=======
+		tfile->socket.sk->sk_shutdown = RCV_SHUTDOWN;
+>>>>>>> common/deprecated/android-3.18
 		tfile->socket.sk->sk_data_ready(tfile->socket.sk);
 		RCU_INIT_POINTER(tfile->tun, NULL);
 		--tun->numqueues;
 	}
 	list_for_each_entry(tfile, &tun->disabled, next) {
+<<<<<<< HEAD
+=======
+		tfile->socket.sk->sk_shutdown = RCV_SHUTDOWN;
+>>>>>>> common/deprecated/android-3.18
 		tfile->socket.sk->sk_data_ready(tfile->socket.sk);
 		RCU_INIT_POINTER(tfile->tun, NULL);
 	}
@@ -568,7 +596,12 @@ static void tun_detach_all(struct net_device *dev)
 		module_put(THIS_MODULE);
 }
 
+<<<<<<< HEAD
 static int tun_attach(struct tun_struct *tun, struct file *file, bool skip_filter)
+=======
+static int tun_attach(struct tun_struct *tun, struct file *file,
+		      bool skip_filter, bool publish_tun)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct tun_file *tfile = file->private_data;
 	int err;
@@ -599,7 +632,13 @@ static int tun_attach(struct tun_struct *tun, struct file *file, bool skip_filte
 			goto out;
 	}
 	tfile->queue_index = tun->numqueues;
+<<<<<<< HEAD
 	rcu_assign_pointer(tfile->tun, tun);
+=======
+	tfile->socket.sk->sk_shutdown &= ~RCV_SHUTDOWN;
+	if (publish_tun)
+		rcu_assign_pointer(tfile->tun, tun);
+>>>>>>> common/deprecated/android-3.18
 	rcu_assign_pointer(tun->tfiles[tun->numqueues], tfile);
 	tun->numqueues++;
 
@@ -972,7 +1011,10 @@ static void tun_net_init(struct net_device *dev)
 		/* Zero header length */
 		dev->type = ARPHRD_NONE;
 		dev->flags = IFF_POINTOPOINT | IFF_NOARP | IFF_MULTICAST;
+<<<<<<< HEAD
 		dev->tx_queue_len = TUN_READQ_SIZE;  /* We prefer our own queue length */
+=======
+>>>>>>> common/deprecated/android-3.18
 		break;
 
 	case TUN_TAP_DEV:
@@ -984,7 +1026,10 @@ static void tun_net_init(struct net_device *dev)
 
 		eth_hw_addr_random(dev);
 
+<<<<<<< HEAD
 		dev->tx_queue_len = TUN_READQ_SIZE;  /* We prefer our own queue length */
+=======
+>>>>>>> common/deprecated/android-3.18
 		break;
 	}
 }
@@ -1204,7 +1249,11 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
 			}
 			skb_shinfo(skb)->gso_type = SKB_GSO_UDP;
 			if (skb->protocol == htons(ETH_P_IPV6))
+<<<<<<< HEAD
 				ipv6_proxy_select_ident(skb);
+=======
+				ipv6_proxy_select_ident(dev_net(skb->dev), skb);
+>>>>>>> common/deprecated/android-3.18
 			break;
 		}
 		default:
@@ -1267,6 +1316,7 @@ static ssize_t tun_chr_aio_write(struct kiocb *iocb, const struct iovec *iv,
 	return result;
 }
 
+<<<<<<< HEAD
 // ------------- START of KNOX_VPN ------------------//
 
 /* KNOX VPN packets have extra bytes because they carry meta information by default
@@ -1328,6 +1378,8 @@ static int knoxvpn_process_uidpid(struct tun_struct *tun, struct sk_buff *skb,
 
 // ------------- END of KNOX_VPN ------------------//
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /* Put packet to the user space buffer */
 static ssize_t tun_put_user(struct tun_struct *tun,
 			    struct tun_file *tfile,
@@ -1407,12 +1459,15 @@ static ssize_t tun_put_user(struct tun_struct *tun,
 		total += vnet_hdr_sz;
 	}
 
+<<<<<<< HEAD
 // ------------- START of KNOX_VPN ------------------//
 	if (knoxvpn_process_uidpid(tun, skb, iv, &len, &total) < 0) {
 		return -EINVAL;
 	}
 // ------------- END of KNOX_VPN ------------------//
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	copied = total;
 	len = min_t(int, skb->len + vlan_hlen, len);
 	total += skb->len + vlan_hlen;
@@ -1464,9 +1519,12 @@ static ssize_t tun_do_read(struct tun_struct *tun, struct tun_file *tfile,
 	if (!len)
 		return ret;
 
+<<<<<<< HEAD
 	if (tun->dev->reg_state != NETREG_REGISTERED)
 		return -EIO;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* Read frames from queue */
 	skb = __skb_recv_datagram(tfile->socket.sk, noblock ? MSG_DONTWAIT : 0,
 				  &peeked, &off, &err);
@@ -1524,6 +1582,11 @@ static void tun_setup(struct net_device *dev)
 
 	dev->ethtool_ops = &tun_ethtool_ops;
 	dev->destructor = tun_free_netdev;
+<<<<<<< HEAD
+=======
+	/* We prefer our own queue length */
+	dev->tx_queue_len = TUN_READQ_SIZE;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /* Trivial set of netlink ops to allow deleting tun or tap
@@ -1531,7 +1594,13 @@ static void tun_setup(struct net_device *dev)
  */
 static int tun_validate(struct nlattr *tb[], struct nlattr *data[])
 {
+<<<<<<< HEAD
 	return -EINVAL;
+=======
+	/* NL_SET_ERR_MSG(extack,
+		       "tun/tap creation via rtnetlink is not supported."); */
+	return -EOPNOTSUPP;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static struct rtnl_link_ops tun_link_ops __read_mostly = {
@@ -1631,6 +1700,7 @@ static int tun_flags(struct tun_struct *tun)
 {
 	int flags = 0;
 
+<<<<<<< HEAD
 // ------------- START of KNOX_VPN ------------------//
 	/* Checks if meta header is enabled so that
 	 * packets will be prepended with meta data(UID/PID)
@@ -1640,6 +1710,8 @@ static int tun_flags(struct tun_struct *tun)
 	}
 // ------------- END of KNOX_VPN -------------------//
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (tun->flags & TUN_TUN_DEV)
 		flags |= IFF_TUN;
 	else
@@ -1728,7 +1800,11 @@ static int tun_set_iff(struct net *net, struct file *file, struct ifreq *ifr)
 		if (err < 0)
 			return err;
 
+<<<<<<< HEAD
 		err = tun_attach(tun, file, ifr->ifr_flags & IFF_NOFILTER);
+=======
+		err = tun_attach(tun, file, ifr->ifr_flags & IFF_NOFILTER, true);
+>>>>>>> common/deprecated/android-3.18
 		if (err < 0)
 			return err;
 
@@ -1773,6 +1849,12 @@ static int tun_set_iff(struct net *net, struct file *file, struct ifreq *ifr)
 
 		if (!dev)
 			return -ENOMEM;
+<<<<<<< HEAD
+=======
+		err = dev_get_valid_name(net, dev, name);
+		if (err < 0)
+			goto err_free_dev;
+>>>>>>> common/deprecated/android-3.18
 
 		dev_net_set(dev, net);
 		dev->rtnl_link_ops = &tun_link_ops;
@@ -1805,13 +1887,24 @@ static int tun_set_iff(struct net *net, struct file *file, struct ifreq *ifr)
 				       NETIF_F_HW_VLAN_STAG_TX);
 
 		INIT_LIST_HEAD(&tun->disabled);
+<<<<<<< HEAD
 		err = tun_attach(tun, file, false);
+=======
+		err = tun_attach(tun, file, false, false);
+>>>>>>> common/deprecated/android-3.18
 		if (err < 0)
 			goto err_free_flow;
 
 		err = register_netdevice(tun->dev);
 		if (err < 0)
 			goto err_detach;
+<<<<<<< HEAD
+=======
+		/* free_netdev() won't check refcnt, to aovid race
+		 * with dev_put() we need publish tun after registration.
+		 */
+		rcu_assign_pointer(tfile->tun, tun);
+>>>>>>> common/deprecated/android-3.18
 
 		if (device_create_file(&tun->dev->dev, &dev_attr_tun_flags) ||
 		    device_create_file(&tun->dev->dev, &dev_attr_owner) ||
@@ -1823,6 +1916,7 @@ static int tun_set_iff(struct net *net, struct file *file, struct ifreq *ifr)
 
 	tun_debug(KERN_INFO, tun, "tun_set_iff\n");
 
+<<<<<<< HEAD
 // ------------- START of KNOX_VPN ------------------//
 	if (ifr->ifr_flags & IFF_META_HDR) {
 		tun->flags |= TUN_META_HDR;
@@ -1831,6 +1925,8 @@ static int tun_set_iff(struct net *net, struct file *file, struct ifreq *ifr)
 	}
 // ------------- END of KNOX_VPN -------------------//
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (ifr->ifr_flags & IFF_NO_PI)
 		tun->flags |= TUN_NO_PI;
 	else
@@ -1977,7 +2073,11 @@ static int tun_set_queue(struct file *file, struct ifreq *ifr)
 		ret = security_tun_dev_attach_queue(tun->security);
 		if (ret < 0)
 			goto unlock;
+<<<<<<< HEAD
 		ret = tun_attach(tun, file, false);
+=======
+		ret = tun_attach(tun, file, false, true);
+>>>>>>> common/deprecated/android-3.18
 	} else if (ifr->ifr_flags & IFF_DETACH_QUEUE) {
 		tun = rtnl_dereference(tfile->tun);
 		if (!tun || !(tun->flags & TUN_TAP_MQ) || tfile->detached)
@@ -1992,6 +2092,48 @@ unlock:
 	return ret;
 }
 
+<<<<<<< HEAD
+=======
+/* Return correct value for tun->dev->addr_len based on tun->dev->type. */
+static unsigned char tun_get_addr_len(unsigned short type)
+{
+	switch (type) {
+	case ARPHRD_IP6GRE:
+	case ARPHRD_TUNNEL6:
+		return sizeof(struct in6_addr);
+	case ARPHRD_IPGRE:
+	case ARPHRD_TUNNEL:
+	case ARPHRD_SIT:
+		return 4;
+	case ARPHRD_ETHER:
+		return ETH_ALEN;
+	case ARPHRD_IEEE802154:
+	case ARPHRD_IEEE802154_MONITOR:
+		return IEEE802154_EXTENDED_ADDR_LEN;
+	case ARPHRD_PHONET_PIPE:
+	case ARPHRD_PPP:
+	case ARPHRD_NONE:
+		return 0;
+	case ARPHRD_6LOWPAN:
+		return EUI64_ADDR_LEN;
+	case ARPHRD_FDDI:
+		return FDDI_K_ALEN;
+	case ARPHRD_HIPPI:
+		return HIPPI_ALEN;
+	case ARPHRD_IEEE802:
+		return FC_ALEN;
+	case ARPHRD_ROSE:
+		return ROSE_ADDR_LEN;
+	case ARPHRD_NETROM:
+		return AX25_ADDR_LEN;
+	case ARPHRD_LOCALTLK:
+		return LTALK_ALEN;
+	default:
+		return 0;
+	}
+}
+
+>>>>>>> common/deprecated/android-3.18
 static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
 			    unsigned long arg, int ifreq_len)
 {
@@ -2005,11 +2147,14 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
 	int vnet_hdr_sz;
 	unsigned int ifindex;
 	int ret;
+<<<<<<< HEAD
 // ------------- START of KNOX_VPN ------------------//
 	int knox_flag = 0;
 	int tun_meta_param;
 	int tun_meta_value;
 // ------------- END of KNOX_VPN -------------------//
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #ifdef CONFIG_ANDROID_PARANOID_NETWORK
 	if (cmd != TUNGETIFF && !capable(CAP_NET_ADMIN)) {
@@ -2027,6 +2172,7 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
 		/* Currently this just means: "what IFF flags are valid?".
 		 * This is needed because we never checked for invalid flags on
 		 * TUNSETIFF. */
+<<<<<<< HEAD
 
 // ------------- START of KNOX_VPN ------------------//
 		knox_flag |= IFF_META_HDR;
@@ -2034,6 +2180,11 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
 				IFF_VNET_HDR | IFF_MULTI_QUEUE | knox_flag,
 				(unsigned int __user*)argp);
 // ------------- END of KNOX_VPN -------------------//
+=======
+		return put_user(IFF_TUN | IFF_TAP | IFF_NO_PI | IFF_ONE_QUEUE |
+				IFF_VNET_HDR | IFF_MULTI_QUEUE,
+				(unsigned int __user*)argp);
+>>>>>>> common/deprecated/android-3.18
 	} else if (cmd == TUNSETQUEUE)
 		return tun_set_queue(file, &ifr);
 
@@ -2144,6 +2295,10 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
 			ret = -EBUSY;
 		} else {
 			tun->dev->type = (int) arg;
+<<<<<<< HEAD
+=======
+			tun->dev->addr_len = tun_get_addr_len(tun->dev->type);
+>>>>>>> common/deprecated/android-3.18
 			tun_debug(KERN_INFO, tun, "linktype set to %d\n",
 				  tun->dev->type);
 			ret = 0;
@@ -2194,6 +2349,13 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
 			ret = -EFAULT;
 			break;
 		}
+<<<<<<< HEAD
+=======
+		if (sndbuf <= 0) {
+			ret = -EINVAL;
+			break;
+		}
+>>>>>>> common/deprecated/android-3.18
 
 		tun->sndbuf = sndbuf;
 		tun_set_sndbuf(tun);
@@ -2218,6 +2380,7 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
 		tun->vnet_hdr_sz = vnet_hdr_sz;
 		break;
 
+<<<<<<< HEAD
 // ------------- START of KNOX_VPN ------------------//
 	case TUNGETMETAPARAM:
 
@@ -2250,6 +2413,8 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
 		break;
 // ------------- END of KNOX_VPN -------------------//
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	case TUNATTACHFILTER:
 		/* Can be set only for TAPs */
 		ret = -EINVAL;

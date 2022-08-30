@@ -195,7 +195,11 @@ static void parport_detach(struct parport *port)
 	struct pps_client_pp *device;
 
 	/* FIXME: oooh, this is ugly! */
+<<<<<<< HEAD
 	if (strcmp(pardev->name, KBUILD_MODNAME))
+=======
+	if (!pardev || strcmp(pardev->name, KBUILD_MODNAME))
+>>>>>>> common/deprecated/android-3.18
 		/* not our port */
 		return;
 

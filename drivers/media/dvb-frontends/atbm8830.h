@@ -61,7 +61,11 @@ struct atbm8830_config {
 	u8 agc_hold_loop;
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_ATBM8830)
+=======
+#if IS_REACHABLE(CONFIG_DVB_ATBM8830)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend *atbm8830_attach(const struct atbm8830_config *config,
 		struct i2c_adapter *i2c);
 #else

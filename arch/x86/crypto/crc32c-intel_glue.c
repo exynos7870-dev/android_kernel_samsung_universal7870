@@ -59,16 +59,22 @@
 asmlinkage unsigned int crc_pcl(const u8 *buffer, int len,
 				unsigned int crc_init);
 static int crc32c_pcl_breakeven = CRC32C_PCL_BREAKEVEN_EAGERFPU;
+<<<<<<< HEAD
 #if defined(X86_FEATURE_EAGER_FPU)
+=======
+>>>>>>> common/deprecated/android-3.18
 #define set_pcl_breakeven_point()					\
 do {									\
 	if (!use_eager_fpu())						\
 		crc32c_pcl_breakeven = CRC32C_PCL_BREAKEVEN_NOEAGERFPU;	\
 } while (0)
+<<<<<<< HEAD
 #else
 #define set_pcl_breakeven_point()					\
 	(crc32c_pcl_breakeven = CRC32C_PCL_BREAKEVEN_NOEAGERFPU)
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 #endif /* CONFIG_X86_64 */
 
 static u32 crc32c_intel_le_hw_byte(u32 crc, unsigned char const *data, size_t length)

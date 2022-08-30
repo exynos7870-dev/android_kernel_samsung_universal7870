@@ -2564,6 +2564,12 @@ static int pxa_udc_suspend(struct platform_device *_dev, pm_message_t state)
 	udc->pullup_resume = udc->pullup_on;
 	dplus_pullup(udc, 0);
 
+<<<<<<< HEAD
+=======
+	if (udc->driver)
+		udc->driver->disconnect(&udc->gadget);
+
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 

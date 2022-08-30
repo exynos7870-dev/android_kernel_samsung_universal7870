@@ -33,7 +33,11 @@
 	662: __ASM_CLAC ;						\
 	.popsection ;							\
 	.pushsection .altinstructions, "a" ;				\
+<<<<<<< HEAD
 	altinstruction_entry 661b, 662b, X86_FEATURE_SMAP, 3, 3 ;	\
+=======
+	altinstruction_entry 661b, 662b, X86_FEATURE_SMAP, 3, 3, 0 ;	\
+>>>>>>> common/deprecated/android-3.18
 	.popsection
 
 #define ASM_STAC							\
@@ -42,7 +46,11 @@
 	662: __ASM_STAC ;						\
 	.popsection ;							\
 	.pushsection .altinstructions, "a" ;				\
+<<<<<<< HEAD
 	altinstruction_entry 661b, 662b, X86_FEATURE_SMAP, 3, 3 ;	\
+=======
+	altinstruction_entry 661b, 662b, X86_FEATURE_SMAP, 3, 3, 0 ;	\
+>>>>>>> common/deprecated/android-3.18
 	.popsection
 
 #else /* CONFIG_X86_SMAP */

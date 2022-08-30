@@ -114,6 +114,7 @@ static int service_tx_status_request(
 		}
 
 		is_in = epnum & USB_DIR_IN;
+<<<<<<< HEAD
 		if (is_in) {
 			epnum &= 0x0f;
 			ep = &musb->endpoints[epnum].ep_in;
@@ -123,6 +124,21 @@ static int service_tx_status_request(
 		regs = musb->endpoints[epnum].regs;
 
 		if (epnum >= MUSB_C_NUM_EPS || !ep->desc) {
+=======
+		epnum &= 0x0f;
+		if (epnum >= MUSB_C_NUM_EPS) {
+			handled = -EINVAL;
+			break;
+		}
+
+		if (is_in)
+			ep = &musb->endpoints[epnum].ep_in;
+		else
+			ep = &musb->endpoints[epnum].ep_out;
+		regs = musb->endpoints[epnum].regs;
+
+		if (!ep->desc) {
+>>>>>>> common/deprecated/android-3.18
 			handled = -EINVAL;
 			break;
 		}

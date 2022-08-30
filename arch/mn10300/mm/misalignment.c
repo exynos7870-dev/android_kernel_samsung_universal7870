@@ -437,7 +437,11 @@ transfer_failed:
 
 	info.si_signo	= SIGSEGV;
 	info.si_errno	= 0;
+<<<<<<< HEAD
 	info.si_code	= 0;
+=======
+	info.si_code	= SEGV_MAPERR;
+>>>>>>> common/deprecated/android-3.18
 	info.si_addr	= (void *) regs->pc;
 	force_sig_info(SIGSEGV, &info, current);
 	return;

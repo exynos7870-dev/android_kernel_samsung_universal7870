@@ -153,7 +153,10 @@ obj-$(CONFIG_SENSORS_W83L785TS)	+= w83l785ts.o
 obj-$(CONFIG_SENSORS_W83L786NG)	+= w83l786ng.o
 obj-$(CONFIG_SENSORS_WM831X)	+= wm831x-hwmon.o
 obj-$(CONFIG_SENSORS_WM8350)	+= wm8350-hwmon.o
+<<<<<<< HEAD
 obj-$(CONFIG_SENSORS_SEC_THERMISTOR)	+= sec_thermistor.o
+=======
+>>>>>>> common/deprecated/android-3.18
 
 obj-$(CONFIG_PMBUS)		+= pmbus/
 

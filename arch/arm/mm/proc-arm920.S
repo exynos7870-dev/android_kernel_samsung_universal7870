@@ -448,7 +448,11 @@ arm920_crval:
 
 	.align
 
+<<<<<<< HEAD
 	.section ".proc.info.init", #alloc, #execinstr
+=======
+	.section ".proc.info.init", #alloc
+>>>>>>> common/deprecated/android-3.18
 
 	.type	__arm920_proc_info,#object
 __arm920_proc_info:
@@ -464,7 +468,11 @@ __arm920_proc_info:
 		PMD_BIT4 | \
 		PMD_SECT_AP_WRITE | \
 		PMD_SECT_AP_READ
+<<<<<<< HEAD
 	b	__arm920_setup
+=======
+	initfn	__arm920_setup, __arm920_proc_info
+>>>>>>> common/deprecated/android-3.18
 	.long	cpu_arch_name
 	.long	cpu_elf_name
 	.long	HWCAP_SWP | HWCAP_HALF | HWCAP_THUMB

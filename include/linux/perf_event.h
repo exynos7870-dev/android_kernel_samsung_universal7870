@@ -654,6 +654,10 @@ static inline int is_software_event(struct perf_event *event)
 
 extern struct static_key perf_swevent_enabled[PERF_COUNT_SW_MAX];
 
+<<<<<<< HEAD
+=======
+extern void ___perf_sw_event(u32, u64, struct pt_regs *, u64);
+>>>>>>> common/deprecated/android-3.18
 extern void __perf_sw_event(u32, u64, struct pt_regs *, u64);
 
 #ifndef perf_arch_fetch_caller_regs
@@ -678,6 +682,7 @@ static inline void perf_fetch_caller_regs(struct pt_regs *regs)
 static __always_inline void
 perf_sw_event(u32 event_id, u64 nr, struct pt_regs *regs, u64 addr)
 {
+<<<<<<< HEAD
 	struct pt_regs hot_regs;
 
 	if (static_key_false(&perf_swevent_enabled[event_id])) {
@@ -686,6 +691,27 @@ perf_sw_event(u32 event_id, u64 nr, struct pt_regs *regs, u64 addr)
 			regs = &hot_regs;
 		}
 		__perf_sw_event(event_id, nr, regs, addr);
+=======
+	if (static_key_false(&perf_swevent_enabled[event_id]))
+		__perf_sw_event(event_id, nr, regs, addr);
+}
+
+DECLARE_PER_CPU(struct pt_regs, __perf_regs[4]);
+
+/*
+ * 'Special' version for the scheduler, it hard assumes no recursion,
+ * which is guaranteed by us not actually scheduling inside other swevents
+ * because those disable preemption.
+ */
+static __always_inline void
+perf_sw_event_sched(u32 event_id, u64 nr, u64 addr)
+{
+	if (static_key_false(&perf_swevent_enabled[event_id])) {
+		struct pt_regs *regs = this_cpu_ptr(&__perf_regs[0]);
+
+		perf_fetch_caller_regs(regs);
+		___perf_sw_event(event_id, nr, regs, addr);
+>>>>>>> common/deprecated/android-3.18
 	}
 }
 
@@ -701,7 +727,11 @@ static inline void perf_event_task_sched_in(struct task_struct *prev,
 static inline void perf_event_task_sched_out(struct task_struct *prev,
 					     struct task_struct *next)
 {
+<<<<<<< HEAD
 	perf_sw_event(PERF_COUNT_SW_CONTEXT_SWITCHES, 1, NULL, 0);
+=======
+	perf_sw_event_sched(PERF_COUNT_SW_CONTEXT_SWITCHES, 1, 0);
+>>>>>>> common/deprecated/android-3.18
 
 	if (static_key_false(&perf_sched_events.key))
 		__perf_event_task_sched_out(prev, next);
@@ -817,6 +847,11 @@ static inline int perf_event_refresh(struct perf_event *event, int refresh)
 static inline void
 perf_sw_event(u32 event_id, u64 nr, struct pt_regs *regs, u64 addr)	{ }
 static inline void
+<<<<<<< HEAD
+=======
+perf_sw_event_sched(u32 event_id, u64 nr, u64 addr)			{ }
+static inline void
+>>>>>>> common/deprecated/android-3.18
 perf_bp_event(struct perf_event *event, void *data)			{ }
 
 static inline int perf_register_guest_info_callbacks

@@ -57,6 +57,10 @@
 #include <xen/xen.h>
 #include <xen/xenbus.h>
 #include <xen/events.h>
+<<<<<<< HEAD
+=======
+#include <xen/xen-ops.h>
+>>>>>>> common/deprecated/android-3.18
 #include <xen/page.h>
 
 #include <xen/hvm.h>
@@ -469,8 +473,16 @@ int xenbus_probe_node(struct xen_bus_type *bus,
 
 	/* Register with generic device framework. */
 	err = device_register(&xendev->dev);
+<<<<<<< HEAD
 	if (err)
 		goto fail;
+=======
+	if (err) {
+		put_device(&xendev->dev);
+		xendev = NULL;
+		goto fail;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 fail:
@@ -735,6 +747,33 @@ static int __init xenstored_local_init(void)
 	return err;
 }
 
+<<<<<<< HEAD
+=======
+static int xenbus_resume_cb(struct notifier_block *nb,
+			    unsigned long action, void *data)
+{
+	int err = 0;
+
+	if (xen_hvm_domain()) {
+		uint64_t v;
+
+		err = hvm_get_parameter(HVM_PARAM_STORE_EVTCHN, &v);
+		if (!err && v)
+			xen_store_evtchn = v;
+		else
+			pr_warn("Cannot update xenstore event channel: %d\n",
+				err);
+	} else
+		xen_store_evtchn = xen_start_info->store_evtchn;
+
+	return err;
+}
+
+static struct notifier_block xenbus_resume_nb = {
+	.notifier_call = xenbus_resume_cb,
+};
+
+>>>>>>> common/deprecated/android-3.18
 static int __init xenbus_init(void)
 {
 	int err = 0;
@@ -793,6 +832,13 @@ static int __init xenbus_init(void)
 		goto out_error;
 	}
 
+<<<<<<< HEAD
+=======
+	if ((xen_store_domain_type != XS_LOCAL) &&
+	    (xen_store_domain_type != XS_UNKNOWN))
+		xen_resume_notifier_register(&xenbus_resume_nb);
+
+>>>>>>> common/deprecated/android-3.18
 #ifdef CONFIG_XEN_COMPAT_XENFS
 	/*
 	 * Create xenfs mountpoint in /proc for compatibility with

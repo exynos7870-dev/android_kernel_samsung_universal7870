@@ -66,7 +66,11 @@ struct dib7000p_ops {
 	struct dvb_frontend *(*init)(struct i2c_adapter *i2c_adap, u8 i2c_addr, struct dib7000p_config *cfg);
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_DIB7000P)
+=======
+#if IS_REACHABLE(CONFIG_DVB_DIB7000P)
+>>>>>>> common/deprecated/android-3.18
 void *dib7000p_attach(struct dib7000p_ops *ops);
 #else
 static inline void *dib7000p_attach(struct dib7000p_ops *ops)

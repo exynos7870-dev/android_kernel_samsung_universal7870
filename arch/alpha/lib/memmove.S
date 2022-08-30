@@ -6,7 +6,11 @@
  * This is hand-massaged output from the original memcpy.c.  We defer to
  * memcpy whenever possible; the backwards copy loops are not unrolled.
  */
+<<<<<<< HEAD
         
+=======
+#include <asm/export.h>
+>>>>>>> common/deprecated/android-3.18
 	.set noat
 	.set noreorder
 	.text
@@ -179,3 +183,7 @@ $egress:
 	nop
 
 	.end memmove
+<<<<<<< HEAD
+=======
+	EXPORT_SYMBOL(memmove)
+>>>>>>> common/deprecated/android-3.18

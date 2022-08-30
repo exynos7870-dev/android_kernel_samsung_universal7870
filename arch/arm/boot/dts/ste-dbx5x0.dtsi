@@ -995,6 +995,7 @@
 			status = "disabled";
 		};
 
+<<<<<<< HEAD
 		vmmci: regulator-gpio {
 			compatible = "regulator-gpio";
 
@@ -1012,6 +1013,8 @@
 			status = "disabled";
 		};
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		mcde@a0350000 {
 			compatible = "stericsson,mcde";
 			reg = <0xa0350000 0x1000>, /* MCDE */

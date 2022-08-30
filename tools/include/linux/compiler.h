@@ -37,4 +37,15 @@
 
 #define ACCESS_ONCE(x) (*(volatile typeof(x) *)&(x))
 
+<<<<<<< HEAD
+=======
+#ifndef __fallthrough
+# if defined(__GNUC__) && __GNUC__ >= 7
+#  define __fallthrough __attribute__ ((fallthrough))
+# else
+#  define __fallthrough
+# endif
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 #endif /* _TOOLS_LINUX_COMPILER_H */

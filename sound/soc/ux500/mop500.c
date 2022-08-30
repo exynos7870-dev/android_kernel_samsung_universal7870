@@ -168,3 +168,10 @@ static struct platform_driver snd_soc_mop500_driver = {
 };
 
 module_platform_driver(snd_soc_mop500_driver);
+<<<<<<< HEAD
+=======
+
+MODULE_LICENSE("GPL v2");
+MODULE_DESCRIPTION("ASoC MOP500 board driver");
+MODULE_AUTHOR("Ola Lilja");
+>>>>>>> common/deprecated/android-3.18

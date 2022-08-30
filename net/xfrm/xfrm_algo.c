@@ -220,7 +220,11 @@ static struct xfrm_algo_desc aalg_list[] = {
 
 	.uinfo = {
 		.auth = {
+<<<<<<< HEAD
 			.icv_truncbits = 96,
+=======
+			.icv_truncbits = 128,
+>>>>>>> common/deprecated/android-3.18
 			.icv_fullbits = 256,
 		}
 	},

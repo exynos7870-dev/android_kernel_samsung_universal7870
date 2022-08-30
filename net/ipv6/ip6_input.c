@@ -99,6 +99,7 @@ int ipv6_rcv(struct sk_buff *skb, struct net_device *dev, struct packet_type *pt
 	 * arrived via the sending interface (ethX), because of the
 	 * nature of scoping architecture. --yoshfuji
 	 */
+<<<<<<< HEAD
 	if (skb_dst(skb) && !ip6_dst_idev(skb_dst(skb))) {
 		struct dst_entry *dst = skb_dst(skb);
 		struct rt6_info *info = (struct rt6_info *)dst;
@@ -110,6 +111,9 @@ int ipv6_rcv(struct sk_buff *skb, struct net_device *dev, struct packet_type *pt
 	IP6CB(skb)->iif = skb_dst(skb) ? (skb_dst(skb)->__use ? 
 			ip6_dst_idev(skb_dst(skb))->dev->ifindex : 
 			dev->ifindex) : dev->ifindex; 
+=======
+	IP6CB(skb)->iif = skb_dst(skb) ? ip6_dst_idev(skb_dst(skb))->dev->ifindex : dev->ifindex;
+>>>>>>> common/deprecated/android-3.18
 
 	if (unlikely(!pskb_may_pull(skb, sizeof(*hdr))))
 		goto err;
@@ -339,10 +343,17 @@ int ip6_mc_input(struct sk_buff *skb)
 				if (offset < 0)
 					goto out;
 
+<<<<<<< HEAD
 				if (!ipv6_is_mld(skb, nexthdr, offset))
 					goto out;
 
 				deliver = true;
+=======
+				if (ipv6_is_mld(skb, nexthdr, offset))
+					deliver = true;
+
+				goto out;
+>>>>>>> common/deprecated/android-3.18
 			}
 			/* unknown RA - process it normally */
 		}

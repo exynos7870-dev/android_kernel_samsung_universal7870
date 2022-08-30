@@ -27,9 +27,12 @@
 #include "debugfs.h"
 #include "wext-compat.h"
 #include "rdev-ops.h"
+<<<<<<< HEAD
 #if 1 /* 20151217 Temporal patch for page allocation fail when wifi on */
 #include <linux/vmalloc.h>
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 /* name for sysfs, %d is appended */
 #define PHY_NAME "phy"
@@ -89,6 +92,7 @@ struct wiphy *wiphy_idx_to_wiphy(int wiphy_idx)
 	return &rdev->wiphy;
 }
 
+<<<<<<< HEAD
 int cfg80211_dev_rename(struct cfg80211_registered_device *rdev,
 			char *newname)
 {
@@ -97,6 +101,19 @@ int cfg80211_dev_rename(struct cfg80211_registered_device *rdev,
 
 	ASSERT_RTNL();
 
+=======
+static int cfg80211_dev_check_name(struct cfg80211_registered_device *rdev,
+				   const char *newname)
+{
+	struct cfg80211_registered_device *rdev2;
+	int wiphy_idx, taken = -1, digits;
+
+	ASSERT_RTNL();
+
+	if (strlen(newname) > NL80211_WIPHY_NAME_MAXLEN)
+		return -EINVAL;
+
+>>>>>>> common/deprecated/android-3.18
 	/* prohibit calling the thing phy%d when %d is not its number */
 	sscanf(newname, PHY_NAME "%d%n", &wiphy_idx, &taken);
 	if (taken == strlen(newname) && wiphy_idx != rdev->wiphy_idx) {
@@ -112,6 +129,7 @@ int cfg80211_dev_rename(struct cfg80211_registered_device *rdev,
 			return -EINVAL;
 	}
 
+<<<<<<< HEAD
 
 	/* Ignore nop renames */
 	if (strcmp(newname, dev_name(&rdev->wiphy.dev)) == 0)
@@ -122,6 +140,31 @@ int cfg80211_dev_rename(struct cfg80211_registered_device *rdev,
 		if (strcmp(newname, dev_name(&rdev2->wiphy.dev)) == 0)
 			return -EINVAL;
 
+=======
+	/* Ensure another device does not already have this name. */
+	list_for_each_entry(rdev2, &cfg80211_rdev_list, list)
+		if (strcmp(newname, wiphy_name(&rdev2->wiphy)) == 0)
+			return -EINVAL;
+
+	return 0;
+}
+
+int cfg80211_dev_rename(struct cfg80211_registered_device *rdev,
+			char *newname)
+{
+	int result;
+
+	ASSERT_RTNL();
+
+	/* Ignore nop renames */
+	if (strcmp(newname, wiphy_name(&rdev->wiphy)) == 0)
+		return 0;
+
+	result = cfg80211_dev_check_name(rdev, newname);
+	if (result < 0)
+		return result;
+
+>>>>>>> common/deprecated/android-3.18
 	result = device_rename(&rdev->wiphy.dev, newname);
 	if (result)
 		return result;
@@ -310,9 +353,30 @@ static void cfg80211_destroy_iface_wk(struct work_struct *work)
 	rtnl_unlock();
 }
 
+<<<<<<< HEAD
 /* exported functions */
 
 struct wiphy *wiphy_new(const struct cfg80211_ops *ops, int sizeof_priv)
+=======
+static void cfg80211_sched_scan_stop_wk(struct work_struct *work)
+{
+	struct cfg80211_registered_device *rdev;
+
+	rdev = container_of(work, struct cfg80211_registered_device,
+			   sched_scan_stop_wk);
+
+	rtnl_lock();
+
+	__cfg80211_stop_sched_scan(rdev, false);
+
+	rtnl_unlock();
+}
+
+/* exported functions */
+
+struct wiphy *wiphy_new_nm(const struct cfg80211_ops *ops, int sizeof_priv,
+			   const char *requested_name)
+>>>>>>> common/deprecated/android-3.18
 {
 	static atomic_t wiphy_counter = ATOMIC_INIT(0);
 
@@ -330,11 +394,15 @@ struct wiphy *wiphy_new(const struct cfg80211_ops *ops, int sizeof_priv)
 
 	alloc_size = sizeof(*rdev) + sizeof_priv;
 
+<<<<<<< HEAD
 #if 1 /* 20151217 Temporal patch for page allocation fail when wifi on */
 	rdev = vzalloc(alloc_size);
 #else
 	rdev = kzalloc(alloc_size, GFP_KERNEL);
 #endif
+=======
+	rdev = kzalloc(alloc_size, GFP_KERNEL);
+>>>>>>> common/deprecated/android-3.18
 	if (!rdev)
 		return NULL;
 
@@ -345,11 +413,15 @@ struct wiphy *wiphy_new(const struct cfg80211_ops *ops, int sizeof_priv)
 	if (unlikely(rdev->wiphy_idx < 0)) {
 		/* ugh, wrapped! */
 		atomic_dec(&wiphy_counter);
+<<<<<<< HEAD
 #if 1 /* 20151217 Temporal patch for page allocation fail when wifi on */
 		vfree(rdev);
 #else
 		kfree(rdev);
 #endif
+=======
+		kfree(rdev);
+>>>>>>> common/deprecated/android-3.18
 		return NULL;
 	}
 
@@ -357,7 +429,41 @@ struct wiphy *wiphy_new(const struct cfg80211_ops *ops, int sizeof_priv)
 	rdev->wiphy_idx--;
 
 	/* give it a proper name */
+<<<<<<< HEAD
 	dev_set_name(&rdev->wiphy.dev, PHY_NAME "%d", rdev->wiphy_idx);
+=======
+	if (requested_name && requested_name[0]) {
+		int rv;
+
+		rtnl_lock();
+		rv = cfg80211_dev_check_name(rdev, requested_name);
+
+		if (rv < 0) {
+			rtnl_unlock();
+			goto use_default_name;
+		}
+
+		rv = dev_set_name(&rdev->wiphy.dev, "%s", requested_name);
+		rtnl_unlock();
+		if (rv)
+			goto use_default_name;
+	} else {
+		int rv;
+
+use_default_name:
+		/* NOTE:  This is *probably* safe w/out holding rtnl because of
+		 * the restrictions on phy names.  Probably this call could
+		 * fail if some other part of the kernel (re)named a device
+		 * phyX.  But, might should add some locking and check return
+		 * value, and use a different name if this one exists?
+		 */
+		rv = dev_set_name(&rdev->wiphy.dev, PHY_NAME "%d", rdev->wiphy_idx);
+		if (rv < 0) {
+			kfree(rdev);
+			return NULL;
+		}
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	INIT_LIST_HEAD(&rdev->wdev_list);
 	INIT_LIST_HEAD(&rdev->beacon_registrations);
@@ -379,6 +485,10 @@ struct wiphy *wiphy_new(const struct cfg80211_ops *ops, int sizeof_priv)
 	INIT_LIST_HEAD(&rdev->destroy_list);
 	spin_lock_init(&rdev->destroy_list_lock);
 	INIT_WORK(&rdev->destroy_work, cfg80211_destroy_iface_wk);
+<<<<<<< HEAD
+=======
+	INIT_WORK(&rdev->sched_scan_stop_wk, cfg80211_sched_scan_stop_wk);
+>>>>>>> common/deprecated/android-3.18
 
 #ifdef CONFIG_CFG80211_DEFAULT_PS
 	rdev->wiphy.flags |= WIPHY_FLAG_PS_ON_BY_DEFAULT;
@@ -392,11 +502,15 @@ struct wiphy *wiphy_new(const struct cfg80211_ops *ops, int sizeof_priv)
 				   &rdev->rfkill_ops, rdev);
 
 	if (!rdev->rfkill) {
+<<<<<<< HEAD
 #if 1 /* 20151217 Temporal patch for page allocation fail when wifi on */
 		vfree(rdev);
 #else
 		kfree(rdev);
 #endif
+=======
+		wiphy_free(&rdev->wiphy);
+>>>>>>> common/deprecated/android-3.18
 		return NULL;
 	}
 
@@ -421,7 +535,11 @@ struct wiphy *wiphy_new(const struct cfg80211_ops *ops, int sizeof_priv)
 
 	return &rdev->wiphy;
 }
+<<<<<<< HEAD
 EXPORT_SYMBOL(wiphy_new);
+=======
+EXPORT_SYMBOL(wiphy_new_nm);
+>>>>>>> common/deprecated/android-3.18
 
 static int wiphy_verify_combinations(struct wiphy *wiphy)
 {
@@ -737,6 +855,10 @@ void wiphy_unregister(struct wiphy *wiphy)
 	flush_work(&rdev->event_work);
 	cancel_delayed_work_sync(&rdev->dfs_update_channels_wk);
 	flush_work(&rdev->destroy_work);
+<<<<<<< HEAD
+=======
+	flush_work(&rdev->sched_scan_stop_wk);
+>>>>>>> common/deprecated/android-3.18
 
 #ifdef CONFIG_PM
 	if (rdev->wiphy.wowlan_config && rdev->ops->set_wakeup)
@@ -758,11 +880,15 @@ void cfg80211_dev_free(struct cfg80211_registered_device *rdev)
 	}
 	list_for_each_entry_safe(scan, tmp, &rdev->bss_list, list)
 		cfg80211_put_bss(&rdev->wiphy, &scan->pub);
+<<<<<<< HEAD
 #if 1 /* 20151217 Temporal patch for page allocation fail when wifi on */
 	vfree(rdev);
 #else
 	kfree(rdev);
 #endif
+=======
+	kfree(rdev);
+>>>>>>> common/deprecated/android-3.18
 }
 
 void wiphy_free(struct wiphy *wiphy)
@@ -1058,6 +1184,11 @@ static int cfg80211_netdev_notifier_call(struct notifier_block *nb,
 		return NOTIFY_DONE;
 	}
 
+<<<<<<< HEAD
+=======
+	wireless_nlevent_flush();
+
+>>>>>>> common/deprecated/android-3.18
 	return NOTIFY_OK;
 }
 

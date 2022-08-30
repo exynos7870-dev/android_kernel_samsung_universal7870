@@ -1,6 +1,9 @@
+<<<<<<< HEAD
 # Any varying coverage in these files is non-deterministic
 # and is generally not a function of system call inputs.
 KCOV_INSTRUMENT		:= n
+=======
+>>>>>>> common/deprecated/android-3.18
 
 obj-y += mutex.o semaphore.o rwsem.o mcs_spinlock.o
 

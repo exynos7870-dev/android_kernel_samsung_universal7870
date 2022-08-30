@@ -402,7 +402,11 @@ static int mal_poll(struct napi_struct *napi, int budget)
 	unsigned long flags;
 
 	MAL_DBG2(mal, "poll(%d)" NL, budget);
+<<<<<<< HEAD
  again:
+=======
+
+>>>>>>> common/deprecated/android-3.18
 	/* Process TX skbs */
 	list_for_each(l, &mal->poll_list) {
 		struct mal_commac *mc =
@@ -451,7 +455,10 @@ static int mal_poll(struct napi_struct *napi, int budget)
 			spin_lock_irqsave(&mal->lock, flags);
 			mal_disable_eob_irq(mal);
 			spin_unlock_irqrestore(&mal->lock, flags);
+<<<<<<< HEAD
 			goto again;
+=======
+>>>>>>> common/deprecated/android-3.18
 		}
 		mc->ops->poll_tx(mc->dev);
 	}

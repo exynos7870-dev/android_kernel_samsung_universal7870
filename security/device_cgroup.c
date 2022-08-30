@@ -568,7 +568,11 @@ static int propagate_exception(struct dev_cgroup *devcg_root,
 		    devcg->behavior == DEVCG_DEFAULT_ALLOW) {
 			rc = dev_exception_add(devcg, ex);
 			if (rc)
+<<<<<<< HEAD
 				break;
+=======
+				return rc;
+>>>>>>> common/deprecated/android-3.18
 		} else {
 			/*
 			 * in the other possible cases:

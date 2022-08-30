@@ -67,3 +67,10 @@ static struct spi_driver pcm512x_spi_driver = {
 };
 
 module_spi_driver(pcm512x_spi_driver);
+<<<<<<< HEAD
+=======
+
+MODULE_DESCRIPTION("ASoC PCM512x codec driver - SPI");
+MODULE_AUTHOR("Mark Brown <broonie@kernel.org>");
+MODULE_LICENSE("GPL v2");
+>>>>>>> common/deprecated/android-3.18

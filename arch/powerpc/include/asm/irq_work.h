@@ -5,5 +5,9 @@ static inline bool arch_irq_work_has_interrupt(void)
 {
 	return true;
 }
+<<<<<<< HEAD
+=======
+extern void arch_irq_work_raise(void);
+>>>>>>> common/deprecated/android-3.18
 
 #endif /* _ASM_POWERPC_IRQ_WORK_H */

@@ -35,7 +35,11 @@ struct tda8083_config
 	u8 demod_address;
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_TDA8083)
+=======
+#if IS_REACHABLE(CONFIG_DVB_TDA8083)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend* tda8083_attach(const struct tda8083_config* config,
 					   struct i2c_adapter* i2c);
 #else

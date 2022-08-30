@@ -275,10 +275,13 @@ static const char * const fw_path[] = {
 	"/lib/firmware/updates/" UTS_RELEASE,
 	"/lib/firmware/updates",
 	"/lib/firmware/" UTS_RELEASE,
+<<<<<<< HEAD
 #ifdef CONFIG_QCOM_WIFI
 	"/etc/firmware",
 	"/etc/firmware/wlan",
 #endif /* CONFIG_QCOM_WIFI */
+=======
+>>>>>>> common/deprecated/android-3.18
 	"/lib/firmware"
 };
 
@@ -549,10 +552,15 @@ static void fw_dev_release(struct device *dev)
 	kfree(fw_priv);
 }
 
+<<<<<<< HEAD
 static int firmware_uevent(struct device *dev, struct kobj_uevent_env *env)
 {
 	struct firmware_priv *fw_priv = to_firmware_priv(dev);
 
+=======
+static int do_firmware_uevent(struct firmware_priv *fw_priv, struct kobj_uevent_env *env)
+{
+>>>>>>> common/deprecated/android-3.18
 	if (add_uevent_var(env, "FIRMWARE=%s", fw_priv->buf->fw_id))
 		return -ENOMEM;
 	if (add_uevent_var(env, "TIMEOUT=%i", loading_timeout))
@@ -563,6 +571,21 @@ static int firmware_uevent(struct device *dev, struct kobj_uevent_env *env)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+static int firmware_uevent(struct device *dev, struct kobj_uevent_env *env)
+{
+	struct firmware_priv *fw_priv = to_firmware_priv(dev);
+	int err = 0;
+
+	mutex_lock(&fw_lock);
+	if (fw_priv->buf)
+		err = do_firmware_uevent(fw_priv, env);
+	mutex_unlock(&fw_lock);
+	return err;
+}
+
+>>>>>>> common/deprecated/android-3.18
 static struct class firmware_class = {
 	.name		= "firmware",
 	.class_attrs	= firmware_class_attrs,
@@ -1102,15 +1125,26 @@ static int
 _request_firmware(const struct firmware **firmware_p, const char *name,
 		  struct device *device, unsigned int opt_flags)
 {
+<<<<<<< HEAD
 	struct firmware *fw;
+=======
+	struct firmware *fw = NULL;
+>>>>>>> common/deprecated/android-3.18
 	long timeout;
 	int ret;
 
 	if (!firmware_p)
 		return -EINVAL;
 
+<<<<<<< HEAD
 	if (!name || name[0] == '\0')
 		return -EINVAL;
+=======
+	if (!name || name[0] == '\0') {
+		ret = -EINVAL;
+		goto out;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	ret = _request_firmware_prepare(&fw, name, device);
 	if (ret <= 0) /* error or already assigned */
@@ -1542,7 +1576,11 @@ static void __device_uncache_fw_images(void)
  * then the device driver can load its firmwares easily at
  * time when system is not ready to complete loading firmware.
  */
+<<<<<<< HEAD
 static void device_cache_fw_images(unsigned int suspend_flag)
+=======
+static void device_cache_fw_images(void)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct firmware_cache *fwc = &fw_cache;
 	int old_timeout;
@@ -1553,6 +1591,7 @@ static void device_cache_fw_images(unsigned int suspend_flag)
 	/* cancel uncache work */
 	cancel_delayed_work_sync(&fwc->work);
 
+<<<<<<< HEAD
 	if (suspend_flag) {
 		/*
 		 * use small loading timeout for caching devices' firmware
@@ -1575,6 +1614,28 @@ static void device_cache_fw_images(unsigned int suspend_flag)
 
 		loading_timeout = old_timeout;
 	}
+=======
+	/*
+	 * use small loading timeout for caching devices' firmware
+	 * because all these firmware images have been loaded
+	 * successfully at lease once, also system is ready for
+	 * completing firmware loading now. The maximum size of
+	 * firmware in current distributions is about 2M bytes,
+	 * so 10 secs should be enough.
+	 */
+	old_timeout = loading_timeout;
+	loading_timeout = 10;
+
+	mutex_lock(&fw_lock);
+	fwc->state = FW_LOADER_START_CACHE;
+	dpm_for_each_dev(NULL, dev_cache_fw_image);
+	mutex_unlock(&fw_lock);
+
+	/* wait for completion of caching firmware for all devices */
+	async_synchronize_full_domain(&fw_cache_domain);
+
+	loading_timeout = old_timeout;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -1610,14 +1671,21 @@ static void device_uncache_fw_images_delay(unsigned long delay)
 static int fw_pm_notify(struct notifier_block *notify_block,
 			unsigned long mode, void *unused)
 {
+<<<<<<< HEAD
 	unsigned int suspend = 0;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	switch (mode) {
 	case PM_HIBERNATION_PREPARE:
 	case PM_SUSPEND_PREPARE:
 	case PM_RESTORE_PREPARE:
 		kill_requests_without_uevent();
+<<<<<<< HEAD
 		device_cache_fw_images(suspend);
+=======
+		device_cache_fw_images();
+>>>>>>> common/deprecated/android-3.18
 		break;
 
 	case PM_POST_SUSPEND:

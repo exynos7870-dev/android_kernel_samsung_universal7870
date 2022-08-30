@@ -24,7 +24,11 @@
 
 #include <linux/kconfig.h>
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_ZL10039)
+=======
+#if IS_REACHABLE(CONFIG_DVB_ZL10039)
+>>>>>>> common/deprecated/android-3.18
 struct dvb_frontend *zl10039_attach(struct dvb_frontend *fe,
 					u8 i2c_addr,
 					struct i2c_adapter *i2c);

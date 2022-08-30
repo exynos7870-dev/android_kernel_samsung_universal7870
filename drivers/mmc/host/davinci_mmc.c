@@ -1147,7 +1147,11 @@ static inline void mmc_davinci_cpufreq_deregister(struct mmc_davinci_host *host)
 {
 }
 #endif
+<<<<<<< HEAD
 static void __init init_mmcsd_host(struct mmc_davinci_host *host)
+=======
+static void init_mmcsd_host(struct mmc_davinci_host *host)
+>>>>>>> common/deprecated/android-3.18
 {
 
 	mmc_davinci_reset_ctrl(host, 1);

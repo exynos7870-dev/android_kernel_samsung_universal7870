@@ -194,6 +194,10 @@
 			rtc@fc900000 {
 				compatible = "st,spear600-rtc";
 				reg = <0xfc900000 0x1000>;
+<<<<<<< HEAD
+=======
+				interrupt-parent = <&vic0>;
+>>>>>>> common/deprecated/android-3.18
 				interrupts = <10>;
 				status = "disabled";
 			};

@@ -766,6 +766,16 @@ UNUSUAL_DEV(  0x059f, 0x0643, 0x0000, 0x0000,
 		USB_SC_DEVICE, USB_PR_DEVICE, NULL,
 		US_FL_GO_SLOW ),
 
+<<<<<<< HEAD
+=======
+/* Reported by Christian Schaller <cschalle@redhat.com> */
+UNUSUAL_DEV(  0x059f, 0x0651, 0x0000, 0x0000,
+		"LaCie",
+		"External HDD",
+		USB_SC_DEVICE, USB_PR_DEVICE, NULL,
+		US_FL_NO_WP_DETECT ),
+
+>>>>>>> common/deprecated/android-3.18
 /* Submitted by Joel Bourquard <numlock@freesurf.ch>
  * Some versions of this device need the SubClass and Protocol overrides
  * while others don't.
@@ -1199,6 +1209,15 @@ UNUSUAL_DEV( 0x090a, 0x1200, 0x0000, 0x9999,
 		USB_SC_RBC, USB_PR_BULK, NULL,
 		0 ),
 
+<<<<<<< HEAD
+=======
+UNUSUAL_DEV(0x090c, 0x1000, 0x1100, 0x1100,
+		"Samsung",
+		"Flash Drive FIT",
+		USB_SC_DEVICE, USB_PR_DEVICE, NULL,
+		US_FL_MAX_SECTORS_64),
+
+>>>>>>> common/deprecated/android-3.18
 /* aeb */
 UNUSUAL_DEV( 0x090c, 0x1132, 0x0000, 0xffff,
 		"Feiya",
@@ -1372,6 +1391,16 @@ UNUSUAL_DEV( 0x0bc2, 0x3010, 0x0000, 0x0000,
 		USB_SC_DEVICE, USB_PR_DEVICE, NULL,
 		US_FL_SANE_SENSE ),
 
+<<<<<<< HEAD
+=======
+/* Reported by Kris Lindgren <kris.lindgren@gmail.com> */
+UNUSUAL_DEV( 0x0bc2, 0x3332, 0x0000, 0x9999,
+		"Seagate",
+		"External",
+		USB_SC_DEVICE, USB_PR_DEVICE, NULL,
+		US_FL_NO_WP_DETECT ),
+
+>>>>>>> common/deprecated/android-3.18
 UNUSUAL_DEV(  0x0d49, 0x7310, 0x0000, 0x9999,
 		"Maxtor",
 		"USB to SATA",
@@ -1379,6 +1408,21 @@ UNUSUAL_DEV(  0x0d49, 0x7310, 0x0000, 0x9999,
 		US_FL_SANE_SENSE),
 
 /*
+<<<<<<< HEAD
+=======
+ * Reported by Icenowy Zheng <icenowy@aosc.io>
+ * The SMI SM3350 USB-UFS bridge controller will enter a wrong state
+ * that do not process read/write command if a long sense is requested,
+ * so force to use 18-byte sense.
+ */
+UNUSUAL_DEV(  0x090c, 0x3350, 0x0000, 0xffff,
+		"SMI",
+		"SM3350 UFS-to-USB-Mass-Storage bridge",
+		USB_SC_DEVICE, USB_PR_DEVICE, NULL,
+		US_FL_BAD_SENSE ),
+
+/*
+>>>>>>> common/deprecated/android-3.18
  * Pete Zaitcev <zaitcev@yahoo.com>, bz#164688.
  * The device blatantly ignores LUN and returns 1 in GetMaxLUN.
  */
@@ -1980,7 +2024,11 @@ UNUSUAL_DEV(  0x14cd, 0x6600, 0x0201, 0x0201,
 		US_FL_IGNORE_RESIDUE ),
 
 /* Reported by Michael Büsch <m@bues.ch> */
+<<<<<<< HEAD
 UNUSUAL_DEV(  0x152d, 0x0567, 0x0114, 0x0114,
+=======
+UNUSUAL_DEV(  0x152d, 0x0567, 0x0114, 0x0117,
+>>>>>>> common/deprecated/android-3.18
 		"JMicron",
 		"USB to ATA/ATAPI Bridge",
 		USB_SC_DEVICE, USB_PR_DEVICE, NULL,
@@ -2058,6 +2106,21 @@ UNUSUAL_DEV( 0x1908, 0x3335, 0x0200, 0x0200,
 		USB_SC_DEVICE, USB_PR_DEVICE, NULL,
 		US_FL_NO_READ_DISC_INFO ),
 
+<<<<<<< HEAD
+=======
+/* Reported by Oliver Neukum <oneukum@suse.com>
+ * This device morphes spontaneously into another device if the access
+ * pattern of Windows isn't followed. Thus writable media would be dirty
+ * if the initial instance is used. So the device is limited to its
+ * virtual CD.
+ * And yes, the concept that BCD goes up to 9 is not heeded */
+UNUSUAL_DEV( 0x19d2, 0x1225, 0x0000, 0xffff,
+		"ZTE,Incorporated",
+		"ZTE WCDMA Technologies MSM",
+		USB_SC_DEVICE, USB_PR_DEVICE, NULL,
+		US_FL_SINGLE_LUN ),
+
+>>>>>>> common/deprecated/android-3.18
 /* Reported by Sven Geggus <sven-usbst@geggus.net>
  * This encrypted pen drive returns bogus data for the initial READ(10).
  */
@@ -2105,6 +2168,30 @@ UNUSUAL_DEV(  0x22b8, 0x3010, 0x0001, 0x0001,
 		USB_SC_DEVICE, USB_PR_DEVICE, NULL,
 		US_FL_FIX_CAPACITY | US_FL_IGNORE_RESIDUE ),
 
+<<<<<<< HEAD
+=======
+/* Reported by Teijo Kinnunen <teijo.kinnunen@code-q.fi> */
+UNUSUAL_DEV(  0x152d, 0x2567, 0x0117, 0x0117,
+		"JMicron",
+		"USB to ATA/ATAPI Bridge",
+		USB_SC_DEVICE, USB_PR_DEVICE, NULL,
+		US_FL_BROKEN_FUA ),
+
+/* Reported by David Kozub <zub@linux.fjfi.cvut.cz> */
+UNUSUAL_DEV(0x152d, 0x0578, 0x0000, 0x9999,
+		"JMicron",
+		"JMS567",
+		USB_SC_DEVICE, USB_PR_DEVICE, NULL,
+		US_FL_BROKEN_FUA),
+
+/* Reported-by George Cherian <george.cherian@cavium.com> */
+UNUSUAL_DEV(0x152d, 0x9561, 0x0000, 0x9999,
+		"JMicron",
+		"JMS56x",
+		USB_SC_DEVICE, USB_PR_DEVICE, NULL,
+		US_FL_NO_REPORT_OPCODES),
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Patch by Constantin Baranov <const@tltsu.ru>
  * Report by Andreas Koenecke.
@@ -2132,6 +2219,16 @@ UNUSUAL_DEV(  0x3340, 0xffff, 0x0000, 0x0000,
 		USB_SC_DEVICE,USB_PR_DEVICE,NULL,
 		US_FL_MAX_SECTORS_64 ),
 
+<<<<<<< HEAD
+=======
+/* Reported by Cyril Roelandt <tipecaml@gmail.com> */
+UNUSUAL_DEV(  0x357d, 0x7788, 0x0114, 0x0114,
+		"JMicron",
+		"USB to ATA/ATAPI Bridge",
+		USB_SC_DEVICE, USB_PR_DEVICE, NULL,
+		US_FL_BROKEN_FUA | US_FL_IGNORE_UAS ),
+
+>>>>>>> common/deprecated/android-3.18
 /* Reported by Andrey Rahmatullin <wrar@altlinux.org> */
 UNUSUAL_DEV(  0x4102, 0x1020, 0x0100,  0x0100,
 		"iRiver",
@@ -2155,6 +2252,16 @@ UNUSUAL_DEV(  0x4146, 0xba01, 0x0100, 0x0100,
 		"Micro Mini 1GB",
 		USB_SC_DEVICE, USB_PR_DEVICE, NULL, US_FL_NOT_LOCKABLE ),
 
+<<<<<<< HEAD
+=======
+/* Reported-by: Tim Anderson <tsa@biglakesoftware.com> */
+UNUSUAL_DEV(  0x2ca3, 0x0031, 0x0000, 0x9999,
+		"DJI",
+		"CineSSD",
+		USB_SC_DEVICE, USB_PR_DEVICE, NULL,
+		US_FL_NO_ATA_1X),
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Nick Bowler <nbowler@elliptictech.com>
  * SCSI stack spams (otherwise harmless) error messages.

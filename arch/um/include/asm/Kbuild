@@ -27,4 +27,8 @@ generic-y += sections.h
 generic-y += switch_to.h
 generic-y += topology.h
 generic-y += trace_clock.h
+<<<<<<< HEAD
+=======
+generic-y += word-at-a-time.h
+>>>>>>> common/deprecated/android-3.18
 generic-y += xor.h

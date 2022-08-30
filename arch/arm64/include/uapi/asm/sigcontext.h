@@ -44,18 +44,25 @@ struct _aarch64_ctx {
 	__u32 size;
 };
 
+<<<<<<< HEAD
 typedef struct{
 	__u64 a;
 	__u64 b;
 }___uint128_t;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #define FPSIMD_MAGIC	0x46508001
 
 struct fpsimd_context {
 	struct _aarch64_ctx head;
 	__u32 fpsr;
 	__u32 fpcr;
+<<<<<<< HEAD
 	___uint128_t vregs[32];
+=======
+	__uint128_t vregs[32];
+>>>>>>> common/deprecated/android-3.18
 };
 
 /* ESR_EL1 context */

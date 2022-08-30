@@ -28,6 +28,10 @@
 #include <linux/io.h>
 #include <linux/module.h>
 #include <linux/netdevice.h>
+<<<<<<< HEAD
+=======
+#include <linux/of.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/phy.h>
 #include <linux/platform_device.h>
 #include <net/ip.h>

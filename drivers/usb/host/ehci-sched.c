@@ -1604,11 +1604,19 @@ iso_stream_schedule (
 	 */
 	now2 = (now - base) & (mod - 1);
 
+<<<<<<< HEAD
 	/* Is the schedule already full? */
 	if (unlikely(!empty && start < period)) {
 		ehci_dbg(ehci, "iso sched full %p (%u-%u < %u mod %u)\n",
 				urb, stream->next_uframe, base, period, mod);
 		status = -ENOSPC;
+=======
+	/* Is the schedule about to wrap around? */
+	if (unlikely(!empty && start < period)) {
+		ehci_dbg(ehci, "request %p would overflow (%u-%u < %u mod %u)\n",
+				urb, stream->next_uframe, base, period, mod);
+		status = -EFBIG;
+>>>>>>> common/deprecated/android-3.18
 		goto fail;
 	}
 

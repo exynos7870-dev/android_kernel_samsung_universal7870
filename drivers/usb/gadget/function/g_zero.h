@@ -69,7 +69,10 @@ void lb_modexit(void);
 int lb_modinit(void);
 
 /* common utilities */
+<<<<<<< HEAD
 void free_ep_req(struct usb_ep *ep, struct usb_request *req);
+=======
+>>>>>>> common/deprecated/android-3.18
 void disable_endpoints(struct usb_composite_dev *cdev,
 		struct usb_ep *in, struct usb_ep *out,
 		struct usb_ep *iso_in, struct usb_ep *iso_out,

@@ -14,6 +14,10 @@
 #include <linux/delay.h>
 #include <linux/module.h>
 #include <linux/interrupt.h>
+<<<<<<< HEAD
+=======
+#include <linux/dmi.h>
+>>>>>>> common/deprecated/android-3.18
 #include "sbshc.h"
 
 #define PREFIX "ACPI: "
@@ -87,6 +91,11 @@ enum acpi_smb_offset {
 	ACPI_SMB_ALARM_DATA = 0x26,	/* 2 bytes alarm data */
 };
 
+<<<<<<< HEAD
+=======
+static bool macbook;
+
+>>>>>>> common/deprecated/android-3.18
 static inline int smb_hc_read(struct acpi_smb_hc *hc, u8 address, u8 *data)
 {
 	return ec_read(hc->offset + address, data);
@@ -132,6 +141,11 @@ static int acpi_smbus_transaction(struct acpi_smb_hc *hc, u8 protocol,
 	}
 
 	mutex_lock(&hc->lock);
+<<<<<<< HEAD
+=======
+	if (macbook)
+		udelay(5);
+>>>>>>> common/deprecated/android-3.18
 	if (smb_hc_read(hc, ACPI_SMB_PROTOCOL, &temp))
 		goto end;
 	if (temp) {
@@ -210,6 +224,10 @@ int acpi_smbus_unregister_callback(struct acpi_smb_hc *hc)
 	hc->callback = NULL;
 	hc->context = NULL;
 	mutex_unlock(&hc->lock);
+<<<<<<< HEAD
+=======
+	acpi_os_wait_events_complete();
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -257,12 +275,35 @@ extern int acpi_ec_add_query_handler(struct acpi_ec *ec, u8 query_bit,
 			      acpi_handle handle, acpi_ec_query_func func,
 			      void *data);
 
+<<<<<<< HEAD
+=======
+static int macbook_dmi_match(const struct dmi_system_id *d)
+{
+	pr_debug("Detected MacBook, enabling workaround\n");
+	macbook = true;
+	return 0;
+}
+
+static struct dmi_system_id acpi_smbus_dmi_table[] = {
+	{ macbook_dmi_match, "Apple MacBook", {
+	  DMI_MATCH(DMI_BOARD_VENDOR, "Apple"),
+	  DMI_MATCH(DMI_PRODUCT_NAME, "MacBook") },
+	},
+	{ },
+};
+
+>>>>>>> common/deprecated/android-3.18
 static int acpi_smbus_hc_add(struct acpi_device *device)
 {
 	int status;
 	unsigned long long val;
 	struct acpi_smb_hc *hc;
 
+<<<<<<< HEAD
+=======
+	dmi_check_system(acpi_smbus_dmi_table);
+
+>>>>>>> common/deprecated/android-3.18
 	if (!device)
 		return -EINVAL;
 
@@ -287,8 +328,13 @@ static int acpi_smbus_hc_add(struct acpi_device *device)
 	device->driver_data = hc;
 
 	acpi_ec_add_query_handler(hc->ec, hc->query_bit, NULL, smbus_alarm, hc);
+<<<<<<< HEAD
 	printk(KERN_INFO PREFIX "SBS HC: EC = 0x%p, offset = 0x%0x, query_bit = 0x%0x\n",
 		hc->ec, hc->offset, hc->query_bit);
+=======
+	dev_info(&device->dev, "SBS HC: offset = 0x%0x, query_bit = 0x%0x\n",
+		 hc->offset, hc->query_bit);
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }
@@ -304,6 +350,10 @@ static int acpi_smbus_hc_remove(struct acpi_device *device)
 
 	hc = acpi_driver_data(device);
 	acpi_ec_remove_query_handler(hc->ec, hc->query_bit);
+<<<<<<< HEAD
+=======
+	acpi_os_wait_events_complete();
+>>>>>>> common/deprecated/android-3.18
 	kfree(hc);
 	device->driver_data = NULL;
 	return 0;

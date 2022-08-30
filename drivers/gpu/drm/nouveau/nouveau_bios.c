@@ -332,6 +332,12 @@ get_fp_strap(struct drm_device *dev, struct nvbios *bios)
 	if (bios->major_version < 5 && bios->data[0x48] & 0x4)
 		return NVReadVgaCrtc5758(dev, 0, 0xf) & 0xf;
 
+<<<<<<< HEAD
+=======
+	if (device->info.family >= NV_DEVICE_INFO_V0_MAXWELL)
+		return nvif_rd32(device, 0x001800) & 0x0000000f;
+	else
+>>>>>>> common/deprecated/android-3.18
 	if (device->info.family >= NV_DEVICE_INFO_V0_TESLA)
 		return (nvif_rd32(device, NV_PEXTDEV_BOOT_0) >> 24) & 0xf;
 	else

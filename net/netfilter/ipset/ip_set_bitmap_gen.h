@@ -66,12 +66,19 @@ mtype_destroy(struct ip_set *set)
 	if (SET_WITH_TIMEOUT(set))
 		del_timer_sync(&map->gc);
 
+<<<<<<< HEAD
 	ip_set_free(map->members);
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (set->dsize) {
 		if (set->extensions & IPSET_EXT_DESTROY)
 			mtype_ext_cleanup(set);
 		ip_set_free(map->extensions);
 	}
+<<<<<<< HEAD
+=======
+	ip_set_free(map->members);
+>>>>>>> common/deprecated/android-3.18
 	kfree(map);
 
 	set->data = NULL;

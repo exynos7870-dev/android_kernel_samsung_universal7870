@@ -52,12 +52,20 @@ static int transient_prepare_exception(struct dm_exception_store *store,
 }
 
 static void transient_commit_exception(struct dm_exception_store *store,
+<<<<<<< HEAD
 				       struct dm_exception *e,
+=======
+				       struct dm_exception *e, int valid,
+>>>>>>> common/deprecated/android-3.18
 				       void (*callback) (void *, int success),
 				       void *callback_context)
 {
 	/* Just succeed */
+<<<<<<< HEAD
 	callback(callback_context, 1);
+=======
+	callback(callback_context, valid);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void transient_usage(struct dm_exception_store *store,

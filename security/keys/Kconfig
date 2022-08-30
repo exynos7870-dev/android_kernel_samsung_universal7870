@@ -20,6 +20,13 @@ config KEYS
 
 	  If you are unsure as to whether this is required, answer N.
 
+<<<<<<< HEAD
+=======
+config KEYS_COMPAT
+	def_bool y
+	depends on COMPAT && KEYS
+
+>>>>>>> common/deprecated/android-3.18
 config PERSISTENT_KEYRINGS
 	bool "Enable register of persistent per-UID keyrings"
 	depends on KEYS

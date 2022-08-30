@@ -60,6 +60,10 @@ struct loop_device {
 	wait_queue_head_t	lo_event;
 	/* wait queue for incoming requests */
 	wait_queue_head_t	lo_req_wait;
+<<<<<<< HEAD
+=======
+	bool			sysfs_inited;
+>>>>>>> common/deprecated/android-3.18
 
 	struct request_queue	*lo_queue;
 	struct gendisk		*lo_disk;

@@ -70,7 +70,10 @@
 #define IRQF_FORCE_RESUME	0x00008000
 #define IRQF_NO_THREAD		0x00010000
 #define IRQF_EARLY_RESUME	0x00020000
+<<<<<<< HEAD
 #define IRQF_GIC_MULTI_TARGET	0x10000000
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #define IRQF_TIMER		(__IRQF_TIMER | IRQF_NO_SUSPEND | IRQF_NO_THREAD)
 

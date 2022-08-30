@@ -119,5 +119,10 @@ bool adau17x1_has_dsp(struct adau *adau);
 
 #define ADAU17X1_CONVERTER0_CONVSR_MASK		0x7
 
+<<<<<<< HEAD
+=======
+#define ADAU17X1_CONVERTER0_ADOSR		BIT(3)
+
+>>>>>>> common/deprecated/android-3.18
 
 #endif

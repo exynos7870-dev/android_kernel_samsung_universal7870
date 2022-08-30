@@ -450,7 +450,11 @@
 			};
 
 			sata@a0000 {
+<<<<<<< HEAD
 				compatible = "marvell,orion-sata";
+=======
+				compatible = "marvell,armada-370-sata";
+>>>>>>> common/deprecated/android-3.18
 				reg = <0xa0000 0x5000>;
 				interrupts = <GIC_SPI 26 IRQ_TYPE_LEVEL_HIGH>;
 				clocks = <&gateclk 14>, <&gateclk 20>;

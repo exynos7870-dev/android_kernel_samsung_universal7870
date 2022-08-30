@@ -14,7 +14,11 @@
 MODULE_LICENSE("GPL");
 
 #ifndef __ARM_NEON__
+<<<<<<< HEAD
 #error You should compile this file with '-mfloat-abi=softfp -mfpu=neon'
+=======
+#error You should compile this file with '-march=armv7-a -mfloat-abi=softfp -mfpu=neon'
+>>>>>>> common/deprecated/android-3.18
 #endif
 
 /*

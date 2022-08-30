@@ -19,6 +19,7 @@ config MMC_DEBUG
 	  This is an option for use by developers; most people should
 	  say N here.  This enables MMC core and driver debugging.
 
+<<<<<<< HEAD
 config MMC_BLOCK_DEFERRED_RESUME
 	bool "Enable Deferred Resume"
 	depends on MMC != n
@@ -29,6 +30,8 @@ config MMC_SUPPORT_STLOG
 	depends on MMC && PROC_STLOG
 	default y
 
+=======
+>>>>>>> common/deprecated/android-3.18
 if MMC
 
 source "drivers/mmc/core/Kconfig"

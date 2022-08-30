@@ -144,6 +144,12 @@ struct iscsi_task {
 	void			*dd_data;	/* driver/transport data */
 };
 
+<<<<<<< HEAD
+=======
+/* invalid scsi_task pointer */
+#define	INVALID_SCSI_TASK	(struct iscsi_task *)-1l
+
+>>>>>>> common/deprecated/android-3.18
 static inline int iscsi_task_has_unsol_data(struct iscsi_task *task)
 {
 	return task->unsol_r2t.data_length > task->unsol_r2t.sent;
@@ -196,6 +202,10 @@ struct iscsi_conn {
 	struct iscsi_task	*task;		/* xmit task in progress */
 
 	/* xmit */
+<<<<<<< HEAD
+=======
+	spinlock_t		taskqueuelock;  /* protects the next three lists */
+>>>>>>> common/deprecated/android-3.18
 	struct list_head	mgmtqueue;	/* mgmt (control) xmit queue */
 	struct list_head	cmdqueue;	/* data-path cmd queue */
 	struct list_head	requeue;	/* tasks needing another run */

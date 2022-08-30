@@ -63,8 +63,13 @@ EXPORT_SYMBOL_GPL(nfs_pgheader_init);
 void nfs_set_pgio_error(struct nfs_pgio_header *hdr, int error, loff_t pos)
 {
 	spin_lock(&hdr->lock);
+<<<<<<< HEAD
 	if (pos < hdr->io_start + hdr->good_bytes) {
 		set_bit(NFS_IOHDR_ERROR, &hdr->flags);
+=======
+	if (!test_and_set_bit(NFS_IOHDR_ERROR, &hdr->flags)
+	    || pos < hdr->io_start + hdr->good_bytes) {
+>>>>>>> common/deprecated/android-3.18
 		clear_bit(NFS_IOHDR_EOF, &hdr->flags);
 		hdr->good_bytes = pos - hdr->io_start;
 		hdr->error = error;
@@ -115,7 +120,11 @@ __nfs_iocounter_wait(struct nfs_io_counter *c)
 		set_bit(NFS_IO_INPROGRESS, &c->flags);
 		if (atomic_read(&c->io_count) == 0)
 			break;
+<<<<<<< HEAD
 		ret = nfs_wait_bit_killable(&q.key, TASK_KILLABLE);
+=======
+		ret = nfs_wait_bit_killable(&q.key);
+>>>>>>> common/deprecated/android-3.18
 	} while (atomic_read(&c->io_count) != 0 && !ret);
 	finish_wait(wq, &q.wait);
 	return ret;
@@ -486,7 +495,11 @@ size_t nfs_generic_pg_test(struct nfs_pageio_descriptor *desc,
 	 * for it without upsetting the slab allocator.
 	 */
 	if (((desc->pg_count + req->wb_bytes) >> PAGE_SHIFT) *
+<<<<<<< HEAD
 			sizeof(struct page) > PAGE_SIZE)
+=======
+			sizeof(struct page *) > PAGE_SIZE)
+>>>>>>> common/deprecated/android-3.18
 		return 0;
 
 	return min(desc->pg_bsize - desc->pg_count, (size_t)req->wb_bytes);
@@ -506,6 +519,7 @@ struct nfs_pgio_header *nfs_pgio_header_alloc(const struct nfs_rw_ops *ops)
 }
 EXPORT_SYMBOL_GPL(nfs_pgio_header_alloc);
 
+<<<<<<< HEAD
 /*
  * nfs_pgio_header_free - Free a read or write header
  * @hdr: The header to free
@@ -516,6 +530,8 @@ void nfs_pgio_header_free(struct nfs_pgio_header *hdr)
 }
 EXPORT_SYMBOL_GPL(nfs_pgio_header_free);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /**
  * nfs_pgio_data_destroy - make @hdr suitable for reuse
  *
@@ -524,14 +540,32 @@ EXPORT_SYMBOL_GPL(nfs_pgio_header_free);
  *
  * @hdr: A header that has had nfs_generic_pgio called
  */
+<<<<<<< HEAD
 void nfs_pgio_data_destroy(struct nfs_pgio_header *hdr)
+=======
+static void nfs_pgio_data_destroy(struct nfs_pgio_header *hdr)
+>>>>>>> common/deprecated/android-3.18
 {
 	if (hdr->args.context)
 		put_nfs_open_context(hdr->args.context);
 	if (hdr->page_array.pagevec != hdr->page_array.page_array)
 		kfree(hdr->page_array.pagevec);
 }
+<<<<<<< HEAD
 EXPORT_SYMBOL_GPL(nfs_pgio_data_destroy);
+=======
+
+/*
+ * nfs_pgio_header_free - Free a read or write header
+ * @hdr: The header to free
+ */
+void nfs_pgio_header_free(struct nfs_pgio_header *hdr)
+{
+	nfs_pgio_data_destroy(hdr);
+	hdr->rw_ops->rw_free_header(hdr);
+}
+EXPORT_SYMBOL_GPL(nfs_pgio_header_free);
+>>>>>>> common/deprecated/android-3.18
 
 /**
  * nfs_pgio_rpcsetup - Set up arguments for a pageio call
@@ -571,7 +605,11 @@ static void nfs_pgio_rpcsetup(struct nfs_pgio_header *hdr,
 	}
 
 	hdr->res.fattr   = &hdr->fattr;
+<<<<<<< HEAD
 	hdr->res.count   = count;
+=======
+	hdr->res.count   = 0;
+>>>>>>> common/deprecated/android-3.18
 	hdr->res.eof     = 0;
 	hdr->res.verf    = &hdr->verf;
 	nfs_fattr_init(&hdr->fattr);
@@ -646,7 +684,10 @@ static int nfs_pgio_error(struct nfs_pageio_descriptor *desc,
 			  struct nfs_pgio_header *hdr)
 {
 	set_bit(NFS_IOHDR_REDO, &hdr->flags);
+<<<<<<< HEAD
 	nfs_pgio_data_destroy(hdr);
+=======
+>>>>>>> common/deprecated/android-3.18
 	hdr->completion_ops->completion(hdr);
 	desc->pg_completion_ops->error_cleanup(&desc->pg_list);
 	return -ENOMEM;
@@ -661,7 +702,11 @@ static void nfs_pgio_release(void *calldata)
 	struct nfs_pgio_header *hdr = calldata;
 	if (hdr->rw_ops->rw_release)
 		hdr->rw_ops->rw_release(hdr);
+<<<<<<< HEAD
 	nfs_pgio_data_destroy(hdr);
+=======
+
+>>>>>>> common/deprecated/android-3.18
 	hdr->completion_ops->completion(hdr);
 }
 
@@ -981,7 +1026,10 @@ static int nfs_do_recoalesce(struct nfs_pageio_descriptor *desc)
 			struct nfs_page *req;
 
 			req = list_first_entry(&head, struct nfs_page, wb_list);
+<<<<<<< HEAD
 			nfs_list_remove_request(req);
+=======
+>>>>>>> common/deprecated/android-3.18
 			if (__nfs_pageio_add_request(desc, req))
 				continue;
 			if (desc->pg_error < 0)

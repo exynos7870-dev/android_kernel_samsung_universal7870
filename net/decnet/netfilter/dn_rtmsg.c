@@ -104,7 +104,13 @@ static inline void dnrmg_receive_user_skb(struct sk_buff *skb)
 {
 	struct nlmsghdr *nlh = nlmsg_hdr(skb);
 
+<<<<<<< HEAD
 	if (nlh->nlmsg_len < sizeof(*nlh) || skb->len < nlh->nlmsg_len)
+=======
+	if (skb->len < sizeof(*nlh) ||
+	    nlh->nlmsg_len < sizeof(*nlh) ||
+	    skb->len < nlh->nlmsg_len)
+>>>>>>> common/deprecated/android-3.18
 		return;
 
 	if (!netlink_capable(skb, CAP_NET_ADMIN))

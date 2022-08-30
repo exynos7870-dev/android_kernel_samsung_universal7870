@@ -51,7 +51,10 @@ struct sched_param {
 #include <linux/resource.h>
 #include <linux/timer.h>
 #include <linux/hrtimer.h>
+<<<<<<< HEAD
 #include <linux/kcov.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 #include <linux/task_io_accounting.h>
 #include <linux/latencytop.h>
 #include <linux/cred.h>
@@ -169,6 +172,7 @@ extern int nr_threads;
 DECLARE_PER_CPU(unsigned long, process_counts);
 extern int nr_processes(void);
 extern unsigned long nr_running(void);
+<<<<<<< HEAD
 #ifdef CONFIG_SCHED_AVG_NR_RUNNING
 extern int avg_nr_running(void);
 #else
@@ -177,10 +181,13 @@ static inline unsigned long avg_nr_running(void)
 	return nr_running();
 }
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 extern bool single_task_running(void);
 extern unsigned long nr_iowait(void);
 extern unsigned long nr_iowait_cpu(int cpu);
 extern void get_iowait_load(unsigned long *nr_waiters, unsigned long *load);
+<<<<<<< HEAD
 #ifdef CONFIG_SCHED_HMP
 extern unsigned long nr_running_cpu(unsigned int cpu);
 extern int register_hmp_task_migration_notifier(struct notifier_block *nb);
@@ -193,6 +200,19 @@ extern unsigned long nr_running_cpu(unsigned int cpu);
 
 extern void calc_global_load(unsigned long ticks);
 extern void update_cpu_load_nohz(void);
+=======
+#ifdef CONFIG_CPU_QUIET
+extern u64 nr_running_integral(unsigned int cpu);
+#endif
+
+extern void calc_global_load(unsigned long ticks);
+
+#if defined(CONFIG_SMP) && defined(CONFIG_NO_HZ_COMMON)
+extern void update_cpu_load_nohz(void);
+#else
+static inline void update_cpu_load_nohz(void) { }
+#endif
+>>>>>>> common/deprecated/android-3.18
 
 extern unsigned long get_parent_ip(unsigned long addr);
 
@@ -285,6 +305,18 @@ extern char ___assert_task_state[1 - 2*!!(
 /* Task command name length */
 #define TASK_COMM_LEN 16
 
+<<<<<<< HEAD
+=======
+enum task_event {
+	PUT_PREV_TASK   = 0,
+	PICK_NEXT_TASK  = 1,
+	TASK_WAKE       = 2,
+	TASK_MIGRATE    = 3,
+	TASK_UPDATE     = 4,
+	IRQ_UPDATE	= 5,
+};
+
+>>>>>>> common/deprecated/android-3.18
 #include <linux/spinlock.h>
 
 /*
@@ -342,9 +374,12 @@ extern void show_regs(struct pt_regs *);
  */
 extern void show_stack(struct task_struct *task, unsigned long *sp);
 
+<<<<<<< HEAD
 void io_schedule(void);
 long io_schedule_timeout(long timeout);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 extern void cpu_init (void);
 extern void trap_init(void);
 extern void update_process_times(int user);
@@ -401,6 +436,16 @@ extern signed long schedule_timeout_uninterruptible(signed long timeout);
 asmlinkage void schedule(void);
 extern void schedule_preempt_disabled(void);
 
+<<<<<<< HEAD
+=======
+extern long io_schedule_timeout(long timeout);
+
+static inline void io_schedule(void)
+{
+	io_schedule_timeout(MAX_SCHEDULE_TIMEOUT);
+}
+
+>>>>>>> common/deprecated/android-3.18
 struct nsproxy;
 struct user_namespace;
 
@@ -747,6 +792,19 @@ struct signal_struct {
 
 #define SIGNAL_UNKILLABLE	0x00000040 /* for init: ignore fatal signals */
 
+<<<<<<< HEAD
+=======
+#define SIGNAL_STOP_MASK (SIGNAL_CLD_MASK | SIGNAL_STOP_STOPPED | \
+			  SIGNAL_STOP_CONTINUED)
+
+static inline void signal_set_stop_flags(struct signal_struct *sig,
+					 unsigned int flags)
+{
+	WARN_ON(sig->flags & (SIGNAL_GROUP_EXIT|SIGNAL_GROUP_COREDUMP));
+	sig->flags = (sig->flags & ~SIGNAL_STOP_MASK) | flags;
+}
+
+>>>>>>> common/deprecated/android-3.18
 /* If true, all threads except ->group_exit_task have pending SIGKILL */
 static inline int signal_group_exit(const struct signal_struct *sig)
 {
@@ -874,11 +932,22 @@ enum cpu_idle_type {
  */
 #define SCHED_CAPACITY_SHIFT	10
 #define SCHED_CAPACITY_SCALE	(1L << SCHED_CAPACITY_SHIFT)
+<<<<<<< HEAD
 /*
  * Increase resolution of cpu_power calculations
  */
 #define SCHED_POWER_SHIFT	10
 #define SCHED_POWER_SCALE	(1L << SCHED_POWER_SHIFT)
+=======
+
+struct sched_capacity_reqs {
+	unsigned long cfs;
+	unsigned long rt;
+	unsigned long dl;
+
+	unsigned long total;
+};
+>>>>>>> common/deprecated/android-3.18
 
 /*
  * sched-domains (multiprocessor balancing) declarations:
@@ -898,6 +967,10 @@ enum cpu_idle_type {
 #define SD_PREFER_SIBLING	0x1000	/* Prefer to place tasks in a sibling domain */
 #define SD_OVERLAP		0x2000	/* sched_domains of this level overlap */
 #define SD_NUMA			0x4000	/* cross-node balancing */
+<<<<<<< HEAD
+=======
+#define SD_SHARE_CAP_STATES	0x8000  /* Domain members share capacity state */
+>>>>>>> common/deprecated/android-3.18
 
 #ifdef CONFIG_SCHED_SMT
 static inline int cpu_smt_flags(void)
@@ -930,6 +1003,27 @@ struct sched_domain_attr {
 
 extern int sched_domain_level_max;
 
+<<<<<<< HEAD
+=======
+struct capacity_state {
+	unsigned long cap;	/* compute capacity */
+	unsigned long power;	/* power consumption at this compute capacity */
+};
+
+struct idle_state {
+	unsigned long power;	 /* power consumption in this idle state */
+};
+
+struct sched_group_energy {
+	unsigned int nr_idle_states;	/* number of idle states */
+	struct idle_state *idle_states;	/* ptr to idle state array */
+	unsigned int nr_cap_states;	/* number of capacity states */
+	struct capacity_state *cap_states; /* ptr to capacity state array */
+};
+
+unsigned long capacity_curr_of(int cpu);
+
+>>>>>>> common/deprecated/android-3.18
 struct sched_group;
 
 struct sched_domain {
@@ -1028,6 +1122,11 @@ bool cpus_share_cache(int this_cpu, int that_cpu);
 
 typedef const struct cpumask *(*sched_domain_mask_f)(int cpu);
 typedef int (*sched_domain_flags_f)(void);
+<<<<<<< HEAD
+=======
+typedef
+const struct sched_group_energy * const(*sched_domain_energy_f)(int cpu);
+>>>>>>> common/deprecated/android-3.18
 
 #define SDTL_OVERLAP	0x01
 
@@ -1040,6 +1139,10 @@ struct sd_data {
 struct sched_domain_topology_level {
 	sched_domain_mask_f mask;
 	sched_domain_flags_f sd_flags;
+<<<<<<< HEAD
+=======
+	sched_domain_energy_f energy;
+>>>>>>> common/deprecated/android-3.18
 	int		    flags;
 	int		    numa_level;
 	struct sd_data      data;
@@ -1059,6 +1162,7 @@ extern void wake_up_if_idle(int cpu);
 # define SD_INIT_NAME(type)
 #endif
 
+<<<<<<< HEAD
 #ifdef CONFIG_SCHED_HMP
 struct hmp_domain {
 	struct cpumask cpus;
@@ -1077,6 +1181,8 @@ extern int set_active_down_migration(int enable);
 extern int set_hmp_aggressive_up_migration(int enable);
 extern int set_hmp_aggressive_yield(int enable);
 #endif /* CONFIG_SCHED_HMP */
+=======
+>>>>>>> common/deprecated/android-3.18
 #else /* CONFIG_SMP */
 
 struct sched_domain_attr;
@@ -1114,6 +1220,7 @@ struct load_weight {
 	u32 inv_weight;
 };
 
+<<<<<<< HEAD
 struct sched_avg {
 	/*
 	 * These sums represent an infinite geometric series and so are bound
@@ -1131,6 +1238,26 @@ struct sched_avg {
 	u64 hmp_last_down_migration;
 #endif
 	u32 usage_avg_sum;
+=======
+/*
+ * The load_avg/util_avg accumulates an infinite geometric series.
+ * 1) load_avg factors frequency scaling into the amount of time that a
+ * sched_entity is runnable on a rq into its weight. For cfs_rq, it is the
+ * aggregated such weights of all runnable and blocked sched_entities.
+ * 2) util_avg factors frequency and cpu scaling into the amount of time
+ * that a sched_entity is running on a CPU, in the range [0..SCHED_LOAD_SCALE].
+ * For cfs_rq, it is the aggregated such times of all runnable and
+ * blocked sched_entities.
+ * The 64 bit load_sum can:
+ * 1) for cfs_rq, afford 4353082796 (=2^64/47742/88761) entities with
+ * the highest weight (=88761) always runnable, we should not overflow
+ * 2) for entity, support any load.weight always runnable
+ */
+struct sched_avg {
+	u64 last_update_time, load_sum;
+	u32 util_sum, period_contrib;
+	unsigned long load_avg, util_avg;
+>>>>>>> common/deprecated/android-3.18
 };
 
 #ifdef CONFIG_SCHEDSTATS
@@ -1169,6 +1296,44 @@ struct sched_statistics {
 };
 #endif
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_SCHED_WALT
+#define RAVG_HIST_SIZE_MAX  5
+
+/* ravg represents frequency scaled cpu-demand of tasks */
+struct ravg {
+	/*
+	 * 'mark_start' marks the beginning of an event (task waking up, task
+	 * starting to execute, task being preempted) within a window
+	 *
+	 * 'sum' represents how runnable a task has been within current
+	 * window. It incorporates both running time and wait time and is
+	 * frequency scaled.
+	 *
+	 * 'sum_history' keeps track of history of 'sum' seen over previous
+	 * RAVG_HIST_SIZE windows. Windows where task was entirely sleeping are
+	 * ignored.
+	 *
+	 * 'demand' represents maximum sum seen over previous
+	 * sysctl_sched_ravg_hist_size windows. 'demand' could drive frequency
+	 * demand for tasks.
+	 *
+	 * 'curr_window' represents task's contribution to cpu busy time
+	 * statistics (rq->curr_runnable_sum) in current window
+	 *
+	 * 'prev_window' represents task's contribution to cpu busy time
+	 * statistics (rq->prev_runnable_sum) in previous window
+	 */
+	u64 mark_start;
+	u32 sum, demand;
+	u32 sum_history[RAVG_HIST_SIZE_MAX];
+	u32 curr_window, prev_window;
+	u16 active_windows;
+};
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 struct sched_entity {
 	struct load_weight	load;		/* for load-balancing */
 	struct rb_node		run_node;
@@ -1196,7 +1361,11 @@ struct sched_entity {
 #endif
 
 #ifdef CONFIG_SMP
+<<<<<<< HEAD
 	/* Per-entity load-tracking */
+=======
+	/* Per entity load average tracking */
+>>>>>>> common/deprecated/android-3.18
 	struct sched_avg	avg;
 #endif
 };
@@ -1229,6 +1398,10 @@ struct sched_dl_entity {
 	u64 dl_deadline;	/* relative deadline of each instance	*/
 	u64 dl_period;		/* separation of two instances (period) */
 	u64 dl_bw;		/* dl_runtime / dl_deadline		*/
+<<<<<<< HEAD
+=======
+	u64 dl_density;		/* dl_runtime / dl_deadline		*/
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * Actual scheduling parameters. Initialized with the values above,
@@ -1275,10 +1448,13 @@ union rcu_special {
 };
 struct rcu_node;
 
+<<<<<<< HEAD
 #ifdef CONFIG_FIVE
 struct task_integrity;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 enum perf_event_task_context {
 	perf_invalid_context = -1,
 	perf_hw_context = 0,
@@ -1287,6 +1463,16 @@ enum perf_event_task_context {
 };
 
 struct task_struct {
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_THREAD_INFO_IN_TASK
+	/*
+	 * For reasons of header soup (see current_thread_info()), this
+	 * must be the first element of task_struct.
+	 */
+	struct thread_info thread_info;
+#endif
+>>>>>>> common/deprecated/android-3.18
 	volatile long state;	/* -1 unrunnable, 0 runnable, >0 stopped */
 	void *stack;
 	atomic_t usage;
@@ -1296,9 +1482,18 @@ struct task_struct {
 #ifdef CONFIG_SMP
 	struct llist_node wake_entry;
 	int on_cpu;
+<<<<<<< HEAD
 	struct task_struct *last_wakee;
 	unsigned long wakee_flips;
 	unsigned long wakee_flip_decay_ts;
+=======
+#ifdef CONFIG_THREAD_INFO_IN_TASK
+	unsigned int cpu;	/* current CPU */
+#endif
+	unsigned int wakee_flips;
+	unsigned long wakee_flip_decay_ts;
+	struct task_struct *last_wakee;
+>>>>>>> common/deprecated/android-3.18
 
 	int wake_cpu;
 #endif
@@ -1309,6 +1504,18 @@ struct task_struct {
 	const struct sched_class *sched_class;
 	struct sched_entity se;
 	struct sched_rt_entity rt;
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_SCHED_WALT
+	struct ravg ravg;
+	/*
+	 * 'init_load_pct' represents the initial task load assigned to children
+	 * of this task
+	 */
+	u32 init_load_pct;
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 #ifdef CONFIG_CGROUP_SCHED
 	struct task_group *sched_task_group;
 #endif
@@ -1357,7 +1564,11 @@ struct task_struct {
 	unsigned brk_randomized:1;
 #endif
 	/* per-thread vma caching */
+<<<<<<< HEAD
 	u32 vmacache_seqnum;
+=======
+	u64 vmacache_seqnum;
+>>>>>>> common/deprecated/android-3.18
 	struct vm_area_struct *vmacache[VMACACHE_SIZE];
 #if defined(SPLIT_RSS_COUNTING)
 	struct task_rss_stat	rss_stat;
@@ -1381,6 +1592,11 @@ struct task_struct {
 
 	unsigned long atomic_flags; /* Flags needing atomic access. */
 
+<<<<<<< HEAD
+=======
+	struct restart_block restart_block;
+
+>>>>>>> common/deprecated/android-3.18
 	pid_t pid;
 	pid_t tgid;
 
@@ -1444,6 +1660,10 @@ struct task_struct {
 	struct list_head cpu_timers[3];
 
 /* process credentials */
+<<<<<<< HEAD
+=======
+	const struct cred __rcu *ptracer_cred; /* Tracer's credentials at attach */
+>>>>>>> common/deprecated/android-3.18
 	const struct cred __rcu *real_cred; /* objective and real subjective task
 					 * credentials (COW) */
 	const struct cred __rcu *cred;	/* effective (overridable) subjective task
@@ -1494,8 +1714,13 @@ struct task_struct {
 	struct seccomp seccomp;
 
 /* Thread group tracking */
+<<<<<<< HEAD
    	u32 parent_exec_id;
    	u32 self_exec_id;
+=======
+	u64 parent_exec_id;
+	u64 self_exec_id;
+>>>>>>> common/deprecated/android-3.18
 /* Protection of (de-)allocation: mm, files, fs, tty, keyrings, mems_allowed,
  * mempolicy */
 	spinlock_t alloc_lock;
@@ -1584,6 +1809,11 @@ struct task_struct {
 #endif
 	struct list_head pi_state_list;
 	struct futex_pi_state *pi_state_cache;
+<<<<<<< HEAD
+=======
+	struct mutex futex_exit_mutex;
+	unsigned int futex_state;
+>>>>>>> common/deprecated/android-3.18
 #endif
 #ifdef CONFIG_PERF_EVENTS
 	struct perf_event_context *perf_event_ctxp[perf_nr_task_contexts];
@@ -1700,6 +1930,7 @@ struct task_struct {
 	/* bitmask and counter of trace recursion */
 	unsigned long trace_recursion;
 #endif /* CONFIG_TRACING */
+<<<<<<< HEAD
 #ifdef CONFIG_KCOV
 	/* Coverage collection mode enabled for this task (0 if disabled). */
 	enum kcov_mode kcov_mode;
@@ -1710,6 +1941,8 @@ struct task_struct {
 	/* kcov desciptor wired with this task or NULL. */
 	struct kcov	*kcov;
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 #ifdef CONFIG_MEMCG /* memcg uses this to do batch job */
 	unsigned int memcg_kmem_skip_account;
 	struct memcg_oom_info {
@@ -1726,12 +1959,15 @@ struct task_struct {
 	unsigned int	sequential_io;
 	unsigned int	sequential_io_avg;
 #endif
+<<<<<<< HEAD
 #ifdef CONFIG_SDP
 	unsigned int sensitive;
 #endif
 #ifdef CONFIG_FIVE
 	struct task_integrity *integrity;
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 /* Future-safe accessor for struct task_struct's cpus_allowed. */
@@ -1836,6 +2072,7 @@ static inline pid_t task_tgid_nr(struct task_struct *tsk)
 	return tsk->tgid;
 }
 
+<<<<<<< HEAD
 static pid_t task_tgid_nr_ns(struct task_struct *tsk, struct pid_namespace *ns);
 
 static inline int pid_alive(const struct task_struct *p);
@@ -1855,6 +2092,10 @@ static inline pid_t task_ppid_nr(const struct task_struct *tsk)
 {
 	return task_ppid_nr_ns(tsk, &init_pid_ns);
 }
+=======
+
+static inline int pid_alive(const struct task_struct *p);
+>>>>>>> common/deprecated/android-3.18
 
 static inline pid_t task_pgrp_nr_ns(struct task_struct *tsk,
 					struct pid_namespace *ns)
@@ -1889,6 +2130,26 @@ static inline pid_t task_tgid_vnr(struct task_struct *tsk)
 	return __task_pid_nr_ns(tsk, __PIDTYPE_TGID, NULL);
 }
 
+<<<<<<< HEAD
+=======
+static inline pid_t task_ppid_nr_ns(const struct task_struct *tsk, struct pid_namespace *ns)
+{
+	pid_t pid = 0;
+
+	rcu_read_lock();
+	if (pid_alive(tsk))
+		pid = task_tgid_nr_ns(rcu_dereference(tsk->real_parent), ns);
+	rcu_read_unlock();
+
+	return pid;
+}
+
+static inline pid_t task_ppid_nr(const struct task_struct *tsk)
+{
+	return task_ppid_nr_ns(tsk, &init_pid_ns);
+}
+
+>>>>>>> common/deprecated/android-3.18
 /* obsolete, do not use */
 static inline pid_t task_pgrp_nr(struct task_struct *tsk)
 {
@@ -1977,7 +2238,10 @@ extern int task_free_unregister(struct notifier_block *n);
  * Per process flags
  */
 #define PF_EXITING	0x00000004	/* getting shut down */
+<<<<<<< HEAD
 #define PF_EXITPIDONE	0x00000008	/* pi exit done on shut down */
+=======
+>>>>>>> common/deprecated/android-3.18
 #define PF_VCPU		0x00000010	/* I'm a virtual CPU */
 #define PF_WQ_WORKER	0x00000020	/* I'm a workqueue worker */
 #define PF_FORKNOEXEC	0x00000040	/* forked but didn't exec */
@@ -2158,6 +2422,7 @@ static inline void calc_load_enter_idle(void) { }
 static inline void calc_load_exit_idle(void) { }
 #endif /* CONFIG_NO_HZ_COMMON */
 
+<<<<<<< HEAD
 #ifndef CONFIG_CPUMASK_OFFSTACK
 static inline int set_cpus_allowed(struct task_struct *p, cpumask_t new_mask)
 {
@@ -2165,6 +2430,8 @@ static inline int set_cpus_allowed(struct task_struct *p, cpumask_t new_mask)
 }
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * Do not use outside of architecture code which knows its limitations.
  *
@@ -2317,7 +2584,13 @@ void yield(void);
 extern struct exec_domain	default_exec_domain;
 
 union thread_union {
+<<<<<<< HEAD
 	struct thread_info thread_info;
+=======
+#ifndef CONFIG_THREAD_INFO_IN_TASK
+	struct thread_info thread_info;
+#endif
+>>>>>>> common/deprecated/android-3.18
 	unsigned long stack[THREAD_SIZE/sizeof(long)];
 };
 
@@ -2505,8 +2778,15 @@ extern struct mm_struct *get_task_mm(struct task_struct *task);
  * succeeds.
  */
 extern struct mm_struct *mm_access(struct task_struct *task, unsigned int mode);
+<<<<<<< HEAD
 /* Remove the current tasks stale references to the old mm_struct */
 extern void mm_release(struct task_struct *, struct mm_struct *);
+=======
+/* Remove the current tasks stale references to the old mm_struct on exit() */
+extern void exit_mm_release(struct task_struct *, struct mm_struct *);
+/* Remove the current tasks stale references to the old mm_struct on exec() */
+extern void exec_mm_release(struct task_struct *, struct mm_struct *);
+>>>>>>> common/deprecated/android-3.18
 
 extern int copy_thread(unsigned long, unsigned long, unsigned long,
 			struct task_struct *);
@@ -2533,7 +2813,16 @@ static inline void set_task_comm(struct task_struct *tsk, const char *from)
 {
 	__set_task_comm(tsk, from, false);
 }
+<<<<<<< HEAD
 extern char *get_task_comm(char *to, struct task_struct *tsk);
+=======
+
+extern char *__get_task_comm(char *to, size_t len, struct task_struct *tsk);
+#define get_task_comm(buf, tsk) ({			\
+	BUILD_BUG_ON(sizeof(buf) != TASK_COMM_LEN);	\
+	__get_task_comm(buf, sizeof(buf), tsk);		\
+})
+>>>>>>> common/deprecated/android-3.18
 
 #ifdef CONFIG_SMP
 void scheduler_ipi(void);
@@ -2703,10 +2992,41 @@ static inline void threadgroup_lock(struct task_struct *tsk) {}
 static inline void threadgroup_unlock(struct task_struct *tsk) {}
 #endif
 
+<<<<<<< HEAD
 #ifndef __HAVE_THREAD_FUNCTIONS
 
 #define task_thread_info(task)	((struct thread_info *)(task)->stack)
 #define task_stack_page(task)	((task)->stack)
+=======
+#ifdef CONFIG_THREAD_INFO_IN_TASK
+
+static inline struct thread_info *task_thread_info(struct task_struct *task)
+{
+	return &task->thread_info;
+}
+
+/*
+ * When accessing the stack of a non-current task that might exit, use
+ * try_get_task_stack() instead.  task_stack_page will return a pointer
+ * that could get freed out from under you.
+ */
+static inline void *task_stack_page(const struct task_struct *task)
+{
+	return task->stack;
+}
+
+#define setup_thread_stack(new,old)	do { } while(0)
+
+static inline unsigned long *end_of_stack(const struct task_struct *task)
+{
+	return task->stack;
+}
+
+#elif !defined(__HAVE_THREAD_FUNCTIONS)
+
+#define task_thread_info(task)	((struct thread_info *)(task)->stack)
+#define task_stack_page(task)	((void *)(task)->stack)
+>>>>>>> common/deprecated/android-3.18
 
 static inline void setup_thread_stack(struct task_struct *p, struct task_struct *org)
 {
@@ -2733,6 +3053,17 @@ static inline unsigned long *end_of_stack(struct task_struct *p)
 }
 
 #endif
+<<<<<<< HEAD
+=======
+
+static inline void *try_get_task_stack(struct task_struct *tsk)
+{
+	return task_stack_page(tsk);
+}
+
+static inline void put_task_stack(struct task_struct *tsk) {}
+
+>>>>>>> common/deprecated/android-3.18
 #define task_stack_end_corrupted(task) \
 		(*(end_of_stack(task)) != STACK_END_MAGIC)
 
@@ -3009,7 +3340,15 @@ static inline void ptrace_signal_wake_up(struct task_struct *t, bool resume)
 
 static inline unsigned int task_cpu(const struct task_struct *p)
 {
+<<<<<<< HEAD
 	return task_thread_info(p)->cpu;
+=======
+#ifdef CONFIG_THREAD_INFO_IN_TASK
+	return p->cpu;
+#else
+	return task_thread_info(p)->cpu;
+#endif
+>>>>>>> common/deprecated/android-3.18
 }
 
 static inline int task_node(const struct task_struct *p)
@@ -3103,13 +3442,21 @@ static inline void mm_update_next_owner(struct mm_struct *mm)
 static inline unsigned long task_rlimit(const struct task_struct *tsk,
 		unsigned int limit)
 {
+<<<<<<< HEAD
 	return ACCESS_ONCE(tsk->signal->rlim[limit].rlim_cur);
+=======
+	return READ_ONCE(tsk->signal->rlim[limit].rlim_cur);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static inline unsigned long task_rlimit_max(const struct task_struct *tsk,
 		unsigned int limit)
 {
+<<<<<<< HEAD
 	return ACCESS_ONCE(tsk->signal->rlim[limit].rlim_max);
+=======
+	return READ_ONCE(tsk->signal->rlim[limit].rlim_max);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static inline unsigned long rlimit(unsigned int limit)

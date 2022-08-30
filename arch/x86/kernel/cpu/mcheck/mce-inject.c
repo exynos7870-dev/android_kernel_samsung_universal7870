@@ -152,7 +152,10 @@ static void raise_mce(struct mce *m)
 	if (context == MCJ_CTX_RANDOM)
 		return;
 
+<<<<<<< HEAD
 #ifdef CONFIG_X86_LOCAL_APIC
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (m->inject_flags & (MCJ_IRQ_BROADCAST | MCJ_NMI_BROADCAST)) {
 		unsigned long start;
 		int cpu;
@@ -193,9 +196,13 @@ static void raise_mce(struct mce *m)
 		raise_local();
 		put_cpu();
 		put_online_cpus();
+<<<<<<< HEAD
 	} else
 #endif
 	{
+=======
+	} else {
+>>>>>>> common/deprecated/android-3.18
 		preempt_disable();
 		raise_local();
 		preempt_enable();

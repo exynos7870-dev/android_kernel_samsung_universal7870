@@ -74,7 +74,11 @@ struct lgdt3305_config {
 	enum lgdt_demod_chip_type demod_chip;
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_LGDT3305)
+=======
+#if IS_REACHABLE(CONFIG_DVB_LGDT3305)
+>>>>>>> common/deprecated/android-3.18
 extern
 struct dvb_frontend *lgdt3305_attach(const struct lgdt3305_config *config,
 				     struct i2c_adapter *i2c_adap);

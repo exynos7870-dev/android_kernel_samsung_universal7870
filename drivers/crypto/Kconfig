@@ -436,6 +436,9 @@ config CRYPTO_DEV_QCE
 	  hardware. To compile this driver as a module, choose M here. The
 	  module will be called qcrypto.
 
+<<<<<<< HEAD
 source "drivers/crypto/fmp/Kconfig"
 
+=======
+>>>>>>> common/deprecated/android-3.18
 endif # CRYPTO_HW

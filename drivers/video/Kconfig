@@ -17,8 +17,11 @@ config SH_LCD_MIPI_DSI
 
 source "drivers/char/agp/Kconfig"
 
+<<<<<<< HEAD
 source "drivers/gpu/arm/Kconfig"
 
+=======
+>>>>>>> common/deprecated/android-3.18
 source "drivers/gpu/vga/Kconfig"
 
 source "drivers/gpu/host1x/Kconfig"

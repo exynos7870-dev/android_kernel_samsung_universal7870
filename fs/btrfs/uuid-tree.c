@@ -332,6 +332,11 @@ again_search_slot:
 				}
 				if (ret < 0 && ret != -ENOENT)
 					goto out;
+<<<<<<< HEAD
+=======
+				key.offset++;
+				goto again_search_slot;
+>>>>>>> common/deprecated/android-3.18
 			}
 			item_size -= sizeof(subid_le);
 			offset += sizeof(subid_le);
@@ -348,7 +353,11 @@ skip:
 
 out:
 	btrfs_free_path(path);
+<<<<<<< HEAD
 	if (ret)
 		btrfs_warn(fs_info, "btrfs_uuid_tree_iterate failed %d", ret);
 	return 0;
+=======
+	return ret;
+>>>>>>> common/deprecated/android-3.18
 }

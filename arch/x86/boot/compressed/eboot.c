@@ -365,7 +365,12 @@ __setup_efi_pci32(efi_pci_io_protocol_32 *pci, struct pci_setup_rom **__rom)
 	if (status != EFI_SUCCESS)
 		goto free_struct;
 
+<<<<<<< HEAD
 	memcpy(rom->romdata, pci->romimage, pci->romsize);
+=======
+	memcpy(rom->romdata, (void *)(unsigned long)pci->romimage,
+	       pci->romsize);
+>>>>>>> common/deprecated/android-3.18
 	return status;
 
 free_struct:
@@ -471,7 +476,12 @@ __setup_efi_pci64(efi_pci_io_protocol_64 *pci, struct pci_setup_rom **__rom)
 	if (status != EFI_SUCCESS)
 		goto free_struct;
 
+<<<<<<< HEAD
 	memcpy(rom->romdata, pci->romimage, pci->romsize);
+=======
+	memcpy(rom->romdata, (void *)(unsigned long)pci->romimage,
+	       pci->romsize);
+>>>>>>> common/deprecated/android-3.18
 	return status;
 
 free_struct:
@@ -1110,6 +1120,11 @@ struct boot_params *make_boot_params(struct efi_config *c)
 	if (!cmdline_ptr)
 		goto fail;
 	hdr->cmd_line_ptr = (unsigned long)cmdline_ptr;
+<<<<<<< HEAD
+=======
+	/* Fill in upper bits of command line address, NOP on 32 bit  */
+	boot_params->ext_cmd_line_ptr = (u64)(unsigned long)cmdline_ptr >> 32;
+>>>>>>> common/deprecated/android-3.18
 
 	hdr->ramdisk_image = 0;
 	hdr->ramdisk_size = 0;
@@ -1192,6 +1207,13 @@ static efi_status_t setup_e820(struct boot_params *params,
 		unsigned int e820_type = 0;
 		unsigned long m = efi->efi_memmap;
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_X86_64
+		m |= (u64)efi->efi_memmap_hi << 32;
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 		d = (efi_memory_desc_t *)(m + (i * efi->efi_memdesc_size));
 		switch (d->type) {
 		case EFI_RESERVED_TYPE:

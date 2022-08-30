@@ -35,6 +35,10 @@
 #include <linux/hiddev.h>
 #include <linux/compat.h>
 #include <linux/vmalloc.h>
+<<<<<<< HEAD
+=======
+#include <linux/nospec.h>
+>>>>>>> common/deprecated/android-3.18
 #include "usbhid.h"
 
 #ifdef CONFIG_USB_DYNAMIC_MINORS
@@ -307,6 +311,17 @@ static int hiddev_open(struct inode *inode, struct file *file)
 	spin_unlock_irq(&list->hiddev->list_lock);
 
 	mutex_lock(&hiddev->existancelock);
+<<<<<<< HEAD
+=======
+	/*
+	 * recheck exist with existance lock held to
+	 * avoid opening a disconnected device
+	 */
+	if (!list->hiddev->exist) {
+		res = -ENODEV;
+		goto bail_unlock;
+	}
+>>>>>>> common/deprecated/android-3.18
 	if (!list->hiddev->open++)
 		if (list->hiddev->exist) {
 			struct hid_device *hid = hiddev->hid;
@@ -321,6 +336,13 @@ static int hiddev_open(struct inode *inode, struct file *file)
 	return 0;
 bail_unlock:
 	mutex_unlock(&hiddev->existancelock);
+<<<<<<< HEAD
+=======
+
+	spin_lock_irq(&list->hiddev->list_lock);
+	list_del(&list->node);
+	spin_unlock_irq(&list->hiddev->list_lock);
+>>>>>>> common/deprecated/android-3.18
 bail:
 	file->private_data = NULL;
 	vfree(list);
@@ -478,10 +500,20 @@ static noinline int hiddev_ioctl_usage(struct hiddev *hiddev, unsigned int cmd, 
 
 		if (uref->field_index >= report->maxfield)
 			goto inval;
+<<<<<<< HEAD
+=======
+		uref->field_index = array_index_nospec(uref->field_index,
+						       report->maxfield);
+>>>>>>> common/deprecated/android-3.18
 
 		field = report->field[uref->field_index];
 		if (uref->usage_index >= field->maxusage)
 			goto inval;
+<<<<<<< HEAD
+=======
+		uref->usage_index = array_index_nospec(uref->usage_index,
+						       field->maxusage);
+>>>>>>> common/deprecated/android-3.18
 
 		uref->usage_code = field->usage[uref->usage_index].hid;
 
@@ -508,6 +540,7 @@ static noinline int hiddev_ioctl_usage(struct hiddev *hiddev, unsigned int cmd, 
 
 			if (uref->field_index >= report->maxfield)
 				goto inval;
+<<<<<<< HEAD
 
 			field = report->field[uref->field_index];
 		}
@@ -522,16 +555,43 @@ static noinline int hiddev_ioctl_usage(struct hiddev *hiddev, unsigned int cmd, 
 			 (uref_multi->num_values > HID_MAX_MULTI_USAGES ||
 			uref->usage_index + uref_multi->num_values >
 			field->report_count))
+=======
+			uref->field_index = array_index_nospec(uref->field_index,
+							       report->maxfield);
+
+			field = report->field[uref->field_index];
+
+			if (cmd == HIDIOCGCOLLECTIONINDEX) {
+				if (uref->usage_index >= field->maxusage)
+					goto inval;
+			} else if (uref->usage_index >= field->report_count)
+				goto inval;
+		}
+
+		if ((cmd == HIDIOCGUSAGES || cmd == HIDIOCSUSAGES) &&
+		    (uref_multi->num_values > HID_MAX_MULTI_USAGES ||
+		     uref->usage_index + uref_multi->num_values > field->report_count))
+>>>>>>> common/deprecated/android-3.18
 			goto inval;
 
 		switch (cmd) {
 		case HIDIOCGUSAGE:
+<<<<<<< HEAD
+=======
+			if (uref->usage_index >= field->report_count)
+				goto inval;
+>>>>>>> common/deprecated/android-3.18
 			uref->value = field->value[uref->usage_index];
 			if (copy_to_user(user_arg, uref, sizeof(*uref)))
 				goto fault;
 			goto goodreturn;
 
 		case HIDIOCSUSAGE:
+<<<<<<< HEAD
+=======
+			if (uref->usage_index >= field->report_count)
+				goto inval;
+>>>>>>> common/deprecated/android-3.18
 			field->value[uref->usage_index] = uref->value;
 			goto goodreturn;
 
@@ -762,6 +822,11 @@ static long hiddev_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
 		if (finfo.field_index >= report->maxfield)
 			break;
+<<<<<<< HEAD
+=======
+		finfo.field_index = array_index_nospec(finfo.field_index,
+						       report->maxfield);
+>>>>>>> common/deprecated/android-3.18
 
 		field = report->field[finfo.field_index];
 		memset(&finfo, 0, sizeof(finfo));
@@ -802,6 +867,11 @@ static long hiddev_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
 		if (cinfo.index >= hid->maxcollection)
 			break;
+<<<<<<< HEAD
+=======
+		cinfo.index = array_index_nospec(cinfo.index,
+						 hid->maxcollection);
+>>>>>>> common/deprecated/android-3.18
 
 		cinfo.type = hid->collection[cinfo.index].type;
 		cinfo.usage = hid->collection[cinfo.index].usage;
@@ -930,9 +1000,15 @@ void hiddev_disconnect(struct hid_device *hid)
 	hiddev->exist = 0;
 
 	if (hiddev->open) {
+<<<<<<< HEAD
 		mutex_unlock(&hiddev->existancelock);
 		usbhid_close(hiddev->hid);
 		wake_up_interruptible(&hiddev->wait);
+=======
+		usbhid_close(hiddev->hid);
+		wake_up_interruptible(&hiddev->wait);
+		mutex_unlock(&hiddev->existancelock);
+>>>>>>> common/deprecated/android-3.18
 	} else {
 		mutex_unlock(&hiddev->existancelock);
 		kfree(hiddev);

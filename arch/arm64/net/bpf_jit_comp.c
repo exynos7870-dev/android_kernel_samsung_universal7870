@@ -413,6 +413,10 @@ emit_cond_jmp:
 		case BPF_JGE:
 			jmp_cond = A64_COND_CS;
 			break;
+<<<<<<< HEAD
+=======
+		case BPF_JSET:
+>>>>>>> common/deprecated/android-3.18
 		case BPF_JNE:
 			jmp_cond = A64_COND_NE;
 			break;
@@ -487,7 +491,11 @@ emit_cond_jmp:
 			return -EINVAL;
 		}
 
+<<<<<<< HEAD
 		imm64 = (u64)insn1.imm << 32 | imm;
+=======
+		imm64 = (u64)insn1.imm << 32 | (u32)imm;
+>>>>>>> common/deprecated/android-3.18
 		emit_a64_mov_i64(dst, imm64, ctx);
 
 		return 1;

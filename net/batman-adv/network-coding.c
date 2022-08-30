@@ -15,6 +15,10 @@
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
+<<<<<<< HEAD
+=======
+#include <linux/bitops.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/debugfs.h>
 
 #include "main.h"
@@ -105,9 +109,15 @@ static void batadv_nc_tvlv_ogm_handler_v1(struct batadv_priv *bat_priv,
 					  uint16_t tvlv_value_len)
 {
 	if (flags & BATADV_TVLV_HANDLER_OGM_CIFNOTFND)
+<<<<<<< HEAD
 		orig->capabilities &= ~BATADV_ORIG_CAPA_HAS_NC;
 	else
 		orig->capabilities |= BATADV_ORIG_CAPA_HAS_NC;
+=======
+		clear_bit(BATADV_ORIG_CAPA_HAS_NC, &orig->capabilities);
+	else
+		set_bit(BATADV_ORIG_CAPA_HAS_NC, &orig->capabilities);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -174,6 +184,7 @@ void batadv_nc_init_orig(struct batadv_orig_node *orig_node)
 }
 
 /**
+<<<<<<< HEAD
  * batadv_nc_node_free_rcu - rcu callback to free an nc node and remove
  *  its refcount on the orig_node
  * @rcu: rcu pointer of the nc node
@@ -190,12 +201,31 @@ static void batadv_nc_node_free_rcu(struct rcu_head *rcu)
 /**
  * batadv_nc_node_free_ref - decrements the nc node refcounter and possibly
  * frees it
+=======
+ * batadv_nc_node_release - release nc_node from lists and queue for free after
+ *  rcu grace period
+ * @nc_node: the nc node to free
+ */
+static void batadv_nc_node_release(struct batadv_nc_node *nc_node)
+{
+	batadv_orig_node_free_ref(nc_node->orig_node);
+	kfree_rcu(nc_node, rcu);
+}
+
+/**
+ * batadv_nc_node_free_ref - decrement the nc node refcounter and possibly
+ *  release it
+>>>>>>> common/deprecated/android-3.18
  * @nc_node: the nc node to free
  */
 static void batadv_nc_node_free_ref(struct batadv_nc_node *nc_node)
 {
 	if (atomic_dec_and_test(&nc_node->refcount))
+<<<<<<< HEAD
 		call_rcu(&nc_node->rcu, batadv_nc_node_free_rcu);
+=======
+		batadv_nc_node_release(nc_node);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -804,6 +834,7 @@ static struct batadv_nc_node
 	spinlock_t *lock; /* Used to lock list selected by "int in_coding" */
 	struct list_head *list;
 
+<<<<<<< HEAD
 	/* Check if nc_node is already added */
 	nc_node = batadv_nc_find_nc_node(orig_node, orig_neigh_node, in_coding);
 
@@ -824,6 +855,8 @@ static struct batadv_nc_node
 	nc_node->orig_node = orig_neigh_node;
 	atomic_set(&nc_node->refcount, 2);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* Select ingoing or outgoing coding node */
 	if (in_coding) {
 		lock = &orig_neigh_node->in_coding_list_lock;
@@ -833,10 +866,35 @@ static struct batadv_nc_node
 		list = &orig_neigh_node->out_coding_list;
 	}
 
+<<<<<<< HEAD
+=======
+	spin_lock_bh(lock);
+
+	/* Check if nc_node is already added */
+	nc_node = batadv_nc_find_nc_node(orig_node, orig_neigh_node, in_coding);
+
+	/* Node found */
+	if (nc_node)
+		goto unlock;
+
+	nc_node = kzalloc(sizeof(*nc_node), GFP_ATOMIC);
+	if (!nc_node)
+		goto unlock;
+
+	atomic_inc(&orig_neigh_node->refcount);
+
+	/* Initialize nc_node */
+	INIT_LIST_HEAD(&nc_node->list);
+	ether_addr_copy(nc_node->addr, orig_node->orig);
+	nc_node->orig_node = orig_neigh_node;
+	atomic_set(&nc_node->refcount, 2);
+
+>>>>>>> common/deprecated/android-3.18
 	batadv_dbg(BATADV_DBG_NC, bat_priv, "Adding nc_node %pM -> %pM\n",
 		   nc_node->addr, nc_node->orig_node->orig);
 
 	/* Add nc_node to orig_node */
+<<<<<<< HEAD
 	spin_lock_bh(lock);
 	list_add_tail_rcu(&nc_node->list, list);
 	spin_unlock_bh(lock);
@@ -846,6 +904,13 @@ static struct batadv_nc_node
 free:
 	kfree(nc_node);
 	return NULL;
+=======
+	list_add_tail_rcu(&nc_node->list, list);
+unlock:
+	spin_unlock_bh(lock);
+
+	return nc_node;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -871,7 +936,11 @@ void batadv_nc_update_nc_node(struct batadv_priv *bat_priv,
 		goto out;
 
 	/* check if orig node is network coding enabled */
+<<<<<<< HEAD
 	if (!(orig_node->capabilities & BATADV_ORIG_CAPA_HAS_NC))
+=======
+	if (!test_bit(BATADV_ORIG_CAPA_HAS_NC, &orig_node->capabilities))
+>>>>>>> common/deprecated/android-3.18
 		goto out;
 
 	/* accept ogms from 'good' neighbors and single hop neighbors */
@@ -969,6 +1038,7 @@ static struct batadv_nc_path *batadv_nc_get_path(struct batadv_priv *bat_priv,
  */
 static uint8_t batadv_nc_random_weight_tq(uint8_t tq)
 {
+<<<<<<< HEAD
 	uint8_t rand_val, rand_tq;
 
 	get_random_bytes(&rand_val, sizeof(rand_val));
@@ -978,6 +1048,10 @@ static uint8_t batadv_nc_random_weight_tq(uint8_t tq)
 
 	/* normalize the randomized packet loss */
 	rand_tq /= BATADV_TQ_MAX_VALUE;
+=======
+	/* randomize the estimated packet loss (max TQ - estimated TQ) */
+	u8 rand_tq = prandom_u32_max(BATADV_TQ_MAX_VALUE + 1 - tq);
+>>>>>>> common/deprecated/android-3.18
 
 	/* convert to (randomized) estimated tq again */
 	return BATADV_TQ_MAX_VALUE - rand_tq;

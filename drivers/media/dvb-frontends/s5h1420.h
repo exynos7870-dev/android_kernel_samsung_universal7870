@@ -40,7 +40,11 @@ struct s5h1420_config
 	u8 serial_mpeg:1;
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_S5H1420)
+=======
+#if IS_REACHABLE(CONFIG_DVB_S5H1420)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend *s5h1420_attach(const struct s5h1420_config *config,
 	     struct i2c_adapter *i2c);
 extern struct i2c_adapter *s5h1420_get_tuner_i2c_adapter(struct dvb_frontend *fe);

@@ -229,7 +229,10 @@ parse_failed:
 	list_for_each_entry(window, resources, list)
 		kfree(window->res);
 	pci_free_resource_list(resources);
+<<<<<<< HEAD
 	kfree(bus_range);
+=======
+>>>>>>> common/deprecated/android-3.18
 	return err;
 }
 EXPORT_SYMBOL_GPL(of_pci_get_host_bridge_resources);

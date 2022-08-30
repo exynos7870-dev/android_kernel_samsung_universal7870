@@ -9,8 +9,13 @@
 
 #define FONTDATAMAX 4096
 
+<<<<<<< HEAD
 static const unsigned char fontdata_8x16[FONTDATAMAX] = {
 
+=======
+static const struct font_data fontdata_8x16 = {
+	{ 0, 0, FONTDATAMAX, 0 }, {
+>>>>>>> common/deprecated/android-3.18
 	/* 0 0x00 '^@' */
 	0x00, /* 00000000 */
 	0x00, /* 00000000 */
@@ -4618,8 +4623,12 @@ static const unsigned char fontdata_8x16[FONTDATAMAX] = {
 	0x00, /* 00000000 */
 	0x00, /* 00000000 */
 	0x00, /* 00000000 */
+<<<<<<< HEAD
 
 };
+=======
+} };
+>>>>>>> common/deprecated/android-3.18
 
 
 const struct font_desc font_vga_8x16 = {
@@ -4627,7 +4636,11 @@ const struct font_desc font_vga_8x16 = {
 	.name	= "VGA8x16",
 	.width	= 8,
 	.height	= 16,
+<<<<<<< HEAD
 	.data	= fontdata_8x16,
+=======
+	.data	= fontdata_8x16.data,
+>>>>>>> common/deprecated/android-3.18
 	.pref	= 0,
 };
 EXPORT_SYMBOL(font_vga_8x16);

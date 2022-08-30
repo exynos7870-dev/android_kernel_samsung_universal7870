@@ -426,6 +426,11 @@ struct ubi_debug_info {
  * @fm_size: fastmap size in bytes
  * @fm_sem: allows ubi_update_fastmap() to block EBA table changes
  * @fm_work: fastmap work queue
+<<<<<<< HEAD
+=======
+ * @fm_work_scheduled: non-zero if fastmap work was scheduled
+ * @fast_attach: non-zero if UBI was attached by fastmap
+>>>>>>> common/deprecated/android-3.18
  *
  * @used: RB-tree of used physical eraseblocks
  * @erroneous: RB-tree of erroneous used physical eraseblocks
@@ -437,7 +442,11 @@ struct ubi_debug_info {
  * @pq_head: protection queue head
  * @wl_lock: protects the @used, @free, @pq, @pq_head, @lookuptbl, @move_from,
  *	     @move_to, @move_to_put @erase_pending, @wl_scheduled, @works,
+<<<<<<< HEAD
  *	     @erroneous, and @erroneous_peb_count fields
+=======
+ *	     @erroneous, @erroneous_peb_count, and @fm_work_scheduled fields
+>>>>>>> common/deprecated/android-3.18
  * @move_mutex: serializes eraseblock moves
  * @work_sem: used to wait for all the scheduled works to finish and prevent
  * new works from being submitted
@@ -532,6 +541,11 @@ struct ubi_device {
 	void *fm_buf;
 	size_t fm_size;
 	struct work_struct fm_work;
+<<<<<<< HEAD
+=======
+	int fm_work_scheduled;
+	int fast_attach;
+>>>>>>> common/deprecated/android-3.18
 
 	/* Wear-leveling sub-system's stuff */
 	struct rb_root used;
@@ -1018,4 +1032,22 @@ static inline int idx2vol_id(const struct ubi_device *ubi, int idx)
 		return idx;
 }
 
+<<<<<<< HEAD
+=======
+/**
+ * ubi_is_fm_vol - check whether a volume ID is a Fastmap volume.
+ * @vol_id: volume ID
+ */
+static inline bool ubi_is_fm_vol(int vol_id)
+{
+	switch (vol_id) {
+		case UBI_FM_SB_VOLUME_ID:
+		case UBI_FM_DATA_VOLUME_ID:
+		return true;
+	}
+
+	return false;
+}
+
+>>>>>>> common/deprecated/android-3.18
 #endif /* !__UBI_UBI_H__ */

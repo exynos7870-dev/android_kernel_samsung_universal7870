@@ -185,7 +185,12 @@ static void *cramfs_read(struct super_block *sb, unsigned int offset, unsigned i
 			continue;
 		blk_offset = (blocknr - buffer_blocknr[i]) << PAGE_CACHE_SHIFT;
 		blk_offset += offset;
+<<<<<<< HEAD
 		if (blk_offset + len > BUFFER_SIZE)
+=======
+		if (blk_offset > BUFFER_SIZE ||
+		    blk_offset + len > BUFFER_SIZE)
+>>>>>>> common/deprecated/android-3.18
 			continue;
 		return read_buffers[i] + blk_offset;
 	}

@@ -73,9 +73,13 @@ startup_64:
 	subq	$_text - __START_KERNEL_map, %rbp
 
 	/* Is the address not 2M aligned? */
+<<<<<<< HEAD
 	movq	%rbp, %rax
 	andl	$~PMD_PAGE_MASK, %eax
 	testl	%eax, %eax
+=======
+	testl	$~PMD_PAGE_MASK, %ebp
+>>>>>>> common/deprecated/android-3.18
 	jnz	bad_address
 
 	/*
@@ -321,14 +325,19 @@ bad_address:
 	jmp bad_address
 
 	__INIT
+<<<<<<< HEAD
 	.globl early_idt_handlers
 early_idt_handlers:
+=======
+ENTRY(early_idt_handler_array)
+>>>>>>> common/deprecated/android-3.18
 	# 104(%rsp) %rflags
 	#  96(%rsp) %cs
 	#  88(%rsp) %rip
 	#  80(%rsp) error code
 	i = 0
 	.rept NUM_EXCEPTION_VECTORS
+<<<<<<< HEAD
 	.if (EXCEPTION_ERRCODE_MASK >> i) & 1
 	ASM_NOP2
 	.else
@@ -341,6 +350,23 @@ early_idt_handlers:
 
 /* This is global to keep gas from relaxing the jumps */
 ENTRY(early_idt_handler)
+=======
+	.ifeq (EXCEPTION_ERRCODE_MASK >> i) & 1
+	pushq $0		# Dummy error code, to make stack frame uniform
+	.endif
+	pushq $i		# 72(%rsp) Vector number
+	jmp early_idt_handler_common
+	i = i + 1
+	.fill early_idt_handler_array + i*EARLY_IDT_HANDLER_SIZE - ., 1, 0xcc
+	.endr
+ENDPROC(early_idt_handler_array)
+
+early_idt_handler_common:
+	/*
+	 * The stack is the hardware frame, an error code or zero, and the
+	 * vector number.
+	 */
+>>>>>>> common/deprecated/android-3.18
 	cld
 
 	cmpl $2,(%rsp)		# X86_TRAP_NMI
@@ -412,7 +438,11 @@ ENTRY(early_idt_handler)
 is_nmi:
 	addq $16,%rsp		# drop vector number and error code
 	INTERRUPT_RETURN
+<<<<<<< HEAD
 ENDPROC(early_idt_handler)
+=======
+ENDPROC(early_idt_handler_common)
+>>>>>>> common/deprecated/android-3.18
 
 	__INITDATA
 

@@ -173,6 +173,10 @@ void led_classdev_resume(struct led_classdev *led_cdev)
 }
 EXPORT_SYMBOL_GPL(led_classdev_resume);
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_PM_SLEEP
+>>>>>>> common/deprecated/android-3.18
 static int led_suspend(struct device *dev)
 {
 	struct led_classdev *led_cdev = dev_get_drvdata(dev);
@@ -192,11 +196,17 @@ static int led_resume(struct device *dev)
 
 	return 0;
 }
+<<<<<<< HEAD
 
 static const struct dev_pm_ops leds_class_dev_pm_ops = {
 	.suspend        = led_suspend,
 	.resume         = led_resume,
 };
+=======
+#endif
+
+static SIMPLE_DEV_PM_OPS(leds_class_dev_pm_ops, led_suspend, led_resume);
+>>>>>>> common/deprecated/android-3.18
 
 /**
  * led_classdev_register - register a new object of led_classdev class.
@@ -256,12 +266,22 @@ void led_classdev_unregister(struct led_classdev *led_cdev)
 	up_write(&led_cdev->trigger_lock);
 #endif
 
+<<<<<<< HEAD
 	cancel_work_sync(&led_cdev->set_brightness_work);
 
 	/* Stop blinking */
 	led_stop_software_blink(led_cdev);
 	led_set_brightness(led_cdev, LED_OFF);
 
+=======
+	/* Stop blinking */
+	led_stop_software_blink(led_cdev);
+
+	led_set_brightness(led_cdev, LED_OFF);
+
+	flush_work(&led_cdev->set_brightness_work);
+
+>>>>>>> common/deprecated/android-3.18
 	device_unregister(led_cdev->dev);
 
 	down_write(&leds_list_lock);

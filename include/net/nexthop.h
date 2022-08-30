@@ -6,7 +6,11 @@
 
 static inline int rtnh_ok(const struct rtnexthop *rtnh, int remaining)
 {
+<<<<<<< HEAD
 	return remaining >= sizeof(*rtnh) &&
+=======
+	return remaining >= (int)sizeof(*rtnh) &&
+>>>>>>> common/deprecated/android-3.18
 	       rtnh->rtnh_len >= sizeof(*rtnh) &&
 	       rtnh->rtnh_len <= remaining;
 }

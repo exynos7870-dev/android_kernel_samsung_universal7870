@@ -27,6 +27,38 @@
 
 #include "mm_internal.h"
 
+<<<<<<< HEAD
+=======
+/*
+ * Tables translating between page_cache_type_t and pte encoding.
+ * Minimal supported modes are defined statically, modified if more supported
+ * cache modes are available.
+ * Index into __cachemode2pte_tbl is the cachemode.
+ * Index into __pte2cachemode_tbl are the caching attribute bits of the pte
+ * (_PAGE_PWT, _PAGE_PCD, _PAGE_PAT) at index bit positions 0, 1, 2.
+ */
+uint16_t __cachemode2pte_tbl[_PAGE_CACHE_MODE_NUM] = {
+	[_PAGE_CACHE_MODE_WB]		= 0,
+	[_PAGE_CACHE_MODE_WC]		= _PAGE_PWT,
+	[_PAGE_CACHE_MODE_UC_MINUS]	= _PAGE_PCD,
+	[_PAGE_CACHE_MODE_UC]		= _PAGE_PCD | _PAGE_PWT,
+	[_PAGE_CACHE_MODE_WT]		= _PAGE_PCD,
+	[_PAGE_CACHE_MODE_WP]		= _PAGE_PCD,
+};
+EXPORT_SYMBOL_GPL(__cachemode2pte_tbl);
+uint8_t __pte2cachemode_tbl[8] = {
+	[__pte2cm_idx(0)] = _PAGE_CACHE_MODE_WB,
+	[__pte2cm_idx(_PAGE_PWT)] = _PAGE_CACHE_MODE_WC,
+	[__pte2cm_idx(_PAGE_PCD)] = _PAGE_CACHE_MODE_UC_MINUS,
+	[__pte2cm_idx(_PAGE_PWT | _PAGE_PCD)] = _PAGE_CACHE_MODE_UC,
+	[__pte2cm_idx(_PAGE_PAT)] = _PAGE_CACHE_MODE_WB,
+	[__pte2cm_idx(_PAGE_PWT | _PAGE_PAT)] = _PAGE_CACHE_MODE_WC,
+	[__pte2cm_idx(_PAGE_PCD | _PAGE_PAT)] = _PAGE_CACHE_MODE_UC_MINUS,
+	[__pte2cm_idx(_PAGE_PWT | _PAGE_PCD | _PAGE_PAT)] = _PAGE_CACHE_MODE_UC,
+};
+EXPORT_SYMBOL_GPL(__pte2cachemode_tbl);
+
+>>>>>>> common/deprecated/android-3.18
 static unsigned long __initdata pgt_buf_start;
 static unsigned long __initdata pgt_buf_end;
 static unsigned long __initdata pgt_buf_top;
@@ -71,8 +103,11 @@ __ref void *alloc_low_pages(unsigned int num)
 	} else {
 		pfn = pgt_buf_end;
 		pgt_buf_end += num;
+<<<<<<< HEAD
 		printk(KERN_DEBUG "BRK [%#010lx, %#010lx] PGTABLE\n",
 			pfn << PAGE_SHIFT, (pgt_buf_end << PAGE_SHIFT) - 1);
+=======
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	for (i = 0; i < num; i++) {
@@ -144,11 +179,19 @@ static void __init probe_page_size_mask(void)
 
 	/* Enable PSE if available */
 	if (cpu_has_pse)
+<<<<<<< HEAD
 		set_in_cr4(X86_CR4_PSE);
 
 	/* Enable PGE if available */
 	if (cpu_has_pge) {
 		set_in_cr4(X86_CR4_PGE);
+=======
+		cr4_set_bits_and_update_boot(X86_CR4_PSE);
+
+	/* Enable PGE if available */
+	if (cpu_has_pge) {
+		cr4_set_bits_and_update_boot(X86_CR4_PGE);
+>>>>>>> common/deprecated/android-3.18
 		__supported_pte_mask |= _PAGE_GLOBAL;
 	}
 }
@@ -581,6 +624,7 @@ void __init init_mem_mapping(void)
  * is valid. The argument is a physical page number.
  *
  *
+<<<<<<< HEAD
  * On x86, access has to be given to the first megabyte of ram because that area
  * contains bios code and data regions used by X and dosemu and similar apps.
  * Access has to be given to non-kernel-ram areas as well, these contain the PCI
@@ -595,6 +639,42 @@ int devmem_is_allowed(unsigned long pagenr)
 	if (!page_is_ram(pagenr))
 		return 1;
 	return 0;
+=======
+ * On x86, access has to be given to the first megabyte of RAM because that
+ * area traditionally contains BIOS code and data regions used by X, dosemu,
+ * and similar apps. Since they map the entire memory range, the whole range
+ * must be allowed (for mapping), but any areas that would otherwise be
+ * disallowed are flagged as being "zero filled" instead of rejected.
+ * Access has to be given to non-kernel-ram areas as well, these contain the
+ * PCI mmio resources as well as potential bios/acpi data regions.
+ */
+int devmem_is_allowed(unsigned long pagenr)
+{
+	if (page_is_ram(pagenr)) {
+		/*
+		 * For disallowed memory regions in the low 1MB range,
+		 * request that the page be shown as all zeros.
+		 */
+		if (pagenr < 256)
+			return 2;
+
+		return 0;
+	}
+
+	/*
+	 * This must follow RAM test, since System RAM is considered a
+	 * restricted resource under CONFIG_STRICT_IOMEM.
+	 */
+	if (iomem_is_exclusive(pagenr << PAGE_SHIFT)) {
+		/* Low 1MB bypasses iomem restrictions. */
+		if (pagenr < 256)
+			return 1;
+
+		return 0;
+	}
+
+	return 1;
+>>>>>>> common/deprecated/android-3.18
 }
 
 void free_init_pages(char *what, unsigned long begin, unsigned long end)
@@ -687,3 +767,14 @@ void __init zone_sizes_init(void)
 	free_area_init_nodes(max_zone_pfns);
 }
 
+<<<<<<< HEAD
+=======
+DEFINE_PER_CPU_SHARED_ALIGNED(struct tlb_state, cpu_tlbstate) = {
+#ifdef CONFIG_SMP
+	.active_mm = &init_mm,
+	.state = 0,
+#endif
+	.cr4 = ~0UL,	/* fail hard if we screw up cr4 shadow initialization */
+};
+EXPORT_PER_CPU_SYMBOL(cpu_tlbstate);
+>>>>>>> common/deprecated/android-3.18

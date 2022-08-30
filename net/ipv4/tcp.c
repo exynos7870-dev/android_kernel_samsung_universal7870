@@ -275,13 +275,20 @@
 #include <net/tcp.h>
 #include <net/xfrm.h>
 #include <net/ip.h>
+<<<<<<< HEAD
 #include <net/ip6_route.h>
 #include <net/ipv6.h>
 #include <net/transp_v6.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 #include <net/sock.h>
 
 #include <asm/uaccess.h>
 #include <asm/ioctls.h>
+<<<<<<< HEAD
+=======
+#include <asm/unaligned.h>
+>>>>>>> common/deprecated/android-3.18
 #include <net/busy_poll.h>
 
 int sysctl_tcp_fin_timeout __read_mostly = TCP_FIN_TIMEOUT;
@@ -304,6 +311,7 @@ EXPORT_SYMBOL(sysctl_tcp_wmem);
 atomic_long_t tcp_memory_allocated;	/* Current allocated memory. */
 EXPORT_SYMBOL(tcp_memory_allocated);
 
+<<<<<<< HEAD
 int sysctl_tcp_delack_seg __read_mostly = TCP_DELACK_SEG;
 EXPORT_SYMBOL(sysctl_tcp_delack_seg);
 
@@ -311,6 +319,8 @@ int sysctl_tcp_use_userconfig __read_mostly;
 EXPORT_SYMBOL(sysctl_tcp_use_userconfig);
 
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * Current number of TCP sockets.
  */
@@ -391,7 +401,11 @@ void tcp_init_sock(struct sock *sk)
 	struct inet_connection_sock *icsk = inet_csk(sk);
 	struct tcp_sock *tp = tcp_sk(sk);
 
+<<<<<<< HEAD
 	__skb_queue_head_init(&tp->out_of_order_queue);
+=======
+	tp->out_of_order_queue = RB_ROOT;
+>>>>>>> common/deprecated/android-3.18
 	tcp_init_xmit_timers(sk);
 	tcp_prequeue_init(tp);
 	INIT_LIST_HEAD(&tp->tsq_node);
@@ -956,7 +970,11 @@ new_segment:
 
 		i = skb_shinfo(skb)->nr_frags;
 		can_coalesce = skb_can_coalesce(skb, i, page, offset);
+<<<<<<< HEAD
 		if (!can_coalesce && i >= MAX_SKB_FRAGS) {
+=======
+		if (!can_coalesce && i >= sysctl_max_skb_frags) {
+>>>>>>> common/deprecated/android-3.18
 			tcp_mark_push(tp, skb);
 			goto new_segment;
 		}
@@ -1077,9 +1095,18 @@ static int tcp_sendmsg_fastopen(struct sock *sk, struct msghdr *msg,
 				int *copied, size_t size)
 {
 	struct tcp_sock *tp = tcp_sk(sk);
+<<<<<<< HEAD
 	int err, flags;
 
 	if (!(sysctl_tcp_fastopen & TFO_CLIENT_ENABLE))
+=======
+	struct sockaddr *uaddr = msg->msg_name;
+	int err, flags;
+
+	if (!(sysctl_tcp_fastopen & TFO_CLIENT_ENABLE) ||
+	    (uaddr && msg->msg_namelen >= sizeof(uaddr->sa_family) &&
+	     uaddr->sa_family == AF_UNSPEC))
+>>>>>>> common/deprecated/android-3.18
 		return -EOPNOTSUPP;
 	if (tp->fastopen_req != NULL)
 		return -EALREADY; /* Another Fast Open is in progress */
@@ -1092,7 +1119,11 @@ static int tcp_sendmsg_fastopen(struct sock *sk, struct msghdr *msg,
 	tp->fastopen_req->size = size;
 
 	flags = (msg->msg_flags & MSG_DONTWAIT) ? O_NONBLOCK : 0;
+<<<<<<< HEAD
 	err = __inet_stream_connect(sk->sk_socket, msg->msg_name,
+=======
+	err = __inet_stream_connect(sk->sk_socket, uaddr,
+>>>>>>> common/deprecated/android-3.18
 				    msg->msg_namelen, flags);
 	*copied = tp->fastopen_req->copied;
 	tcp_free_fastopen_req(tp);
@@ -1113,7 +1144,11 @@ int tcp_sendmsg(struct kiocb *iocb, struct sock *sk, struct msghdr *msg,
 	lock_sock(sk);
 
 	flags = msg->msg_flags;
+<<<<<<< HEAD
 	if (flags & MSG_FASTOPEN) {
+=======
+	if ((flags & MSG_FASTOPEN) && !tp->repair) {
+>>>>>>> common/deprecated/android-3.18
 		err = tcp_sendmsg_fastopen(sk, msg, &copied_syn, size);
 		if (err == -EINPROGRESS && copied_syn > 0)
 			goto out;
@@ -1242,7 +1277,11 @@ new_segment:
 
 				if (!skb_can_coalesce(skb, i, pfrag->page,
 						      pfrag->offset)) {
+<<<<<<< HEAD
 					if (i == MAX_SKB_FRAGS || !sg) {
+=======
+					if (i == sysctl_max_skb_frags || !sg) {
+>>>>>>> common/deprecated/android-3.18
 						tcp_mark_push(tp, skb);
 						goto new_segment;
 					}
@@ -1430,11 +1469,16 @@ static void tcp_cleanup_rbuf(struct sock *sk, int copied)
 		   /* Delayed ACKs frequently hit locked sockets during bulk
 		    * receive. */
 		if (icsk->icsk_ack.blocked ||
+<<<<<<< HEAD
 		    /* Once-per-sysctl_tcp_delack_seg segments
 			  * ACK was not sent by tcp_input.c
 			  */
 		    tp->rcv_nxt - tp->rcv_wup > (icsk->icsk_ack.rcv_mss) *
 						sysctl_tcp_delack_seg ||
+=======
+		    /* Once-per-two-segments ACK was not sent by tcp_input.c */
+		    tp->rcv_nxt - tp->rcv_wup > icsk->icsk_ack.rcv_mss ||
+>>>>>>> common/deprecated/android-3.18
 		    /*
 		     * If this read emptied read buffer, we send ACK, if
 		     * connection is not bidirectional, user drained
@@ -1685,7 +1729,11 @@ int tcp_recvmsg(struct kiocb *iocb, struct sock *sk, struct msghdr *msg,
 			 * shouldn't happen.
 			 */
 			if (WARN(before(*seq, TCP_SKB_CB(skb)->seq),
+<<<<<<< HEAD
 				 "recvmsg bug: copied %X seq %X rcvnxt %X fl %X\n",
+=======
+				 "TCP recvmsg seq # bug: copied %X, seq %X, rcvnxt %X, fl %X\n",
+>>>>>>> common/deprecated/android-3.18
 				 *seq, TCP_SKB_CB(skb)->seq, tp->rcv_nxt,
 				 flags))
 				break;
@@ -1698,7 +1746,11 @@ int tcp_recvmsg(struct kiocb *iocb, struct sock *sk, struct msghdr *msg,
 			if (TCP_SKB_CB(skb)->tcp_flags & TCPHDR_FIN)
 				goto found_fin_ok;
 			WARN(!(flags & MSG_PEEK),
+<<<<<<< HEAD
 			     "recvmsg bug 2: copied %X seq %X rcvnxt %X fl %X\n",
+=======
+			     "TCP recvmsg seq # bug 2: copied %X, seq %X, rcvnxt %X, fl %X\n",
+>>>>>>> common/deprecated/android-3.18
 			     *seq, TCP_SKB_CB(skb)->seq, tp->rcv_nxt, flags);
 		}
 
@@ -2206,6 +2258,12 @@ adjudge_to_death:
 			tcp_send_active_reset(sk, GFP_ATOMIC);
 			NET_INC_STATS_BH(sock_net(sk),
 					LINUX_MIB_TCPABORTONMEMORY);
+<<<<<<< HEAD
+=======
+		} else if (!check_net(sock_net(sk))) {
+			/* Not possible to send reset; just close */
+			tcp_set_state(sk, TCP_CLOSE);
+>>>>>>> common/deprecated/android-3.18
 		}
 	}
 
@@ -2267,7 +2325,11 @@ int tcp_disconnect(struct sock *sk, int flags)
 	tcp_clear_xmit_timers(sk);
 	__skb_queue_purge(&sk->sk_receive_queue);
 	tcp_write_queue_purge(sk);
+<<<<<<< HEAD
 	__skb_queue_purge(&tp->out_of_order_queue);
+=======
+	skb_rbtree_purge(&tp->out_of_order_queue);
+>>>>>>> common/deprecated/android-3.18
 
 	inet->inet_dport = 0;
 
@@ -2279,7 +2341,10 @@ int tcp_disconnect(struct sock *sk, int flags)
 	tp->srtt_us = 0;
 	if ((tp->write_seq += tp->max_window + 2) == 0)
 		tp->write_seq = 1;
+<<<<<<< HEAD
 	icsk->icsk_backoff = 0;
+=======
+>>>>>>> common/deprecated/android-3.18
 	tp->snd_cwnd = 2;
 	icsk->icsk_probes_out = 0;
 	tp->packets_out = 0;
@@ -2288,17 +2353,39 @@ int tcp_disconnect(struct sock *sk, int flags)
 	tp->window_clamp = 0;
 	tcp_set_ca_state(sk, TCP_CA_Open);
 	tcp_clear_retrans(tp);
+<<<<<<< HEAD
 	inet_csk_delack_init(sk);
 	/* Initialize rcv_mss to TCP_MIN_MSS to avoid division by 0
 	* issue in __tcp_select_window()
 	*/
+=======
+	tp->total_retrans = 0;
+	inet_csk_delack_init(sk);
+	/* Initialize rcv_mss to TCP_MIN_MSS to avoid division by 0
+	 * issue in __tcp_select_window()
+	 */
+>>>>>>> common/deprecated/android-3.18
 	icsk->icsk_ack.rcv_mss = TCP_MIN_MSS;
 	tcp_init_send_head(sk);
 	memset(&tp->rx_opt, 0, sizeof(tp->rx_opt));
 	__sk_dst_reset(sk);
+<<<<<<< HEAD
 
 	WARN_ON(inet->inet_num && !icsk->icsk_bind_hash);
 
+=======
+	dst_release(sk->sk_rx_dst);
+	sk->sk_rx_dst = NULL;
+
+	WARN_ON(inet->inet_num && !icsk->icsk_bind_hash);
+
+	if (sk->sk_frag.page) {
+		put_page(sk->sk_frag.page);
+		sk->sk_frag.page = NULL;
+		sk->sk_frag.offset = 0;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	sk->sk_error_report(sk);
 	return err;
 }
@@ -2474,7 +2561,11 @@ static int do_tcp_setsockopt(struct sock *sk, int level,
 	case TCP_REPAIR_QUEUE:
 		if (!tp->repair)
 			err = -EPERM;
+<<<<<<< HEAD
 		else if (val < TCP_QUEUES_NR)
+=======
+		else if ((unsigned int)val < TCP_QUEUES_NR)
+>>>>>>> common/deprecated/android-3.18
 			tp->repair_queue = val;
 		else
 			err = -EINVAL;
@@ -2606,7 +2697,10 @@ static int do_tcp_setsockopt(struct sock *sk, int level,
 
 #ifdef CONFIG_TCP_MD5SIG
 	case TCP_MD5SIG:
+<<<<<<< HEAD
 		/* Read the IP->Key mappings from userspace */
+=======
+>>>>>>> common/deprecated/android-3.18
 		err = tp->af_specific->md5_parse(sk, optval, optlen);
 		break;
 #endif
@@ -2622,10 +2716,20 @@ static int do_tcp_setsockopt(struct sock *sk, int level,
 
 	case TCP_FASTOPEN:
 		if (val >= 0 && ((1 << sk->sk_state) & (TCPF_CLOSE |
+<<<<<<< HEAD
 		    TCPF_LISTEN)))
 			err = fastopen_init_queue(sk, val);
 		else
 			err = -EINVAL;
+=======
+		    TCPF_LISTEN))) {
+			tcp_fastopen_init_key_once(true);
+
+			err = fastopen_init_queue(sk, val);
+		} else {
+			err = -EINVAL;
+		}
+>>>>>>> common/deprecated/android-3.18
 		break;
 	case TCP_TIMESTAMP:
 		if (!tp->repair)
@@ -2676,6 +2780,11 @@ void tcp_get_info(const struct sock *sk, struct tcp_info *info)
 	const struct tcp_sock *tp = tcp_sk(sk);
 	const struct inet_connection_sock *icsk = inet_csk(sk);
 	u32 now = tcp_time_stamp;
+<<<<<<< HEAD
+=======
+	u64 rate64;
+	u32 rate;
+>>>>>>> common/deprecated/android-3.18
 
 	memset(info, 0, sizeof(*info));
 
@@ -2736,10 +2845,20 @@ void tcp_get_info(const struct sock *sk, struct tcp_info *info)
 
 	info->tcpi_total_retrans = tp->total_retrans;
 
+<<<<<<< HEAD
 	info->tcpi_pacing_rate = sk->sk_pacing_rate != ~0U ?
 					sk->sk_pacing_rate : ~0ULL;
 	info->tcpi_max_pacing_rate = sk->sk_max_pacing_rate != ~0U ?
 					sk->sk_max_pacing_rate : ~0ULL;
+=======
+	rate = READ_ONCE(sk->sk_pacing_rate);
+	rate64 = rate != ~0U ? rate : ~0ULL;
+	put_unaligned(rate64, &info->tcpi_pacing_rate);
+
+	rate = READ_ONCE(sk->sk_max_pacing_rate);
+	rate64 = rate != ~0U ? rate : ~0ULL;
+	put_unaligned(rate64, &info->tcpi_max_pacing_rate);
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL_GPL(tcp_get_info);
 
@@ -3023,9 +3142,18 @@ EXPORT_SYMBOL(tcp_md5_hash_skb_data);
 
 int tcp_md5_hash_key(struct tcp_md5sig_pool *hp, const struct tcp_md5sig_key *key)
 {
+<<<<<<< HEAD
 	struct scatterlist sg;
 
 	sg_init_one(&sg, key->key, key->keylen);
+=======
+	u8 keylen = READ_ONCE(key->keylen); /* paired with WRITE_ONCE() in tcp_md5_do_add */
+	struct scatterlist sg;
+
+	sg_init_one(&sg, key->key, keylen);
+
+	/* tcp_md5_do_add() might change key->key under us */
+>>>>>>> common/deprecated/android-3.18
 	return crypto_hash_update(&hp->md5_desc, &sg, key->keylen);
 }
 EXPORT_SYMBOL(tcp_md5_hash_key);
@@ -3124,6 +3252,10 @@ void __init tcp_init(void)
 	int max_rshare, max_wshare, cnt;
 	unsigned int i;
 
+<<<<<<< HEAD
+=======
+	BUILD_BUG_ON(TCP_MIN_SND_MSS <= MAX_TCP_OPTION_SPACE);
+>>>>>>> common/deprecated/android-3.18
 	BUILD_BUG_ON(sizeof(struct tcp_skb_cb) > sizeof(skb->cb));
 
 	percpu_counter_init(&tcp_sockets_allocated, 0, GFP_KERNEL);
@@ -3197,6 +3329,7 @@ void __init tcp_init(void)
 	BUG_ON(tcp_register_congestion_control(&tcp_reno) != 0);
 	tcp_tasklet_init();
 }
+<<<<<<< HEAD
 
 static int tcp_is_local(struct net *net, __be32 addr) {
 	struct rtable *rt;
@@ -3325,3 +3458,5 @@ restart:
 
 	return 0;
 }
+=======
+>>>>>>> common/deprecated/android-3.18

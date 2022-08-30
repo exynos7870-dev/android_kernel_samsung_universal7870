@@ -1025,6 +1025,10 @@ int omap3isp_ccp2_register_entities(struct isp_ccp2_device *ccp2,
 	int ret;
 
 	/* Register the subdev and video nodes. */
+<<<<<<< HEAD
+=======
+	ccp2->subdev.dev = vdev->mdev->dev;
+>>>>>>> common/deprecated/android-3.18
 	ret = v4l2_device_register_subdev(vdev, &ccp2->subdev);
 	if (ret < 0)
 		goto error;

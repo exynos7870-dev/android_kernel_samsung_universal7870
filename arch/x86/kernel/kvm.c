@@ -151,6 +151,11 @@ void kvm_async_pf_task_wait(u32 token)
 		if (hlist_unhashed(&n.link))
 			break;
 
+<<<<<<< HEAD
+=======
+		rcu_irq_exit();
+
+>>>>>>> common/deprecated/android-3.18
 		if (!n.halted) {
 			local_irq_enable();
 			schedule();
@@ -159,11 +164,19 @@ void kvm_async_pf_task_wait(u32 token)
 			/*
 			 * We cannot reschedule. So halt.
 			 */
+<<<<<<< HEAD
 			rcu_irq_exit();
 			native_safe_halt();
 			rcu_irq_enter();
 			local_irq_disable();
 		}
+=======
+			native_safe_halt();
+			local_irq_disable();
+		}
+
+		rcu_irq_enter();
+>>>>>>> common/deprecated/android-3.18
 	}
 	if (!n.halted)
 		finish_wait(&n.wq, &wait);

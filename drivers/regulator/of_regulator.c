@@ -23,7 +23,10 @@ static void of_get_regulation_constraints(struct device_node *np,
 					struct regulator_init_data **init_data)
 {
 	const __be32 *min_uV, *max_uV;
+<<<<<<< HEAD
 	const __be32 *expected_consumer;
+=======
+>>>>>>> common/deprecated/android-3.18
 	struct regulation_constraints *constraints = &(*init_data)->constraints;
 	int ret;
 	u32 pval;
@@ -74,6 +77,7 @@ static void of_get_regulation_constraints(struct device_node *np,
 	ret = of_property_read_u32(np, "regulator-enable-ramp-delay", &pval);
 	if (!ret)
 		constraints->enable_time = pval;
+<<<<<<< HEAD
 
 	ret = of_property_read_u32(np, "regulator-initial-mode", &pval);
 	if (!ret)
@@ -85,6 +89,8 @@ static void of_get_regulation_constraints(struct device_node *np,
 	expected_consumer = of_get_property(np, "regulator-expected-consumer", NULL);
 	if (expected_consumer)
 		constraints->expected_consumer = be32_to_cpu(*expected_consumer);
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -193,6 +199,10 @@ int of_regulator_match(struct device *dev, struct device_node *node,
 				dev_err(dev,
 					"failed to parse DT for regulator %s\n",
 					child->name);
+<<<<<<< HEAD
+=======
+				of_node_put(child);
+>>>>>>> common/deprecated/android-3.18
 				return -EINVAL;
 			}
 			match->of_node = of_node_get(child);

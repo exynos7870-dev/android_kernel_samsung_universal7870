@@ -255,4 +255,8 @@ CPU_LE( rev	data2, data2 )
 .Lret0:
 	mov	result, #0
 	ret
+<<<<<<< HEAD
 ENDPROC(memcmp)
+=======
+ENDPIPROC(memcmp)
+>>>>>>> common/deprecated/android-3.18

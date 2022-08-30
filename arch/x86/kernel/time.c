@@ -22,10 +22,13 @@
 #include <asm/hpet.h>
 #include <asm/time.h>
 
+<<<<<<< HEAD
 #ifdef CONFIG_X86_64
 __visible DEFINE_VVAR(volatile unsigned long, jiffies) = INITIAL_JIFFIES;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 unsigned long profile_pc(struct pt_regs *regs)
 {
 	unsigned long pc = instruction_pointer(regs);

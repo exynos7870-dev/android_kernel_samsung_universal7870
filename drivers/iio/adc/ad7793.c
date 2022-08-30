@@ -257,7 +257,11 @@ static int ad7793_setup(struct iio_dev *indio_dev,
 	unsigned int vref_mv)
 {
 	struct ad7793_state *st = iio_priv(indio_dev);
+<<<<<<< HEAD
 	int i, ret = -1;
+=======
+	int i, ret;
+>>>>>>> common/deprecated/android-3.18
 	unsigned long long scale_uv;
 	u32 id;
 
@@ -266,7 +270,11 @@ static int ad7793_setup(struct iio_dev *indio_dev,
 		return ret;
 
 	/* reset the serial interface */
+<<<<<<< HEAD
 	ret = spi_write(st->sd.spi, (u8 *)&ret, sizeof(ret));
+=======
+	ret = ad_sd_reset(&st->sd, 32);
+>>>>>>> common/deprecated/android-3.18
 	if (ret < 0)
 		goto out;
 	usleep_range(500, 2000); /* Wait for at least 500us */
@@ -279,6 +287,10 @@ static int ad7793_setup(struct iio_dev *indio_dev,
 	id &= AD7793_ID_MASK;
 
 	if (id != st->chip_info->id) {
+<<<<<<< HEAD
+=======
+		ret = -ENODEV;
+>>>>>>> common/deprecated/android-3.18
 		dev_err(&st->sd.spi->dev, "device ID query failed\n");
 		goto out;
 	}
@@ -579,7 +591,11 @@ static const struct iio_info ad7797_info = {
 	.read_raw = &ad7793_read_raw,
 	.write_raw = &ad7793_write_raw,
 	.write_raw_get_fmt = &ad7793_write_raw_get_fmt,
+<<<<<<< HEAD
 	.attrs = &ad7793_attribute_group,
+=======
+	.attrs = &ad7797_attribute_group,
+>>>>>>> common/deprecated/android-3.18
 	.validate_trigger = ad_sd_validate_trigger,
 	.driver_module = THIS_MODULE,
 };

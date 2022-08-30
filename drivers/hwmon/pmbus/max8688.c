@@ -44,7 +44,11 @@ static int max8688_read_word_data(struct i2c_client *client, int page, int reg)
 {
 	int ret;
 
+<<<<<<< HEAD
 	if (page)
+=======
+	if (page > 0)
+>>>>>>> common/deprecated/android-3.18
 		return -ENXIO;
 
 	switch (reg) {

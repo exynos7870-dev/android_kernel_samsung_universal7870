@@ -26,6 +26,10 @@ static inline struct mcryptd_ahash *__mcryptd_ahash_cast(
 
 struct mcryptd_cpu_queue {
 	struct crypto_queue queue;
+<<<<<<< HEAD
+=======
+	spinlock_t q_lock;
+>>>>>>> common/deprecated/android-3.18
 	struct work_struct work;
 };
 

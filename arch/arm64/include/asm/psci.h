@@ -16,6 +16,7 @@
 
 int psci_init(void);
 
+<<<<<<< HEAD
 #define PSCI_UNUSED_INDEX		128
 #define PSCI_CLUSTER_SLEEP		(PSCI_UNUSED_INDEX)
 #define PSCI_SYSTEM_IDLE		(PSCI_UNUSED_INDEX + 1)
@@ -23,4 +24,6 @@ int psci_init(void);
 #define PSCI_SYSTEM_SLEEP		(PSCI_UNUSED_INDEX + 3)
 #define PSCI_SYSTEM_CP_CALL		(PSCI_UNUSED_INDEX + 4)
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #endif /* __ASM_PSCI_H */

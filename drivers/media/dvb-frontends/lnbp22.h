@@ -39,7 +39,11 @@
 
 #include <linux/dvb/frontend.h>
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_LNBP22)
+=======
+#if IS_REACHABLE(CONFIG_DVB_LNBP22)
+>>>>>>> common/deprecated/android-3.18
 /*
  * override_set and override_clear control which system register bits (above)
  * to always set & clear

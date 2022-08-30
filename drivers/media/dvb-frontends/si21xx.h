@@ -13,7 +13,11 @@ struct si21xx_config {
 	int min_delay_ms;
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_SI21XX)
+=======
+#if IS_REACHABLE(CONFIG_DVB_SI21XX)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend *si21xx_attach(const struct si21xx_config *config,
 						struct i2c_adapter *i2c);
 #else

@@ -81,7 +81,11 @@ void __init setup_real_mode(void)
 
 	trampoline_header->start = (u64) secondary_startup_64;
 	trampoline_cr4_features = &trampoline_header->cr4;
+<<<<<<< HEAD
 	*trampoline_cr4_features = read_cr4();
+=======
+	*trampoline_cr4_features = __read_cr4();
+>>>>>>> common/deprecated/android-3.18
 
 	trampoline_pgd = (u64 *) __va(real_mode_header->trampoline_pgd);
 	trampoline_pgd[0] = init_level4_pgt[pgd_index(__PAGE_OFFSET)].pgd;

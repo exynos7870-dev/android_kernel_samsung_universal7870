@@ -19,7 +19,11 @@
  * string once.
  */
 
+<<<<<<< HEAD
 
+=======
+#include <asm/export.h>
+>>>>>>> common/deprecated/android-3.18
 	.text
 
 	.align 4
@@ -52,3 +56,7 @@ $found:	cttz	$2, $3		# U0 :
 	br	__stxcpy	# L0 :
 
 	.end strcat
+<<<<<<< HEAD
+=======
+	EXPORT_SYMBOL(strcat)
+>>>>>>> common/deprecated/android-3.18

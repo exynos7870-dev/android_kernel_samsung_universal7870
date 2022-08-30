@@ -12,6 +12,7 @@
 
 /* On cooling devices upper and lower limits */
 #define THERMAL_NO_LIMIT		(-1UL)
+<<<<<<< HEAD
 #define TABLE_END			(~1)
 
 #define THROTTLE_ACTIVE			(1)
@@ -21,6 +22,8 @@
 
 #define DISABLE				(0)
 #define ENABLE				(1)
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #endif
 

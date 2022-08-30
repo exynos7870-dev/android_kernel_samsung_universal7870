@@ -21,6 +21,10 @@
 #include <linux/slab.h>
 #include <linux/netdevice.h>
 #include <linux/if_arp.h>
+<<<<<<< HEAD
+=======
+#include <linux/workqueue.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/can.h>
 #include <linux/can/dev.h>
 #include <linux/can/skb.h>
@@ -273,6 +277,87 @@ static int can_get_bittiming(struct net_device *dev, struct can_bittiming *bt,
 	return err;
 }
 
+<<<<<<< HEAD
+=======
+static void can_update_state_error_stats(struct net_device *dev,
+					 enum can_state new_state)
+{
+	struct can_priv *priv = netdev_priv(dev);
+
+	if (new_state <= priv->state)
+		return;
+
+	switch (new_state) {
+	case CAN_STATE_ERROR_WARNING:
+		priv->can_stats.error_warning++;
+		break;
+	case CAN_STATE_ERROR_PASSIVE:
+		priv->can_stats.error_passive++;
+		break;
+	case CAN_STATE_BUS_OFF:
+	default:
+		break;
+	};
+}
+
+static int can_tx_state_to_frame(struct net_device *dev, enum can_state state)
+{
+	switch (state) {
+	case CAN_STATE_ERROR_ACTIVE:
+		return CAN_ERR_CRTL_ACTIVE;
+	case CAN_STATE_ERROR_WARNING:
+		return CAN_ERR_CRTL_TX_WARNING;
+	case CAN_STATE_ERROR_PASSIVE:
+		return CAN_ERR_CRTL_TX_PASSIVE;
+	default:
+		return 0;
+	}
+}
+
+static int can_rx_state_to_frame(struct net_device *dev, enum can_state state)
+{
+	switch (state) {
+	case CAN_STATE_ERROR_ACTIVE:
+		return CAN_ERR_CRTL_ACTIVE;
+	case CAN_STATE_ERROR_WARNING:
+		return CAN_ERR_CRTL_RX_WARNING;
+	case CAN_STATE_ERROR_PASSIVE:
+		return CAN_ERR_CRTL_RX_PASSIVE;
+	default:
+		return 0;
+	}
+}
+
+void can_change_state(struct net_device *dev, struct can_frame *cf,
+		      enum can_state tx_state, enum can_state rx_state)
+{
+	struct can_priv *priv = netdev_priv(dev);
+	enum can_state new_state = max(tx_state, rx_state);
+
+	if (unlikely(new_state == priv->state)) {
+		netdev_warn(dev, "%s: oops, state did not change", __func__);
+		return;
+	}
+
+	netdev_dbg(dev, "New error state: %d\n", new_state);
+
+	can_update_state_error_stats(dev, new_state);
+	priv->state = new_state;
+
+	if (unlikely(new_state == CAN_STATE_BUS_OFF)) {
+		cf->can_id |= CAN_ERR_BUSOFF;
+		return;
+	}
+
+	cf->can_id |= CAN_ERR_CRTL;
+	cf->data[1] |= tx_state >= rx_state ?
+		       can_tx_state_to_frame(dev, tx_state) : 0;
+	cf->data[1] |= tx_state <= rx_state ?
+		       can_rx_state_to_frame(dev, rx_state) : 0;
+}
+EXPORT_SYMBOL_GPL(can_change_state);
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Local echo of CAN messages
  *
@@ -342,6 +427,40 @@ void can_put_echo_skb(struct sk_buff *skb, struct net_device *dev,
 }
 EXPORT_SYMBOL_GPL(can_put_echo_skb);
 
+<<<<<<< HEAD
+=======
+struct sk_buff *__can_get_echo_skb(struct net_device *dev, unsigned int idx, u8 *len_ptr)
+{
+	struct can_priv *priv = netdev_priv(dev);
+
+	if (idx >= priv->echo_skb_max) {
+		netdev_err(dev, "%s: BUG! Trying to access can_priv::echo_skb out of bounds (%u/max %u)\n",
+			   __func__, idx, priv->echo_skb_max);
+		return NULL;
+	}
+
+	if (priv->echo_skb[idx]) {
+		/* Using "struct canfd_frame::len" for the frame
+		 * length is supported on both CAN and CANFD frames.
+		 */
+		struct sk_buff *skb = priv->echo_skb[idx];
+		struct canfd_frame *cf = (struct canfd_frame *)skb->data;
+
+		/* get the real payload length for netdev statistics */
+		if (cf->can_id & CAN_RTR_FLAG)
+			*len_ptr = 0;
+		else
+			*len_ptr = cf->len;
+
+		priv->echo_skb[idx] = NULL;
+
+		return skb;
+	}
+
+	return NULL;
+}
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Get the skb from the stack and loop it back locally
  *
@@ -351,6 +470,7 @@ EXPORT_SYMBOL_GPL(can_put_echo_skb);
  */
 unsigned int can_get_echo_skb(struct net_device *dev, unsigned int idx)
 {
+<<<<<<< HEAD
 	struct can_priv *priv = netdev_priv(dev);
 
 	BUG_ON(idx >= priv->echo_skb_max);
@@ -367,6 +487,22 @@ unsigned int can_get_echo_skb(struct net_device *dev, unsigned int idx)
 	}
 
 	return 0;
+=======
+	struct sk_buff *skb;
+	u8 len;
+
+	skb = __can_get_echo_skb(dev, idx, &len);
+	if (!skb)
+		return 0;
+
+	skb_get(skb);
+	if (netif_rx(skb) == NET_RX_SUCCESS)
+		dev_consume_skb_any(skb);
+	else
+		dev_kfree_skb_any(skb);
+
+	return len;
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL_GPL(can_get_echo_skb);
 
@@ -391,9 +527,14 @@ EXPORT_SYMBOL_GPL(can_free_echo_skb);
 /*
  * CAN device restart for bus-off recovery
  */
+<<<<<<< HEAD
 static void can_restart(unsigned long data)
 {
 	struct net_device *dev = (struct net_device *)data;
+=======
+static void can_restart(struct net_device *dev)
+{
+>>>>>>> common/deprecated/android-3.18
 	struct can_priv *priv = netdev_priv(dev);
 	struct net_device_stats *stats = &dev->stats;
 	struct sk_buff *skb;
@@ -416,11 +557,19 @@ static void can_restart(unsigned long data)
 	}
 	cf->can_id |= CAN_ERR_RESTARTED;
 
+<<<<<<< HEAD
 	netif_rx(skb);
 
 	stats->rx_packets++;
 	stats->rx_bytes += cf->can_dlc;
 
+=======
+	stats->rx_packets++;
+	stats->rx_bytes += cf->can_dlc;
+
+	netif_rx_ni(skb);
+
+>>>>>>> common/deprecated/android-3.18
 restart:
 	netdev_dbg(dev, "restarted\n");
 	priv->can_stats.restarts++;
@@ -433,6 +582,17 @@ restart:
 		netdev_err(dev, "Error %d during restart", err);
 }
 
+<<<<<<< HEAD
+=======
+static void can_restart_work(struct work_struct *work)
+{
+	struct delayed_work *dwork = to_delayed_work(work);
+	struct can_priv *priv = container_of(dwork, struct can_priv, restart_work);
+
+	can_restart(priv->dev);
+}
+
+>>>>>>> common/deprecated/android-3.18
 int can_restart_now(struct net_device *dev)
 {
 	struct can_priv *priv = netdev_priv(dev);
@@ -446,8 +606,13 @@ int can_restart_now(struct net_device *dev)
 	if (priv->state != CAN_STATE_BUS_OFF)
 		return -EBUSY;
 
+<<<<<<< HEAD
 	/* Runs as soon as possible in the timer context */
 	mod_timer(&priv->restart_timer, jiffies);
+=======
+	cancel_delayed_work_sync(&priv->restart_work);
+	can_restart(dev);
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }
@@ -463,14 +628,23 @@ void can_bus_off(struct net_device *dev)
 {
 	struct can_priv *priv = netdev_priv(dev);
 
+<<<<<<< HEAD
 	netdev_dbg(dev, "bus-off\n");
+=======
+	netdev_info(dev, "bus-off\n");
+>>>>>>> common/deprecated/android-3.18
 
 	netif_carrier_off(dev);
 	priv->can_stats.bus_off++;
 
 	if (priv->restart_ms)
+<<<<<<< HEAD
 		mod_timer(&priv->restart_timer,
 			  jiffies + (priv->restart_ms * HZ) / 1000);
+=======
+		schedule_delayed_work(&priv->restart_work,
+				      msecs_to_jiffies(priv->restart_ms));
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL_GPL(can_bus_off);
 
@@ -577,6 +751,10 @@ struct net_device *alloc_candev(int sizeof_priv, unsigned int echo_skb_max)
 		return NULL;
 
 	priv = netdev_priv(dev);
+<<<<<<< HEAD
+=======
+	priv->dev = dev;
+>>>>>>> common/deprecated/android-3.18
 
 	if (echo_skb_max) {
 		priv->echo_skb_max = echo_skb_max;
@@ -586,7 +764,11 @@ struct net_device *alloc_candev(int sizeof_priv, unsigned int echo_skb_max)
 
 	priv->state = CAN_STATE_STOPPED;
 
+<<<<<<< HEAD
 	init_timer(&priv->restart_timer);
+=======
+	INIT_DELAYED_WORK(&priv->restart_work, can_restart_work);
+>>>>>>> common/deprecated/android-3.18
 
 	return dev;
 }
@@ -615,11 +797,24 @@ int can_change_mtu(struct net_device *dev, int new_mtu)
 	/* allow change of MTU according to the CANFD ability of the device */
 	switch (new_mtu) {
 	case CAN_MTU:
+<<<<<<< HEAD
+=======
+		/* 'CANFD-only' controllers can not switch to CAN_MTU */
+		if (priv->ctrlmode_static & CAN_CTRLMODE_FD)
+			return -EINVAL;
+
+>>>>>>> common/deprecated/android-3.18
 		priv->ctrlmode &= ~CAN_CTRLMODE_FD;
 		break;
 
 	case CANFD_MTU:
+<<<<<<< HEAD
 		if (!(priv->ctrlmode_supported & CAN_CTRLMODE_FD))
+=======
+		/* check for potential CANFD ability */
+		if (!(priv->ctrlmode_supported & CAN_CTRLMODE_FD) &&
+		    !(priv->ctrlmode_static & CAN_CTRLMODE_FD))
+>>>>>>> common/deprecated/android-3.18
 			return -EINVAL;
 
 		priv->ctrlmode |= CAN_CTRLMODE_FD;
@@ -661,8 +856,11 @@ int open_candev(struct net_device *dev)
 	if (!netif_carrier_ok(dev))
 		netif_carrier_on(dev);
 
+<<<<<<< HEAD
 	setup_timer(&priv->restart_timer, can_restart, (unsigned long)dev);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 EXPORT_SYMBOL_GPL(open_candev);
@@ -677,7 +875,11 @@ void close_candev(struct net_device *dev)
 {
 	struct can_priv *priv = netdev_priv(dev);
 
+<<<<<<< HEAD
 	del_timer_sync(&priv->restart_timer);
+=======
+	cancel_delayed_work_sync(&priv->restart_work);
+>>>>>>> common/deprecated/android-3.18
 	can_flush_echo_skb(dev);
 }
 EXPORT_SYMBOL_GPL(close_candev);
@@ -701,6 +903,41 @@ static const struct nla_policy can_policy[IFLA_CAN_MAX + 1] = {
 				= { .len = sizeof(struct can_bittiming_const) },
 };
 
+<<<<<<< HEAD
+=======
+static int can_validate(struct nlattr *tb[], struct nlattr *data[])
+{
+	bool is_can_fd = false;
+
+	/* Make sure that valid CAN FD configurations always consist of
+	 * - nominal/arbitration bittiming
+	 * - data bittiming
+	 * - control mode with CAN_CTRLMODE_FD set
+	 */
+
+	if (!data)
+		return 0;
+
+	if (data[IFLA_CAN_CTRLMODE]) {
+		struct can_ctrlmode *cm = nla_data(data[IFLA_CAN_CTRLMODE]);
+
+		is_can_fd = cm->flags & cm->mask & CAN_CTRLMODE_FD;
+	}
+
+	if (is_can_fd) {
+		if (!data[IFLA_CAN_BITTIMING] || !data[IFLA_CAN_DATA_BITTIMING])
+			return -EOPNOTSUPP;
+	}
+
+	if (data[IFLA_CAN_DATA_BITTIMING]) {
+		if (!is_can_fd || !data[IFLA_CAN_BITTIMING])
+			return -EOPNOTSUPP;
+	}
+
+	return 0;
+}
+
+>>>>>>> common/deprecated/android-3.18
 static int can_changelink(struct net_device *dev,
 			  struct nlattr *tb[], struct nlattr *data[])
 {
@@ -732,19 +969,44 @@ static int can_changelink(struct net_device *dev,
 
 	if (data[IFLA_CAN_CTRLMODE]) {
 		struct can_ctrlmode *cm;
+<<<<<<< HEAD
+=======
+		u32 ctrlstatic;
+		u32 maskedflags;
+>>>>>>> common/deprecated/android-3.18
 
 		/* Do not allow changing controller mode while running */
 		if (dev->flags & IFF_UP)
 			return -EBUSY;
 		cm = nla_data(data[IFLA_CAN_CTRLMODE]);
+<<<<<<< HEAD
 
 		/* check whether changed bits are allowed to be modified */
 		if (cm->mask & ~priv->ctrlmode_supported)
+=======
+		ctrlstatic = priv->ctrlmode_static;
+		maskedflags = cm->flags & cm->mask;
+
+		/* check whether provided bits are allowed to be passed */
+		if (cm->mask & ~(priv->ctrlmode_supported | ctrlstatic))
+			return -EOPNOTSUPP;
+
+		/* do not check for static fd-non-iso if 'fd' is disabled */
+		if (!(maskedflags & CAN_CTRLMODE_FD))
+			ctrlstatic &= ~CAN_CTRLMODE_FD_NON_ISO;
+
+		/* make sure static options are provided by configuration */
+		if ((maskedflags & ctrlstatic) != ctrlstatic)
+>>>>>>> common/deprecated/android-3.18
 			return -EOPNOTSUPP;
 
 		/* clear bits to be modified and copy the flag values */
 		priv->ctrlmode &= ~cm->mask;
+<<<<<<< HEAD
 		priv->ctrlmode |= (cm->flags & cm->mask);
+=======
+		priv->ctrlmode |= maskedflags;
+>>>>>>> common/deprecated/android-3.18
 
 		/* CAN_CTRLMODE_FD can only be set when driver supports FD */
 		if (priv->ctrlmode & CAN_CTRLMODE_FD)
@@ -820,7 +1082,11 @@ static int can_fill_info(struct sk_buff *skb, const struct net_device *dev)
 {
 	struct can_priv *priv = netdev_priv(dev);
 	struct can_ctrlmode cm = {.flags = priv->ctrlmode};
+<<<<<<< HEAD
 	struct can_berr_counter bec;
+=======
+	struct can_berr_counter bec = { };
+>>>>>>> common/deprecated/android-3.18
 	enum can_state state = priv->state;
 
 	if (priv->do_get_state)
@@ -880,6 +1146,7 @@ static int can_newlink(struct net *src_net, struct net_device *dev,
 	return -EOPNOTSUPP;
 }
 
+<<<<<<< HEAD
 static struct rtnl_link_ops can_link_ops __read_mostly = {
 	.kind		= "can",
 	.maxtype	= IFLA_CAN_MAX,
@@ -887,6 +1154,22 @@ static struct rtnl_link_ops can_link_ops __read_mostly = {
 	.setup		= can_setup,
 	.newlink	= can_newlink,
 	.changelink	= can_changelink,
+=======
+static void can_dellink(struct net_device *dev, struct list_head *head)
+{
+}
+
+static struct rtnl_link_ops can_link_ops __read_mostly = {
+	.kind		= "can",
+	.netns_refund	= true,
+	.maxtype	= IFLA_CAN_MAX,
+	.policy		= can_policy,
+	.setup		= can_setup,
+	.validate	= can_validate,
+	.newlink	= can_newlink,
+	.changelink	= can_changelink,
+	.dellink	= can_dellink,
+>>>>>>> common/deprecated/android-3.18
 	.get_size	= can_get_size,
 	.fill_info	= can_fill_info,
 	.get_xstats_size = can_get_xstats_size,
@@ -899,6 +1182,11 @@ static struct rtnl_link_ops can_link_ops __read_mostly = {
 int register_candev(struct net_device *dev)
 {
 	dev->rtnl_link_ops = &can_link_ops;
+<<<<<<< HEAD
+=======
+	netif_carrier_off(dev);
+
+>>>>>>> common/deprecated/android-3.18
 	return register_netdev(dev);
 }
 EXPORT_SYMBOL_GPL(register_candev);

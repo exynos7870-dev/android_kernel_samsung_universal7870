@@ -242,10 +242,16 @@ int omap4_enter_lowpower(unsigned int cpu, unsigned int power_state)
 		save_state = 1;
 		break;
 	case PWRDM_POWER_RET:
+<<<<<<< HEAD
 		if (IS_PM44XX_ERRATUM(PM_OMAP4_CPU_OSWR_DISABLE)) {
 			save_state = 0;
 			break;
 		}
+=======
+		if (IS_PM44XX_ERRATUM(PM_OMAP4_CPU_OSWR_DISABLE))
+			save_state = 0;
+		break;
+>>>>>>> common/deprecated/android-3.18
 	default:
 		/*
 		 * CPUx CSWR is invalid hardware state. Also CPUx OSWR

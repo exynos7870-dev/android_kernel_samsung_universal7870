@@ -61,7 +61,12 @@ GLOBAL(ftrace_graph_call)
 	jmp ftrace_stub
 #endif
 
+<<<<<<< HEAD
 GLOBAL(ftrace_stub)
+=======
+/* This is weak to keep gas from relaxing the jumps */
+WEAK(ftrace_stub)
+>>>>>>> common/deprecated/android-3.18
 	retq
 END(ftrace_caller)
 

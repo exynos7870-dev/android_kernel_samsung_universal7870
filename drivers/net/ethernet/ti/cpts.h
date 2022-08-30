@@ -27,6 +27,10 @@
 #include <linux/list.h>
 #include <linux/ptp_clock_kernel.h>
 #include <linux/skbuff.h>
+<<<<<<< HEAD
+=======
+#include <linux/timecounter.h>
+>>>>>>> common/deprecated/android-3.18
 
 struct cpsw_cpts {
 	u32 idver;                /* Identification and version */

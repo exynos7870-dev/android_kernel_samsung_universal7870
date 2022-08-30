@@ -165,7 +165,11 @@ int acpi_processor_ppc_has_changed(struct acpi_processor *pr, int event_flag)
 {
 	int ret;
 
+<<<<<<< HEAD
 	if (ignore_ppc) {
+=======
+	if (ignore_ppc || !pr->performance) {
+>>>>>>> common/deprecated/android-3.18
 		/*
 		 * Only when it is notification event, the _OST object
 		 * will be evaluated. Otherwise it is skipped.

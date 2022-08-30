@@ -51,7 +51,11 @@ then
 			mkdir $builddir
 		fi
 	else
+<<<<<<< HEAD
 		echo Bad build directory: \"$builddir\"
+=======
+		echo Bad build directory: \"$buildloc\"
+>>>>>>> common/deprecated/android-3.18
 		exit 2
 	fi
 fi

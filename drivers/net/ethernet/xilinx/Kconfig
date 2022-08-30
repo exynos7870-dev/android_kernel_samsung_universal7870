@@ -36,6 +36,10 @@ config XILINX_AXI_EMAC
 config XILINX_LL_TEMAC
 	tristate "Xilinx LL TEMAC (LocalLink Tri-mode Ethernet MAC) driver"
 	depends on (PPC || MICROBLAZE)
+<<<<<<< HEAD
+=======
+	depends on !64BIT || BROKEN
+>>>>>>> common/deprecated/android-3.18
 	select PHYLIB
 	---help---
 	  This driver supports the Xilinx 10/100/1000 LocalLink TEMAC

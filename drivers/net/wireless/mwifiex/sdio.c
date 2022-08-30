@@ -1750,6 +1750,11 @@ error:
 	if (ret) {
 		kfree(card->mpa_tx.buf);
 		kfree(card->mpa_rx.buf);
+<<<<<<< HEAD
+=======
+		card->mpa_tx.buf = NULL;
+		card->mpa_rx.buf = NULL;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	return ret;

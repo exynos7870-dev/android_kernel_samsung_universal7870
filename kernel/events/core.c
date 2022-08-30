@@ -229,7 +229,11 @@ int perf_cpu_time_max_percent_handler(struct ctl_table *table, int write,
 				void __user *buffer, size_t *lenp,
 				loff_t *ppos)
 {
+<<<<<<< HEAD
 	int ret = proc_dointvec(table, write, buffer, lenp, ppos);
+=======
+	int ret = proc_dointvec_minmax(table, write, buffer, lenp, ppos);
+>>>>>>> common/deprecated/android-3.18
 
 	if (ret || !write)
 		return ret;
@@ -440,9 +444,21 @@ static inline void __update_cgrp_time(struct perf_cgroup *cgrp)
 
 static inline void update_cgrp_time_from_cpuctx(struct perf_cpu_context *cpuctx)
 {
+<<<<<<< HEAD
 	struct perf_cgroup *cgrp_out = cpuctx->cgrp;
 	if (cgrp_out)
 		__update_cgrp_time(cgrp_out);
+=======
+	struct perf_cgroup *cgrp = cpuctx->cgrp;
+	struct cgroup_subsys_state *css;
+
+	if (cgrp) {
+		for (css = &cgrp->css; css; css = css->parent) {
+			cgrp = container_of(css, struct perf_cgroup, css);
+			__update_cgrp_time(cgrp);
+		}
+	}
+>>>>>>> common/deprecated/android-3.18
 }
 
 static inline void update_cgrp_time_from_event(struct perf_event *event)
@@ -470,6 +486,10 @@ perf_cgroup_set_timestamp(struct task_struct *task,
 {
 	struct perf_cgroup *cgrp;
 	struct perf_cgroup_info *info;
+<<<<<<< HEAD
+=======
+	struct cgroup_subsys_state *css;
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * ctx->lock held by caller
@@ -480,8 +500,17 @@ perf_cgroup_set_timestamp(struct task_struct *task,
 		return;
 
 	cgrp = perf_cgroup_from_task(task);
+<<<<<<< HEAD
 	info = this_cpu_ptr(cgrp->info);
 	info->timestamp = ctx->timestamp;
+=======
+
+	for (css = &cgrp->css; css; css = css->parent) {
+		cgrp = container_of(css, struct perf_cgroup, css);
+		info = this_cpu_ptr(cgrp->info);
+		info->timestamp = ctx->timestamp;
+	}
+>>>>>>> common/deprecated/android-3.18
 }
 
 #define PERF_CGROUP_SWOUT	0x1 /* cgroup switch out every event */
@@ -945,6 +974,10 @@ static void put_ctx(struct perf_event_context *ctx)
  * function.
  *
  * Lock order:
+<<<<<<< HEAD
+=======
+ *    cred_guard_mutex
+>>>>>>> common/deprecated/android-3.18
  *	task_struct::perf_event_mutex
  *	  perf_event_context::mutex
  *	    perf_event_context::lock
@@ -1448,17 +1481,23 @@ static void perf_group_detach(struct perf_event *event)
 	 * If this was a group event with sibling events then
 	 * upgrade the siblings to singleton events by adding them
 	 * to whatever list we are on.
+<<<<<<< HEAD
 	 * If this isn't on a list, make sure we still remove the sibling's
 	 * group_entry from this sibling_list; otherwise, when that sibling
 	 * is later deallocated, it will try to remove itself from this
 	 * sibling_list, which may well have been deallocated already,
 	 * resulting in a use-after-free.
+=======
+>>>>>>> common/deprecated/android-3.18
 	 */
 	list_for_each_entry_safe(sibling, tmp, &event->sibling_list, group_entry) {
 		if (list)
 			list_move_tail(&sibling->group_entry, list);
+<<<<<<< HEAD
 		else
 			list_del_init(&sibling->group_entry);
+=======
+>>>>>>> common/deprecated/android-3.18
 		sibling->group_leader = sibling;
 
 		/* Inherit group flags from the previous leader */
@@ -1543,14 +1582,23 @@ event_sched_out(struct perf_event *event,
 
 	perf_pmu_disable(event->pmu);
 
+<<<<<<< HEAD
+=======
+	event->tstamp_stopped = tstamp;
+	event->pmu->del(event, 0);
+	event->oncpu = -1;
+>>>>>>> common/deprecated/android-3.18
 	event->state = PERF_EVENT_STATE_INACTIVE;
 	if (event->pending_disable) {
 		event->pending_disable = 0;
 		event->state = PERF_EVENT_STATE_OFF;
 	}
+<<<<<<< HEAD
 	event->tstamp_stopped = tstamp;
 	event->pmu->del(event, 0);
 	event->oncpu = -1;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	if (!is_software_event(event))
 		cpuctx->active_oncpu--;
@@ -3295,7 +3343,10 @@ static struct task_struct *
 find_lively_task_by_vpid(pid_t vpid)
 {
 	struct task_struct *task;
+<<<<<<< HEAD
 	int err;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	rcu_read_lock();
 	if (!vpid)
@@ -3309,6 +3360,7 @@ find_lively_task_by_vpid(pid_t vpid)
 	if (!task)
 		return ERR_PTR(-ESRCH);
 
+<<<<<<< HEAD
 	/* Reuse ptrace permission checks for now. */
 	err = -EACCES;
 	if (!ptrace_may_access(task, PTRACE_MODE_READ))
@@ -3319,6 +3371,9 @@ errout:
 	put_task_struct(task);
 	return ERR_PTR(err);
 
+=======
+	return task;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
@@ -3348,7 +3403,13 @@ find_get_context(struct pmu *pmu, struct task_struct *task, int cpu)
 		cpuctx = per_cpu_ptr(pmu->pmu_cpu_context, cpu);
 		ctx = &cpuctx->ctx;
 		get_ctx(ctx);
+<<<<<<< HEAD
 		++ctx->pin_count;
+=======
+		raw_spin_lock_irqsave(&ctx->lock, flags);
+		++ctx->pin_count;
+		raw_spin_unlock_irqrestore(&ctx->lock, flags);
+>>>>>>> common/deprecated/android-3.18
 
 		return ctx;
 	}
@@ -3865,6 +3926,7 @@ static void perf_event_for_each(struct perf_event *event,
 		perf_event_for_each_child(sibling, func);
 }
 
+<<<<<<< HEAD
 static int perf_event_period(struct perf_event *event, u64 __user *arg)
 {
 	struct perf_event_context *ctx = event->ctx;
@@ -3887,6 +3949,23 @@ static int perf_event_period(struct perf_event *event, u64 __user *arg)
 			goto unlock;
 		}
 
+=======
+struct period_event {
+	struct perf_event *event;
+	u64 value;
+};
+
+static int __perf_event_period(void *info)
+{
+	struct period_event *pe = info;
+	struct perf_event *event = pe->event;
+	struct perf_event_context *ctx = event->ctx;
+	u64 value = pe->value;
+	bool active;
+
+	raw_spin_lock(&ctx->lock);
+	if (event->attr.freq) {
+>>>>>>> common/deprecated/android-3.18
 		event->attr.sample_freq = value;
 	} else {
 		event->attr.sample_period = value;
@@ -3905,11 +3984,68 @@ static int perf_event_period(struct perf_event *event, u64 __user *arg)
 		event->pmu->start(event, PERF_EF_RELOAD);
 		perf_pmu_enable(ctx->pmu);
 	}
+<<<<<<< HEAD
 
 unlock:
 	raw_spin_unlock_irq(&ctx->lock);
 
 	return ret;
+=======
+	raw_spin_unlock(&ctx->lock);
+
+	return 0;
+}
+
+static int perf_event_period(struct perf_event *event, u64 __user *arg)
+{
+	struct period_event pe = { .event = event, };
+	struct perf_event_context *ctx = event->ctx;
+	struct task_struct *task;
+	u64 value;
+
+	if (!is_sampling_event(event))
+		return -EINVAL;
+
+	if (copy_from_user(&value, arg, sizeof(value)))
+		return -EFAULT;
+
+	if (!value)
+		return -EINVAL;
+
+	if (event->attr.freq && value > sysctl_perf_event_sample_rate)
+		return -EINVAL;
+
+	task = ctx->task;
+	pe.value = value;
+
+	if (!task) {
+		cpu_function_call(event->cpu, __perf_event_period, &pe);
+		return 0;
+	}
+
+retry:
+	if (!task_function_call(task, __perf_event_period, &pe))
+		return 0;
+
+	raw_spin_lock_irq(&ctx->lock);
+	if (ctx->is_active) {
+		raw_spin_unlock_irq(&ctx->lock);
+		task = ctx->task;
+		goto retry;
+	}
+
+	if (event->attr.freq) {
+		event->attr.sample_freq = value;
+	} else {
+		event->attr.sample_period = value;
+		event->hw.sample_period = value;
+	}
+
+	local64_set(&event->hw.period_left, 0);
+	raw_spin_unlock_irq(&ctx->lock);
+
+	return 0;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static const struct file_operations perf_fops;
@@ -4213,6 +4349,7 @@ static void ring_buffer_attach(struct perf_event *event,
 		WARN_ON_ONCE(event->rcu_pending);
 
 		old_rb = event->rb;
+<<<<<<< HEAD
 		event->rcu_batches = get_state_synchronize_rcu();
 		event->rcu_pending = 1;
 
@@ -4227,6 +4364,22 @@ static void ring_buffer_attach(struct perf_event *event,
 	}
 
 	if (rb) {
+=======
+		spin_lock_irqsave(&old_rb->event_lock, flags);
+		list_del_rcu(&event->rb_entry);
+		spin_unlock_irqrestore(&old_rb->event_lock, flags);
+
+		event->rcu_batches = get_state_synchronize_rcu();
+		event->rcu_pending = 1;
+	}
+
+	if (rb) {
+		if (event->rcu_pending) {
+			cond_synchronize_rcu(event->rcu_batches);
+			event->rcu_pending = 0;
+		}
+
+>>>>>>> common/deprecated/android-3.18
 		spin_lock_irqsave(&rb->event_lock, flags);
 		list_add_rcu(&event->rb_entry, &rb->event_list);
 		spin_unlock_irqrestore(&rb->event_lock, flags);
@@ -4310,13 +4463,23 @@ static void perf_mmap_open(struct vm_area_struct *vma)
 static void perf_mmap_close(struct vm_area_struct *vma)
 {
 	struct perf_event *event = vma->vm_file->private_data;
+<<<<<<< HEAD
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	struct ring_buffer *rb = ring_buffer_get(event);
 	struct user_struct *mmap_user = rb->mmap_user;
 	int mmap_locked = rb->mmap_locked;
 	unsigned long size = perf_data_size(rb);
+<<<<<<< HEAD
 
 	atomic_dec(&rb->mmap_count);
+=======
+	bool detach_rest = false;
+
+	if (atomic_dec_and_test(&rb->mmap_count))
+		detach_rest = true;
+>>>>>>> common/deprecated/android-3.18
 
 	if (!atomic_dec_and_mutex_lock(&event->mmap_count, &event->mmap_mutex))
 		goto out_put;
@@ -4325,7 +4488,11 @@ static void perf_mmap_close(struct vm_area_struct *vma)
 	mutex_unlock(&event->mmap_mutex);
 
 	/* If there's still other mmap()s of this buffer, we're done. */
+<<<<<<< HEAD
 	if (atomic_read(&rb->mmap_count))
+=======
+	if (!detach_rest)
+>>>>>>> common/deprecated/android-3.18
 		goto out_put;
 
 	/*
@@ -4463,7 +4630,19 @@ again:
 	 */
 	user_lock_limit *= num_online_cpus();
 
+<<<<<<< HEAD
 	user_locked = atomic_long_read(&user->locked_vm) + user_extra;
+=======
+	user_locked = atomic_long_read(&user->locked_vm);
+
+	/*
+	 * sysctl_perf_event_mlock may have changed, so that
+	 *     user->locked_vm > user_lock_limit
+	 */
+	if (user_locked > user_lock_limit)
+		user_locked = user_lock_limit;
+	user_locked += user_extra;
+>>>>>>> common/deprecated/android-3.18
 
 	extra = 0;
 	if (user_locked > user_lock_limit)
@@ -4554,12 +4733,27 @@ static const struct file_operations perf_fops = {
  * to user-space before waking everybody up.
  */
 
+<<<<<<< HEAD
+=======
+static inline struct fasync_struct **perf_event_fasync(struct perf_event *event)
+{
+	/* only the parent has fasync state */
+	if (event->parent)
+		event = event->parent;
+	return &event->fasync;
+}
+
+>>>>>>> common/deprecated/android-3.18
 void perf_event_wakeup(struct perf_event *event)
 {
 	ring_buffer_wakeup(event);
 
 	if (event->pending_kill) {
+<<<<<<< HEAD
 		kill_fasync(&event->fasync, SIGIO, event->pending_kill);
+=======
+		kill_fasync(perf_event_fasync(event), SIGIO, event->pending_kill);
+>>>>>>> common/deprecated/android-3.18
 		event->pending_kill = 0;
 	}
 }
@@ -4830,9 +5024,12 @@ static void perf_output_read_one(struct perf_output_handle *handle,
 	__output_copy(handle, values, n * sizeof(u64));
 }
 
+<<<<<<< HEAD
 /*
  * XXX PERF_FORMAT_GROUP vs inherited events seems difficult.
  */
+=======
+>>>>>>> common/deprecated/android-3.18
 static void perf_output_read_group(struct perf_output_handle *handle,
 			    struct perf_event *event,
 			    u64 enabled, u64 running)
@@ -4850,7 +5047,12 @@ static void perf_output_read_group(struct perf_output_handle *handle,
 	if (read_format & PERF_FORMAT_TOTAL_TIME_RUNNING)
 		values[n++] = running;
 
+<<<<<<< HEAD
 	if (leader != event)
+=======
+	if ((leader != event) &&
+	    (leader->state == PERF_EVENT_STATE_ACTIVE))
+>>>>>>> common/deprecated/android-3.18
 		leader->pmu->read(leader);
 
 	values[n++] = perf_event_count(leader);
@@ -4877,6 +5079,16 @@ static void perf_output_read_group(struct perf_output_handle *handle,
 #define PERF_FORMAT_TOTAL_TIMES (PERF_FORMAT_TOTAL_TIME_ENABLED|\
 				 PERF_FORMAT_TOTAL_TIME_RUNNING)
 
+<<<<<<< HEAD
+=======
+/*
+ * XXX PERF_SAMPLE_READ vs inherited events seems difficult.
+ *
+ * The problem is that its both hard and excessively expensive to iterate the
+ * child list, not to mention that its impossible to IPI the children running
+ * on another CPU, from interrupt/NMI context.
+ */
+>>>>>>> common/deprecated/android-3.18
 static void perf_output_read(struct perf_output_handle *handle,
 			     struct perf_event *event)
 {
@@ -5296,10 +5508,24 @@ static void perf_event_task_output(struct perf_event *event,
 		goto out;
 
 	task_event->event_id.pid = perf_event_pid(event, task);
+<<<<<<< HEAD
 	task_event->event_id.ppid = perf_event_pid(event, current);
 
 	task_event->event_id.tid = perf_event_tid(event, task);
 	task_event->event_id.ptid = perf_event_tid(event, current);
+=======
+	task_event->event_id.tid = perf_event_tid(event, task);
+
+	if (task_event->event_id.header.type == PERF_RECORD_EXIT) {
+		task_event->event_id.ppid = perf_event_pid(event,
+							task->real_parent);
+		task_event->event_id.ptid = perf_event_pid(event,
+							task->real_parent);
+	} else {  /* PERF_RECORD_FORK */
+		task_event->event_id.ppid = perf_event_pid(event, current);
+		task_event->event_id.ptid = perf_event_tid(event, current);
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	perf_output_put(&handle, task_event->event_id);
 
@@ -5490,6 +5716,10 @@ static void perf_event_mmap_output(struct perf_event *event,
 	struct perf_output_handle handle;
 	struct perf_sample_data sample;
 	int size = mmap_event->event_id.header.size;
+<<<<<<< HEAD
+=======
+	u32 type = mmap_event->event_id.header.type;
+>>>>>>> common/deprecated/android-3.18
 	int ret;
 
 	if (!perf_event_mmap_match(event, data))
@@ -5533,6 +5763,10 @@ static void perf_event_mmap_output(struct perf_event *event,
 	perf_output_end(&handle);
 out:
 	mmap_event->event_id.header.size = size;
+<<<<<<< HEAD
+=======
+	mmap_event->event_id.header.type = type;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void perf_event_mmap_event(struct perf_mmap_event *mmap_event)
@@ -5547,6 +5781,30 @@ static void perf_event_mmap_event(struct perf_mmap_event *mmap_event)
 	char *buf = NULL;
 	char *name;
 
+<<<<<<< HEAD
+=======
+	if (vma->vm_flags & VM_READ)
+		prot |= PROT_READ;
+	if (vma->vm_flags & VM_WRITE)
+		prot |= PROT_WRITE;
+	if (vma->vm_flags & VM_EXEC)
+		prot |= PROT_EXEC;
+
+	if (vma->vm_flags & VM_MAYSHARE)
+		flags = MAP_SHARED;
+	else
+		flags = MAP_PRIVATE;
+
+	if (vma->vm_flags & VM_DENYWRITE)
+		flags |= MAP_DENYWRITE;
+	if (vma->vm_flags & VM_MAYEXEC)
+		flags |= MAP_EXECUTABLE;
+	if (vma->vm_flags & VM_LOCKED)
+		flags |= MAP_LOCKED;
+	if (vma->vm_flags & VM_HUGETLB)
+		flags |= MAP_HUGETLB;
+
+>>>>>>> common/deprecated/android-3.18
 	if (file) {
 		struct inode *inode;
 		dev_t dev;
@@ -5573,6 +5831,7 @@ static void perf_event_mmap_event(struct perf_mmap_event *mmap_event)
 		maj = MAJOR(dev);
 		min = MINOR(dev);
 
+<<<<<<< HEAD
 		if (vma->vm_flags & VM_READ)
 			prot |= PROT_READ;
 		if (vma->vm_flags & VM_WRITE)
@@ -5594,6 +5853,8 @@ static void perf_event_mmap_event(struct perf_mmap_event *mmap_event)
 		if (vma->vm_flags & VM_HUGETLB)
 			flags |= MAP_HUGETLB;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		goto got_name;
 	} else {
 		if (vma->vm_ops && vma->vm_ops->name) {
@@ -5794,7 +6055,11 @@ static int __perf_event_overflow(struct perf_event *event,
 	else
 		perf_event_output(event, data, regs);
 
+<<<<<<< HEAD
 	if (event->fasync && event->pending_kill) {
+=======
+	if (*perf_event_fasync(event) && event->pending_kill) {
+>>>>>>> common/deprecated/android-3.18
 		event->pending_wakeup = 1;
 		irq_work_queue(&event->pending);
 	}
@@ -6015,6 +6280,11 @@ end:
 	rcu_read_unlock();
 }
 
+<<<<<<< HEAD
+=======
+DEFINE_PER_CPU(struct pt_regs, __perf_regs[4]);
+
+>>>>>>> common/deprecated/android-3.18
 int perf_swevent_get_recursion_context(void)
 {
 	struct swevent_htable *swhash = this_cpu_ptr(&swevent_htable);
@@ -6030,13 +6300,30 @@ inline void perf_swevent_put_recursion_context(int rctx)
 	put_recursion_context(swhash->recursion, rctx);
 }
 
+<<<<<<< HEAD
 void __perf_sw_event(u32 event_id, u64 nr, struct pt_regs *regs, u64 addr)
 {
 	struct perf_sample_data data;
+=======
+void ___perf_sw_event(u32 event_id, u64 nr, struct pt_regs *regs, u64 addr)
+{
+	struct perf_sample_data data;
+
+	if (WARN_ON_ONCE(!regs))
+		return;
+
+	perf_sample_data_init(&data, addr, 0);
+	do_perf_sw_event(PERF_TYPE_SOFTWARE, event_id, nr, &data, regs);
+}
+
+void __perf_sw_event(u32 event_id, u64 nr, struct pt_regs *regs, u64 addr)
+{
+>>>>>>> common/deprecated/android-3.18
 	int rctx;
 
 	preempt_disable_notrace();
 	rctx = perf_swevent_get_recursion_context();
+<<<<<<< HEAD
 	if (rctx < 0)
 		return;
 
@@ -6045,6 +6332,15 @@ void __perf_sw_event(u32 event_id, u64 nr, struct pt_regs *regs, u64 addr)
 	do_perf_sw_event(PERF_TYPE_SOFTWARE, event_id, nr, &data, regs);
 
 	perf_swevent_put_recursion_context(rctx);
+=======
+	if (unlikely(rctx < 0))
+		goto fail;
+
+	___perf_sw_event(event_id, nr, regs, addr);
+
+	perf_swevent_put_recursion_context(rctx);
+fail:
+>>>>>>> common/deprecated/android-3.18
 	preempt_enable_notrace();
 }
 
@@ -6304,6 +6600,11 @@ void perf_tp_event(u64 addr, u64 count, void *record, int entry_size,
 			goto unlock;
 
 		list_for_each_entry_rcu(event, &ctx->event_list, event_entry) {
+<<<<<<< HEAD
+=======
+			if (event->cpu != smp_processor_id())
+				continue;
+>>>>>>> common/deprecated/android-3.18
 			if (event->attr.type != PERF_TYPE_TRACEPOINT)
 				continue;
 			if (event->attr.config != entry->type)
@@ -7152,9 +7453,16 @@ perf_event_alloc(struct perf_event_attr *attr, int cpu,
 	local64_set(&hwc->period_left, hwc->sample_period);
 
 	/*
+<<<<<<< HEAD
 	 * we currently do not support PERF_FORMAT_GROUP on inherited events
 	 */
 	if (attr->inherit && (attr->read_format & PERF_FORMAT_GROUP))
+=======
+	 * We currently do not support PERF_SAMPLE_READ on inherited events.
+	 * See perf_output_read().
+	 */
+	if (attr->inherit && (attr->sample_type & PERF_SAMPLE_READ))
+>>>>>>> common/deprecated/android-3.18
 		goto err_ns;
 
 	pmu = perf_init_event(event);
@@ -7173,6 +7481,12 @@ perf_event_alloc(struct perf_event_attr *attr, int cpu,
 		}
 	}
 
+<<<<<<< HEAD
+=======
+	/* symmetric to unaccount_event() in _free_event() */
+	account_event(event);
+
+>>>>>>> common/deprecated/android-3.18
 	return event;
 
 err_pmu:
@@ -7301,9 +7615,15 @@ static int perf_copy_attr(struct perf_event_attr __user *uattr,
 		 * __u16 sample size limit.
 		 */
 		if (attr->sample_stack_user >= USHRT_MAX)
+<<<<<<< HEAD
 			ret = -EINVAL;
 		else if (!IS_ALIGNED(attr->sample_stack_user, sizeof(u64)))
 			ret = -EINVAL;
+=======
+			return -EINVAL;
+		else if (!IS_ALIGNED(attr->sample_stack_user, sizeof(u64)))
+			return -EINVAL;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 out:
@@ -7372,6 +7692,40 @@ static void mutex_lock_double(struct mutex *a, struct mutex *b)
 	mutex_lock_nested(b, SINGLE_DEPTH_NESTING);
 }
 
+<<<<<<< HEAD
+=======
+/*
+ * Variation on perf_event_ctx_lock_nested(), except we take two context
+ * mutexes.
+ */
+static struct perf_event_context *
+__perf_event_ctx_lock_double(struct perf_event *group_leader,
+			     struct perf_event_context *ctx)
+{
+	struct perf_event_context *gctx;
+
+again:
+	rcu_read_lock();
+	gctx = ACCESS_ONCE(group_leader->ctx);
+	if (!atomic_inc_not_zero(&gctx->refcount)) {
+		rcu_read_unlock();
+		goto again;
+	}
+	rcu_read_unlock();
+
+	mutex_lock_double(&gctx->mutex, &ctx->mutex);
+
+	if (group_leader->ctx != gctx) {
+		mutex_unlock(&ctx->mutex);
+		mutex_unlock(&gctx->mutex);
+		put_ctx(gctx);
+		goto again;
+	}
+
+	return gctx;
+}
+
+>>>>>>> common/deprecated/android-3.18
 /**
  * sys_perf_event_open - open a performance event, associate it to a task/cpu
  *
@@ -7464,11 +7818,36 @@ SYSCALL_DEFINE5(perf_event_open,
 
 	get_online_cpus();
 
+<<<<<<< HEAD
+=======
+	if (task) {
+		err = mutex_lock_interruptible(&task->signal->cred_guard_mutex);
+		if (err)
+			goto err_cpus;
+
+		/*
+		 * Reuse ptrace permission checks for now.
+		 *
+		 * We must hold cred_guard_mutex across this and any potential
+		 * perf_install_in_context() call for this new event to
+		 * serialize against exec() altering our credentials (and the
+		 * perf_event_exit_task() that could imply).
+		 */
+		err = -EACCES;
+		if (!ptrace_may_access(task, PTRACE_MODE_READ_REALCREDS))
+			goto err_cred;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	event = perf_event_alloc(&attr, cpu, task, group_leader, NULL,
 				 NULL, NULL);
 	if (IS_ERR(event)) {
 		err = PTR_ERR(event);
+<<<<<<< HEAD
 		goto err_cpus;
+=======
+		goto err_cred;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (flags & PERF_FLAG_PID_CGROUP) {
@@ -7486,8 +7865,11 @@ SYSCALL_DEFINE5(perf_event_open,
 		}
 	}
 
+<<<<<<< HEAD
 	account_event(event);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Special case software events and allow them to be part of
 	 * any hardware group.
@@ -7526,11 +7908,14 @@ SYSCALL_DEFINE5(perf_event_open,
 		goto err_alloc;
 	}
 
+<<<<<<< HEAD
 	if (task) {
 		put_task_struct(task);
 		task = NULL;
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Look up the group leader (we will attach this event to it):
 	 */
@@ -7544,6 +7929,7 @@ SYSCALL_DEFINE5(perf_event_open,
 		if (group_leader->group_leader != group_leader)
 			goto err_context;
 		/*
+<<<<<<< HEAD
 		 * Do not allow to attach to a group in a different
 		 * task or CPU context:
 		 */
@@ -7566,6 +7952,29 @@ SYSCALL_DEFINE5(perf_event_open,
 			if (group_leader->ctx != ctx)
 				goto err_context;
 		}
+=======
+		 * Make sure we're both events for the same CPU;
+		 * grouping events for different CPUs is broken; since
+		 * you can never concurrently schedule them anyhow.
+		 */
+		if (group_leader->cpu != event->cpu)
+			goto err_context;
+
+		/*
+		 * Make sure we're both on the same task, or both
+		 * per-CPU events.
+		 */
+		if (group_leader->ctx->task != ctx->task)
+			goto err_context;
+
+		/*
+		 * Do not allow to attach to a group in a different task
+		 * or CPU context. If we're moving SW events, we'll fix
+		 * this up later, so allow that.
+		 */
+		if (!move_group && group_leader->ctx != ctx)
+			goto err_context;
+>>>>>>> common/deprecated/android-3.18
 
 		/*
 		 * Only a group leader can be exclusive or pinned
@@ -7584,18 +7993,53 @@ SYSCALL_DEFINE5(perf_event_open,
 					f_flags);
 	if (IS_ERR(event_file)) {
 		err = PTR_ERR(event_file);
+<<<<<<< HEAD
+=======
+		event_file = NULL;
+>>>>>>> common/deprecated/android-3.18
 		goto err_context;
 	}
 
 	if (move_group) {
+<<<<<<< HEAD
 		gctx = group_leader->ctx;
+=======
+		gctx = __perf_event_ctx_lock_double(group_leader, ctx);
+
+		/*
+		 * Check if we raced against another sys_perf_event_open() call
+		 * moving the software group underneath us.
+		 */
+		if (!(group_leader->group_flags & PERF_GROUP_SOFTWARE)) {
+			/*
+			 * If someone moved the group out from under us, check
+			 * if this new event wound up on the same ctx, if so
+			 * its the regular !move_group case, otherwise fail.
+			 */
+			if (gctx != ctx) {
+				err = -EINVAL;
+				goto err_locked;
+			} else {
+				perf_event_ctx_unlock(group_leader, gctx);
+				move_group = 0;
+			}
+		}
+
+		/*
+		 * This is the point on no return; we cannot fail hereafter. This is
+		 * where we start modifying current state.
+		 */
+>>>>>>> common/deprecated/android-3.18
 
 		/*
 		 * See perf_event_ctx_lock() for comments on the details
 		 * of swizzling perf_event::ctx.
 		 */
+<<<<<<< HEAD
 		mutex_lock_double(&gctx->mutex, &ctx->mutex);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		perf_remove_from_context(group_leader, false);
 
 		/*
@@ -7622,6 +8066,10 @@ SYSCALL_DEFINE5(perf_event_open,
 		 * the old lists, before installing it on new lists.
 		 */
 		synchronize_rcu();
+<<<<<<< HEAD
+=======
+
+>>>>>>> common/deprecated/android-3.18
 		perf_install_in_context(ctx, group_leader, group_leader->cpu);
 		get_ctx(ctx);
 		list_for_each_entry(sibling, &group_leader->sibling_list,
@@ -7635,11 +8083,23 @@ SYSCALL_DEFINE5(perf_event_open,
 	perf_unpin_context(ctx);
 
 	if (move_group) {
+<<<<<<< HEAD
 		mutex_unlock(&gctx->mutex);
+=======
+		perf_event_ctx_unlock(group_leader, gctx);
+>>>>>>> common/deprecated/android-3.18
 		put_ctx(gctx);
 	}
 	mutex_unlock(&ctx->mutex);
 
+<<<<<<< HEAD
+=======
+	if (task) {
+		mutex_unlock(&task->signal->cred_guard_mutex);
+		put_task_struct(task);
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	put_online_cpus();
 
 	event->owner = current;
@@ -7664,11 +8124,31 @@ SYSCALL_DEFINE5(perf_event_open,
 	fd_install(event_fd, event_file);
 	return event_fd;
 
+<<<<<<< HEAD
+=======
+err_locked:
+	if (move_group)
+		perf_event_ctx_unlock(group_leader, gctx);
+	mutex_unlock(&ctx->mutex);
+	fput(event_file);
+>>>>>>> common/deprecated/android-3.18
 err_context:
 	perf_unpin_context(ctx);
 	put_ctx(ctx);
 err_alloc:
+<<<<<<< HEAD
 	free_event(event);
+=======
+	/*
+	 * If event_file is set, the fput() above will have called ->release()
+	 * and that will take care of freeing the event.
+	 */
+	if (!event_file)
+		free_event(event);
+err_cred:
+	if (task)
+		mutex_unlock(&task->signal->cred_guard_mutex);
+>>>>>>> common/deprecated/android-3.18
 err_cpus:
 	put_online_cpus();
 err_task:
@@ -7722,7 +8202,11 @@ perf_event_create_kernel_counter(struct perf_event_attr *attr, int cpu,
 
 	WARN_ON_ONCE(ctx->parent_ctx);
 	mutex_lock(&ctx->mutex);
+<<<<<<< HEAD
 	perf_install_in_context(ctx, event, cpu);
+=======
+	perf_install_in_context(ctx, event, event->cpu);
+>>>>>>> common/deprecated/android-3.18
 	perf_unpin_context(ctx);
 	mutex_unlock(&ctx->mutex);
 
@@ -7917,6 +8401,12 @@ static void perf_event_exit_task_context(struct task_struct *child, int ctxn)
 
 /*
  * When a child task exits, feed back event values to parent events.
+<<<<<<< HEAD
+=======
+ *
+ * Can be called with cred_guard_mutex held when called from
+ * install_exec_creds().
+>>>>>>> common/deprecated/android-3.18
  */
 void perf_event_exit_task(struct task_struct *child)
 {
@@ -8200,7 +8690,11 @@ static int perf_event_init_context(struct task_struct *child, int ctxn)
 		ret = inherit_task_group(event, parent, parent_ctx,
 					 child, ctxn, &inherited_all);
 		if (ret)
+<<<<<<< HEAD
 			break;
+=======
+			goto out_unlock;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/*
@@ -8216,7 +8710,11 @@ static int perf_event_init_context(struct task_struct *child, int ctxn)
 		ret = inherit_task_group(event, parent, parent_ctx,
 					 child, ctxn, &inherited_all);
 		if (ret)
+<<<<<<< HEAD
 			break;
+=======
+			goto out_unlock;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	raw_spin_lock_irqsave(&parent_ctx->lock, flags);
@@ -8244,6 +8742,10 @@ static int perf_event_init_context(struct task_struct *child, int ctxn)
 	}
 
 	raw_spin_unlock_irqrestore(&parent_ctx->lock, flags);
+<<<<<<< HEAD
+=======
+out_unlock:
+>>>>>>> common/deprecated/android-3.18
 	mutex_unlock(&parent_ctx->mutex);
 
 	perf_unpin_context(parent_ctx);

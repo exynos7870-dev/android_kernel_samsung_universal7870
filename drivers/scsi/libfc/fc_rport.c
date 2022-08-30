@@ -121,12 +121,22 @@ static struct fc_rport_priv *fc_rport_create(struct fc_lport *lport,
 					     u32 port_id)
 {
 	struct fc_rport_priv *rdata;
+<<<<<<< HEAD
+=======
+	size_t rport_priv_size = sizeof(*rdata);
+>>>>>>> common/deprecated/android-3.18
 
 	rdata = lport->tt.rport_lookup(lport, port_id);
 	if (rdata)
 		return rdata;
 
+<<<<<<< HEAD
 	rdata = kzalloc(sizeof(*rdata) + lport->rport_priv_size, GFP_KERNEL);
+=======
+	if (lport->rport_priv_size > 0)
+		rport_priv_size = lport->rport_priv_size;
+	rdata = kzalloc(rport_priv_size, GFP_KERNEL);
+>>>>>>> common/deprecated/android-3.18
 	if (!rdata)
 		return NULL;
 

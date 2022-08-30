@@ -1070,11 +1070,14 @@ source "arch/powerpc/Kconfig.debug"
 
 source "security/Kconfig"
 
+<<<<<<< HEAD
 config KEYS_COMPAT
 	bool
 	depends on COMPAT && KEYS
 	default y
 
+=======
+>>>>>>> common/deprecated/android-3.18
 source "crypto/Kconfig"
 
 config PPC_LIB_RHEAP

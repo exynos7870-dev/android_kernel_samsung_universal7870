@@ -5,7 +5,11 @@
  * Copy a null-terminated string from SRC to DST.  Return a pointer
  * to the null-terminator in the source.
  */
+<<<<<<< HEAD
 
+=======
+#include <asm/export.h>
+>>>>>>> common/deprecated/android-3.18
 	.text
 
 	.align 3
@@ -21,3 +25,7 @@ strcpy:
 	br	__stxcpy	# do the copy
 
 	.end strcpy
+<<<<<<< HEAD
+=======
+	EXPORT_SYMBOL(strcpy)
+>>>>>>> common/deprecated/android-3.18

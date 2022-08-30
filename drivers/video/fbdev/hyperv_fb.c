@@ -716,7 +716,14 @@ static int hvfb_getmem(struct fb_info *info)
 		}
 	}
 
+<<<<<<< HEAD
 	fb_virt = ioremap(par->mem.start, screen_fb_size);
+=======
+	/*
+	 * Map the VRAM cacheable for performance.
+	 */
+	fb_virt = ioremap_wc(par->mem.start, screen_fb_size);
+>>>>>>> common/deprecated/android-3.18
 	if (!fb_virt)
 		goto err2;
 

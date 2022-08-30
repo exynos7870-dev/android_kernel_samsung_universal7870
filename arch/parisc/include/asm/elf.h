@@ -348,6 +348,13 @@ struct pt_regs;	/* forward declaration... */
 
 #define ELF_HWCAP	0
 
+<<<<<<< HEAD
+=======
+#define STACK_RND_MASK	(is_32bit_task() ? \
+				0x7ff >> (PAGE_SHIFT - 12) : \
+				0x3ffff >> (PAGE_SHIFT - 12))
+
+>>>>>>> common/deprecated/android-3.18
 struct mm_struct;
 extern unsigned long arch_randomize_brk(struct mm_struct *);
 #define arch_randomize_brk arch_randomize_brk

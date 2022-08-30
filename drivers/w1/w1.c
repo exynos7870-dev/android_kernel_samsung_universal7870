@@ -727,7 +727,11 @@ int w1_attach_slave_device(struct w1_master *dev, struct w1_reg_num *rn)
 
 	/* slave modules need to be loaded in a context with unlocked mutex */
 	mutex_unlock(&dev->mutex);
+<<<<<<< HEAD
 	request_module("w1-family-0x%0x", rn->family);
+=======
+	request_module("w1-family-0x%02X", rn->family);
+>>>>>>> common/deprecated/android-3.18
 	mutex_lock(&dev->mutex);
 
 	spin_lock(&w1_flock);
@@ -749,6 +753,10 @@ int w1_attach_slave_device(struct w1_master *dev, struct w1_reg_num *rn)
 		dev_err(&dev->dev, "%s: Attaching %s failed.\n", __func__,
 			 sl->name);
 		w1_family_put(sl->family);
+<<<<<<< HEAD
+=======
+		atomic_dec(&sl->master->refcnt);
+>>>>>>> common/deprecated/android-3.18
 		kfree(sl);
 		return err;
 	}

@@ -332,8 +332,13 @@ static int bcm63xx_spi_probe(struct platform_device *pdev)
 
 	irq = platform_get_irq(pdev, 0);
 	if (irq < 0) {
+<<<<<<< HEAD
 		dev_err(dev, "no irq\n");
 		return -ENXIO;
+=======
+		dev_err(dev, "no irq: %d\n", irq);
+		return irq;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	clk = devm_clk_get(dev, "spi");

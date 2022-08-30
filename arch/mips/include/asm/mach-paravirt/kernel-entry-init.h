@@ -11,11 +11,19 @@
 #define CP0_EBASE $15, 1
 
 	.macro  kernel_entry_setup
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_SMP
+>>>>>>> common/deprecated/android-3.18
 	mfc0	t0, CP0_EBASE
 	andi	t0, t0, 0x3ff		# CPUNum
 	beqz	t0, 1f
 	# CPUs other than zero goto smp_bootstrap
 	j	smp_bootstrap
+<<<<<<< HEAD
+=======
+#endif /* CONFIG_SMP */
+>>>>>>> common/deprecated/android-3.18
 
 1:
 	.endm

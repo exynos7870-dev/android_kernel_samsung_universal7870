@@ -359,14 +359,26 @@ v7_dma_inv_range:
 	ALT_UP(W(nop))
 #endif
 	mcrne	p15, 0, r0, c7, c14, 1		@ clean & invalidate D / U line
+<<<<<<< HEAD
+=======
+	addne	r0, r0, r2
+>>>>>>> common/deprecated/android-3.18
 
 	tst	r1, r3
 	bic	r1, r1, r3
 	mcrne	p15, 0, r1, c7, c14, 1		@ clean & invalidate D / U line
+<<<<<<< HEAD
 1:
 	mcr	p15, 0, r0, c7, c6, 1		@ invalidate D / U line
 	add	r0, r0, r2
 	cmp	r0, r1
+=======
+	cmp	r0, r1
+1:
+	mcrlo	p15, 0, r0, c7, c6, 1		@ invalidate D / U line
+	addlo	r0, r0, r2
+	cmplo	r0, r1
+>>>>>>> common/deprecated/android-3.18
 	blo	1b
 	dsb	st
 	ret	lr

@@ -19,7 +19,11 @@
 #include <linux/ktime.h>
 #include <linux/hrtimer.h>
 #include <linux/module.h>
+<<<<<<< HEAD
 #include <linux/exynos-ss.h>
+=======
+#include <linux/suspend.h>
+>>>>>>> common/deprecated/android-3.18
 #include <trace/events/power.h>
 
 #include "cpuidle.h"
@@ -33,7 +37,10 @@ LIST_HEAD(cpuidle_detected_devices);
 static int enabled_devices;
 static int off __read_mostly;
 static int initialized __read_mostly;
+<<<<<<< HEAD
 static bool use_deepest_state __read_mostly;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 int cpuidle_disabled(void)
 {
@@ -67,6 +74,7 @@ int cpuidle_play_dead(void)
 }
 
 /**
+<<<<<<< HEAD
  * cpuidle_use_deepest_state - Enable/disable the "deepest idle" mode.
  * @enable: Whether enable or disable the feature.
  *
@@ -85,6 +93,11 @@ void cpuidle_use_deepest_state(bool enable)
  * cpuidle_find_deepest_state - Find the state of the greatest exit latency.
  * @drv: cpuidle driver for a given CPU.
  * @dev: cpuidle device for a given CPU.
+=======
+ * cpuidle_find_deepest_state - Find deepest state meeting specific conditions.
+ * @drv: cpuidle driver for the given CPU.
+ * @dev: cpuidle device for the given CPU.
+>>>>>>> common/deprecated/android-3.18
  */
 static int cpuidle_find_deepest_state(struct cpuidle_driver *drv,
 				      struct cpuidle_device *dev)
@@ -106,6 +119,30 @@ static int cpuidle_find_deepest_state(struct cpuidle_driver *drv,
 }
 
 /**
+<<<<<<< HEAD
+=======
+ * cpuidle_enter_freeze - Enter an idle state suitable for suspend-to-idle.
+ *
+ * Find the deepest state available and enter it.
+ */
+void cpuidle_enter_freeze(void)
+{
+	struct cpuidle_device *dev = __this_cpu_read(cpuidle_devices);
+	struct cpuidle_driver *drv = cpuidle_get_cpu_driver(dev);
+	int index;
+
+	index = cpuidle_find_deepest_state(drv, dev);
+	if (index >= 0)
+		cpuidle_enter(drv, dev, index);
+	else
+		arch_cpu_idle();
+
+	/* Interrupts are enabled again here. */
+	local_irq_disable();
+}
+
+/**
+>>>>>>> common/deprecated/android-3.18
  * cpuidle_enter_state - enter the state and update stats
  * @dev: cpuidle device for this cpu
  * @drv: cpuidle driver for this cpu
@@ -120,18 +157,34 @@ int cpuidle_enter_state(struct cpuidle_device *dev, struct cpuidle_driver *drv,
 	ktime_t time_start, time_end;
 	s64 diff;
 
+<<<<<<< HEAD
 	trace_cpu_idle_rcuidle(index, dev->cpu);
 	exynos_ss_cpuidle(index, 0, 0, ESS_FLAG_IN);
+=======
+	/* Take note of the planned idle state. */
+	sched_idle_set_state(target_state, index);
+
+	trace_cpu_idle_rcuidle(index, dev->cpu);
+>>>>>>> common/deprecated/android-3.18
 	time_start = ktime_get();
 
 	entered_state = target_state->enter(dev, drv, index);
 
 	time_end = ktime_get();
+<<<<<<< HEAD
 	exynos_ss_cpuidle(index, entered_state,
 		(int)ktime_to_us(ktime_sub(time_end, time_start)), ESS_FLAG_OUT);
 	trace_cpu_idle_rcuidle(PWR_EVENT_EXIT, dev->cpu);
 
 	if (!cpuidle_state_is_coupled(dev, drv, entered_state))
+=======
+	trace_cpu_idle_rcuidle(PWR_EVENT_EXIT, dev->cpu);
+
+	/* The cpu is no longer idle or about to enter idle. */
+	sched_idle_set_state(NULL, -1);
+
+	if (!cpuidle_state_is_coupled(dev, drv, index))
+>>>>>>> common/deprecated/android-3.18
 		local_irq_enable();
 
 	diff = ktime_to_us(ktime_sub(time_end, time_start));
@@ -170,9 +223,12 @@ int cpuidle_select(struct cpuidle_driver *drv, struct cpuidle_device *dev)
 	if (!drv || !dev || !dev->enabled)
 		return -EBUSY;
 
+<<<<<<< HEAD
 	if (unlikely(use_deepest_state))
 		return cpuidle_find_deepest_state(drv, dev);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	return cpuidle_curr_governor->select(drv, dev);
 }
 
@@ -204,7 +260,11 @@ int cpuidle_enter(struct cpuidle_driver *drv, struct cpuidle_device *dev,
  */
 void cpuidle_reflect(struct cpuidle_device *dev, int index)
 {
+<<<<<<< HEAD
 	if (cpuidle_curr_governor->reflect && !unlikely(use_deepest_state))
+=======
+	if (cpuidle_curr_governor->reflect)
+>>>>>>> common/deprecated/android-3.18
 		cpuidle_curr_governor->reflect(dev, index);
 }
 
@@ -359,6 +419,11 @@ static void __cpuidle_unregister_device(struct cpuidle_device *dev)
 	list_del(&dev->device_list);
 	per_cpu(cpuidle_devices, dev->cpu) = NULL;
 	module_put(drv->owner);
+<<<<<<< HEAD
+=======
+
+	dev->registered = 0;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void __cpuidle_device_init(struct cpuidle_device *dev)
@@ -565,6 +630,7 @@ static inline void latency_notifier_init(struct notifier_block *n)
 
 #endif /* CONFIG_SMP */
 
+<<<<<<< HEAD
 #ifdef CONFIG_CPU_IDLE_STOP_IDLE_DURING_HOTPLUG
 /* during hotplug out in progress, disable cpuidle for faster hotplug out */
 static int exynos_cpuidle_hotcpu_callback(struct notifier_block *nfb,
@@ -605,6 +671,8 @@ static int __init cpuidle_hotcpu_init(void)
 device_initcall(cpuidle_hotcpu_init);
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /**
  * cpuidle_init - core initializer
  */

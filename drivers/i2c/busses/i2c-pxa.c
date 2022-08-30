@@ -650,11 +650,17 @@ static inline void i2c_pxa_stop_message(struct pxa_i2c *i2c)
 {
 	u32 icr;
 
+<<<<<<< HEAD
 	/*
 	 * Clear the STOP and ACK flags
 	 */
 	icr = readl(_ICR(i2c));
 	icr &= ~(ICR_STOP | ICR_ACKNAK);
+=======
+	/* Clear the START, STOP, ACK, TB and MA flags */
+	icr = readl(_ICR(i2c));
+	icr &= ~(ICR_START | ICR_STOP | ICR_ACKNAK | ICR_TB | ICR_MA);
+>>>>>>> common/deprecated/android-3.18
 	writel(icr, _ICR(i2c));
 }
 

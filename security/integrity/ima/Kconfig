@@ -10,6 +10,10 @@ config IMA
 	select CRYPTO_HASH_INFO
 	select TCG_TPM if HAS_IOMEM && !UML
 	select TCG_TIS if TCG_TPM && X86
+<<<<<<< HEAD
+=======
+	select TCG_CRB if TCG_TPM && ACPI
+>>>>>>> common/deprecated/android-3.18
 	select TCG_IBMVTPM if TCG_TPM && PPC64
 	help
 	  The Trusted Computing Group(TCG) runtime Integrity

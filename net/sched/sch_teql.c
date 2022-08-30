@@ -145,6 +145,12 @@ teql_destroy(struct Qdisc *sch)
 	struct teql_sched_data *dat = qdisc_priv(sch);
 	struct teql_master *master = dat->m;
 
+<<<<<<< HEAD
+=======
+	if (!master)
+		return;
+
+>>>>>>> common/deprecated/android-3.18
 	prev = master->slaves;
 	if (prev) {
 		do {

@@ -1023,7 +1023,11 @@ skip:
 	/* The record may be cleared by others, try read next record */
 	if (len == -ENOENT)
 		goto skip;
+<<<<<<< HEAD
 	else if (len < sizeof(*rcd)) {
+=======
+	else if (len < 0 || len < sizeof(*rcd)) {
+>>>>>>> common/deprecated/android-3.18
 		rc = -EIO;
 		goto out;
 	}

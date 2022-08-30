@@ -14,6 +14,10 @@
 #include <linux/tty.h>
 #include <linux/seq_file.h>
 #include <linux/bitops.h>
+<<<<<<< HEAD
+=======
+#include "internal.h"
+>>>>>>> common/deprecated/android-3.18
 
 /*
  * The /proc/tty directory inodes...
@@ -164,7 +168,11 @@ void proc_tty_unregister_driver(struct tty_driver *driver)
 	if (!ent)
 		return;
 		
+<<<<<<< HEAD
 	remove_proc_entry(driver->driver_name, proc_tty_driver);
+=======
+	remove_proc_entry(ent->name, proc_tty_driver);
+>>>>>>> common/deprecated/android-3.18
 	
 	driver->proc_entry = NULL;
 }

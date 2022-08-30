@@ -289,6 +289,10 @@ static int cs5536_init_one(struct pci_dev *dev, const struct pci_device_id *id)
 
 static const struct pci_device_id cs5536[] = {
 	{ PCI_VDEVICE(AMD,	PCI_DEVICE_ID_AMD_CS5536_IDE), },
+<<<<<<< HEAD
+=======
+	{ PCI_VDEVICE(AMD,	PCI_DEVICE_ID_AMD_CS5536_DEV_IDE), },
+>>>>>>> common/deprecated/android-3.18
 	{ },
 };
 

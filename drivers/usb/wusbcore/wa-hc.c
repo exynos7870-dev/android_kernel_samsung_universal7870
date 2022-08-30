@@ -39,6 +39,12 @@ int wa_create(struct wahc *wa, struct usb_interface *iface,
 	int result;
 	struct device *dev = &iface->dev;
 
+<<<<<<< HEAD
+=======
+	if (iface->cur_altsetting->desc.bNumEndpoints < 3)
+		return -ENODEV;
+
+>>>>>>> common/deprecated/android-3.18
 	result = wa_rpipes_create(wa);
 	if (result < 0)
 		goto error_rpipes_create;

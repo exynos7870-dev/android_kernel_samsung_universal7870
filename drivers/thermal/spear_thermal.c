@@ -54,8 +54,12 @@ static struct thermal_zone_device_ops ops = {
 	.get_temp = thermal_get_temp,
 };
 
+<<<<<<< HEAD
 #ifdef CONFIG_PM
 static int spear_thermal_suspend(struct device *dev)
+=======
+static int __maybe_unused spear_thermal_suspend(struct device *dev)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct platform_device *pdev = to_platform_device(dev);
 	struct thermal_zone_device *spear_thermal = platform_get_drvdata(pdev);
@@ -72,7 +76,11 @@ static int spear_thermal_suspend(struct device *dev)
 	return 0;
 }
 
+<<<<<<< HEAD
 static int spear_thermal_resume(struct device *dev)
+=======
+static int __maybe_unused spear_thermal_resume(struct device *dev)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct platform_device *pdev = to_platform_device(dev);
 	struct thermal_zone_device *spear_thermal = platform_get_drvdata(pdev);
@@ -94,7 +102,10 @@ static int spear_thermal_resume(struct device *dev)
 
 	return 0;
 }
+<<<<<<< HEAD
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 static SIMPLE_DEV_PM_OPS(spear_thermal_pm_ops, spear_thermal_suspend,
 		spear_thermal_resume);

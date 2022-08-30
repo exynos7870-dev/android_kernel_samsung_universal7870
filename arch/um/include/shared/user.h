@@ -17,7 +17,11 @@
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
 /* This is to get size_t */
+<<<<<<< HEAD
 #ifdef __KERNEL__
+=======
+#ifndef __UM_HOST__
+>>>>>>> common/deprecated/android-3.18
 #include <linux/types.h>
 #else
 #include <stddef.h>

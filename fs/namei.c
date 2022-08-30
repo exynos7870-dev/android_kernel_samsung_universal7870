@@ -40,6 +40,12 @@
 #include "internal.h"
 #include "mount.h"
 
+<<<<<<< HEAD
+=======
+#define CREATE_TRACE_POINTS
+#include <trace/events/namei.h>
+
+>>>>>>> common/deprecated/android-3.18
 /* [Feb-1997 T. Schoebel-Theuer]
  * Fundamental changes in the pathname lookup mechanisms (namei)
  * were necessary because of omirr.  The reason is that omirr needs
@@ -621,6 +627,84 @@ static inline int d_revalidate(struct dentry *dentry, unsigned int flags)
 	return dentry->d_op->d_revalidate(dentry, flags);
 }
 
+<<<<<<< HEAD
+=======
+#define INIT_PATH_SIZE 64
+
+static void success_walk_trace(struct nameidata *nd)
+{
+	struct path *pt = &nd->path;
+	struct inode *i = nd->inode;
+	char buf[INIT_PATH_SIZE], *try_buf;
+	int cur_path_size;
+	char *p;
+
+	/* When eBPF/ tracepoint is disabled, keep overhead low. */
+	if (!trace_inodepath_enabled())
+		return;
+
+	/* First try stack allocated buffer. */
+	try_buf = buf;
+	cur_path_size = INIT_PATH_SIZE;
+
+	while (cur_path_size <= PATH_MAX) {
+		/* Free previous heap allocation if we are now trying
+		 * a second or later heap allocation.
+		 */
+		if (try_buf != buf)
+			kfree(try_buf);
+
+		/* All but the first alloc are on the heap. */
+		if (cur_path_size != INIT_PATH_SIZE) {
+			try_buf = kmalloc(cur_path_size, GFP_KERNEL);
+			if (!try_buf) {
+				try_buf = buf;
+				sprintf(try_buf, "error:buf_alloc_failed");
+				break;
+			}
+		}
+
+		p = d_path(pt, try_buf, cur_path_size);
+
+		if (!IS_ERR(p)) {
+			char *end = mangle_path(try_buf, p, "\n");
+
+			if (end) {
+				try_buf[end - try_buf] = 0;
+				break;
+			} else {
+				/* On mangle errors, double path size
+				 * till PATH_MAX.
+				 */
+				cur_path_size = cur_path_size << 1;
+				continue;
+			}
+		}
+
+		if (PTR_ERR(p) == -ENAMETOOLONG) {
+			/* If d_path complains that name is too long,
+			 * then double path size till PATH_MAX.
+			 */
+			cur_path_size = cur_path_size << 1;
+			continue;
+		}
+
+		sprintf(try_buf, "error:d_path_failed_%lu",
+			-1 * PTR_ERR(p));
+		break;
+	}
+
+	if (cur_path_size > PATH_MAX)
+		sprintf(try_buf, "error:d_path_name_too_long");
+
+	trace_inodepath(i, try_buf);
+
+	if (try_buf != buf)
+		kfree(try_buf);
+	return;
+}
+
+>>>>>>> common/deprecated/android-3.18
 /**
  * complete_walk - successful completion of path walk
  * @nd:  pointer nameidata
@@ -659,6 +743,7 @@ static int complete_walk(struct nameidata *nd)
 		rcu_read_unlock();
 	}
 
+<<<<<<< HEAD
 	if (likely(!(nd->flags & LOOKUP_JUMPED)))
 		return 0;
 
@@ -668,6 +753,23 @@ static int complete_walk(struct nameidata *nd)
 	status = dentry->d_op->d_weak_revalidate(dentry, nd->flags);
 	if (status > 0)
 		return 0;
+=======
+	if (likely(!(nd->flags & LOOKUP_JUMPED))) {
+		success_walk_trace(nd);
+		return 0;
+	}
+
+	if (likely(!(dentry->d_flags & DCACHE_OP_WEAK_REVALIDATE))) {
+		success_walk_trace(nd);
+		return 0;
+	}
+
+	status = dentry->d_op->d_weak_revalidate(dentry, nd->flags);
+	if (status > 0) {
+		success_walk_trace(nd);
+		return 0;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	if (!status)
 		status = -ESTALE;
@@ -738,6 +840,11 @@ static inline void put_link(struct nameidata *nd, struct path *link, void *cooki
 
 int sysctl_protected_symlinks __read_mostly = 0;
 int sysctl_protected_hardlinks __read_mostly = 0;
+<<<<<<< HEAD
+=======
+int sysctl_protected_fifos __read_mostly;
+int sysctl_protected_regular __read_mostly;
+>>>>>>> common/deprecated/android-3.18
 
 /**
  * may_follow_link - Check symlink following for unsafe situations
@@ -759,6 +866,10 @@ static inline int may_follow_link(struct path *link, struct nameidata *nd)
 {
 	const struct inode *inode;
 	const struct inode *parent;
+<<<<<<< HEAD
+=======
+	kuid_t puid;
+>>>>>>> common/deprecated/android-3.18
 
 	if (!sysctl_protected_symlinks)
 		return 0;
@@ -774,7 +885,12 @@ static inline int may_follow_link(struct path *link, struct nameidata *nd)
 		return 0;
 
 	/* Allowed if parent directory and link owner match. */
+<<<<<<< HEAD
 	if (uid_eq(parent->i_uid, inode->i_uid))
+=======
+	puid = parent->i_uid;
+	if (uid_valid(puid) && uid_eq(puid, inode->i_uid))
+>>>>>>> common/deprecated/android-3.18
 		return 0;
 
 	audit_log_link_denied("follow_link", link);
@@ -852,6 +968,48 @@ static int may_linkat(struct path *link)
 	return -EPERM;
 }
 
+<<<<<<< HEAD
+=======
+/**
+ * may_create_in_sticky - Check whether an O_CREAT open in a sticky directory
+ *			  should be allowed, or not, on files that already
+ *			  exist.
+ * @dir: the sticky parent directory
+ * @inode: the inode of the file to open
+ *
+ * Block an O_CREAT open of a FIFO (or a regular file) when:
+ *   - sysctl_protected_fifos (or sysctl_protected_regular) is enabled
+ *   - the file already exists
+ *   - we are in a sticky directory
+ *   - we don't own the file
+ *   - the owner of the directory doesn't own the file
+ *   - the directory is world writable
+ * If the sysctl_protected_fifos (or sysctl_protected_regular) is set to 2
+ * the directory doesn't have to be world writable: being group writable will
+ * be enough.
+ *
+ * Returns 0 if the open is allowed, -ve on error.
+ */
+static int may_create_in_sticky(struct dentry * const dir,
+				struct inode * const inode)
+{
+	if ((!sysctl_protected_fifos && S_ISFIFO(inode->i_mode)) ||
+	    (!sysctl_protected_regular && S_ISREG(inode->i_mode)) ||
+	    likely(!(dir->d_inode->i_mode & S_ISVTX)) ||
+	    uid_eq(inode->i_uid, dir->d_inode->i_uid) ||
+	    uid_eq(current_fsuid(), inode->i_uid))
+		return 0;
+
+	if (likely(dir->d_inode->i_mode & 0002) ||
+	    (dir->d_inode->i_mode & 0020 &&
+	     ((sysctl_protected_fifos >= 2 && S_ISFIFO(inode->i_mode)) ||
+	      (sysctl_protected_regular >= 2 && S_ISREG(inode->i_mode))))) {
+		return -EACCES;
+	}
+	return 0;
+}
+
+>>>>>>> common/deprecated/android-3.18
 static __always_inline int
 follow_link(struct path *link, struct nameidata *nd, void **p)
 {
@@ -1866,6 +2024,12 @@ static int path_init(int dfd, const char *name, unsigned int flags,
 {
 	int retval = 0;
 
+<<<<<<< HEAD
+=======
+	if (!*name)
+		flags &= ~LOOKUP_RCU;
+
+>>>>>>> common/deprecated/android-3.18
 	nd->last_type = LAST_ROOT; /* if there are only slashes... */
 	nd->flags = flags | LOOKUP_JUMPED;
 	nd->depth = 0;
@@ -2287,7 +2451,11 @@ mountpoint_last(struct nameidata *nd, struct path *path)
 	if (unlikely(nd->last_type != LAST_NORM)) {
 		error = handle_dots(nd, nd->last_type);
 		if (error)
+<<<<<<< HEAD
 			goto out;
+=======
+			return error;
+>>>>>>> common/deprecated/android-3.18
 		dentry = dget(nd->path.dentry);
 		goto done;
 	}
@@ -2828,6 +2996,7 @@ no_open:
 		dentry = lookup_real(dir, dentry, nd->flags);
 		if (IS_ERR(dentry))
 			return PTR_ERR(dentry);
+<<<<<<< HEAD
 
 		if (create_error) {
 			int open_flag = op->open_flag;
@@ -2844,6 +3013,12 @@ no_open:
 			}
 			/* will fail later, go on to get the right error */
 		}
+=======
+	}
+	if (create_error && !dentry->d_inode) {
+		error = create_error;
+		goto out;
+>>>>>>> common/deprecated/android-3.18
 	}
 looked_up:
 	path->dentry = dentry;
@@ -3100,9 +3275,22 @@ finish_open:
 		return error;
 	}
 	audit_inode(name, nd->path.dentry, 0);
+<<<<<<< HEAD
 	error = -EISDIR;
 	if ((open_flag & O_CREAT) && d_is_dir(nd->path.dentry))
 		goto out;
+=======
+
+	if (open_flag & O_CREAT) {
+		error = -EISDIR;
+		if (d_is_dir(nd->path.dentry))
+			goto out;
+		error = may_create_in_sticky(dir,
+					     d_backing_inode(nd->path.dentry));
+		if (unlikely(error))
+			goto out;
+	}
+>>>>>>> common/deprecated/android-3.18
 	error = -ENOTDIR;
 	if ((nd->flags & LOOKUP_DIRECTORY) && !d_can_lookup(nd->path.dentry))
 		goto out;
@@ -3143,6 +3331,13 @@ opened:
 			goto exit_fput;
 	}
 out:
+<<<<<<< HEAD
+=======
+	if (unlikely(error > 0)) {
+		WARN_ON(1);
+		error = -EINVAL;
+	}
+>>>>>>> common/deprecated/android-3.18
 	if (got_write)
 		mnt_drop_write(nd->path.mnt);
 	path_put(&save_parent);
@@ -3254,7 +3449,11 @@ static struct file *path_openat(int dfd, struct filename *pathname,
 
 	if (unlikely(file->f_flags & __O_TMPFILE)) {
 		error = do_tmpfile(dfd, pathname, nd, flags, op, file, &opened);
+<<<<<<< HEAD
 		goto out;
+=======
+		goto out2;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	error = path_init(dfd, pathname->name, flags | LOOKUP_PARENT, nd, &base);
@@ -3292,6 +3491,10 @@ out:
 		path_put(&nd->root);
 	if (base)
 		fput(base);
+<<<<<<< HEAD
+=======
+out2:
+>>>>>>> common/deprecated/android-3.18
 	if (!(opened & FILE_OPENED)) {
 		BUG_ON(!error);
 		put_filp(file);
@@ -3512,10 +3715,17 @@ retry:
 		goto out;
 	switch (mode & S_IFMT) {
 		case 0: case S_IFREG:
+<<<<<<< HEAD
 			error = vfs_create2(path.mnt, path.dentry->d_inode, dentry, mode, true);
 			break;
 		case S_IFCHR: case S_IFBLK:
 			error = vfs_mknod2(path.mnt, path.dentry->d_inode, dentry, mode,
+=======
+			error = vfs_create2(path.mnt, path.dentry->d_inode,dentry,mode,true);
+			break;
+		case S_IFCHR: case S_IFBLK:
+			error = vfs_mknod2(path.mnt, path.dentry->d_inode,dentry,mode,
+>>>>>>> common/deprecated/android-3.18
 					new_decode_dev(dev));
 			break;
 		case S_IFIFO: case S_IFSOCK:
@@ -3660,6 +3870,11 @@ out:
 		d_delete(dentry);
 	return error;
 }
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL(vfs_rmdir2);
+
+>>>>>>> common/deprecated/android-3.18
 int vfs_rmdir(struct inode *dir, struct dentry *dentry)
 {
 	return vfs_rmdir2(NULL, dir, dentry);
@@ -3673,10 +3888,13 @@ static long do_rmdir(int dfd, const char __user *pathname)
 	struct dentry *dentry;
 	struct nameidata nd;
 	unsigned int lookup_flags = 0;
+<<<<<<< HEAD
 #if ANDROID_VERSION < 80000
 	char *path_buf = NULL;
 	char *propagate_path = NULL;
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 retry:
 	name = user_path_parent(dfd, pathname, &nd, lookup_flags);
 	if (IS_ERR(name))
@@ -3711,17 +3929,21 @@ retry:
 	error = security_path_rmdir(&nd.path, dentry);
 	if (error)
 		goto exit3;
+<<<<<<< HEAD
 #if ANDROID_VERSION < 80000
 	if (nd.path.dentry->d_sb->s_op->unlink_callback) {
 		path_buf = kmalloc(PATH_MAX, GFP_KERNEL);
 		propagate_path = dentry_path_raw(dentry, path_buf, PATH_MAX);
 	}
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	error = vfs_rmdir2(nd.path.mnt, nd.path.dentry->d_inode, dentry);
 exit3:
 	dput(dentry);
 exit2:
 	mutex_unlock(&nd.path.dentry->d_inode->i_mutex);
+<<<<<<< HEAD
 #if ANDROID_VERSION < 80000
 	if (path_buf && !error) {
 		nd.path.dentry->d_sb->s_op->unlink_callback(nd.path.dentry->d_sb,
@@ -3732,6 +3954,8 @@ exit2:
 		path_buf = NULL;
 	}
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	mnt_drop_write(nd.path.mnt);
 exit1:
 	path_put(&nd.path);
@@ -3827,10 +4051,13 @@ static long do_unlinkat(int dfd, const char __user *pathname)
 	struct inode *inode = NULL;
 	struct inode *delegated_inode = NULL;
 	unsigned int lookup_flags = 0;
+<<<<<<< HEAD
 #if ANDROID_VERSION < 80000
 	char *path_buf = NULL;
 	char *propagate_path = NULL;
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 retry:
 	name = user_path_parent(dfd, pathname, &nd, lookup_flags);
 	if (IS_ERR(name))
@@ -3855,12 +4082,15 @@ retry_deleg:
 		inode = dentry->d_inode;
 		if (d_is_negative(dentry))
 			goto slashes;
+<<<<<<< HEAD
 #if ANDROID_VERSION < 80000
 		if (inode->i_sb->s_op->unlink_callback) {
 			path_buf = kmalloc(PATH_MAX, GFP_KERNEL);
 			propagate_path = dentry_path_raw(dentry, path_buf, PATH_MAX);
 		}
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 		ihold(inode);
 		error = security_path_unlink(&nd.path, dentry);
 		if (error)
@@ -3870,6 +4100,7 @@ exit2:
 		dput(dentry);
 	}
 	mutex_unlock(&nd.path.dentry->d_inode->i_mutex);
+<<<<<<< HEAD
 #if ANDROID_VERSION < 80000
 	if (path_buf && !error) {
 		inode->i_sb->s_op->unlink_callback(inode->i_sb, propagate_path);
@@ -3879,6 +4110,8 @@ exit2:
 		path_buf = NULL;
 	}
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (inode)
 		iput(inode);	/* truncate the inode here */
 	inode = NULL;
@@ -4006,9 +4239,13 @@ SYSCALL_DEFINE2(symlink, const char __user *, oldname, const char __user *, newn
  * be appropriate for callers that expect the underlying filesystem not
  * to be NFS exported.
  */
+<<<<<<< HEAD
 int vfs_link2(struct vfsmount *mnt, struct dentry *old_dentry,
 		struct inode *dir, struct dentry *new_dentry,
 		struct inode **delegated_inode)
+=======
+int vfs_link2(struct vfsmount *mnt, struct dentry *old_dentry, struct inode *dir, struct dentry *new_dentry, struct inode **delegated_inode)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct inode *inode = old_dentry->d_inode;
 	unsigned max_links = dir->i_sb->s_max_links;
@@ -4209,7 +4446,15 @@ int vfs_rename2(struct vfsmount *mnt,
 	unsigned max_links = new_dir->i_sb->s_max_links;
 	struct name_snapshot old_name;
 
+<<<<<<< HEAD
 	if (source == target)
+=======
+	/*
+	 * Check source == target.
+	 * On overlayfs need to look at underlying inodes.
+	 */
+	if (vfs_select_inode(old_dentry, 0) == vfs_select_inode(new_dentry, 0))
+>>>>>>> common/deprecated/android-3.18
 		return 0;
 
 	error = may_delete(mnt, old_dir, old_dentry, is_dir);

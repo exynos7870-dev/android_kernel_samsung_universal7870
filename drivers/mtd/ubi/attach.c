@@ -800,6 +800,23 @@ out_unlock:
 	return err;
 }
 
+<<<<<<< HEAD
+=======
+static bool vol_ignored(int vol_id)
+{
+	switch (vol_id) {
+		case UBI_LAYOUT_VOLUME_ID:
+		return true;
+	}
+
+#ifdef CONFIG_MTD_UBI_FASTMAP
+	return ubi_is_fm_vol(vol_id);
+#else
+	return false;
+#endif
+}
+
+>>>>>>> common/deprecated/android-3.18
 /**
  * scan_peb - scan and process UBI headers of a PEB.
  * @ubi: UBI device description object
@@ -991,17 +1008,27 @@ static int scan_peb(struct ubi_device *ubi, struct ubi_attach_info *ai,
 		*vid = vol_id;
 	if (sqnum)
 		*sqnum = be64_to_cpu(vidh->sqnum);
+<<<<<<< HEAD
 	if (vol_id > UBI_MAX_VOLUMES && vol_id != UBI_LAYOUT_VOLUME_ID) {
+=======
+	if (vol_id > UBI_MAX_VOLUMES && !vol_ignored(vol_id)) {
+>>>>>>> common/deprecated/android-3.18
 		int lnum = be32_to_cpu(vidh->lnum);
 
 		/* Unsupported internal volume */
 		switch (vidh->compat) {
 		case UBI_COMPAT_DELETE:
+<<<<<<< HEAD
 			if (vol_id != UBI_FM_SB_VOLUME_ID
 			    && vol_id != UBI_FM_DATA_VOLUME_ID) {
 				ubi_msg("\"delete\" compatible internal volume %d:%d found, will remove it",
 					vol_id, lnum);
 			}
+=======
+			ubi_msg("\"delete\" compatible internal volume %d:%d found, will remove it",
+				vol_id, lnum);
+
+>>>>>>> common/deprecated/android-3.18
 			err = add_to_list(ai, pnum, vol_id, lnum,
 					  ec, 1, &ai->erase);
 			if (err)

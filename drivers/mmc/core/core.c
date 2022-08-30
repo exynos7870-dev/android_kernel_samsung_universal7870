@@ -30,6 +30,10 @@
 #include <linux/slab.h>
 #include <linux/of.h>
 
+<<<<<<< HEAD
+=======
+#define CREATE_TRACE_POINTS
+>>>>>>> common/deprecated/android-3.18
 #include <trace/events/mmc.h>
 
 #include <linux/mmc/card.h>
@@ -47,6 +51,14 @@
 #include "sd_ops.h"
 #include "sdio_ops.h"
 
+<<<<<<< HEAD
+=======
+EXPORT_TRACEPOINT_SYMBOL_GPL(mmc_blk_erase_start);
+EXPORT_TRACEPOINT_SYMBOL_GPL(mmc_blk_erase_end);
+EXPORT_TRACEPOINT_SYMBOL_GPL(mmc_blk_rw_start);
+EXPORT_TRACEPOINT_SYMBOL_GPL(mmc_blk_rw_end);
+
+>>>>>>> common/deprecated/android-3.18
 /* If the device is not responding */
 #define MMC_CORE_TIMEOUT_MS	(10 * 60 * 1000) /* 10 minute timeout */
 
@@ -56,6 +68,10 @@
  */
 #define MMC_BKOPS_MAX_TIMEOUT	(4 * 60 * 1000) /* max time to wait in ms */
 
+<<<<<<< HEAD
+=======
+static struct workqueue_struct *workqueue;
+>>>>>>> common/deprecated/android-3.18
 static const unsigned freqs[] = { 400000, 300000, 200000, 100000 };
 
 /*
@@ -66,6 +82,7 @@ static const unsigned freqs[] = { 400000, 300000, 200000, 100000 };
 bool use_spi_crc = 1;
 module_param(use_spi_crc, bool, 0);
 
+<<<<<<< HEAD
 static int mmc_schedule_delayed_work(struct delayed_work *work,
 				     unsigned long delay)
 {
@@ -76,6 +93,23 @@ static int mmc_schedule_delayed_work(struct delayed_work *work,
 	 * userspace becomes frozen during system PM.
 	 */
 	return queue_delayed_work(system_freezable_wq, work, delay);
+=======
+/*
+ * Internal function. Schedule delayed work in the MMC work queue.
+ */
+static int mmc_schedule_delayed_work(struct delayed_work *work,
+				     unsigned long delay)
+{
+	return queue_delayed_work(workqueue, work, delay);
+}
+
+/*
+ * Internal function. Flush all scheduled work from the MMC work queue.
+ */
+static void mmc_flush_scheduled_work(void)
+{
+	flush_workqueue(workqueue);
+>>>>>>> common/deprecated/android-3.18
 }
 
 #ifdef CONFIG_FAIL_MMC_REQUEST
@@ -154,6 +188,23 @@ void mmc_request_done(struct mmc_host *host, struct mmc_request *mrq)
 			pr_debug("%s:     %d bytes transferred: %d\n",
 				mmc_hostname(host),
 				mrq->data->bytes_xfered, mrq->data->error);
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_BLOCK
+			if (mrq->lat_hist_enabled) {
+				ktime_t completion;
+				u_int64_t delta_us;
+
+				completion = ktime_get();
+				delta_us = ktime_us_delta(completion,
+							  mrq->io_start);
+				blk_update_latency_hist(
+					(mrq->data->flags & MMC_DATA_READ) ?
+					&host->io_lat_read :
+					&host->io_lat_write, delta_us);
+			}
+#endif
+>>>>>>> common/deprecated/android-3.18
 			trace_mmc_blk_rw_end(cmd->opcode, cmd->arg, mrq->data);
 		}
 
@@ -311,12 +362,19 @@ EXPORT_SYMBOL(mmc_start_bkops);
  */
 static void mmc_wait_data_done(struct mmc_request *mrq)
 {
+<<<<<<< HEAD
 	unsigned long flags;
 
 	spin_lock_irqsave(&mrq->host->context_info.lock, flags);
 	mrq->host->context_info.is_done_rcv = true;
 	wake_up_interruptible(&mrq->host->context_info.wait);
 	spin_unlock_irqrestore(&mrq->host->context_info.lock, flags);
+=======
+	struct mmc_context_info *context_info = &mrq->host->context_info;
+
+	context_info->is_done_rcv = true;
+	wake_up_interruptible(&context_info->wait);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void mmc_wait_done(struct mmc_request *mrq)
@@ -385,6 +443,7 @@ static int mmc_wait_for_data_req_done(struct mmc_host *host,
 				 context_info->is_new_req));
 		spin_lock_irqsave(&context_info->lock, flags);
 		context_info->is_waiting_last_req = false;
+<<<<<<< HEAD
 		if (context_info->is_done_rcv) {
 			context_info->is_done_rcv = false;
 			context_info->is_new_req = false;
@@ -400,6 +459,23 @@ static int mmc_wait_for_data_req_done(struct mmc_host *host,
 				pr_info("%s: req failed (CMD%u): %d, retrying...\n",
 						mmc_hostname(host),
 						cmd->opcode, cmd->error);
+=======
+		spin_unlock_irqrestore(&context_info->lock, flags);
+		if (context_info->is_done_rcv) {
+			context_info->is_done_rcv = false;
+			context_info->is_new_req = false;
+			cmd = mrq->cmd;
+
+			if (!cmd->error || !cmd->retries ||
+			    mmc_card_removed(host->card)) {
+				err = host->areq->err_check(host->card,
+							    host->areq);
+				break; /* return err */
+			} else {
+				pr_info("%s: req failed (CMD%u): %d, retrying...\n",
+					mmc_hostname(host),
+					cmd->opcode, cmd->error);
+>>>>>>> common/deprecated/android-3.18
 				cmd->retries--;
 				cmd->error = 0;
 				host->ops->request(host, mrq);
@@ -408,14 +484,21 @@ static int mmc_wait_for_data_req_done(struct mmc_host *host,
 		} else if (context_info->is_new_req) {
 			context_info->is_new_req = false;
 			if (!next_req) {
+<<<<<<< HEAD
 				spin_unlock_irqrestore(&context_info->lock,
 							flags);
+=======
+>>>>>>> common/deprecated/android-3.18
 				err = MMC_BLK_NEW_REQUEST;
 				break; /* return err */
 			}
 		}
+<<<<<<< HEAD
 		spin_unlock_irqrestore(&context_info->lock, flags);
 	} /* while */
+=======
+	}
+>>>>>>> common/deprecated/android-3.18
 	return err;
 }
 
@@ -547,6 +630,16 @@ struct mmc_async_req *mmc_start_req(struct mmc_host *host,
 	}
 
 	if (!err && areq) {
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_BLOCK
+		if (host->latency_hist_enabled) {
+			areq->mrq->io_start = ktime_get();
+			areq->mrq->lat_hist_enabled = 1;
+		} else
+			areq->mrq->lat_hist_enabled = 0;
+#endif
+>>>>>>> common/deprecated/android-3.18
 		trace_mmc_blk_rw_start(areq->mrq->cmd->opcode,
 				       areq->mrq->cmd->arg,
 				       areq->mrq->data);
@@ -582,10 +675,13 @@ EXPORT_SYMBOL(mmc_start_req);
  */
 void mmc_wait_for_req(struct mmc_host *host, struct mmc_request *mrq)
 {
+<<<<<<< HEAD
 #ifdef CONFIG_MMC_BLOCK_DEFERRED_RESUME
 	if (mmc_bus_needs_resume(host))
 		mmc_resume_bus(host);
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	__mmc_start_req(host, mrq);
 	mmc_wait_for_req_done(host, mrq);
 }
@@ -821,11 +917,19 @@ void mmc_set_data_timeout(struct mmc_data *data, const struct mmc_card *card)
 	/*
 	 * Some cards require longer data read timeout than indicated in CSD.
 	 * Address this by setting the read timeout to a "reasonably high"
+<<<<<<< HEAD
 	 * value. For the cards tested, 300ms has proven enough. If necessary,
 	 * this value can be increased if other problematic cards require this.
 	 */
 	if (mmc_card_long_read_time(card) && data->flags & MMC_DATA_READ) {
 		data->timeout_ns = 300000000;
+=======
+	 * value. For the cards tested, 600ms has proven enough. If necessary,
+	 * this value can be increased if other problematic cards require this.
+	 */
+	if (mmc_card_long_read_time(card) && data->flags & MMC_DATA_READ) {
+		data->timeout_ns = 600000000;
+>>>>>>> common/deprecated/android-3.18
 		data->timeout_clks = 0;
 	}
 
@@ -983,7 +1087,11 @@ static inline void mmc_set_ios(struct mmc_host *host)
 		"width %u timing %u\n",
 		 mmc_hostname(host), ios->clock, ios->bus_mode,
 		 ios->power_mode, ios->chip_select, ios->vdd,
+<<<<<<< HEAD
 		 ios->bus_width, ios->timing);
+=======
+		 1 << ios->bus_width, ios->timing);
+>>>>>>> common/deprecated/android-3.18
 
 	if (ios->clock > 0)
 		mmc_set_ungated(host);
@@ -1078,6 +1186,33 @@ void mmc_set_ungated(struct mmc_host *host)
 }
 #endif
 
+<<<<<<< HEAD
+=======
+int mmc_execute_tuning(struct mmc_card *card)
+{
+	struct mmc_host *host = card->host;
+	u32 opcode;
+	int err;
+
+	if (!host->ops->execute_tuning)
+		return 0;
+
+	if (mmc_card_mmc(card))
+		opcode = MMC_SEND_TUNING_BLOCK_HS200;
+	else
+		opcode = MMC_SEND_TUNING_BLOCK;
+
+	mmc_host_clk_hold(host);
+	err = host->ops->execute_tuning(host, opcode);
+	mmc_host_clk_release(host);
+
+	if (err)
+		pr_err("%s: tuning execution failed\n", mmc_hostname(host));
+
+	return err;
+}
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Change the bus mode (open drain/push-pull) of a host.
  */
@@ -1191,8 +1326,17 @@ int mmc_of_parse_voltage(struct device_node *np, u32 *mask)
 
 	voltage_ranges = of_get_property(np, "voltage-ranges", &num_ranges);
 	num_ranges = num_ranges / sizeof(*voltage_ranges) / 2;
+<<<<<<< HEAD
 	if (!voltage_ranges || !num_ranges) {
 		pr_info("%s: voltage-ranges unspecified\n", np->full_name);
+=======
+	if (!voltage_ranges) {
+		pr_debug("%s: voltage-ranges unspecified\n", np->full_name);
+		return -EINVAL;
+	}
+	if (!num_ranges) {
+		pr_err("%s: voltage-ranges empty\n", np->full_name);
+>>>>>>> common/deprecated/android-3.18
 		return -EINVAL;
 	}
 
@@ -1217,6 +1361,37 @@ EXPORT_SYMBOL(mmc_of_parse_voltage);
 
 #endif /* CONFIG_OF */
 
+<<<<<<< HEAD
+=======
+static int mmc_of_get_func_num(struct device_node *node)
+{
+	u32 reg;
+	int ret;
+
+	ret = of_property_read_u32(node, "reg", &reg);
+	if (ret < 0)
+		return ret;
+
+	return reg;
+}
+
+struct device_node *mmc_of_find_child_device(struct mmc_host *host,
+		unsigned func_num)
+{
+	struct device_node *node;
+
+	if (!host->parent || !host->parent->of_node)
+		return NULL;
+
+	for_each_child_of_node(host->parent->of_node, node) {
+		if (mmc_of_get_func_num(node) == func_num)
+			return node;
+	}
+
+	return NULL;
+}
+
+>>>>>>> common/deprecated/android-3.18
 #ifdef CONFIG_REGULATOR
 
 /**
@@ -1393,6 +1568,7 @@ int __mmc_set_signal_voltage(struct mmc_host *host, int signal_voltage)
 	int err = 0;
 	int old_signal_voltage = host->ios.signal_voltage;
 
+<<<<<<< HEAD
 #if defined(CONFIG_BCM43454) || defined(CONFIG_BCM43454_MODULE) || \
 	defined(CONFIG_BCM43455) || defined(CONFIG_BCM43455_MODULE) || \
 	defined(CONFIG_BCM43456) || defined(CONFIG_BCM43456_MODULE)
@@ -1406,6 +1582,8 @@ int __mmc_set_signal_voltage(struct mmc_host *host, int signal_voltage)
 	(CONFIG_BCM43455) || (CONFIG_BCM43455_MODULE) || \
 	(CONFIG_BCM43456) || (CONFIG_BCM43456_MODULE)*/
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	host->ios.signal_voltage = signal_voltage;
 	if (host->ops->start_signal_voltage_switch) {
 		mmc_host_clk_hold(host);
@@ -1428,6 +1606,7 @@ int mmc_set_signal_voltage(struct mmc_host *host, int signal_voltage, u32 ocr)
 
 	BUG_ON(!host);
 
+<<<<<<< HEAD
 #if defined(CONFIG_BCM43454) || defined(CONFIG_BCM43454_MODULE) || \
 	defined(CONFIG_BCM43455) || defined(CONFIG_BCM43455_MODULE) || \
 	defined(CONFIG_BCM43456) || defined(CONFIG_BCM43456_MODULE)
@@ -1441,6 +1620,8 @@ int mmc_set_signal_voltage(struct mmc_host *host, int signal_voltage, u32 ocr)
 	(CONFIG_BCM43455) || (CONFIG_BCM43455_MODULE) || \
 	(CONFIG_BCM43456) || (CONFIG_BCM43456_MODULE)*/
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Send CMD11 only if the request is to switch the card to
 	 * 1.8V signalling.
@@ -1464,7 +1645,11 @@ int mmc_set_signal_voltage(struct mmc_host *host, int signal_voltage, u32 ocr)
 
 	err = mmc_wait_for_cmd(host, &cmd, 0);
 	if (err)
+<<<<<<< HEAD
 		return err;
+=======
+		goto power_cycle;
+>>>>>>> common/deprecated/android-3.18
 
 	if (!mmc_host_is_spi(host) && (cmd.resp[0] & R1_ERROR))
 		return -EIO;
@@ -1678,6 +1863,7 @@ static inline void mmc_bus_put(struct mmc_host *host)
 	spin_unlock_irqrestore(&host->lock, flags);
 }
 
+<<<<<<< HEAD
 int mmc_resume_bus(struct mmc_host *host)
 {
 	unsigned long flags;
@@ -1709,6 +1895,8 @@ int mmc_resume_bus(struct mmc_host *host)
 
 EXPORT_SYMBOL(mmc_resume_bus);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * Assign a mmc bus handler to a host. Only one bus handler may control a
  * host at any given time.
@@ -1774,9 +1962,12 @@ static void _mmc_detect_change(struct mmc_host *host, unsigned long delay,
 		pm_wakeup_event(mmc_dev(host), 5000);
 
 	host->detect_change = 1;
+<<<<<<< HEAD
 	/* wake lock: 500ms */
 	if (!(host->caps & MMC_CAP_NONREMOVABLE))
 		wake_lock_timeout(&host->detect_wake_lock, HZ / 2);
+=======
+>>>>>>> common/deprecated/android-3.18
 	mmc_schedule_delayed_work(&host->detect, delay);
 }
 
@@ -1847,7 +2038,11 @@ void mmc_init_erase(struct mmc_card *card)
 }
 
 static unsigned int mmc_mmc_erase_timeout(struct mmc_card *card,
+<<<<<<< HEAD
 				          unsigned int arg, unsigned int qty)
+=======
+					  unsigned int arg, unsigned int qty)
+>>>>>>> common/deprecated/android-3.18
 {
 	unsigned int erase_timeout;
 
@@ -2164,12 +2359,18 @@ EXPORT_SYMBOL(mmc_can_discard);
 
 int mmc_can_sanitize(struct mmc_card *card)
 {
+<<<<<<< HEAD
 #ifdef CONFIG_MMC_SANITIZE_ENABLE
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (!mmc_can_trim(card) && !mmc_can_erase(card))
 		return 0;
 	if (card->ext_csd.sec_feature_support & EXT_CSD_SEC_SANITIZE)
 		return 1;
+<<<<<<< HEAD
 #endif /* CONFIG_MMC_SANITIZE_ENABLE*/
+=======
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 EXPORT_SYMBOL(mmc_can_sanitize);
@@ -2444,10 +2645,13 @@ int _mmc_detect_card_removed(struct mmc_host *host)
 		pr_debug("%s: card removed too slowly\n", mmc_hostname(host));
 	}
 
+<<<<<<< HEAD
 	if (ret && !strcmp("mmc1", mmc_hostname(host)) &&
 			host->ops->get_cd && host->ops->get_cd(host))
 		ret =0;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (ret) {
 		mmc_card_set_removed(host->card);
 		pr_debug("%s: card remove detected\n", mmc_hostname(host));
@@ -2471,15 +2675,23 @@ int mmc_detect_card_removed(struct mmc_host *host)
 	 * The card will be considered unchanged unless we have been asked to
 	 * detect a change or host requires polling to provide card detection.
 	 */
+<<<<<<< HEAD
 	if (!host->detect_change && !(host->caps & MMC_CAP_NEEDS_POLL) &&
 		!(host->caps2 & MMC_CAP2_DETECT_ON_ERR))
+=======
+	if (!host->detect_change && !(host->caps & MMC_CAP_NEEDS_POLL))
+>>>>>>> common/deprecated/android-3.18
 		return ret;
 
 	host->detect_change = 0;
 	if (!ret) {
 		ret = _mmc_detect_card_removed(host);
+<<<<<<< HEAD
 		if (ret && ((host->caps & MMC_CAP_NEEDS_POLL) ||
 			(host->caps2 & MMC_CAP2_DETECT_ON_ERR))) {
+=======
+		if (ret && (host->caps & MMC_CAP_NEEDS_POLL)) {
+>>>>>>> common/deprecated/android-3.18
 			/*
 			 * Schedule a detect work as soon as possible to let a
 			 * rescan handle the card removal.
@@ -2498,7 +2710,11 @@ void mmc_rescan(struct work_struct *work)
 	struct mmc_host *host =
 		container_of(work, struct mmc_host, detect.work);
 	int i;
+<<<<<<< HEAD
         printk("%s ,Index:%s, rescan_disable:%d, rescan_entered:%d\n", __FUNCTION__,mmc_hostname(host),host->rescan_disable,host->rescan_entered);
+=======
+
+>>>>>>> common/deprecated/android-3.18
 	if (host->trigger_card_event && host->ops->card_event) {
 		host->ops->card_event(host);
 		host->trigger_card_event = false;
@@ -2561,6 +2777,7 @@ void mmc_rescan(struct work_struct *work)
 	mmc_release_host(host);
 
  out:
+<<<<<<< HEAD
 #ifdef CONFIG_MARVELL_DRIVERS
 	if (host->detect_complete)
 		complete(host->detect_complete);
@@ -2568,6 +2785,8 @@ void mmc_rescan(struct work_struct *work)
 	host->pm_progress = 0;
 	if (!host->rescan_disable)
 		wake_lock_timeout(&host->detect_wake_lock, HZ / 2);
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (host->caps & MMC_CAP_NEEDS_POLL)
 		mmc_schedule_delayed_work(&host->detect, HZ);
 }
@@ -2581,6 +2800,7 @@ void mmc_start_host(struct mmc_host *host)
 		mmc_power_off(host);
 	else
 		mmc_power_up(host, host->ocr_avail);
+<<<<<<< HEAD
 #if defined(CONFIG_QCOM_WIFI) || defined(CONFIG_BCM4343)  || defined(CONFIG_BCM4343_MODULE) || \
 	defined(CONFIG_BCM43454)  || defined(CONFIG_BCM43454_MODULE) || \
 	defined(CONFIG_BCM43455)  || defined(CONFIG_BCM43455_MODULE) || \
@@ -2604,6 +2824,10 @@ void mmc_start_host(struct mmc_host *host)
 	CONFIG_BCM43454 || CONFIG_BCM43454_MODULE || \
 	CONFIG_BCM43455 || CONFIG_BCM43455_MODULE || \
 	CONFIG_BCM43456 || CONFIG_BCM43456_MODULE */
+=======
+	mmc_gpiod_request_cd_irq(host);
+	_mmc_detect_change(host, 0, false);
+>>>>>>> common/deprecated/android-3.18
 }
 
 void mmc_stop_host(struct mmc_host *host)
@@ -2619,6 +2843,10 @@ void mmc_stop_host(struct mmc_host *host)
 
 	host->rescan_disable = 1;
 	cancel_delayed_work_sync(&host->detect);
+<<<<<<< HEAD
+=======
+	mmc_flush_scheduled_work();
+>>>>>>> common/deprecated/android-3.18
 
 	/* clear pm flags now and let card drivers set them as needed */
 	host->pm_flags = 0;
@@ -2729,11 +2957,16 @@ int mmc_pm_notify(struct notifier_block *notify_block,
 	switch (mode) {
 	case PM_HIBERNATION_PREPARE:
 	case PM_SUSPEND_PREPARE:
+<<<<<<< HEAD
 		spin_lock_irqsave(&host->lock, flags);
 		if (mmc_bus_needs_resume(host)) {
 			spin_unlock_irqrestore(&host->lock, flags);
 			break;
 		}
+=======
+	case PM_RESTORE_PREPARE:
+		spin_lock_irqsave(&host->lock, flags);
+>>>>>>> common/deprecated/android-3.18
 		host->rescan_disable = 1;
 		spin_unlock_irqrestore(&host->lock, flags);
 		cancel_delayed_work_sync(&host->detect);
@@ -2741,6 +2974,7 @@ int mmc_pm_notify(struct notifier_block *notify_block,
 		if (!host->bus_ops)
 			break;
 
+<<<<<<< HEAD
 		/*
 		 * It is possible that the wake-lock has been acquired, since
 		 * its being suspended, release the wakelock
@@ -2748,12 +2982,25 @@ int mmc_pm_notify(struct notifier_block *notify_block,
 		if (wake_lock_active(&host->detect_wake_lock))
 			wake_unlock(&host->detect_wake_lock);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		/* Validate prerequisites for suspend */
 		if (host->bus_ops->pre_suspend)
 			err = host->bus_ops->pre_suspend(host);
 		if (!err)
 			break;
 
+<<<<<<< HEAD
+=======
+		if (!mmc_card_is_removable(host)) {
+			dev_warn(mmc_dev(host),
+				 "pre_suspend failed for non-removable host: "
+				 "%d\n", err);
+			/* Avoid removing non-removable hosts */
+			break;
+		}
+
+>>>>>>> common/deprecated/android-3.18
 		/* Calling bus_ops->remove() with a claimed host can deadlock */
 		host->bus_ops->remove(host);
 		mmc_claim_host(host);
@@ -2770,9 +3017,12 @@ int mmc_pm_notify(struct notifier_block *notify_block,
 		spin_lock_irqsave(&host->lock, flags);
 		host->rescan_disable = 0;
 		spin_unlock_irqrestore(&host->lock, flags);
+<<<<<<< HEAD
 		/* SD sync mode will be enabled during pm_progress is set */
 		if (host->card && mmc_card_sd(host->card))
 			host->pm_progress = 1;
+=======
+>>>>>>> common/deprecated/android-3.18
 		_mmc_detect_change(host, 0, false);
 
 	}
@@ -2818,9 +3068,19 @@ static int __init mmc_init(void)
 {
 	int ret;
 
+<<<<<<< HEAD
 	ret = mmc_register_bus();
 	if (ret)
 		return ret;
+=======
+	workqueue = alloc_ordered_workqueue("kmmcd", 0);
+	if (!workqueue)
+		return -ENOMEM;
+
+	ret = mmc_register_bus();
+	if (ret)
+		goto destroy_workqueue;
+>>>>>>> common/deprecated/android-3.18
 
 	ret = mmc_register_host_class();
 	if (ret)
@@ -2836,6 +3096,7 @@ unregister_host_class:
 	mmc_unregister_host_class();
 unregister_bus:
 	mmc_unregister_bus();
+<<<<<<< HEAD
 	return ret;
 }
 #if defined(CONFIG_BCM4343) || defined(CONFIG_BCM4343_MODULE) || \
@@ -2857,14 +3118,84 @@ EXPORT_SYMBOL(mmc_ctrl_power);
 	  CONFIG_BCM43455 || CONFIG_BCM43455_MODULE || \
 	  CONFIG_BCM43456 || CONFIG_BCM43456_MODULE */
 
+=======
+destroy_workqueue:
+	destroy_workqueue(workqueue);
+
+	return ret;
+}
+>>>>>>> common/deprecated/android-3.18
 
 static void __exit mmc_exit(void)
 {
 	sdio_unregister_bus();
 	mmc_unregister_host_class();
 	mmc_unregister_bus();
+<<<<<<< HEAD
 }
 
+=======
+	destroy_workqueue(workqueue);
+}
+
+#ifdef CONFIG_BLOCK
+static ssize_t
+latency_hist_show(struct device *dev, struct device_attribute *attr, char *buf)
+{
+	struct mmc_host *host = cls_dev_to_mmc_host(dev);
+	size_t written_bytes;
+
+	written_bytes = blk_latency_hist_show("Read", &host->io_lat_read,
+			buf, PAGE_SIZE);
+	written_bytes += blk_latency_hist_show("Write", &host->io_lat_write,
+			buf + written_bytes, PAGE_SIZE - written_bytes);
+
+	return written_bytes;
+}
+
+/*
+ * Values permitted 0, 1, 2.
+ * 0 -> Disable IO latency histograms (default)
+ * 1 -> Enable IO latency histograms
+ * 2 -> Zero out IO latency histograms
+ */
+static ssize_t
+latency_hist_store(struct device *dev, struct device_attribute *attr,
+		   const char *buf, size_t count)
+{
+	struct mmc_host *host = cls_dev_to_mmc_host(dev);
+	long value;
+
+	if (kstrtol(buf, 0, &value))
+		return -EINVAL;
+	if (value == BLK_IO_LAT_HIST_ZERO) {
+		memset(&host->io_lat_read, 0, sizeof(host->io_lat_read));
+		memset(&host->io_lat_write, 0, sizeof(host->io_lat_write));
+	} else if (value == BLK_IO_LAT_HIST_ENABLE ||
+		 value == BLK_IO_LAT_HIST_DISABLE)
+		host->latency_hist_enabled = value;
+	return count;
+}
+
+static DEVICE_ATTR(latency_hist, S_IRUGO | S_IWUSR,
+		   latency_hist_show, latency_hist_store);
+
+void
+mmc_latency_hist_sysfs_init(struct mmc_host *host)
+{
+	if (device_create_file(&host->class_dev, &dev_attr_latency_hist))
+		dev_err(&host->class_dev,
+			"Failed to create latency_hist sysfs entry\n");
+}
+
+void
+mmc_latency_hist_sysfs_exit(struct mmc_host *host)
+{
+	device_remove_file(&host->class_dev, &dev_attr_latency_hist);
+}
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 subsys_initcall(mmc_init);
 module_exit(mmc_exit);
 

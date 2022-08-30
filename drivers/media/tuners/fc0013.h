@@ -26,7 +26,11 @@
 #include "dvb_frontend.h"
 #include "fc001x-common.h"
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_MEDIA_TUNER_FC0013)
+=======
+#if IS_REACHABLE(CONFIG_MEDIA_TUNER_FC0013)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend *fc0013_attach(struct dvb_frontend *fe,
 					struct i2c_adapter *i2c,
 					u8 i2c_address, int dual_master,

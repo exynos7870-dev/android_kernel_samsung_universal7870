@@ -81,11 +81,15 @@ static struct cfpkt *cfpkt_create_pfx(u16 len, u16 pfx)
 {
 	struct sk_buff *skb;
 
+<<<<<<< HEAD
 	if (likely(in_interrupt()))
 		skb = alloc_skb(len + pfx, GFP_ATOMIC);
 	else
 		skb = alloc_skb(len + pfx, GFP_KERNEL);
 
+=======
+	skb = alloc_skb(len + pfx, GFP_ATOMIC);
+>>>>>>> common/deprecated/android-3.18
 	if (unlikely(skb == NULL))
 		return NULL;
 
@@ -286,7 +290,11 @@ int cfpkt_setlen(struct cfpkt *pkt, u16 len)
 		else
 			skb_trim(skb, len);
 
+<<<<<<< HEAD
 			return cfpkt_getlen(pkt);
+=======
+		return cfpkt_getlen(pkt);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/* Need to expand SKB */

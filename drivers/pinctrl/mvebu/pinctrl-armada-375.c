@@ -92,19 +92,29 @@ static struct mvebu_mpp_mode mv88f6720_mpp_modes[] = {
 		 MPP_FUNCTION(0x5, "nand", "io1")),
 	MPP_MODE(8,
 		 MPP_FUNCTION(0x0, "gpio", NULL),
+<<<<<<< HEAD
 		 MPP_FUNCTION(0x1, "dev ", "bootcs"),
+=======
+		 MPP_FUNCTION(0x1, "dev", "bootcs"),
+>>>>>>> common/deprecated/android-3.18
 		 MPP_FUNCTION(0x2, "spi0", "cs0"),
 		 MPP_FUNCTION(0x3, "spi1", "cs0"),
 		 MPP_FUNCTION(0x5, "nand", "ce")),
 	MPP_MODE(9,
 		 MPP_FUNCTION(0x0, "gpio", NULL),
+<<<<<<< HEAD
 		 MPP_FUNCTION(0x1, "nf", "wen"),
+=======
+>>>>>>> common/deprecated/android-3.18
 		 MPP_FUNCTION(0x2, "spi0", "sck"),
 		 MPP_FUNCTION(0x3, "spi1", "sck"),
 		 MPP_FUNCTION(0x5, "nand", "we")),
 	MPP_MODE(10,
 		 MPP_FUNCTION(0x0, "gpio", NULL),
+<<<<<<< HEAD
 		 MPP_FUNCTION(0x1, "nf", "ren"),
+=======
+>>>>>>> common/deprecated/android-3.18
 		 MPP_FUNCTION(0x2, "dram", "vttctrl"),
 		 MPP_FUNCTION(0x3, "led", "c1"),
 		 MPP_FUNCTION(0x5, "nand", "re"),

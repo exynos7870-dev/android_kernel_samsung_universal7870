@@ -280,6 +280,7 @@ static inline void clear_LDT(void)
 	set_ldt(NULL, 0);
 }
 
+<<<<<<< HEAD
 /*
  * load one particular LDT into the current CPU
  */
@@ -295,6 +296,8 @@ static inline void load_LDT(mm_context_t *pc)
 	preempt_enable();
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static inline unsigned long get_desc_base(const struct desc_struct *desc)
 {
 	return (unsigned)(desc->base0 | ((desc->base1) << 16) | ((desc->base2) << 24));

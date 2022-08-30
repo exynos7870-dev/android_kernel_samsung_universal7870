@@ -112,9 +112,12 @@ static struct dentry *proc_mount(struct file_system_type *fs_type,
 		ns = task_active_pid_ns(current);
 		options = data;
 
+<<<<<<< HEAD
 		if (!capable(CAP_SYS_ADMIN) && !fs_fully_visible(fs_type))
 			return ERR_PTR(-EPERM);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		/* Does the mounter have privilege over the pid namespace? */
 		if (!ns_capable(ns->user_ns, CAP_SYS_ADMIN))
 			return ERR_PTR(-EPERM);
@@ -166,7 +169,11 @@ static struct file_system_type proc_fs_type = {
 	.name		= "proc",
 	.mount		= proc_mount,
 	.kill_sb	= proc_kill_sb,
+<<<<<<< HEAD
 	.fs_flags	= FS_USERNS_MOUNT,
+=======
+	.fs_flags	= FS_USERNS_VISIBLE | FS_USERNS_MOUNT,
+>>>>>>> common/deprecated/android-3.18
 };
 
 void __init proc_root_init(void)

@@ -61,7 +61,11 @@ asmlinkage void secondary_start_kernel(void);
 struct secondary_data {
 	union {
 		unsigned long mpu_rgn_szr;
+<<<<<<< HEAD
 		unsigned long pgdir;
+=======
+		u64 pgdir;
+>>>>>>> common/deprecated/android-3.18
 	};
 	unsigned long swapper_pg_dir;
 	void *stack;

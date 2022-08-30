@@ -91,6 +91,32 @@ static inline void get_page_foll(struct page *page)
 	}
 }
 
+<<<<<<< HEAD
+=======
+static inline __must_check bool try_get_page_foll(struct page *page)
+{
+	if (unlikely(PageTail(page))) {
+		if (WARN_ON_ONCE(atomic_read(&compound_head(page)->_count) <= 0))
+			return false;
+		/*
+		 * This is safe only because
+		 * __split_huge_page_refcount() can't run under
+		 * get_page_foll() because we hold the proper PT lock.
+		 */
+		__get_page_tail_foll(page, true);
+	} else {
+		/*
+		 * Getting a normal page or the head of a compound page
+		 * requires to already have an elevated page->_count.
+		 */
+		if (WARN_ON_ONCE(atomic_read(&page->_count) <= 0))
+			return false;
+		atomic_inc(&page->_count);
+	}
+	return true;
+}
+
+>>>>>>> common/deprecated/android-3.18
 extern unsigned long highest_memmap_pfn;
 
 /*
@@ -133,8 +159,14 @@ __find_buddy_index(unsigned long page_idx, unsigned int order)
 }
 
 extern int __isolate_free_page(struct page *page, unsigned int order);
+<<<<<<< HEAD
 extern void __free_pages_bootmem(struct page *page, unsigned int order);
 extern void prep_compound_page(struct page *page, unsigned long order);
+=======
+extern void __free_pages_bootmem(struct page *page, unsigned long pfn,
+					unsigned int order);
+extern void prep_compound_page(struct page *page, unsigned int order);
+>>>>>>> common/deprecated/android-3.18
 #ifdef CONFIG_MEMORY_FAILURE
 extern bool is_free_buddy_page(struct page *page);
 #endif
@@ -192,7 +224,11 @@ isolate_migratepages_range(struct compact_control *cc,
  * page cannot be allocated or merged in parallel. Alternatively, it must
  * handle invalid values gracefully, and use page_order_unsafe() below.
  */
+<<<<<<< HEAD
 static inline unsigned long page_order(struct page *page)
+=======
+static inline unsigned int page_order(struct page *page)
+>>>>>>> common/deprecated/android-3.18
 {
 	/* PageBuddy() must be checked by the caller */
 	return page_private(page);

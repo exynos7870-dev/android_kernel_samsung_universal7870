@@ -92,8 +92,13 @@ unsigned int iio_buffer_poll(struct file *filp,
 	struct iio_dev *indio_dev = filp->private_data;
 	struct iio_buffer *rb = indio_dev->buffer;
 
+<<<<<<< HEAD
 	if (!indio_dev->info)
 		return -ENODEV;
+=======
+	if (!indio_dev->info || rb == NULL)
+		return 0;
+>>>>>>> common/deprecated/android-3.18
 
 	poll_wait(filp, &rb->pollq, wait);
 	if (iio_buffer_data_available(rb))
@@ -475,7 +480,11 @@ static int iio_compute_scan_bytes(struct iio_dev *indio_dev,
 {
 	const struct iio_chan_spec *ch;
 	unsigned bytes = 0;
+<<<<<<< HEAD
 	int length, i;
+=======
+	int length, i, largest = 0;
+>>>>>>> common/deprecated/android-3.18
 
 	/* How much space will the demuxed element take? */
 	for_each_set_bit(i, mask,
@@ -488,6 +497,10 @@ static int iio_compute_scan_bytes(struct iio_dev *indio_dev,
 			length = ch->scan_type.storagebits / 8;
 		bytes = ALIGN(bytes, length);
 		bytes += length;
+<<<<<<< HEAD
+=======
+		largest = max(largest, length);
+>>>>>>> common/deprecated/android-3.18
 	}
 	if (timestamp) {
 		ch = iio_find_channel_from_si(indio_dev,
@@ -499,7 +512,14 @@ static int iio_compute_scan_bytes(struct iio_dev *indio_dev,
 			length = ch->scan_type.storagebits / 8;
 		bytes = ALIGN(bytes, length);
 		bytes += length;
+<<<<<<< HEAD
 	}
+=======
+		largest = max(largest, length);
+	}
+
+	bytes = ALIGN(bytes, largest);
+>>>>>>> common/deprecated/android-3.18
 	return bytes;
 }
 
@@ -792,6 +812,7 @@ done:
 }
 EXPORT_SYMBOL(iio_buffer_store_enable);
 
+<<<<<<< HEAD
 int iio_sw_buffer_preenable(struct iio_dev *indio_dev)
 {
 	struct iio_buffer *buffer;
@@ -810,6 +831,8 @@ int iio_sw_buffer_preenable(struct iio_dev *indio_dev)
 }
 EXPORT_SYMBOL(iio_sw_buffer_preenable);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /**
  * iio_validate_scan_mask_onehot() - Validates that exactly one channel is selected
  * @indio_dev: the iio device
@@ -1008,9 +1031,12 @@ static int iio_buffer_update_demux(struct iio_dev *indio_dev,
 				       indio_dev->masklength,
 				       in_ind + 1);
 		while (in_ind != out_ind) {
+<<<<<<< HEAD
 			in_ind = find_next_bit(indio_dev->active_scan_mask,
 					       indio_dev->masklength,
 					       in_ind + 1);
+=======
+>>>>>>> common/deprecated/android-3.18
 			ch = iio_find_channel_from_si(indio_dev, in_ind);
 			if (ch->scan_type.repeat > 1)
 				length = ch->scan_type.storagebits / 8 *
@@ -1019,6 +1045,12 @@ static int iio_buffer_update_demux(struct iio_dev *indio_dev,
 				length = ch->scan_type.storagebits / 8;
 			/* Make sure we are aligned */
 			in_loc = roundup(in_loc, length) + length;
+<<<<<<< HEAD
+=======
+			in_ind = find_next_bit(indio_dev->active_scan_mask,
+					       indio_dev->masklength,
+					       in_ind + 1);
+>>>>>>> common/deprecated/android-3.18
 		}
 		ch = iio_find_channel_from_si(indio_dev, in_ind);
 		if (ch->scan_type.repeat > 1)

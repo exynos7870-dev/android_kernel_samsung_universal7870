@@ -165,7 +165,10 @@ static struct plat_sci_port scif2_platform_data = {
 	.scscr		= SCSCR_TE | SCSCR_RE,
 	.type		= PORT_IRDA,
 	.ops		= &sh770x_sci_port_ops,
+<<<<<<< HEAD
 	.regshift	= 1,
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 static struct resource scif2_resources[] = {

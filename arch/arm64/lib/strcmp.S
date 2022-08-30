@@ -231,4 +231,8 @@ CPU_BE(	orr	syndrome, diff, has_nul )
 	lsr	data1, data1, #56
 	sub	result, data1, data2, lsr #56
 	ret
+<<<<<<< HEAD
 ENDPROC(strcmp)
+=======
+ENDPIPROC(strcmp)
+>>>>>>> common/deprecated/android-3.18

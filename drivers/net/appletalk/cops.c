@@ -324,6 +324,11 @@ static int __init cops_probe1(struct net_device *dev, int ioaddr)
 			break;
 	}
 
+<<<<<<< HEAD
+=======
+	dev->base_addr = ioaddr;
+
+>>>>>>> common/deprecated/android-3.18
 	/* Reserve any actual interrupt. */
 	if (dev->irq) {
 		retval = request_irq(dev->irq, cops_interrupt, 0, dev->name, dev);
@@ -331,8 +336,11 @@ static int __init cops_probe1(struct net_device *dev, int ioaddr)
 			goto err_out;
 	}
 
+<<<<<<< HEAD
 	dev->base_addr = ioaddr;
 
+=======
+>>>>>>> common/deprecated/android-3.18
         lp = netdev_priv(dev);
         spin_lock_init(&lp->lock);
 

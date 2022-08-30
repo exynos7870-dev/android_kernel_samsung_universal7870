@@ -64,6 +64,10 @@ struct usb_yurex {
 
 	struct kref		kref;
 	struct mutex		io_mutex;
+<<<<<<< HEAD
+=======
+	unsigned long		disconnected:1;
+>>>>>>> common/deprecated/android-3.18
 	struct fasync_struct	*async_queue;
 	wait_queue_head_t	waitq;
 
@@ -96,7 +100,10 @@ static void yurex_delete(struct kref *kref)
 
 	dev_dbg(&dev->interface->dev, "%s\n", __func__);
 
+<<<<<<< HEAD
 	usb_put_dev(dev->udev);
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (dev->cntl_urb) {
 		usb_kill_urb(dev->cntl_urb);
 		kfree(dev->cntl_req);
@@ -112,6 +119,11 @@ static void yurex_delete(struct kref *kref)
 				dev->int_buffer, dev->urb->transfer_dma);
 		usb_free_urb(dev->urb);
 	}
+<<<<<<< HEAD
+=======
+	usb_put_intf(dev->interface);
+	usb_put_dev(dev->udev);
+>>>>>>> common/deprecated/android-3.18
 	kfree(dev);
 }
 
@@ -136,6 +148,10 @@ static void yurex_interrupt(struct urb *urb)
 	switch (status) {
 	case 0: /*success*/
 		break;
+<<<<<<< HEAD
+=======
+	/* The device is terminated or messed up, give up */
+>>>>>>> common/deprecated/android-3.18
 	case -EOVERFLOW:
 		dev_err(&dev->interface->dev,
 			"%s - overflow with length %d, actual length is %d\n",
@@ -144,12 +160,21 @@ static void yurex_interrupt(struct urb *urb)
 	case -ENOENT:
 	case -ESHUTDOWN:
 	case -EILSEQ:
+<<<<<<< HEAD
 		/* The device is terminated, clean up */
+=======
+	case -EPROTO:
+	case -ETIME:
+>>>>>>> common/deprecated/android-3.18
 		return;
 	default:
 		dev_err(&dev->interface->dev,
 			"%s - unknown status received: %d\n", __func__, status);
+<<<<<<< HEAD
 		goto exit;
+=======
+		return;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/* handle received message */
@@ -181,7 +206,10 @@ static void yurex_interrupt(struct urb *urb)
 		break;
 	}
 
+<<<<<<< HEAD
 exit:
+=======
+>>>>>>> common/deprecated/android-3.18
 	retval = usb_submit_urb(dev->urb, GFP_ATOMIC);
 	if (retval) {
 		dev_err(&dev->interface->dev, "%s - usb_submit_urb failed: %d\n",
@@ -210,7 +238,11 @@ static int yurex_probe(struct usb_interface *interface, const struct usb_device_
 	init_waitqueue_head(&dev->waitq);
 
 	dev->udev = usb_get_dev(interface_to_usbdev(interface));
+<<<<<<< HEAD
 	dev->interface = interface;
+=======
+	dev->interface = usb_get_intf(interface);
+>>>>>>> common/deprecated/android-3.18
 
 	/* set up the endpoint information */
 	iface_desc = interface->cur_altsetting;
@@ -332,8 +364,15 @@ static void yurex_disconnect(struct usb_interface *interface)
 	usb_deregister_dev(interface, &yurex_class);
 
 	/* prevent more I/O from starting */
+<<<<<<< HEAD
 	mutex_lock(&dev->io_mutex);
 	dev->interface = NULL;
+=======
+	usb_poison_urb(dev->urb);
+	usb_poison_urb(dev->cntl_urb);
+	mutex_lock(&dev->io_mutex);
+	dev->disconnected = 1;
+>>>>>>> common/deprecated/android-3.18
 	mutex_unlock(&dev->io_mutex);
 
 	/* wakeup waiters */
@@ -413,14 +452,19 @@ static int yurex_release(struct inode *inode, struct file *file)
 static ssize_t yurex_read(struct file *file, char *buffer, size_t count, loff_t *ppos)
 {
 	struct usb_yurex *dev;
+<<<<<<< HEAD
 	int retval = 0;
 	int bytes_read = 0;
+=======
+	int len = 0;
+>>>>>>> common/deprecated/android-3.18
 	char in_buffer[20];
 	unsigned long flags;
 
 	dev = file->private_data;
 
 	mutex_lock(&dev->io_mutex);
+<<<<<<< HEAD
 	if (!dev->interface) {		/* already disconnected */
 		retval = -ENODEV;
 		goto exit;
@@ -442,19 +486,43 @@ static ssize_t yurex_read(struct file *file, char *buffer, size_t count, loff_t 
 exit:
 	mutex_unlock(&dev->io_mutex);
 	return retval;
+=======
+	if (dev->disconnected) {		/* already disconnected */
+		mutex_unlock(&dev->io_mutex);
+		return -ENODEV;
+	}
+
+	spin_lock_irqsave(&dev->lock, flags);
+	len = snprintf(in_buffer, 20, "%lld\n", dev->bbu);
+	spin_unlock_irqrestore(&dev->lock, flags);
+	mutex_unlock(&dev->io_mutex);
+
+	if (WARN_ON_ONCE(len >= sizeof(in_buffer)))
+		return -EIO;
+
+	return simple_read_from_buffer(buffer, count, ppos, in_buffer, len);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static ssize_t yurex_write(struct file *file, const char *user_buffer, size_t count, loff_t *ppos)
 {
 	struct usb_yurex *dev;
 	int i, set = 0, retval = 0;
+<<<<<<< HEAD
 	char buffer[16];
+=======
+	char buffer[16 + 1];
+>>>>>>> common/deprecated/android-3.18
 	char *data = buffer;
 	unsigned long long c, c2 = 0;
 	signed long timeout = 0;
 	DEFINE_WAIT(wait);
 
+<<<<<<< HEAD
 	count = min(sizeof(buffer), count);
+=======
+	count = min(sizeof(buffer) - 1, count);
+>>>>>>> common/deprecated/android-3.18
 	dev = file->private_data;
 
 	/* verify that we actually have some data to write */
@@ -462,7 +530,11 @@ static ssize_t yurex_write(struct file *file, const char *user_buffer, size_t co
 		goto error;
 
 	mutex_lock(&dev->io_mutex);
+<<<<<<< HEAD
 	if (!dev->interface) {		/* already disconnected */
+=======
+	if (dev->disconnected) {		/* already disconnected */
+>>>>>>> common/deprecated/android-3.18
 		mutex_unlock(&dev->io_mutex);
 		retval = -ENODEV;
 		goto error;
@@ -473,6 +545,10 @@ static ssize_t yurex_write(struct file *file, const char *user_buffer, size_t co
 		retval = -EFAULT;
 		goto error;
 	}
+<<<<<<< HEAD
+=======
+	buffer[count] = 0;
+>>>>>>> common/deprecated/android-3.18
 	memset(dev->cntl_buffer, CMD_PADDING, YUREX_BUF_SIZE);
 
 	switch (buffer[0]) {
@@ -510,11 +586,21 @@ static ssize_t yurex_write(struct file *file, const char *user_buffer, size_t co
 	prepare_to_wait(&dev->waitq, &wait, TASK_INTERRUPTIBLE);
 	dev_dbg(&dev->interface->dev, "%s - submit %c\n", __func__,
 		dev->cntl_buffer[0]);
+<<<<<<< HEAD
 	retval = usb_submit_urb(dev->cntl_urb, GFP_KERNEL);
+=======
+	retval = usb_submit_urb(dev->cntl_urb, GFP_ATOMIC);
+>>>>>>> common/deprecated/android-3.18
 	if (retval >= 0)
 		timeout = schedule_timeout(YUREX_WRITE_TIMEOUT);
 	finish_wait(&dev->waitq, &wait);
 
+<<<<<<< HEAD
+=======
+	/* make sure URB is idle after timeout or (spurious) CMD_ACK */
+	usb_kill_urb(dev->cntl_urb);
+
+>>>>>>> common/deprecated/android-3.18
 	mutex_unlock(&dev->io_mutex);
 
 	if (retval < 0) {

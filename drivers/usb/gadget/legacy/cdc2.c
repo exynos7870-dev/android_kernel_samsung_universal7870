@@ -226,7 +226,11 @@ static __refdata struct usb_composite_driver cdc_driver = {
 	.name		= "g_cdc",
 	.dev		= &device_desc,
 	.strings	= dev_strings,
+<<<<<<< HEAD
 	.max_speed	= USB_SPEED_HIGH,
+=======
+	.max_speed	= USB_SPEED_SUPER,
+>>>>>>> common/deprecated/android-3.18
 	.bind		= cdc_bind,
 	.unbind		= __exit_p(cdc_unbind),
 };

@@ -114,6 +114,7 @@ static unsigned long super_cache_count(struct shrinker *shrink,
 	sb = container_of(shrink, struct super_block, s_shrink);
 
 	/*
+<<<<<<< HEAD
 	 * Don't call grab_super_passive as it is a potential
 	 * scalability bottleneck. The counts could get updated
 	 * between super_cache_count and super_cache_scan anyway.
@@ -121,6 +122,25 @@ static unsigned long super_cache_count(struct shrinker *shrink,
 	 * ensures the safety of call to list_lru_count_node() and
 	 * s_op->nr_cached_objects().
 	 */
+=======
+	 * We don't call trylock_super() here as it is a scalability bottleneck,
+	 * so we're exposed to partial setup state. The shrinker rwsem does not
+	 * protect filesystem operations backing list_lru_shrink_count() or
+	 * s_op->nr_cached_objects(). Counts can change between
+	 * super_cache_count and super_cache_scan, so we really don't need locks
+	 * here.
+	 *
+	 * However, if we are currently mounting the superblock, the underlying
+	 * filesystem might be in a state of partial construction and hence it
+	 * is dangerous to access it.  trylock_super() uses a MS_BORN check to
+	 * avoid this situation, so do the same here. The memory barrier is
+	 * matched with the one in mount_fs() as we don't hold locks here.
+	 */
+	if (!(sb->s_flags & MS_BORN))
+		return 0;
+	smp_rmb();
+
+>>>>>>> common/deprecated/android-3.18
 	if (sb->s_op && sb->s_op->nr_cached_objects)
 		total_objects = sb->s_op->nr_cached_objects(sb,
 						 sc->nid);
@@ -476,7 +496,15 @@ retry:
 	hlist_add_head(&s->s_instances, &type->fs_supers);
 	spin_unlock(&sb_lock);
 	get_filesystem(type);
+<<<<<<< HEAD
 	register_shrinker(&s->s_shrink);
+=======
+	err = register_shrinker(&s->s_shrink);
+	if (err) {
+		deactivate_locked_super(s);
+		s = ERR_PTR(err);
+	}
+>>>>>>> common/deprecated/android-3.18
 	return s;
 }
 
@@ -752,12 +780,16 @@ int do_remount_sb2(struct vfsmount *mnt, struct super_block *sb, int flags, void
 			     sb->s_type->name, retval);
 		}
 	}
+<<<<<<< HEAD
 #ifdef CONFIG_FIVE
 	sb->s_flags = (sb->s_flags & ~MS_RMT_MASK) |
 				(flags & MS_RMT_MASK) | MS_I_VERSION;
 #else
 	sb->s_flags = (sb->s_flags & ~MS_RMT_MASK) | (flags & MS_RMT_MASK);
 #endif
+=======
+	sb->s_flags = (sb->s_flags & ~MS_RMT_MASK) | (flags & MS_RMT_MASK);
+>>>>>>> common/deprecated/android-3.18
 	/* Needs to be ordered wrt mnt_is_readonly() */
 	smp_wmb();
 	sb->s_readonly_remount = 0;
@@ -789,7 +821,11 @@ static void do_emergency_remount(struct work_struct *work)
 	struct super_block *sb, *p = NULL;
 
 	spin_lock(&sb_lock);
+<<<<<<< HEAD
 	list_for_each_entry(sb, &super_blocks, s_list) {
+=======
+	list_for_each_entry_reverse(sb, &super_blocks, s_list) {
+>>>>>>> common/deprecated/android-3.18
 		if (hlist_unhashed(&sb->s_instances))
 			continue;
 		sb->s_count++;
@@ -1135,6 +1171,17 @@ mount_fs(struct file_system_type *type, int flags, const char *name, struct vfsm
 	BUG_ON(!sb);
 	WARN_ON(!sb->s_bdi);
 	WARN_ON(sb->s_bdi == &default_backing_dev_info);
+<<<<<<< HEAD
+=======
+
+	/*
+	 * Write barrier is for super_cache_count(). We place it before setting
+	 * MS_BORN as the data dependency between the two functions is the
+	 * superblock structure contents that we just set up, not the MS_BORN
+	 * flag.
+	 */
+	smp_wmb();
+>>>>>>> common/deprecated/android-3.18
 	sb->s_flags |= MS_BORN;
 
 	error = security_sb_kern_mount(sb, flags, secdata);
@@ -1369,8 +1416,13 @@ int freeze_super(struct super_block *sb)
 		}
 	}
 	/*
+<<<<<<< HEAD
 	 * This is just for debugging purposes so that fs can warn if it
 	 * sees write activity when frozen is set to SB_FREEZE_COMPLETE.
+=======
+	 * For debugging purposes so that fs can warn if it sees write activity
+	 * when frozen is set to SB_FREEZE_COMPLETE, and for thaw_super().
+>>>>>>> common/deprecated/android-3.18
 	 */
 	sb->s_writers.frozen = SB_FREEZE_COMPLETE;
 	up_write(&sb->s_umount);
@@ -1389,7 +1441,11 @@ int thaw_super(struct super_block *sb)
 	int error;
 
 	down_write(&sb->s_umount);
+<<<<<<< HEAD
 	if (sb->s_writers.frozen == SB_UNFROZEN) {
+=======
+	if (sb->s_writers.frozen != SB_FREEZE_COMPLETE) {
+>>>>>>> common/deprecated/android-3.18
 		up_write(&sb->s_umount);
 		return -EINVAL;
 	}

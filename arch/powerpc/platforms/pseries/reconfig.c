@@ -112,7 +112,10 @@ static int pSeries_reconfig_remove_node(struct device_node *np)
 
 	of_detach_node(np);
 	of_node_put(parent);
+<<<<<<< HEAD
 	of_node_put(np); /* Must decrement the refcount */
+=======
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 

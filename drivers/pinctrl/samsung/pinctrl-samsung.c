@@ -30,6 +30,7 @@
 #include <linux/spinlock.h>
 #include <linux/syscore_ops.h>
 
+<<<<<<< HEAD
 #include <soc/samsung/exynos-pm.h>
 
 #include "../core.h"
@@ -42,6 +43,10 @@
 #include <linux/smc.h>
 extern int fpsensor_goto_suspend;
 #endif
+=======
+#include "../core.h"
+#include "pinctrl-samsung.h"
+>>>>>>> common/deprecated/android-3.18
 
 #define GROUP_SUFFIX		"-grp"
 #define GSUFFIX_LEN		sizeof(GROUP_SUFFIX)
@@ -301,6 +306,10 @@ static int samsung_dt_node_to_map(struct pinctrl_dev *pctldev,
 						&reserved_maps, num_maps);
 		if (ret < 0) {
 			samsung_dt_free_map(pctldev, *map, *num_maps);
+<<<<<<< HEAD
+=======
+			of_node_put(np);
+>>>>>>> common/deprecated/android-3.18
 			return ret;
 		}
 	}
@@ -308,6 +317,7 @@ static int samsung_dt_node_to_map(struct pinctrl_dev *pctldev,
 	return 0;
 }
 
+<<<<<<< HEAD
 /* GPIO register names */
 static char *gpio_regs[] = {"CON", "DAT", "PUD", "DRV", "CON_PDN", "PUD_PDN"};
 
@@ -367,6 +377,8 @@ static void samsung_pin_dbg_show(struct pinctrl_dev *pctldev,
 	spin_unlock_irqrestore(&bank->slock, flags);
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /* list of pinctrl callbacks for the pinctrl core */
 static const struct pinctrl_ops samsung_pctrl_ops = {
 	.get_groups_count	= samsung_get_group_count,
@@ -374,7 +386,10 @@ static const struct pinctrl_ops samsung_pctrl_ops = {
 	.get_group_pins		= samsung_get_group_pins,
 	.dt_node_to_map		= samsung_dt_node_to_map,
 	.dt_free_map		= samsung_dt_free_map,
+<<<<<<< HEAD
 	.pin_dbg_show		= samsung_pin_dbg_show,
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 /* check if the selector is a valid pin function selector */
@@ -450,6 +465,7 @@ static void samsung_pinmux_setup(struct pinctrl_dev *pctldev, unsigned selector,
 
 	pin_to_reg_bank(drvdata, grp->pins[0] - drvdata->ctrl->base,
 			&reg, &pin_offset, &bank);
+<<<<<<< HEAD
 
 #ifdef ENABLE_SENSORS_FPRINT_SECURE
 	if (!strncmp(bank->name, CONFIG_SENSORS_FP_SPI_GPIO, 4))
@@ -464,6 +480,8 @@ static void samsung_pinmux_setup(struct pinctrl_dev *pctldev, unsigned selector,
 		return;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	type = bank->type;
 	mask = (1 << type->fld_width[PINCFG_TYPE_FUNC]) - 1;
 	shift = pin_offset * type->fld_width[PINCFG_TYPE_FUNC];
@@ -517,6 +535,7 @@ static int samsung_pinconf_rw(struct pinctrl_dev *pctldev, unsigned int pin,
 	drvdata = pinctrl_dev_get_drvdata(pctldev);
 	pin_to_reg_bank(drvdata, pin - drvdata->ctrl->base, &reg_base,
 					&pin_offset, &bank);
+<<<<<<< HEAD
 
 #ifdef ENABLE_SENSORS_FPRINT_SECURE
 	if (!strncmp(bank->name, CONFIG_SENSORS_FP_SPI_GPIO, 4))
@@ -531,6 +550,8 @@ static int samsung_pinconf_rw(struct pinctrl_dev *pctldev, unsigned int pin,
 		return 0;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	type = bank->type;
 
 	if (cfg_type >= PINCFG_TYPE_NUM || !type->fld_width[cfg_type])
@@ -614,6 +635,7 @@ static int samsung_pinconf_group_get(struct pinctrl_dev *pctldev,
 	return 0;
 }
 
+<<<<<<< HEAD
 /* show whole PUD, DRV, CON_PDN and PUD_PDN register status */
 static void samsung_pinconf_dbg_show(struct pinctrl_dev *pctldev,
 				struct seq_file *s, unsigned pin)
@@ -657,14 +679,19 @@ static void samsung_pinconf_group_dbg_show(struct pinctrl_dev *pctldev,
 	}
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /* list of pinconfig callbacks for pinconfig vertical in the pinctrl code */
 static const struct pinconf_ops samsung_pinconf_ops = {
 	.pin_config_get		= samsung_pinconf_get,
 	.pin_config_set		= samsung_pinconf_set,
 	.pin_config_group_get	= samsung_pinconf_group_get,
 	.pin_config_group_set	= samsung_pinconf_group_set,
+<<<<<<< HEAD
 	.pin_config_dbg_show	= samsung_pinconf_dbg_show,
 	.pin_config_group_dbg_show = samsung_pinconf_group_dbg_show,
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 /* gpiolib gpio_set callback function */
@@ -672,6 +699,7 @@ static void samsung_gpio_set(struct gpio_chip *gc, unsigned offset, int value)
 {
 	struct samsung_pin_bank *bank = gc_to_pin_bank(gc);
 	struct samsung_pin_bank_type *type = bank->type;
+<<<<<<< HEAD
 	void __iomem *reg;
 	u32 data;
 
@@ -690,11 +718,22 @@ static void samsung_gpio_set(struct gpio_chip *gc, unsigned offset, int value)
 
 	reg = bank->drvdata->virt_base + bank->pctl_offset;
 
+=======
+	unsigned long flags;
+	void __iomem *reg;
+	u32 data;
+
+	reg = bank->drvdata->virt_base + bank->pctl_offset;
+
+	spin_lock_irqsave(&bank->slock, flags);
+
+>>>>>>> common/deprecated/android-3.18
 	data = readl(reg + type->reg_offset[PINCFG_TYPE_DAT]);
 	data &= ~(1 << offset);
 	if (value)
 		data |= 1 << offset;
 	writel(data, reg + type->reg_offset[PINCFG_TYPE_DAT]);
+<<<<<<< HEAD
 }
 
 static void samsung_gpio_set_value(struct gpio_chip *gc, unsigned offset, int value)
@@ -704,6 +743,9 @@ static void samsung_gpio_set_value(struct gpio_chip *gc, unsigned offset, int va
 
 	spin_lock_irqsave(&bank->slock, flags);
 	samsung_gpio_set(gc, offset, value);
+=======
+
+>>>>>>> common/deprecated/android-3.18
 	spin_unlock_irqrestore(&bank->slock, flags);
 }
 
@@ -735,6 +777,10 @@ static int samsung_gpio_set_direction(struct gpio_chip *gc,
 	struct samsung_pinctrl_drv_data *drvdata;
 	void __iomem *reg;
 	u32 data, mask, shift;
+<<<<<<< HEAD
+=======
+	unsigned long flags;
+>>>>>>> common/deprecated/android-3.18
 
 	bank = gc_to_pin_bank(gc);
 	type = bank->type;
@@ -751,18 +797,29 @@ static int samsung_gpio_set_direction(struct gpio_chip *gc,
 		reg += 4;
 	}
 
+<<<<<<< HEAD
+=======
+	spin_lock_irqsave(&bank->slock, flags);
+
+>>>>>>> common/deprecated/android-3.18
 	data = readl(reg);
 	data &= ~(mask << shift);
 	if (!input)
 		data |= FUNC_OUTPUT << shift;
 	writel(data, reg);
 
+<<<<<<< HEAD
+=======
+	spin_unlock_irqrestore(&bank->slock, flags);
+
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
 /* gpiolib gpio_direction_input callback function. */
 static int samsung_gpio_direction_input(struct gpio_chip *gc, unsigned offset)
 {
+<<<<<<< HEAD
 	struct samsung_pin_bank *bank = gc_to_pin_bank(gc);
 	unsigned long flags;
 	int ret;
@@ -771,12 +828,16 @@ static int samsung_gpio_direction_input(struct gpio_chip *gc, unsigned offset)
 	ret = samsung_gpio_set_direction(gc, offset, true);
 	spin_unlock_irqrestore(&bank->slock, flags);
 	return ret;
+=======
+	return samsung_gpio_set_direction(gc, offset, true);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /* gpiolib gpio_direction_output callback function. */
 static int samsung_gpio_direction_output(struct gpio_chip *gc, unsigned offset,
 							int value)
 {
+<<<<<<< HEAD
 	struct samsung_pin_bank *bank = gc_to_pin_bank(gc);
 	unsigned long flags;
 	int ret;
@@ -787,6 +848,10 @@ static int samsung_gpio_direction_output(struct gpio_chip *gc, unsigned offset,
 	spin_unlock_irqrestore(&bank->slock, flags);
 
 	return ret;
+=======
+	samsung_gpio_set(gc, offset, value);
+	return samsung_gpio_set_direction(gc, offset, false);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
@@ -929,8 +994,15 @@ static struct samsung_pmx_func *samsung_pinctrl_create_functions(
 		if (!of_get_child_count(cfg_np)) {
 			ret = samsung_pinctrl_create_function(dev, drvdata,
 							cfg_np, func);
+<<<<<<< HEAD
 			if (ret < 0)
 				return ERR_PTR(ret);
+=======
+			if (ret < 0) {
+				of_node_put(cfg_np);
+				return ERR_PTR(ret);
+			}
+>>>>>>> common/deprecated/android-3.18
 			if (ret > 0) {
 				++func;
 				++func_cnt;
@@ -941,8 +1013,16 @@ static struct samsung_pmx_func *samsung_pinctrl_create_functions(
 		for_each_child_of_node(cfg_np, func_np) {
 			ret = samsung_pinctrl_create_function(dev, drvdata,
 						func_np, func);
+<<<<<<< HEAD
 			if (ret < 0)
 				return ERR_PTR(ret);
+=======
+			if (ret < 0) {
+				of_node_put(func_np);
+				of_node_put(cfg_np);
+				return ERR_PTR(ret);
+			}
+>>>>>>> common/deprecated/android-3.18
 			if (ret > 0) {
 				++func;
 				++func_cnt;
@@ -1032,8 +1112,12 @@ static int samsung_pinctrl_register(struct platform_device *pdev,
 	for (bank = 0; bank < drvdata->ctrl->nr_banks; bank++) {
 		pin_bank = &drvdata->ctrl->pin_banks[bank];
 		for (pin = 0; pin < pin_bank->nr_pins; pin++) {
+<<<<<<< HEAD
 			snprintf(pin_names, PIN_NAME_LENGTH,
 				"%s-%d", pin_bank->name, pin);
+=======
+			sprintf(pin_names, "%s-%d", pin_bank->name, pin);
+>>>>>>> common/deprecated/android-3.18
 			pdesc = pindesc + pin_bank->pin_base + pin;
 			pdesc->name = pin_names;
 			pin_names += PIN_NAME_LENGTH;
@@ -1078,7 +1162,11 @@ static void samsung_gpio_free(struct gpio_chip *chip, unsigned offset)
 static const struct gpio_chip samsung_gpiolib_chip = {
 	.request = samsung_gpio_request,
 	.free = samsung_gpio_free,
+<<<<<<< HEAD
 	.set = samsung_gpio_set_value,
+=======
+	.set = samsung_gpio_set,
+>>>>>>> common/deprecated/android-3.18
 	.get = samsung_gpio_get,
 	.direction_input = samsung_gpio_direction_input,
 	.direction_output = samsung_gpio_direction_output,
@@ -1231,6 +1319,7 @@ static int samsung_pinctrl_probe(struct platform_device *pdev)
 		return ret;
 	}
 
+<<<<<<< HEAD
 	ctrl->pinctrl = devm_pinctrl_get(dev);
 	if (IS_ERR(ctrl->pinctrl)) {
 		dev_err(dev, "could not get pinctrl\n");
@@ -1247,6 +1336,8 @@ static int samsung_pinctrl_probe(struct platform_device *pdev)
 	if (IS_ERR(ctrl->pins_sleep))
 		dev_dbg(dev, "could not get sleep pinstate\n");
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (ctrl->eint_gpio_init)
 		ctrl->eint_gpio_init(drvdata);
 	if (ctrl->eint_wkup_init)
@@ -1260,10 +1351,22 @@ static int samsung_pinctrl_probe(struct platform_device *pdev)
 	return 0;
 }
 
+<<<<<<< HEAD
 #if defined(CONFIG_PM) || defined(CONFIG_CPU_IDLE)
 /* save gpio registers */
 static void samsung_pinctrl_save_regs(
 				struct samsung_pinctrl_drv_data *drvdata)
+=======
+#ifdef CONFIG_PM
+
+/**
+ * samsung_pinctrl_suspend_dev - save pinctrl state for suspend for a device
+ *
+ * Save data for all banks handled by this device.
+ */
+static void samsung_pinctrl_suspend_dev(
+	struct samsung_pinctrl_drv_data *drvdata)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct samsung_pin_ctrl *ctrl = drvdata->ctrl;
 	void __iomem *virt_base = drvdata->virt_base;
@@ -1281,6 +1384,7 @@ static void samsung_pinctrl_save_regs(
 		if (!widths[PINCFG_TYPE_CON_PDN])
 			continue;
 
+<<<<<<< HEAD
 #ifdef ENABLE_SENSORS_FPRINT_SECURE
 		if (!strncmp(bank->name, CONFIG_SENSORS_FP_SPI_GPIO, 4))
 			continue;
@@ -1294,6 +1398,8 @@ static void samsung_pinctrl_save_regs(
 			continue;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		for (type = 0; type < PINCFG_TYPE_NUM; type++)
 			if (widths[type])
 				bank->pm_save[type] = readl(reg + offs[type]);
@@ -1311,16 +1417,39 @@ static void samsung_pinctrl_save_regs(
 				 reg, bank->pm_save[PINCFG_TYPE_FUNC]);
 		}
 	}
+<<<<<<< HEAD
 }
 
 /* restore gpio registers */
 static void samsung_pinctrl_restore_regs(
 				struct samsung_pinctrl_drv_data *drvdata)
+=======
+
+	if (ctrl->suspend)
+		ctrl->suspend(drvdata);
+}
+
+/**
+ * samsung_pinctrl_resume_dev - restore pinctrl state from suspend for a device
+ *
+ * Restore one of the banks that was saved during suspend.
+ *
+ * We don't bother doing anything complicated to avoid glitching lines since
+ * we're called before pad retention is turned off.
+ */
+static void samsung_pinctrl_resume_dev(struct samsung_pinctrl_drv_data *drvdata)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct samsung_pin_ctrl *ctrl = drvdata->ctrl;
 	void __iomem *virt_base = drvdata->virt_base;
 	int i;
 
+<<<<<<< HEAD
+=======
+	if (ctrl->resume)
+		ctrl->resume(drvdata);
+
+>>>>>>> common/deprecated/android-3.18
 	for (i = 0; i < ctrl->nr_banks; i++) {
 		struct samsung_pin_bank *bank = &ctrl->pin_banks[i];
 		void __iomem *reg = virt_base + bank->pctl_offset;
@@ -1333,6 +1462,7 @@ static void samsung_pinctrl_restore_regs(
 		if (!widths[PINCFG_TYPE_CON_PDN])
 			continue;
 
+<<<<<<< HEAD
 #ifdef ENABLE_SENSORS_FPRINT_SECURE
 		if (fpsensor_goto_suspend) {
 			pr_info("pinctrl-etspi_pm_resume: resume smc ret = %d\n",
@@ -1351,6 +1481,8 @@ static void samsung_pinctrl_restore_regs(
 			continue;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		if (widths[PINCFG_TYPE_FUNC] * bank->nr_pins > 32) {
 			/* Some banks have two config registers */
 			pr_debug("%s @ %p (con %#010x %08x => %#010x %08x)\n",
@@ -1372,6 +1504,7 @@ static void samsung_pinctrl_restore_regs(
 	}
 }
 
+<<<<<<< HEAD
 #endif /* defined(CONFIG_PM) || defined(CONFIG_CPU_IDLE) */
 
 #ifdef CONFIG_CPU_IDLE
@@ -1501,6 +1634,8 @@ static void samsung_pinctrl_resume_dev(struct samsung_pinctrl_drv_data *drvdata)
 	ctrl->pinctrl->state = ctrl->pins_default;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /**
  * samsung_pinctrl_suspend - save pinctrl state for suspend
  *
@@ -1541,6 +1676,7 @@ static struct syscore_ops samsung_pinctrl_syscore_ops = {
 	.resume		= samsung_pinctrl_resume,
 };
 
+<<<<<<< HEAD
 #if defined(CONFIG_SEC_GPIO_DVS) && defined(CONFIG_PINCTRL_EXYNOS)
 
 #define GET_RESULT_GPIO(a, b, c)	\
@@ -1944,6 +2080,8 @@ struct gpio_dvs_t exynos7870_secgpio_dvs = {
 };
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static const struct of_device_id samsung_pinctrl_dt_match[] = {
 #ifdef CONFIG_PINCTRL_EXYNOS
 	{ .compatible = "samsung,exynos3250-pinctrl",
@@ -1960,10 +2098,13 @@ static const struct of_device_id samsung_pinctrl_dt_match[] = {
 		.data = (void *)exynos5420_pin_ctrl },
 	{ .compatible = "samsung,s5pv210-pinctrl",
 		.data = (void *)s5pv210_pin_ctrl },
+<<<<<<< HEAD
 	{ .compatible = "samsung,exynos7870-pinctrl",
 		.data = (void *)exynos7870_pin_ctrl },
 	{ .compatible = "samsung,exynos8890-pinctrl",
 		.data = (void *)exynos8890_pin_ctrl },
+=======
+>>>>>>> common/deprecated/android-3.18
 #endif
 #ifdef CONFIG_PINCTRL_S3C64XX
 	{ .compatible = "samsung,s3c64xx-pinctrl",
@@ -1992,6 +2133,7 @@ static struct platform_driver samsung_pinctrl_driver = {
 	},
 };
 
+<<<<<<< HEAD
 #ifdef CONFIG_CPU_IDLE
 static struct notifier_block samsung_pinctrl_notifier_block = {
 	.notifier_call = samsung_pinctrl_notifier,
@@ -1999,6 +2141,8 @@ static struct notifier_block samsung_pinctrl_notifier_block = {
 };
 #endif /*CONFIG_CPU_IDLE */
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static int __init samsung_pinctrl_drv_register(void)
 {
 	/*
@@ -2008,9 +2152,12 @@ static int __init samsung_pinctrl_drv_register(void)
 	 * ops that turn off pad retention (like exynos_pm_resume).
 	 */
 	register_syscore_ops(&samsung_pinctrl_syscore_ops);
+<<<<<<< HEAD
 #ifdef CONFIG_CPU_IDLE
 	exynos_pm_register_notifier(&samsung_pinctrl_notifier_block);
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	return platform_driver_register(&samsung_pinctrl_driver);
 }

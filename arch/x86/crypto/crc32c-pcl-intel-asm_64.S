@@ -45,6 +45,10 @@
 
 #include <asm/inst.h>
 #include <linux/linkage.h>
+<<<<<<< HEAD
+=======
+#include <asm/nospec-branch.h>
+>>>>>>> common/deprecated/android-3.18
 
 ## ISCSI CRC 32 Implementation with crc32 and pclmulqdq Instruction
 
@@ -172,7 +176,11 @@ continue_block:
 	movzxw  (bufp, %rax, 2), len
 	offset=crc_array-jump_table
 	lea     offset(bufp, len, 1), bufp
+<<<<<<< HEAD
 	jmp     *bufp
+=======
+	JMP_NOSPEC bufp
+>>>>>>> common/deprecated/android-3.18
 
 	################################################################
 	## 2a) PROCESS FULL BLOCKS:

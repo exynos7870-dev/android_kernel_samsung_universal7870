@@ -225,6 +225,7 @@ static int gic_set_affinity(struct irq_data *d, const struct cpumask *mask_val,
 	unsigned int cpu, shift = (gic_irq(d) % 4) * 8;
 	u32 val, mask, bit;
 
+<<<<<<< HEAD
 	raw_spin_lock(&irq_controller_lock);
 	if (unlikely(d->state_use_accessors & IRQD_GIC_MULTI_TARGET)) {
 		struct cpumask temp_mask;
@@ -252,15 +253,31 @@ static int gic_set_affinity(struct irq_data *d, const struct cpumask *mask_val,
 		bit = gic_cpu_map[cpu] << shift;
 	}
 	mask = 0xff << shift;
+=======
+	if (!force)
+		cpu = cpumask_any_and(mask_val, cpu_online_mask);
+	else
+		cpu = cpumask_first(mask_val);
+
+	if (cpu >= NR_GIC_CPU_IF || cpu >= nr_cpu_ids)
+		return -EINVAL;
+
+	raw_spin_lock(&irq_controller_lock);
+	mask = 0xff << shift;
+	bit = gic_cpu_map[cpu] << shift;
+>>>>>>> common/deprecated/android-3.18
 	val = readl_relaxed(reg) & ~mask;
 	writel_relaxed(val | bit, reg);
 	raw_spin_unlock(&irq_controller_lock);
 
 	return IRQ_SET_MASK_OK;
+<<<<<<< HEAD
 
 err_out:
 	raw_spin_unlock(&irq_controller_lock);
 	return -EINVAL;
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 #endif
 
@@ -289,13 +306,28 @@ static void __exception_irq_entry gic_handle_irq(struct pt_regs *regs)
 		irqstat = readl_relaxed(cpu_base + GIC_CPU_INTACK);
 		irqnr = irqstat & GICC_IAR_INT_ID_MASK;
 
+<<<<<<< HEAD
 		if (likely(irqnr > 15 && irqnr < 1021)) {
+=======
+		if (likely(irqnr > 15 && irqnr < 1020)) {
+>>>>>>> common/deprecated/android-3.18
 			handle_domain_irq(gic->domain, irqnr, regs);
 			continue;
 		}
 		if (irqnr < 16) {
 			writel_relaxed(irqstat, cpu_base + GIC_CPU_EOI);
 #ifdef CONFIG_SMP
+<<<<<<< HEAD
+=======
+			/*
+			 * Ensure any shared data written by the CPU sending
+			 * the IPI is read after we've read the ACK register
+			 * on the GIC.
+			 *
+			 * Pairs with the write barrier in gic_raise_softirq
+			 */
+			smp_rmb();
+>>>>>>> common/deprecated/android-3.18
 			handle_IPI(irqnr, regs);
 #endif
 			continue;
@@ -333,8 +365,11 @@ static void gic_handle_cascade_irq(unsigned int irq, struct irq_desc *desc)
 
 static struct irq_chip gic_chip = {
 	.name			= "GIC",
+<<<<<<< HEAD
 	.irq_disable		= gic_mask_irq,
 	.irq_enable		= gic_unmask_irq,
+=======
+>>>>>>> common/deprecated/android-3.18
 	.irq_mask		= gic_mask_irq,
 	.irq_unmask		= gic_unmask_irq,
 	.irq_eoi		= gic_eoi_irq,

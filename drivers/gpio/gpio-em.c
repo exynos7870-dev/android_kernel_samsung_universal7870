@@ -103,7 +103,11 @@ static int em_gio_irq_reqres(struct irq_data *d)
 {
 	struct em_gio_priv *p = irq_data_get_irq_chip_data(d);
 
+<<<<<<< HEAD
 	if (gpio_lock_as_irq(&p->gpio_chip, irqd_to_hwirq(d))) {
+=======
+	if (gpiochip_lock_as_irq(&p->gpio_chip, irqd_to_hwirq(d))) {
+>>>>>>> common/deprecated/android-3.18
 		dev_err(p->gpio_chip.dev,
 			"unable to lock HW IRQ %lu for IRQ\n",
 			irqd_to_hwirq(d));
@@ -116,7 +120,11 @@ static void em_gio_irq_relres(struct irq_data *d)
 {
 	struct em_gio_priv *p = irq_data_get_irq_chip_data(d);
 
+<<<<<<< HEAD
 	gpio_unlock_as_irq(&p->gpio_chip, irqd_to_hwirq(d));
+=======
+	gpiochip_unlock_as_irq(&p->gpio_chip, irqd_to_hwirq(d));
+>>>>>>> common/deprecated/android-3.18
 }
 
 

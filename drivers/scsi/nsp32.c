@@ -607,7 +607,11 @@ static int nsp32_selection_autoscsi(struct scsi_cmnd *SCpnt)
 	 * check bus line
 	 */
 	phase = nsp32_read1(base, SCSI_BUS_MONITOR);
+<<<<<<< HEAD
 	if(((phase & BUSMON_BSY) == 1) || (phase & BUSMON_SEL) == 1) {
+=======
+	if ((phase & BUSMON_BSY) || (phase & BUSMON_SEL)) {
+>>>>>>> common/deprecated/android-3.18
 		nsp32_msg(KERN_WARNING, "bus busy");
 		SCpnt->result = DID_BUS_BUSY << 16;
 		status = 1;

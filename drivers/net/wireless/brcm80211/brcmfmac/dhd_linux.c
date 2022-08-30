@@ -192,7 +192,11 @@ static netdev_tx_t brcmf_netdev_start_xmit(struct sk_buff *skb,
 	int ret;
 	struct brcmf_if *ifp = netdev_priv(ndev);
 	struct brcmf_pub *drvr = ifp->drvr;
+<<<<<<< HEAD
 	struct ethhdr *eh = (struct ethhdr *)(skb->data);
+=======
+	struct ethhdr *eh;
+>>>>>>> common/deprecated/android-3.18
 
 	brcmf_dbg(DATA, "Enter, idx=%d\n", ifp->bssidx);
 
@@ -213,6 +217,7 @@ static netdev_tx_t brcmf_netdev_start_xmit(struct sk_buff *skb,
 		goto done;
 	}
 
+<<<<<<< HEAD
 	/* Make sure there's enough room for any header */
 	if (skb_headroom(skb) < drvr->hdrlen) {
 		struct sk_buff *skb2;
@@ -229,6 +234,15 @@ static netdev_tx_t brcmf_netdev_start_xmit(struct sk_buff *skb,
 			ret = -ENOMEM;
 			goto done;
 		}
+=======
+	/* Make sure there's enough writable headroom*/
+	ret = skb_cow_head(skb, drvr->hdrlen);
+	if (ret < 0) {
+		brcmf_err("%s: skb_cow_head failed\n",
+			  brcmf_ifname(drvr, ifp->bssidx));
+		dev_kfree_skb(skb);
+		goto done;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/* validate length for ether packet */
@@ -238,6 +252,11 @@ static netdev_tx_t brcmf_netdev_start_xmit(struct sk_buff *skb,
 		goto done;
 	}
 
+<<<<<<< HEAD
+=======
+	eh = (struct ethhdr *)(skb->data);
+
+>>>>>>> common/deprecated/android-3.18
 	if (eh->h_proto == htons(ETH_P_PAE))
 		atomic_inc(&ifp->pend_8021x_cnt);
 

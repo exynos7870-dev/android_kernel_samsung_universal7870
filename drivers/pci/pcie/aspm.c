@@ -391,6 +391,7 @@ static void pcie_aspm_cap_init(struct pcie_link_state *link, int blacklist)
 
 	/* Setup initial capable state. Will be updated later */
 	link->aspm_capable = link->aspm_support;
+<<<<<<< HEAD
 	/*
 	 * If the downstream component has pci bridge function, don't
 	 * do ASPM for now.
@@ -401,6 +402,8 @@ static void pcie_aspm_cap_init(struct pcie_link_state *link, int blacklist)
 			break;
 		}
 	}
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	/* Get and check endpoint acceptable latencies */
 	list_for_each_entry(child, &linkbus->devices, bus_list) {
@@ -521,17 +524,36 @@ static struct pcie_link_state *alloc_pcie_link_state(struct pci_dev *pdev)
 	link = kzalloc(sizeof(*link), GFP_KERNEL);
 	if (!link)
 		return NULL;
+<<<<<<< HEAD
+=======
+
+>>>>>>> common/deprecated/android-3.18
 	INIT_LIST_HEAD(&link->sibling);
 	INIT_LIST_HEAD(&link->children);
 	INIT_LIST_HEAD(&link->link);
 	link->pdev = pdev;
+<<<<<<< HEAD
 	if (pci_pcie_type(pdev) == PCI_EXP_TYPE_DOWNSTREAM) {
 		struct pcie_link_state *parent;
+=======
+
+	/*
+	 * Root Ports and PCI/PCI-X to PCIe Bridges are roots of PCIe
+	 * hierarchies.
+	 */
+	if (pci_pcie_type(pdev) == PCI_EXP_TYPE_ROOT_PORT ||
+	    pci_pcie_type(pdev) == PCI_EXP_TYPE_PCIE_BRIDGE) {
+		link->root = link;
+	} else {
+		struct pcie_link_state *parent;
+
+>>>>>>> common/deprecated/android-3.18
 		parent = pdev->bus->parent->self->link_state;
 		if (!parent) {
 			kfree(link);
 			return NULL;
 		}
+<<<<<<< HEAD
 		link->parent = parent;
 		list_add(&link->link, &parent->children);
 	}
@@ -540,6 +562,13 @@ static struct pcie_link_state *alloc_pcie_link_state(struct pci_dev *pdev)
 		link->root = link;
 	else
 		link->root = link->parent->root;
+=======
+
+		link->parent = parent;
+		link->root = link->parent->root;
+		list_add(&link->link, &parent->children);
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	list_add(&link->sibling, &link_list);
 	pdev->link_state = link;
@@ -835,6 +864,10 @@ static int pcie_aspm_get_policy(char *buffer, struct kernel_param *kp)
 			cnt += sprintf(buffer + cnt, "[%s] ", policy_str[i]);
 		else
 			cnt += sprintf(buffer + cnt, "%s ", policy_str[i]);
+<<<<<<< HEAD
+=======
+	cnt += sprintf(buffer + cnt, "\n");
+>>>>>>> common/deprecated/android-3.18
 	return cnt;
 }
 

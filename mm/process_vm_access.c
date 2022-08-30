@@ -16,7 +16,10 @@
 #include <linux/ptrace.h>
 #include <linux/slab.h>
 #include <linux/syscalls.h>
+<<<<<<< HEAD
 #include <linux/task_integrity.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #ifdef CONFIG_COMPAT
 #include <linux/compat.h>
@@ -198,7 +201,11 @@ static ssize_t process_vm_rw_core(pid_t pid, struct iov_iter *iter,
 		goto free_proc_pages;
 	}
 
+<<<<<<< HEAD
 	mm = mm_access(task, PTRACE_MODE_ATTACH);
+=======
+	mm = mm_access(task, PTRACE_MODE_ATTACH_REALCREDS);
+>>>>>>> common/deprecated/android-3.18
 	if (!mm || IS_ERR(mm)) {
 		rc = IS_ERR(mm) ? PTR_ERR(mm) : -ESRCH;
 		/*
@@ -210,10 +217,13 @@ static ssize_t process_vm_rw_core(pid_t pid, struct iov_iter *iter,
 		goto put_task_struct;
 	}
 
+<<<<<<< HEAD
 	rc = five_process_vm_rw(task, vm_write);
 	if (rc)
 		goto put_task_struct;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	for (i = 0; i < riovcnt && iov_iter_count(iter) && !rc; i++)
 		rc = process_vm_rw_single_vec(
 			(unsigned long)rvec[i].iov_base, rvec[i].iov_len,

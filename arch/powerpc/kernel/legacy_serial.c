@@ -370,6 +370,11 @@ void __init find_legacy_serial_ports(void)
 
 	/* Now find out if one of these is out firmware console */
 	path = of_get_property(of_chosen, "linux,stdout-path", NULL);
+<<<<<<< HEAD
+=======
+	if (path == NULL)
+		path = of_get_property(of_chosen, "stdout-path", NULL);
+>>>>>>> common/deprecated/android-3.18
 	if (path != NULL) {
 		stdout = of_find_node_by_path(path);
 		if (stdout)
@@ -593,8 +598,15 @@ static int __init check_legacy_serial_console(void)
 	/* We are getting a weird phandle from OF ... */
 	/* ... So use the full path instead */
 	name = of_get_property(of_chosen, "linux,stdout-path", NULL);
+<<<<<<< HEAD
 	if (name == NULL) {
 		DBG(" no linux,stdout-path !\n");
+=======
+	if (name == NULL)
+		name = of_get_property(of_chosen, "stdout-path", NULL);
+	if (name == NULL) {
+		DBG(" no stdout-path !\n");
+>>>>>>> common/deprecated/android-3.18
 		return -ENODEV;
 	}
 	prom_stdout = of_find_node_by_path(name);

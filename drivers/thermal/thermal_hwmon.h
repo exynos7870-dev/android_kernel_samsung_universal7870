@@ -34,13 +34,21 @@
 int thermal_add_hwmon_sysfs(struct thermal_zone_device *tz);
 void thermal_remove_hwmon_sysfs(struct thermal_zone_device *tz);
 #else
+<<<<<<< HEAD
 static int
+=======
+static inline int
+>>>>>>> common/deprecated/android-3.18
 thermal_add_hwmon_sysfs(struct thermal_zone_device *tz)
 {
 	return 0;
 }
 
+<<<<<<< HEAD
 static void
+=======
+static inline void
+>>>>>>> common/deprecated/android-3.18
 thermal_remove_hwmon_sysfs(struct thermal_zone_device *tz)
 {
 }

@@ -285,7 +285,11 @@ static int vmw_cmd_invalid(struct vmw_private *dev_priv,
 			   struct vmw_sw_context *sw_context,
 			   SVGA3dCmdHeader *header)
 {
+<<<<<<< HEAD
 	return capable(CAP_SYS_ADMIN) ? : -EINVAL;
+=======
+	return -EINVAL;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int vmw_cmd_ok(struct vmw_private *dev_priv,
@@ -2346,7 +2350,11 @@ int vmw_execbuf_fence_commands(struct drm_file *file_priv,
 		*p_fence = NULL;
 	}
 
+<<<<<<< HEAD
 	return 0;
+=======
+	return ret;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -2489,7 +2497,11 @@ int vmw_execbuf_process(struct drm_file *file_priv,
 
 	ret = ttm_eu_reserve_buffers(&ticket, &sw_context->validate_nodes, true);
 	if (unlikely(ret != 0))
+<<<<<<< HEAD
 		goto out_err;
+=======
+		goto out_err_nores;
+>>>>>>> common/deprecated/android-3.18
 
 	ret = vmw_validate_buffers(dev_priv, sw_context);
 	if (unlikely(ret != 0))
@@ -2533,6 +2545,10 @@ int vmw_execbuf_process(struct drm_file *file_priv,
 	vmw_resource_relocations_free(&sw_context->res_relocations);
 
 	vmw_fifo_commit(dev_priv, command_size);
+<<<<<<< HEAD
+=======
+	mutex_unlock(&dev_priv->binding_mutex);
+>>>>>>> common/deprecated/android-3.18
 
 	vmw_query_bo_switch_commit(dev_priv, sw_context);
 	ret = vmw_execbuf_fence_commands(file_priv, dev_priv,
@@ -2548,7 +2564,10 @@ int vmw_execbuf_process(struct drm_file *file_priv,
 		DRM_ERROR("Fence submission error. Syncing.\n");
 
 	vmw_resource_list_unreserve(&sw_context->resource_list, false);
+<<<<<<< HEAD
 	mutex_unlock(&dev_priv->binding_mutex);
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	ttm_eu_fence_buffer_objects(&ticket, &sw_context->validate_nodes,
 				    (void *) fence);

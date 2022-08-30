@@ -274,7 +274,12 @@ static void named_purge_publ(struct publication *publ)
 		       publ->key);
 	}
 
+<<<<<<< HEAD
 	kfree(p);
+=======
+	if (p)
+		kfree(p);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**

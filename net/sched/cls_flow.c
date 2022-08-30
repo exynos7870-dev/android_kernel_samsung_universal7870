@@ -26,7 +26,11 @@
 #include <net/pkt_cls.h>
 #include <net/ip.h>
 #include <net/route.h>
+<<<<<<< HEAD
 #include <net/flow_keys.h>
+=======
+#include <net/flow_dissector.h>
+>>>>>>> common/deprecated/android-3.18
 
 #if defined(CONFIG_NF_CONNTRACK) || defined(CONFIG_NF_CONNTRACK_MODULE)
 #include <net/netfilter/nf_conntrack.h>
@@ -68,35 +72,59 @@ static inline u32 addr_fold(void *addr)
 
 static u32 flow_get_src(const struct sk_buff *skb, const struct flow_keys *flow)
 {
+<<<<<<< HEAD
 	if (flow->src)
 		return ntohl(flow->src);
+=======
+	if (flow->addrs.src)
+		return ntohl(flow->addrs.src);
+>>>>>>> common/deprecated/android-3.18
 	return addr_fold(skb->sk);
 }
 
 static u32 flow_get_dst(const struct sk_buff *skb, const struct flow_keys *flow)
 {
+<<<<<<< HEAD
 	if (flow->dst)
 		return ntohl(flow->dst);
+=======
+	if (flow->addrs.dst)
+		return ntohl(flow->addrs.dst);
+>>>>>>> common/deprecated/android-3.18
 	return addr_fold(skb_dst(skb)) ^ (__force u16)skb->protocol;
 }
 
 static u32 flow_get_proto(const struct sk_buff *skb, const struct flow_keys *flow)
 {
+<<<<<<< HEAD
 	return flow->ip_proto;
+=======
+	return flow->basic.ip_proto;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static u32 flow_get_proto_src(const struct sk_buff *skb, const struct flow_keys *flow)
 {
+<<<<<<< HEAD
 	if (flow->ports)
 		return ntohs(flow->port16[0]);
+=======
+	if (flow->ports.ports)
+		return ntohs(flow->ports.port16[0]);
+>>>>>>> common/deprecated/android-3.18
 
 	return addr_fold(skb->sk);
 }
 
 static u32 flow_get_proto_dst(const struct sk_buff *skb, const struct flow_keys *flow)
 {
+<<<<<<< HEAD
 	if (flow->ports)
 		return ntohs(flow->port16[1]);
+=======
+	if (flow->ports.ports)
+		return ntohs(flow->ports.port16[1]);
+>>>>>>> common/deprecated/android-3.18
 
 	return addr_fold(skb_dst(skb)) ^ (__force u16)skb->protocol;
 }
@@ -295,7 +323,11 @@ static int flow_classify(struct sk_buff *skb, const struct tcf_proto *tp,
 
 		keymask = f->keymask;
 		if (keymask & FLOW_KEYS_NEEDED)
+<<<<<<< HEAD
 			skb_flow_dissect(skb, &flow_keys);
+=======
+			skb_flow_dissect_flow_keys(skb, &flow_keys);
+>>>>>>> common/deprecated/android-3.18
 
 		for (n = 0; n < f->nkeys; n++) {
 			key = ffs(keymask) - 1;

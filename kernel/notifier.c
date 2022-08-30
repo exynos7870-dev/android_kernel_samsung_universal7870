@@ -5,8 +5,11 @@
 #include <linux/rcupdate.h>
 #include <linux/vmalloc.h>
 #include <linux/reboot.h>
+<<<<<<< HEAD
 #include <linux/suspend.h>
 #include <linux/exynos-ss.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 
 /*
  *	Notifier list for kernel code which wants to be called
@@ -92,11 +95,15 @@ static int notifier_call_chain(struct notifier_block **nl,
 			continue;
 		}
 #endif
+<<<<<<< HEAD
 		if (val == PM_SUSPEND_PREPARE || val == PM_POST_SUSPEND)
 			exynos_ss_suspend(nb->notifier_call, NULL, ESS_FLAG_IN);
 		ret = nb->notifier_call(nb, val, v);
 		if (val == PM_SUSPEND_PREPARE || val == PM_POST_SUSPEND)
 			exynos_ss_suspend(nb->notifier_call, NULL, ESS_FLAG_OUT);
+=======
+		ret = nb->notifier_call(nb, val, v);
+>>>>>>> common/deprecated/android-3.18
 
 		if (nr_calls)
 			(*nr_calls)++;
@@ -553,7 +560,11 @@ NOKPROBE_SYMBOL(notify_die);
 
 int register_die_notifier(struct notifier_block *nb)
 {
+<<<<<<< HEAD
 	vmalloc_sync_all();
+=======
+	vmalloc_sync_mappings();
+>>>>>>> common/deprecated/android-3.18
 	return atomic_notifier_chain_register(&die_chain, nb);
 }
 EXPORT_SYMBOL_GPL(register_die_notifier);

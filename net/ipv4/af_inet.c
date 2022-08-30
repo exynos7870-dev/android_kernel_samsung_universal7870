@@ -123,6 +123,7 @@
 #ifdef CONFIG_ANDROID_PARANOID_NETWORK
 #include <linux/android_aid.h>
 
+<<<<<<< HEAD
 /* START_OF_KNOX_VPN */
 #include <net/ncm.h>
 #include <linux/kfifo.h>
@@ -130,6 +131,8 @@
 #include <linux/pid.h>
 /* END_OF_KNOX_VPN */
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static inline int current_has_network(void)
 {
 	return in_egroup_p(AID_INET) || capable(CAP_NET_RAW);
@@ -249,6 +252,11 @@ int inet_listen(struct socket *sock, int backlog)
 				err = 0;
 			if (err)
 				goto out;
+<<<<<<< HEAD
+=======
+
+			tcp_fastopen_init_key_once(true);
+>>>>>>> common/deprecated/android-3.18
 		}
 		err = inet_csk_listen_start(sk, backlog);
 		if (err)
@@ -278,12 +286,21 @@ static int inet_create(struct net *net, struct socket *sock, int protocol,
 	int try_loading_module = 0;
 	int err;
 
+<<<<<<< HEAD
 	if (protocol < 0 || protocol >= IPPROTO_MAX)
 		return -EINVAL;
 
 	if (!current_has_network())
 		return -EACCES;
 
+=======
+	if (!current_has_network())
+		return -EACCES;
+
+	if (protocol < 0 || protocol >= IPPROTO_MAX)
+		return -EINVAL;
+
+>>>>>>> common/deprecated/android-3.18
 	sock->state = SS_UNCONNECTED;
 
 	/* Look for the requested type/protocol pair. */
@@ -408,6 +425,7 @@ out_rcu_unlock:
 	goto out;
 }
 
+<<<<<<< HEAD
 /* START_OF_KNOX_NPA */
 /** The function is used to check if the ncm feature is enabled or not; if enabled then collect the socket meta-data information; **/
 static void knox_collect_metadata(struct socket *sock) {
@@ -558,6 +576,8 @@ static void knox_collect_metadata(struct socket *sock) {
     }
 }
 /* END_OF_KNOX_NPA */
+=======
+>>>>>>> common/deprecated/android-3.18
 
 /*
  *	The peer socket should always be NULL (or else). When we call this
@@ -590,9 +610,12 @@ int inet_release(struct socket *sock)
 		if (sock_flag(sk, SOCK_LINGER) &&
 		    !(current->flags & PF_EXITING))
 			timeout = sk->sk_lingertime;
+<<<<<<< HEAD
         /* START_OF_KNOX_NPA */
         knox_collect_metadata(sock);
         /* END_OF_KNOX_NPA */
+=======
+>>>>>>> common/deprecated/android-3.18
 		sock->sk = NULL;
 		sk->sk_prot->close(sk, timeout);
 	}
@@ -904,7 +927,10 @@ int inet_sendmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg,
 		 size_t size)
 {
 	struct sock *sk = sock->sk;
+<<<<<<< HEAD
 	int err;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	sock_rps_record_flow(sk);
 
@@ -913,6 +939,7 @@ int inet_sendmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg,
 	    inet_autobind(sk))
 		return -EAGAIN;
 
+<<<<<<< HEAD
     err = sk->sk_prot->sendmsg(iocb, sk, msg, size);
 
     if (err >= 0) {
@@ -923,6 +950,9 @@ int inet_sendmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg,
         }
     }
     return err;
+=======
+	return sk->sk_prot->sendmsg(iocb, sk, msg, size);
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL(inet_sendmsg);
 
@@ -955,6 +985,7 @@ int inet_recvmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg,
 
 	err = sk->sk_prot->recvmsg(iocb, sk, msg, size, flags & MSG_DONTWAIT,
 				   flags & ~MSG_DONTWAIT, &addr_len);
+<<<<<<< HEAD
 	if (err >= 0) {
 		msg->msg_namelen = addr_len;
         if(sock->knox_recv + err > ULLONG_MAX) {
@@ -963,6 +994,10 @@ int inet_recvmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg,
             sock->knox_recv = sock->knox_recv + err;
         }
     }
+=======
+	if (err >= 0)
+		msg->msg_namelen = addr_len;
+>>>>>>> common/deprecated/android-3.18
 	return err;
 }
 EXPORT_SYMBOL(inet_recvmsg);
@@ -1066,7 +1101,10 @@ int inet_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
 	case SIOCSIFPFLAGS:
 	case SIOCGIFPFLAGS:
 	case SIOCSIFFLAGS:
+<<<<<<< HEAD
 	case SIOCKILLADDR:
+=======
+>>>>>>> common/deprecated/android-3.18
 		err = devinet_ioctl(net, cmd, (void __user *)arg);
 		break;
 	default:
@@ -1210,7 +1248,11 @@ static struct inet_protosw inetsw_array[] =
 		.type =       SOCK_DGRAM,
 		.protocol =   IPPROTO_ICMP,
 		.prot =       &ping_prot,
+<<<<<<< HEAD
 		.ops =        &inet_dgram_ops,
+=======
+		.ops =        &inet_sockraw_ops,
+>>>>>>> common/deprecated/android-3.18
 		.flags =      INET_PROTOSW_REUSE,
        },
 
@@ -1482,6 +1524,10 @@ static struct sk_buff *inet_gso_segment(struct sk_buff *skb,
 		if (encap)
 			skb_reset_inner_headers(skb);
 		skb->network_header = (u8 *)iph - skb->head;
+<<<<<<< HEAD
+=======
+		skb_reset_mac_len(skb);
+>>>>>>> common/deprecated/android-3.18
 	} while ((skb = skb->next));
 
 out:
@@ -1598,6 +1644,35 @@ static struct sk_buff **ipip_gro_receive(struct sk_buff **head,
 	return inet_gro_receive(head, skb);
 }
 
+<<<<<<< HEAD
+=======
+#define SECONDS_PER_DAY	86400
+
+/* inet_current_timestamp - Return IP network timestamp
+ *
+ * Return milliseconds since midnight in network byte order.
+ */
+__be32 inet_current_timestamp(void)
+{
+	u32 secs;
+	u32 msecs;
+	struct timespec64 ts;
+
+	ktime_get_real_ts64(&ts);
+
+	/* Get secs since midnight. */
+	(void)div_u64_rem(ts.tv_sec, SECONDS_PER_DAY, &secs);
+	/* Convert to msecs. */
+	msecs = secs * MSEC_PER_SEC;
+	/* Convert nsec to msec. */
+	msecs += (u32)ts.tv_nsec / NSEC_PER_MSEC;
+
+	/* Convert to network byte order. */
+	return htons(msecs);
+}
+EXPORT_SYMBOL(inet_current_timestamp);
+
+>>>>>>> common/deprecated/android-3.18
 int inet_recv_error(struct sock *sk, struct msghdr *msg, int len, int *addr_len)
 {
 	if (sk->sk_family == AF_INET)
@@ -1640,6 +1715,16 @@ out_unlock:
 	return err;
 }
 
+<<<<<<< HEAD
+=======
+static int ipip_gro_complete(struct sk_buff *skb, int nhoff)
+{
+	skb->encapsulation = 1;
+	skb_shinfo(skb)->gso_type |= SKB_GSO_IPIP;
+	return inet_gro_complete(skb, nhoff);
+}
+
+>>>>>>> common/deprecated/android-3.18
 int inet_ctl_sock_create(struct sock **sk, unsigned short family,
 			 unsigned short type, unsigned char protocol,
 			 struct net *net)
@@ -1857,7 +1942,11 @@ static const struct net_offload ipip_offload = {
 	.callbacks = {
 		.gso_segment	= inet_gso_segment,
 		.gro_receive	= ipip_gro_receive,
+<<<<<<< HEAD
 		.gro_complete	= inet_gro_complete,
+=======
+		.gro_complete	= ipip_gro_complete,
+>>>>>>> common/deprecated/android-3.18
 	},
 };
 

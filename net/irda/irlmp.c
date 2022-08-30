@@ -1877,7 +1877,11 @@ static void *irlmp_seq_hb_idx(struct irlmp_iter_state *iter, loff_t *off)
 	for (element = hashbin_get_first(iter->hashbin);
 	     element != NULL;
 	     element = hashbin_get_next(iter->hashbin)) {
+<<<<<<< HEAD
 		if (!off || *off-- == 0) {
+=======
+		if (!off || (*off)-- == 0) {
+>>>>>>> common/deprecated/android-3.18
 			/* NB: hashbin left locked */
 			return element;
 		}

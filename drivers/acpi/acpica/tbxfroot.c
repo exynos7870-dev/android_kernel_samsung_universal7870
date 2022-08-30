@@ -142,7 +142,11 @@ acpi_status acpi_tb_validate_rsdp(struct acpi_table_rsdp * rsdp)
  *
  ******************************************************************************/
 
+<<<<<<< HEAD
 acpi_status __init acpi_find_root_pointer(acpi_size *table_address)
+=======
+acpi_status __init acpi_find_root_pointer(acpi_physical_address * table_address)
+>>>>>>> common/deprecated/android-3.18
 {
 	u8 *table_ptr;
 	u8 *mem_rover;
@@ -200,7 +204,12 @@ acpi_status __init acpi_find_root_pointer(acpi_size *table_address)
 			physical_address +=
 			    (u32) ACPI_PTR_DIFF(mem_rover, table_ptr);
 
+<<<<<<< HEAD
 			*table_address = physical_address;
+=======
+			*table_address =
+			    (acpi_physical_address) physical_address;
+>>>>>>> common/deprecated/android-3.18
 			return_ACPI_STATUS(AE_OK);
 		}
 	}
@@ -233,7 +242,11 @@ acpi_status __init acpi_find_root_pointer(acpi_size *table_address)
 		    (ACPI_HI_RSDP_WINDOW_BASE +
 		     ACPI_PTR_DIFF(mem_rover, table_ptr));
 
+<<<<<<< HEAD
 		*table_address = physical_address;
+=======
+		*table_address = (acpi_physical_address) physical_address;
+>>>>>>> common/deprecated/android-3.18
 		return_ACPI_STATUS(AE_OK);
 	}
 

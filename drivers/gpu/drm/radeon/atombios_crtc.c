@@ -275,6 +275,11 @@ void atombios_crtc_dpms(struct drm_crtc *crtc, int mode)
 			atombios_enable_crtc_memreq(crtc, ATOM_ENABLE);
 		atombios_blank_crtc(crtc, ATOM_DISABLE);
 		drm_vblank_post_modeset(dev, radeon_crtc->crtc_id);
+<<<<<<< HEAD
+=======
+		/* Make sure vblank interrupt is still enabled if needed */
+		radeon_irq_set(rdev);
+>>>>>>> common/deprecated/android-3.18
 		radeon_crtc_load_lut(crtc);
 		break;
 	case DRM_MODE_DPMS_STANDBY:
@@ -580,16 +585,24 @@ static u32 atombios_adjust_pll(struct drm_crtc *crtc,
 		else
 			radeon_crtc->pll_flags |= RADEON_PLL_PREFER_LOW_REF_DIV;
 
+<<<<<<< HEAD
 		/* if there is no audio, set MINM_OVER_MAXP  */
 		if (!drm_detect_monitor_audio(radeon_connector_edid(connector)))
 			radeon_crtc->pll_flags |= RADEON_PLL_PREFER_MINM_OVER_MAXP;
+=======
+>>>>>>> common/deprecated/android-3.18
 		if (rdev->family < CHIP_RV770)
 			radeon_crtc->pll_flags |= RADEON_PLL_PREFER_MINM_OVER_MAXP;
 		/* use frac fb div on APUs */
 		if (ASIC_IS_DCE41(rdev) || ASIC_IS_DCE61(rdev) || ASIC_IS_DCE8(rdev))
 			radeon_crtc->pll_flags |= RADEON_PLL_USE_FRAC_FB_DIV;
 		/* use frac fb div on RS780/RS880 */
+<<<<<<< HEAD
 		if ((rdev->family == CHIP_RS780) || (rdev->family == CHIP_RS880))
+=======
+		if (((rdev->family == CHIP_RS780) || (rdev->family == CHIP_RS880))
+		    && !radeon_crtc->ss_enabled)
+>>>>>>> common/deprecated/android-3.18
 			radeon_crtc->pll_flags |= RADEON_PLL_USE_FRAC_FB_DIV;
 		if (ASIC_IS_DCE32(rdev) && mode->clock > 165000)
 			radeon_crtc->pll_flags |= RADEON_PLL_USE_FRAC_FB_DIV;
@@ -619,7 +632,13 @@ static u32 atombios_adjust_pll(struct drm_crtc *crtc,
 			if (radeon_crtc->ss.refdiv) {
 				radeon_crtc->pll_flags |= RADEON_PLL_USE_REF_DIV;
 				radeon_crtc->pll_reference_div = radeon_crtc->ss.refdiv;
+<<<<<<< HEAD
 				if (ASIC_IS_AVIVO(rdev))
+=======
+				if (ASIC_IS_AVIVO(rdev) &&
+				    rdev->family != CHIP_RS780 &&
+				    rdev->family != CHIP_RS880)
+>>>>>>> common/deprecated/android-3.18
 					radeon_crtc->pll_flags |= RADEON_PLL_USE_FRAC_FB_DIV;
 			}
 		}
@@ -1733,6 +1752,10 @@ static u32 radeon_get_pll_use_mask(struct drm_crtc *crtc)
 static int radeon_get_shared_dp_ppll(struct drm_crtc *crtc)
 {
 	struct drm_device *dev = crtc->dev;
+<<<<<<< HEAD
+=======
+	struct radeon_device *rdev = dev->dev_private;
+>>>>>>> common/deprecated/android-3.18
 	struct drm_crtc *test_crtc;
 	struct radeon_crtc *test_radeon_crtc;
 
@@ -1742,6 +1765,13 @@ static int radeon_get_shared_dp_ppll(struct drm_crtc *crtc)
 		test_radeon_crtc = to_radeon_crtc(test_crtc);
 		if (test_radeon_crtc->encoder &&
 		    ENCODER_MODE_IS_DP(atombios_get_encoder_mode(test_radeon_crtc->encoder))) {
+<<<<<<< HEAD
+=======
+			/* PPLL2 is exclusive to UNIPHYA on DCE61 */
+			if (ASIC_IS_DCE61(rdev) && !ASIC_IS_DCE8(rdev) &&
+			    test_radeon_crtc->pll_id == ATOM_PPLL2)
+				continue;
+>>>>>>> common/deprecated/android-3.18
 			/* for DP use the same PLL for all */
 			if (test_radeon_crtc->pll_id != ATOM_PPLL_INVALID)
 				return test_radeon_crtc->pll_id;
@@ -1763,6 +1793,10 @@ static int radeon_get_shared_nondp_ppll(struct drm_crtc *crtc)
 {
 	struct radeon_crtc *radeon_crtc = to_radeon_crtc(crtc);
 	struct drm_device *dev = crtc->dev;
+<<<<<<< HEAD
+=======
+	struct radeon_device *rdev = dev->dev_private;
+>>>>>>> common/deprecated/android-3.18
 	struct drm_crtc *test_crtc;
 	struct radeon_crtc *test_radeon_crtc;
 	u32 adjusted_clock, test_adjusted_clock;
@@ -1778,6 +1812,13 @@ static int radeon_get_shared_nondp_ppll(struct drm_crtc *crtc)
 		test_radeon_crtc = to_radeon_crtc(test_crtc);
 		if (test_radeon_crtc->encoder &&
 		    !ENCODER_MODE_IS_DP(atombios_get_encoder_mode(test_radeon_crtc->encoder))) {
+<<<<<<< HEAD
+=======
+			/* PPLL2 is exclusive to UNIPHYA on DCE61 */
+			if (ASIC_IS_DCE61(rdev) && !ASIC_IS_DCE8(rdev) &&
+			    test_radeon_crtc->pll_id == ATOM_PPLL2)
+				continue;
+>>>>>>> common/deprecated/android-3.18
 			/* check if we are already driving this connector with another crtc */
 			if (test_radeon_crtc->connector == radeon_crtc->connector) {
 				/* if we are, return that pll */

@@ -93,7 +93,10 @@ static bool match_index(struct hid_usage *usage,
 
 typedef bool (*hid_usage_cmp_t)(struct hid_usage *usage,
 				unsigned int cur_idx, unsigned int val);
+<<<<<<< HEAD
 extern bool lcd_is_on;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 static struct hid_usage *hidinput_find_key(struct hid_device *hid,
 					   hid_usage_cmp_t match,
@@ -746,6 +749,13 @@ static void hidinput_configure_usage(struct hid_input *hidinput, struct hid_fiel
 		case 0x074: map_key_clear(KEY_BRIGHTNESS_MAX);		break;
 		case 0x075: map_key_clear(KEY_BRIGHTNESS_AUTO);		break;
 
+<<<<<<< HEAD
+=======
+		case 0x079: map_key_clear(KEY_KBDILLUMUP);	break;
+		case 0x07a: map_key_clear(KEY_KBDILLUMDOWN);	break;
+		case 0x07c: map_key_clear(KEY_KBDILLUMTOGGLE);	break;
+
+>>>>>>> common/deprecated/android-3.18
 		case 0x082: map_key_clear(KEY_VIDEO_NEXT);	break;
 		case 0x083: map_key_clear(KEY_LAST);		break;
 		case 0x084: map_key_clear(KEY_ENTER);		break;
@@ -876,6 +886,11 @@ static void hidinput_configure_usage(struct hid_input *hidinput, struct hid_fiel
 		case 0x2cb: map_key_clear(KEY_KBDINPUTASSIST_ACCEPT);	break;
 		case 0x2cc: map_key_clear(KEY_KBDINPUTASSIST_CANCEL);	break;
 
+<<<<<<< HEAD
+=======
+		case 0x29f: map_key_clear(KEY_SCALE);		break;
+
+>>>>>>> common/deprecated/android-3.18
 		default:    goto ignore;
 		}
 		break;
@@ -932,6 +947,7 @@ static void hidinput_configure_usage(struct hid_input *hidinput, struct hid_fiel
 		}
 		break;
 
+<<<<<<< HEAD
 #ifdef CONFIG_USB_HMT_SAMSUNG_INPUT
 	case HID_UP_HMTVENDOR:
 		switch (usage->hid & HID_USAGE) {
@@ -943,6 +959,8 @@ static void hidinput_configure_usage(struct hid_input *hidinput, struct hid_fiel
 		break;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	default:
 	unknown:
 		if (field->report_size == 1) {
@@ -962,9 +980,25 @@ static void hidinput_configure_usage(struct hid_input *hidinput, struct hid_fiel
 	}
 
 mapped:
+<<<<<<< HEAD
 	if (device->driver->input_mapped && device->driver->input_mapped(device,
 				hidinput, field, usage, &bit, &max) < 0)
 		goto ignore;
+=======
+	/* Mapping failed, bail out */
+	if (!bit)
+		return;
+
+	if (device->driver->input_mapped &&
+	    device->driver->input_mapped(device, hidinput, field, usage,
+					 &bit, &max) < 0) {
+		/*
+		 * The driver indicated that no further generic handling
+		 * of the usage is desired.
+		 */
+		return;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	set_bit(usage->type, input->evbit);
 
@@ -1023,9 +1057,17 @@ mapped:
 		set_bit(MSC_SCAN, input->mscbit);
 	}
 
+<<<<<<< HEAD
 ignore:
 	return;
 
+=======
+	return;
+
+ignore:
+	usage->type = 0;
+	usage->code = 0;
+>>>>>>> common/deprecated/android-3.18
 }
 
 void hidinput_hid_event(struct hid_device *hid, struct hid_field *field, struct hid_usage *usage, __s32 value)
@@ -1102,18 +1144,38 @@ void hidinput_hid_event(struct hid_device *hid, struct hid_field *field, struct 
 
 	/*
 	 * Ignore out-of-range values as per HID specification,
+<<<<<<< HEAD
 	 * section 5.10 and 6.2.25.
+=======
+	 * section 5.10 and 6.2.25, when NULL state bit is present.
+	 * When it's not, clamp the value to match Microsoft's input
+	 * driver as mentioned in "Required HID usages for digitizers":
+	 * https://msdn.microsoft.com/en-us/library/windows/hardware/dn672278(v=vs.85).asp
+>>>>>>> common/deprecated/android-3.18
 	 *
 	 * The logical_minimum < logical_maximum check is done so that we
 	 * don't unintentionally discard values sent by devices which
 	 * don't specify logical min and max.
 	 */
 	if ((field->flags & HID_MAIN_ITEM_VARIABLE) &&
+<<<<<<< HEAD
 	    (field->logical_minimum < field->logical_maximum) &&
 	    (value < field->logical_minimum ||
 	     value > field->logical_maximum)) {
 		dbg_hid("Ignoring out-of-range value %x\n", value);
 		return;
+=======
+	    (field->logical_minimum < field->logical_maximum)) {
+		if (field->flags & HID_MAIN_ITEM_NULL_STATE &&
+		    (value < field->logical_minimum ||
+		     value > field->logical_maximum)) {
+			dbg_hid("Ignoring out-of-range value %x\n", value);
+			return;
+		}
+		value = clamp(value,
+			      field->logical_minimum,
+			      field->logical_maximum);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/*
@@ -1134,7 +1196,11 @@ void hidinput_hid_event(struct hid_device *hid, struct hid_field *field, struct 
 		return;
 
 	/* report the usage code as scancode if the key status has changed */
+<<<<<<< HEAD
 	if (usage->type == EV_KEY && !!test_bit(usage->code, input->key) != value)
+=======
+	if (usage->type == EV_KEY && (!!test_bit(usage->code, input->key)) != value)
+>>>>>>> common/deprecated/android-3.18
 		input_event(input, EV_MSC, MSC_SCAN, usage->hid);
 
 	input_event(input, usage->type, usage->code, value);
@@ -1251,11 +1317,15 @@ static void hidinput_led_worker(struct work_struct *work)
 	buf = hid_alloc_report_buf(report, GFP_KERNEL);
 	if (!buf)
 		return;
+<<<<<<< HEAD
 	if(!lcd_is_on){
 		dbg_hid("lcd is off, don't report LED event\n");
 		kfree(buf);
 		return;
 	}
+=======
+
+>>>>>>> common/deprecated/android-3.18
 	hid_output_report(report, buf);
 	/* synchronous output report */
 	ret = hid_hw_output_report(hid, buf, len);

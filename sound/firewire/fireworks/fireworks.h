@@ -71,6 +71,10 @@ struct snd_efw {
 
 	/* for quirks */
 	bool is_af9;
+<<<<<<< HEAD
+=======
+	bool is_fireworks3;
+>>>>>>> common/deprecated/android-3.18
 	u32 firmware_version;
 
 	unsigned int midi_in_ports;
@@ -105,7 +109,10 @@ struct snd_efw {
 	u8 *resp_buf;
 	u8 *pull_ptr;
 	u8 *push_ptr;
+<<<<<<< HEAD
 	unsigned int resp_queues;
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 int snd_efw_transaction_cmd(struct fw_unit *unit,

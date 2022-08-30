@@ -69,8 +69,13 @@ static int show_cpuinfo(struct seq_file *m, void *v)
 		   c->x86_model,
 		   c->x86_model_id[0] ? c->x86_model_id : "unknown");
 
+<<<<<<< HEAD
 	if (c->x86_mask || c->cpuid_level >= 0)
 		seq_printf(m, "stepping\t: %d\n", c->x86_mask);
+=======
+	if (c->x86_stepping || c->cpuid_level >= 0)
+		seq_printf(m, "stepping\t: %d\n", c->x86_stepping);
+>>>>>>> common/deprecated/android-3.18
 	else
 		seq_printf(m, "stepping\t: unknown\n");
 	if (c->microcode)
@@ -86,8 +91,13 @@ static int show_cpuinfo(struct seq_file *m, void *v)
 	}
 
 	/* Cache size */
+<<<<<<< HEAD
 	if (c->x86_cache_size >= 0)
 		seq_printf(m, "cache size\t: %d KB\n", c->x86_cache_size);
+=======
+	if (c->x86_cache_size)
+		seq_printf(m, "cache size\t: %u KB\n", c->x86_cache_size);
+>>>>>>> common/deprecated/android-3.18
 
 	show_cpuinfo_core(m, c, cpu);
 	show_cpuinfo_misc(m, c);

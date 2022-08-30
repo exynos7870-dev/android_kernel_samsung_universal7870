@@ -264,13 +264,23 @@ static void tcp_lp_pkts_acked(struct sock *sk, u32 num_acked, s32 rtt_us)
 {
 	struct tcp_sock *tp = tcp_sk(sk);
 	struct lp *lp = inet_csk_ca(sk);
+<<<<<<< HEAD
+=======
+	u32 delta;
+>>>>>>> common/deprecated/android-3.18
 
 	if (rtt_us > 0)
 		tcp_lp_rtt_sample(sk, rtt_us);
 
 	/* calc inference */
+<<<<<<< HEAD
 	if (tcp_time_stamp > tp->rx_opt.rcv_tsecr)
 		lp->inference = 3 * (tcp_time_stamp - tp->rx_opt.rcv_tsecr);
+=======
+	delta = tcp_time_stamp - tp->rx_opt.rcv_tsecr;
+	if ((s32)delta > 0)
+		lp->inference = 3 * delta;
+>>>>>>> common/deprecated/android-3.18
 
 	/* test if within inference */
 	if (lp->last_drop && (tcp_time_stamp - lp->last_drop < lp->inference))

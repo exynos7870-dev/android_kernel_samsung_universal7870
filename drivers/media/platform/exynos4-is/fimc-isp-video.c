@@ -219,8 +219,13 @@ static void isp_video_capture_buffer_queue(struct vb2_buffer *vb)
 							ivb->dma_addr[i];
 
 			isp_dbg(2, &video->ve.vdev,
+<<<<<<< HEAD
 				"dma_buf %pad (%d/%d/%d) addr: %pad\n",
 				&buf_index, ivb->index, i, vb->v4l2_buf.index,
+=======
+				"dma_buf %d (%d/%d/%d) addr: %pad\n",
+				buf_index, ivb->index, i, vb->v4l2_buf.index,
+>>>>>>> common/deprecated/android-3.18
 				&ivb->dma_addr[i]);
 		}
 
@@ -321,7 +326,11 @@ static int isp_video_release(struct file *file)
 		ivc->streaming = 0;
 	}
 
+<<<<<<< HEAD
 	vb2_fop_release(file);
+=======
+	_vb2_fop_release(file, NULL);
+>>>>>>> common/deprecated/android-3.18
 
 	if (v4l2_fh_is_singular_file(file)) {
 		fimc_pipeline_call(&ivc->ve, close);
@@ -389,12 +398,26 @@ static void __isp_video_try_fmt(struct fimc_isp *isp,
 				struct v4l2_pix_format_mplane *pixm,
 				const struct fimc_fmt **fmt)
 {
+<<<<<<< HEAD
 	*fmt = fimc_isp_find_format(&pixm->pixelformat, NULL, 2);
 
 	pixm->colorspace = V4L2_COLORSPACE_SRGB;
 	pixm->field = V4L2_FIELD_NONE;
 	pixm->num_planes = (*fmt)->memplanes;
 	pixm->pixelformat = (*fmt)->fourcc;
+=======
+	const struct fimc_fmt *__fmt;
+
+	__fmt = fimc_isp_find_format(&pixm->pixelformat, NULL, 2);
+
+	if (fmt)
+		*fmt = __fmt;
+
+	pixm->colorspace = V4L2_COLORSPACE_SRGB;
+	pixm->field = V4L2_FIELD_NONE;
+	pixm->num_planes = __fmt->memplanes;
+	pixm->pixelformat = __fmt->fourcc;
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * TODO: double check with the docmentation these width/height
 	 * constraints are correct.

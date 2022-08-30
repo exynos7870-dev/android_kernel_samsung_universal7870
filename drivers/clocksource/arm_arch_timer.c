@@ -68,7 +68,10 @@ static struct clock_event_device __percpu *arch_timer_evt;
 static bool arch_timer_use_virtual = true;
 static bool arch_timer_c3stop;
 static bool arch_timer_mem_use_virtual;
+<<<<<<< HEAD
 static bool arch_timer_use_clocksource_only = false;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 /*
  * Architected system timer support.
@@ -317,6 +320,7 @@ static void arch_timer_evtstrm_enable(int divider)
 
 static void arch_timer_configure_evtstream(void)
 {
+<<<<<<< HEAD
 	int evt_stream_div, pos;
 
 	/* Find the closest power of two to the divisor */
@@ -326,6 +330,26 @@ static void arch_timer_configure_evtstream(void)
 		pos--;
 	/* enable event stream */
 	arch_timer_evtstrm_enable(min(pos, 15));
+=======
+	int evt_stream_div, lsb;
+
+	/*
+	 * As the event stream can at most be generated at half the frequency
+	 * of the counter, use half the frequency when computing the divider.
+	 */
+	evt_stream_div = arch_timer_rate / ARCH_TIMER_EVT_STREAM_FREQ / 2;
+
+	/*
+	 * Find the closest power of two to the divisor. If the adjacent bit
+	 * of lsb (last set bit, starts from 0) is set, then we use (lsb + 1).
+	 */
+	lsb = fls(evt_stream_div) - 1;
+	if (lsb > 0 && (evt_stream_div & BIT(lsb - 1)))
+		lsb++;
+
+	/* enable event stream */
+	arch_timer_evtstrm_enable(max(0, min(lsb, 15)));
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void arch_counter_set_user_access(void)
@@ -350,6 +374,7 @@ static void arch_counter_set_user_access(void)
 
 static int arch_timer_setup(struct clock_event_device *clk)
 {
+<<<<<<< HEAD
 	/*
 	 * If arch_timer is used to clocksource only,
 	 * it doesn't need to setup clockevent configuration.
@@ -358,6 +383,8 @@ static int arch_timer_setup(struct clock_event_device *clk)
 	if (arch_timer_use_clocksource_only)
 		goto skip_clockevent_setup;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	__arch_timer_setup(ARCH_CP15_TIMER, clk);
 
 	if (arch_timer_use_virtual)
@@ -368,7 +395,10 @@ static int arch_timer_setup(struct clock_event_device *clk)
 			enable_percpu_irq(arch_timer_ppi[PHYS_NONSECURE_PPI], 0);
 	}
 
+<<<<<<< HEAD
 skip_clockevent_setup:
+=======
+>>>>>>> common/deprecated/android-3.18
 	arch_counter_set_user_access();
 	if (IS_ENABLED(CONFIG_ARM_ARCH_TIMER_EVTSTREAM))
 		arch_timer_configure_evtstream();
@@ -449,18 +479,25 @@ static cycle_t arch_counter_read_cc(const struct cyclecounter *cc)
 	return arch_timer_read_counter();
 }
 
+<<<<<<< HEAD
 static void arch_timer_resume(struct clocksource *cs)
 {
 	arch_timer_setup(this_cpu_ptr(arch_timer_evt));
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static struct clocksource clocksource_counter = {
 	.name	= "arch_sys_counter",
 	.rating	= 400,
 	.read	= arch_counter_read,
 	.mask	= CLOCKSOURCE_MASK(56),
+<<<<<<< HEAD
 	.flags	= CLOCK_SOURCE_IS_CONTINUOUS,
 	.resume	= arch_timer_resume,
+=======
+	.flags	= CLOCK_SOURCE_IS_CONTINUOUS | CLOCK_SOURCE_SUSPEND_NONSTOP,
+>>>>>>> common/deprecated/android-3.18
 };
 
 static struct cyclecounter cyclecounter = {
@@ -508,6 +545,7 @@ static void __init arch_counter_register(unsigned type)
 
 static void arch_timer_stop(struct clock_event_device *clk)
 {
+<<<<<<< HEAD
 	/*
 	 * If arch_timer is used to clocksource only,
 	 * it doesn't need to stop clockevent configuration.
@@ -516,6 +554,8 @@ static void arch_timer_stop(struct clock_event_device *clk)
 	if (arch_timer_use_clocksource_only)
 		return;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	pr_debug("arch_timer_teardown disable IRQ%d cpu #%d\n",
 		 clk->irq, smp_processor_id());
 
@@ -731,12 +771,15 @@ static void __init arch_timer_init(struct device_node *np)
 		arch_timer_ppi[i] = irq_of_parse_and_map(np, i);
 	arch_timer_detect_rate(NULL, np);
 
+<<<<<<< HEAD
 	/* Exynos Specific Device Tree Information */
 	if (of_property_read_bool(np, "use-clocksource-only")) {
 		pr_info("%s: arch_timer is used only clocksource\n", __func__);
 		arch_timer_use_clocksource_only = true;
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * If HYP mode is available, we know that the physical timer
 	 * has been configured to be accessible from PL1. Use it, so

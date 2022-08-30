@@ -18,7 +18,11 @@
  *	L	- lower subcluster; L0 - subcluster L0; L1 - subcluster L1
  */
 
+<<<<<<< HEAD
 
+=======
+#include <asm/export.h>
+>>>>>>> common/deprecated/android-3.18
 #include <asm/regdef.h>
 
 	.set noreorder
@@ -107,3 +111,7 @@ $eos:
 	nop
 
 	.end strrchr
+<<<<<<< HEAD
+=======
+	EXPORT_SYMBOL(strrchr)
+>>>>>>> common/deprecated/android-3.18

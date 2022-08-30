@@ -278,8 +278,13 @@ void drbd_request_endio(struct bio *bio, int error)
 	} else
 		what = COMPLETED_OK;
 
+<<<<<<< HEAD
 	bio_put(req->private_bio);
 	req->private_bio = ERR_PTR(error);
+=======
+	req->private_bio = ERR_PTR(error);
+	bio_put(bio);
+>>>>>>> common/deprecated/android-3.18
 
 	/* not req_mod(), we need irqsave here! */
 	spin_lock_irqsave(&device->resource->req_lock, flags);

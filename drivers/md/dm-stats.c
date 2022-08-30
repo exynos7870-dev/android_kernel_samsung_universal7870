@@ -795,6 +795,11 @@ static int message_stats_create(struct mapped_device *md,
 		return -EINVAL;
 
 	if (sscanf(argv[2], "/%u%c", &divisor, &dummy) == 1) {
+<<<<<<< HEAD
+=======
+		if (!divisor)
+			return -EINVAL;
+>>>>>>> common/deprecated/android-3.18
 		step = end - start;
 		if (do_div(step, divisor))
 			step++;

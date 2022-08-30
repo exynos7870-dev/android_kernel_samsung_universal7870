@@ -30,7 +30,11 @@
  * SOFTWARE.
  */
 
+<<<<<<< HEAD
 #include <asm-generic/kmap_types.h>
+=======
+#include <linux/highmem.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/errno.h>
@@ -874,7 +878,11 @@ static ssize_t show_fw_ver(struct device *device, struct device_attribute *attr,
 {
 	struct mlx5_ib_dev *dev =
 		container_of(device, struct mlx5_ib_dev, ib_dev.dev);
+<<<<<<< HEAD
 	return sprintf(buf, "%d.%d.%d\n", fw_rev_maj(dev->mdev),
+=======
+	return sprintf(buf, "%d.%d.%04d\n", fw_rev_maj(dev->mdev),
+>>>>>>> common/deprecated/android-3.18
 		       fw_rev_min(dev->mdev), fw_rev_sub(dev->mdev));
 }
 
@@ -916,13 +924,22 @@ static void mlx5_ib_event(struct mlx5_core_dev *dev, void *context,
 {
 	struct mlx5_ib_dev *ibdev = (struct mlx5_ib_dev *)context;
 	struct ib_event ibev;
+<<<<<<< HEAD
 
+=======
+	bool fatal = false;
+>>>>>>> common/deprecated/android-3.18
 	u8 port = 0;
 
 	switch (event) {
 	case MLX5_DEV_EVENT_SYS_ERROR:
+<<<<<<< HEAD
 		ibdev->ib_active = false;
 		ibev.event = IB_EVENT_DEVICE_FATAL;
+=======
+		ibev.event = IB_EVENT_DEVICE_FATAL;
+		fatal = true;
+>>>>>>> common/deprecated/android-3.18
 		break;
 
 	case MLX5_DEV_EVENT_PORT_UP:
@@ -931,14 +948,21 @@ static void mlx5_ib_event(struct mlx5_core_dev *dev, void *context,
 		break;
 
 	case MLX5_DEV_EVENT_PORT_DOWN:
+<<<<<<< HEAD
+=======
+	case MLX5_DEV_EVENT_PORT_INITIALIZED:
+>>>>>>> common/deprecated/android-3.18
 		ibev.event = IB_EVENT_PORT_ERR;
 		port = (u8)param;
 		break;
 
+<<<<<<< HEAD
 	case MLX5_DEV_EVENT_PORT_INITIALIZED:
 		/* not used by ULPs */
 		return;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	case MLX5_DEV_EVENT_LID_CHANGE:
 		ibev.event = IB_EVENT_LID_CHANGE;
 		port = (u8)param;
@@ -970,6 +994,12 @@ static void mlx5_ib_event(struct mlx5_core_dev *dev, void *context,
 
 	if (ibdev->ib_active)
 		ib_dispatch_event(&ibev);
+<<<<<<< HEAD
+=======
+
+	if (fatal)
+		ibdev->ib_active = false;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void get_ext_port_caps(struct mlx5_ib_dev *dev)
@@ -1099,6 +1129,11 @@ static int create_umr_res(struct mlx5_ib_dev *dev)
 	qp->real_qp    = qp;
 	qp->uobject    = NULL;
 	qp->qp_type    = MLX5_IB_QPT_REG_UMR;
+<<<<<<< HEAD
+=======
+	qp->send_cq    = init_attr->send_cq;
+	qp->recv_cq    = init_attr->recv_cq;
+>>>>>>> common/deprecated/android-3.18
 
 	attr->qp_state = IB_QPS_INIT;
 	attr->port_num = 1;

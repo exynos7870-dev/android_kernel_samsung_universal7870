@@ -261,7 +261,10 @@ int mdiobus_register(struct mii_bus *bus)
 	err = device_register(&bus->dev);
 	if (err) {
 		pr_err("mii_bus %s failed to register\n", bus->id);
+<<<<<<< HEAD
 		put_device(&bus->dev);
+=======
+>>>>>>> common/deprecated/android-3.18
 		return -EINVAL;
 	}
 
@@ -300,7 +303,12 @@ void mdiobus_unregister(struct mii_bus *bus)
 {
 	int i;
 
+<<<<<<< HEAD
 	BUG_ON(bus->state != MDIOBUS_REGISTERED);
+=======
+	if (WARN_ON_ONCE(bus->state != MDIOBUS_REGISTERED))
+		return;
+>>>>>>> common/deprecated/android-3.18
 	bus->state = MDIOBUS_UNREGISTERED;
 
 	device_del(&bus->dev);

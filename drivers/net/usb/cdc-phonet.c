@@ -425,6 +425,11 @@ static int usbpn_probe(struct usb_interface *intf, const struct usb_device_id *i
 
 	err = register_netdev(dev);
 	if (err) {
+<<<<<<< HEAD
+=======
+		/* Set disconnected flag so that disconnect() returns early. */
+		pnd->disconnected = 1;
+>>>>>>> common/deprecated/android-3.18
 		usb_driver_release_interface(&usbpn_driver, data_intf);
 		goto out;
 	}

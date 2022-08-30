@@ -11,6 +11,10 @@
 #define _LINUX_NETDEV_FEATURES_H
 
 #include <linux/types.h>
+<<<<<<< HEAD
+=======
+#include <linux/bitops.h>
+>>>>>>> common/deprecated/android-3.18
 
 typedef u64 netdev_features_t;
 

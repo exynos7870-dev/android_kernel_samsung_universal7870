@@ -38,8 +38,12 @@ static inline int ufs_add_nondir(struct dentry *dentry, struct inode *inode)
 {
 	int err = ufs_add_link(dentry, inode);
 	if (!err) {
+<<<<<<< HEAD
 		unlock_new_inode(inode);
 		d_instantiate(dentry, inode);
+=======
+		d_instantiate_new(dentry, inode);
+>>>>>>> common/deprecated/android-3.18
 		return 0;
 	}
 	inode_dec_link_count(inode);
@@ -128,12 +132,21 @@ static int ufs_symlink (struct inode * dir, struct dentry * dentry,
 	if (l > sb->s_blocksize)
 		goto out_notlocked;
 
+<<<<<<< HEAD
 	inode = ufs_new_inode(dir, S_IFLNK | S_IRWXUGO);
 	err = PTR_ERR(inode);
 	if (IS_ERR(inode))
 		goto out_notlocked;
 
 	lock_ufs(dir->i_sb);
+=======
+	lock_ufs(dir->i_sb);
+	inode = ufs_new_inode(dir, S_IFLNK | S_IRWXUGO);
+	err = PTR_ERR(inode);
+	if (IS_ERR(inode))
+		goto out;
+
+>>>>>>> common/deprecated/android-3.18
 	if (l > UFS_SB(sb)->s_uspi->s_maxsymlinklen) {
 		/* slow symlink */
 		inode->i_op = &ufs_symlink_inode_operations;
@@ -174,7 +187,16 @@ static int ufs_link (struct dentry * old_dentry, struct inode * dir,
 	inode_inc_link_count(inode);
 	ihold(inode);
 
+<<<<<<< HEAD
 	error = ufs_add_nondir(dentry, inode);
+=======
+	error = ufs_add_link(dentry, inode);
+	if (error) {
+		inode_dec_link_count(inode);
+		iput(inode);
+	} else
+		d_instantiate(dentry, inode);
+>>>>>>> common/deprecated/android-3.18
 	unlock_ufs(dir->i_sb);
 	return error;
 }
@@ -184,9 +206,19 @@ static int ufs_mkdir(struct inode * dir, struct dentry * dentry, umode_t mode)
 	struct inode * inode;
 	int err;
 
+<<<<<<< HEAD
 	inode = ufs_new_inode(dir, S_IFDIR|mode);
 	if (IS_ERR(inode))
 		return PTR_ERR(inode);
+=======
+	lock_ufs(dir->i_sb);
+	inode_inc_link_count(dir);
+
+	inode = ufs_new_inode(dir, S_IFDIR|mode);
+	err = PTR_ERR(inode);
+	if (IS_ERR(inode))
+		goto out_dir;
+>>>>>>> common/deprecated/android-3.18
 
 	inode->i_op = &ufs_dir_inode_operations;
 	inode->i_fop = &ufs_dir_operations;
@@ -194,9 +226,12 @@ static int ufs_mkdir(struct inode * dir, struct dentry * dentry, umode_t mode)
 
 	inode_inc_link_count(inode);
 
+<<<<<<< HEAD
 	lock_ufs(dir->i_sb);
 	inode_inc_link_count(dir);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	err = ufs_make_empty(inode, dir);
 	if (err)
 		goto out_fail;
@@ -206,7 +241,11 @@ static int ufs_mkdir(struct inode * dir, struct dentry * dentry, umode_t mode)
 		goto out_fail;
 	unlock_ufs(dir->i_sb);
 
+<<<<<<< HEAD
 	d_instantiate(dentry, inode);
+=======
+	d_instantiate_new(dentry, inode);
+>>>>>>> common/deprecated/android-3.18
 out:
 	return err;
 
@@ -215,6 +254,10 @@ out_fail:
 	inode_dec_link_count(inode);
 	unlock_new_inode(inode);
 	iput (inode);
+<<<<<<< HEAD
+=======
+out_dir:
+>>>>>>> common/deprecated/android-3.18
 	inode_dec_link_count(dir);
 	unlock_ufs(dir->i_sb);
 	goto out;

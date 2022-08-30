@@ -156,11 +156,14 @@ static int journal_submit_commit_record(journal_t *journal,
 	set_buffer_uptodate(bh);
 	bh->b_end_io = journal_end_buffer_io_sync;
 
+<<<<<<< HEAD
 #ifdef CONFIG_JOURNAL_DATA_TAG
 	if (journal->j_flags & JBD2_JOURNAL_TAG)
 		set_buffer_journal(bh);
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (journal->j_flags & JBD2_BARRIER &&
 	    !JBD2_HAS_INCOMPAT_FEATURE(journal,
 				       JBD2_FEATURE_INCOMPAT_ASYNC_COMMIT))
@@ -515,7 +518,11 @@ void jbd2_journal_commit_transaction(journal_t *journal)
 	 * frees some memory
 	 */
 	spin_lock(&journal->j_list_lock);
+<<<<<<< HEAD
 	__jbd2_journal_clean_checkpoint_list(journal);
+=======
+	__jbd2_journal_clean_checkpoint_list(journal, false);
+>>>>>>> common/deprecated/android-3.18
 	spin_unlock(&journal->j_list_lock);
 
 	jbd_debug(3, "JBD2: commit phase 1\n");
@@ -745,6 +752,7 @@ start_journal_io:
 				clear_buffer_dirty(bh);
 				set_buffer_uptodate(bh);
 				bh->b_end_io = journal_end_buffer_io_sync;
+<<<<<<< HEAD
 #ifdef CONFIG_JOURNAL_DATA_TAG
 				if (journal->j_flags & JBD2_JOURNAL_TAG)
 					set_buffer_journal(bh);
@@ -753,6 +761,11 @@ start_journal_io:
 			}
 			cond_resched();
 			stats.run.rs_blocks_logged += bufs;
+=======
+				submit_bh(WRITE_SYNC, bh);
+			}
+			cond_resched();
+>>>>>>> common/deprecated/android-3.18
 
 			/* Force a new descriptor to be generated next
                            time round the loop. */
@@ -811,7 +824,11 @@ start_journal_io:
 		err = journal_submit_commit_record(journal, commit_transaction,
 						 &cbh, crc32_sum);
 		if (err)
+<<<<<<< HEAD
 			__jbd2_journal_abort_hard(journal);
+=======
+			jbd2_journal_abort(journal, err);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	blk_finish_plug(&plug);
@@ -840,6 +857,10 @@ start_journal_io:
 		if (unlikely(!buffer_uptodate(bh)))
 			err = -EIO;
 		jbd2_unfile_log_bh(bh);
+<<<<<<< HEAD
+=======
+		stats.run.rs_blocks_logged++;
+>>>>>>> common/deprecated/android-3.18
 
 		/*
 		 * The list contains temporary buffer heads created by
@@ -885,6 +906,10 @@ start_journal_io:
 		BUFFER_TRACE(bh, "ph5: control buffer writeout done: unfile");
 		clear_buffer_jwrite(bh);
 		jbd2_unfile_log_bh(bh);
+<<<<<<< HEAD
+=======
+		stats.run.rs_blocks_logged++;
+>>>>>>> common/deprecated/android-3.18
 		__brelse(bh);		/* One for getblk */
 		/* AKPM: bforget here */
 	}
@@ -903,10 +928,18 @@ start_journal_io:
 		err = journal_submit_commit_record(journal, commit_transaction,
 						&cbh, crc32_sum);
 		if (err)
+<<<<<<< HEAD
 			__jbd2_journal_abort_hard(journal);
 	}
 	if (cbh)
 		err = journal_wait_on_commit_record(journal, cbh);
+=======
+			jbd2_journal_abort(journal, err);
+	}
+	if (cbh)
+		err = journal_wait_on_commit_record(journal, cbh);
+	stats.run.rs_blocks_logged++;
+>>>>>>> common/deprecated/android-3.18
 	if (JBD2_HAS_INCOMPAT_FEATURE(journal,
 				      JBD2_FEATURE_INCOMPAT_ASYNC_COMMIT) &&
 	    journal->j_flags & JBD2_BARRIER) {
@@ -1000,6 +1033,7 @@ restart_loop:
 		 * it. */
 
 		/*
+<<<<<<< HEAD
 		* A buffer which has been freed while still being journaled by
 		* a previous transaction.
 		*/
@@ -1028,6 +1062,23 @@ restart_loop:
 				clear_buffer_req(bh);
 				bh->b_bdev = NULL;
 			}
+=======
+		 * A buffer which has been freed while still being journaled
+		 * by a previous transaction, refile the buffer to BJ_Forget of
+		 * the running transaction. If the just committed transaction
+		 * contains "add to orphan" operation, we can completely
+		 * invalidate the buffer now. We are rather through in that
+		 * since the buffer may be still accessible when blocksize <
+		 * pagesize and it is attached to the last partial page.
+		 */
+		if (buffer_freed(bh) && !jh->b_next_transaction) {
+			clear_buffer_freed(bh);
+			clear_buffer_jbddirty(bh);
+			clear_buffer_mapped(bh);
+			clear_buffer_new(bh);
+			clear_buffer_req(bh);
+			bh->b_bdev = NULL;
+>>>>>>> common/deprecated/android-3.18
 		}
 
 		if (buffer_jbddirty(bh)) {

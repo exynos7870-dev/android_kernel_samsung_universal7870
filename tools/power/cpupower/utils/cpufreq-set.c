@@ -305,6 +305,11 @@ int cmd_freq_set(int argc, char **argv)
 				bitmask_setbit(cpus_chosen, cpus->cpu);
 				cpus = cpus->next;
 			}
+<<<<<<< HEAD
+=======
+			/* Set the last cpu in related cpus list */
+			bitmask_setbit(cpus_chosen, cpus->cpu);
+>>>>>>> common/deprecated/android-3.18
 			cpufreq_put_related_cpus(cpus);
 		}
 	}

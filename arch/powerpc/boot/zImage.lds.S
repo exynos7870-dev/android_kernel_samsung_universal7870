@@ -68,6 +68,10 @@ SECTIONS
   }
 
 #ifdef CONFIG_PPC64_BOOT_WRAPPER
+<<<<<<< HEAD
+=======
+  . = ALIGN(256);
+>>>>>>> common/deprecated/android-3.18
   .got :
   {
     __toc_start = .;

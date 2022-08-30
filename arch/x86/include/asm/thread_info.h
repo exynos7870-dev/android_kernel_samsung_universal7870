@@ -13,6 +13,36 @@
 #include <asm/types.h>
 
 /*
+<<<<<<< HEAD
+=======
+ * TOP_OF_KERNEL_STACK_PADDING is a number of unused bytes that we
+ * reserve at the top of the kernel stack.  We do it because of a nasty
+ * 32-bit corner case.  On x86_32, the hardware stack frame is
+ * variable-length.  Except for vm86 mode, struct pt_regs assumes a
+ * maximum-length frame.  If we enter from CPL 0, the top 8 bytes of
+ * pt_regs don't actually exist.  Ordinarily this doesn't matter, but it
+ * does in at least one case:
+ *
+ * If we take an NMI early enough in SYSENTER, then we can end up with
+ * pt_regs that extends above sp0.  On the way out, in the espfix code,
+ * we can read the saved SS value, but that value will be above sp0.
+ * Without this offset, that can result in a page fault.  (We are
+ * careful that, in this case, the value we read doesn't matter.)
+ *
+ * In vm86 mode, the hardware frame is much longer still, but we neither
+ * access the extra members from NMI context, nor do we write such a
+ * frame at sp0 at all.
+ *
+ * x86_64 has a fixed-length stack frame.
+ */
+#ifdef CONFIG_X86_32
+# define TOP_OF_KERNEL_STACK_PADDING 8
+#else
+# define TOP_OF_KERNEL_STACK_PADDING 0
+#endif
+
+/*
+>>>>>>> common/deprecated/android-3.18
  * low level task data that entry.S needs immediate access to
  * - this struct should fit entirely inside of one cache line
  * - this struct shares the supervisor stack pages
@@ -31,7 +61,10 @@ struct thread_info {
 	__u32			cpu;		/* current CPU */
 	int			saved_preempt_count;
 	mm_segment_t		addr_limit;
+<<<<<<< HEAD
 	struct restart_block    restart_block;
+=======
+>>>>>>> common/deprecated/android-3.18
 	void __user		*sysenter_return;
 	unsigned int		sig_on_uaccess_error:1;
 	unsigned int		uaccess_err:1;	/* uaccess failed */
@@ -45,9 +78,12 @@ struct thread_info {
 	.cpu		= 0,			\
 	.saved_preempt_count = INIT_PREEMPT_COUNT,	\
 	.addr_limit	= KERNEL_DS,		\
+<<<<<<< HEAD
 	.restart_block = {			\
 		.fn = do_no_restart_syscall,	\
 	},					\
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 
 #define init_thread_info	(init_thread_union.thread_info)
@@ -91,6 +127,10 @@ struct thread_info {
 #define TIF_SYSCALL_TRACEPOINT	28	/* syscall tracepoint instrumentation */
 #define TIF_ADDR32		29	/* 32-bit address space on 64 bits */
 #define TIF_X32			30	/* 32-bit native x86-64 binary */
+<<<<<<< HEAD
+=======
+#define TIF_FSCHECK		31	/* Check FS is USER_DS on return */
+>>>>>>> common/deprecated/android-3.18
 
 #define _TIF_SYSCALL_TRACE	(1 << TIF_SYSCALL_TRACE)
 #define _TIF_NOTIFY_RESUME	(1 << TIF_NOTIFY_RESUME)
@@ -115,6 +155,10 @@ struct thread_info {
 #define _TIF_SYSCALL_TRACEPOINT	(1 << TIF_SYSCALL_TRACEPOINT)
 #define _TIF_ADDR32		(1 << TIF_ADDR32)
 #define _TIF_X32		(1 << TIF_X32)
+<<<<<<< HEAD
+=======
+#define _TIF_FSCHECK		(1 << TIF_FSCHECK)
+>>>>>>> common/deprecated/android-3.18
 
 /* work to do in syscall_trace_enter() */
 #define _TIF_WORK_SYSCALL_ENTRY	\
@@ -136,7 +180,11 @@ struct thread_info {
 /* work to do on any return to user space */
 #define _TIF_ALLWORK_MASK						\
 	((0x0000FFFF & ~_TIF_SECCOMP) | _TIF_SYSCALL_TRACEPOINT |	\
+<<<<<<< HEAD
 	_TIF_NOHZ)
+=======
+	_TIF_NOHZ | _TIF_FSCHECK)
+>>>>>>> common/deprecated/android-3.18
 
 /* Only used for 64 bit */
 #define _TIF_DO_NOTIFY_MASK						\

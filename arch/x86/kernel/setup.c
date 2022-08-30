@@ -859,6 +859,15 @@ void __init setup_arch(char **cmdline_p)
 	memblock_reserve(__pa_symbol(_text),
 			 (unsigned long)__bss_stop - (unsigned long)_text);
 
+<<<<<<< HEAD
+=======
+	/*
+	 * Make sure page 0 is always reserved because on systems with
+	 * L1TF its contents can be leaked to user processes.
+	 */
+	memblock_reserve(0, PAGE_SIZE);
+
+>>>>>>> common/deprecated/android-3.18
 	early_reserve_initrd();
 
 	/*
@@ -1176,7 +1185,11 @@ void __init setup_arch(char **cmdline_p)
 
 	if (boot_cpu_data.cpuid_level >= 0) {
 		/* A CPU has %cr4 if and only if it has CPUID */
+<<<<<<< HEAD
 		mmu_cr4_features = read_cr4();
+=======
+		mmu_cr4_features = __read_cr4();
+>>>>>>> common/deprecated/android-3.18
 		if (trampoline_cr4_features)
 			*trampoline_cr4_features = mmu_cr4_features;
 	}

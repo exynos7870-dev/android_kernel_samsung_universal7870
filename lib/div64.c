@@ -100,7 +100,11 @@ u64 div64_u64_rem(u64 dividend, u64 divisor, u64 *remainder)
 		quot = div_u64_rem(dividend, divisor, &rem32);
 		*remainder = rem32;
 	} else {
+<<<<<<< HEAD
 		int n = 1 + fls(high);
+=======
+		int n = fls(high);
+>>>>>>> common/deprecated/android-3.18
 		quot = div_u64(dividend >> n, divisor >> n);
 
 		if (quot != 0)
@@ -138,7 +142,11 @@ u64 div64_u64(u64 dividend, u64 divisor)
 	if (high == 0) {
 		quot = div_u64(dividend, divisor);
 	} else {
+<<<<<<< HEAD
 		int n = 1 + fls(high);
+=======
+		int n = fls(high);
+>>>>>>> common/deprecated/android-3.18
 		quot = div_u64(dividend >> n, divisor >> n);
 
 		if (quot != 0)

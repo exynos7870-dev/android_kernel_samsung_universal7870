@@ -751,14 +751,22 @@ static int kim_probe(struct platform_device *pdev)
 	err = gpio_request(kim_gdata->nshutdown, "kim");
 	if (unlikely(err)) {
 		pr_err(" gpio %ld request failed ", kim_gdata->nshutdown);
+<<<<<<< HEAD
 		return err;
+=======
+		goto err_sysfs_group;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/* Configure nShutdown GPIO as output=0 */
 	err = gpio_direction_output(kim_gdata->nshutdown, 0);
 	if (unlikely(err)) {
 		pr_err(" unable to configure gpio %ld", kim_gdata->nshutdown);
+<<<<<<< HEAD
 		return err;
+=======
+		goto err_sysfs_group;
+>>>>>>> common/deprecated/android-3.18
 	}
 	/* get reference of pdev for request_firmware
 	 */

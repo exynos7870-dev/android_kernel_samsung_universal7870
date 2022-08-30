@@ -77,7 +77,11 @@ void __init free_bootmem_late(unsigned long addr, unsigned long size)
 	end = PFN_DOWN(addr + size);
 
 	for (; cursor < end; cursor++) {
+<<<<<<< HEAD
 		__free_pages_bootmem(pfn_to_page(cursor), 0);
+=======
+		__free_pages_bootmem(pfn_to_page(cursor), cursor, 0);
+>>>>>>> common/deprecated/android-3.18
 		totalram_pages++;
 	}
 }
@@ -92,7 +96,11 @@ static void __init __free_pages_memory(unsigned long start, unsigned long end)
 		while (start + (1UL << order) > end)
 			order--;
 
+<<<<<<< HEAD
 		__free_pages_bootmem(pfn_to_page(start), order);
+=======
+		__free_pages_bootmem(pfn_to_page(start), start, order);
+>>>>>>> common/deprecated/android-3.18
 
 		start += (1UL << order);
 	}

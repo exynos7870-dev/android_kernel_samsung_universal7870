@@ -27,6 +27,10 @@
 #include <linux/seq_file.h>
 
 #include <asm/mach-jz4740/base.h>
+<<<<<<< HEAD
+=======
+#include <asm/mach-jz4740/gpio.h>
+>>>>>>> common/deprecated/android-3.18
 
 #include "irq.h"
 

@@ -45,6 +45,10 @@
  *	$28 - compare status
  */
 
+<<<<<<< HEAD
+=======
+#include <asm/export.h>
+>>>>>>> common/deprecated/android-3.18
 #define halt .long 0
 
 /*
@@ -151,6 +155,10 @@ ufunction:
 	addq	$30,STACK,$30
 	ret	$31,($23),1
 	.end	ufunction
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL(ufunction)
+>>>>>>> common/deprecated/android-3.18
 
 /*
  * Uhh.. Ugly signed division. I'd rather not have it at all, but
@@ -193,3 +201,7 @@ sfunction:
 	addq	$30,STACK,$30
 	ret	$31,($23),1
 	.end	sfunction
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL(sfunction)
+>>>>>>> common/deprecated/android-3.18

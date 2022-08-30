@@ -465,7 +465,11 @@ static irqreturn_t das800_interrupt(int irq, void *d)
 	struct comedi_cmd *cmd;
 	unsigned long irq_flags;
 	unsigned int status;
+<<<<<<< HEAD
 	unsigned int val;
+=======
+	unsigned short val;
+>>>>>>> common/deprecated/android-3.18
 	bool fifo_empty;
 	bool fifo_overflow;
 	int i;

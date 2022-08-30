@@ -233,8 +233,15 @@ static int spdif_in_probe(struct platform_device *pdev)
 	}
 
 	host->irq = platform_get_irq(pdev, 0);
+<<<<<<< HEAD
 	if (host->irq < 0)
 		return -EINVAL;
+=======
+	if (host->irq < 0) {
+		dev_warn(&pdev->dev, "failed to get IRQ: %d\n", host->irq);
+		return host->irq;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	host->clk = devm_clk_get(&pdev->dev, NULL);
 	if (IS_ERR(host->clk))

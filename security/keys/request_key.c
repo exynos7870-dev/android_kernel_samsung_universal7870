@@ -437,6 +437,10 @@ link_check_failed:
 
 link_prealloc_failed:
 	mutex_unlock(&user->cons_lock);
+<<<<<<< HEAD
+=======
+	key_put(key);
+>>>>>>> common/deprecated/android-3.18
 	kleave(" = %d [prelink]", ret);
 	return ret;
 
@@ -462,13 +466,22 @@ static struct key *construct_key_and_link(struct keyring_search_context *ctx,
 
 	kenter("");
 
+<<<<<<< HEAD
 	if (ctx->index_key.type == &key_type_keyring)
 		return ERR_PTR(-EPERM);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	ret = construct_get_dest_keyring(&dest_keyring);
 	if (ret)
 		goto error;
 
+<<<<<<< HEAD
+=======
+	if (ctx->index_key.type == &key_type_keyring)
+		return ERR_PTR(-EPERM);
+
+>>>>>>> common/deprecated/android-3.18
 	user = key_user_lookup(current_fsuid());
 	if (!user) {
 		ret = -ENOMEM;
@@ -543,6 +556,10 @@ struct key *request_key_and_link(struct key_type *type,
 	struct keyring_search_context ctx = {
 		.index_key.type		= type,
 		.index_key.description	= description,
+<<<<<<< HEAD
+=======
+		.index_key.desc_len	= strlen(description),
+>>>>>>> common/deprecated/android-3.18
 		.cred			= current_cred(),
 		.match_data.cmp		= key_default_cmp,
 		.match_data.raw_data	= description,
@@ -621,10 +638,16 @@ int wait_for_key_construction(struct key *key, bool intr)
 			  intr ? TASK_INTERRUPTIBLE : TASK_UNINTERRUPTIBLE);
 	if (ret)
 		return -ERESTARTSYS;
+<<<<<<< HEAD
 	if (test_bit(KEY_FLAG_NEGATIVE, &key->flags)) {
 		smp_rmb();
 		return key->type_data.reject_error;
 	}
+=======
+	ret = key_read_state(key);
+	if (ret < 0)
+		return ret;
+>>>>>>> common/deprecated/android-3.18
 	return key_validate(key);
 }
 EXPORT_SYMBOL(wait_for_key_construction);

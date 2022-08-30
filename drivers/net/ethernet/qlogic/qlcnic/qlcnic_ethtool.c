@@ -59,7 +59,12 @@ static const struct qlcnic_stats qlcnic_gstrings_stats[] = {
 	 QLC_OFF(stats.mac_filter_limit_overrun)},
 	{"spurious intr", QLC_SIZEOF(stats.spurious_intr),
 	 QLC_OFF(stats.spurious_intr)},
+<<<<<<< HEAD
 
+=======
+	{"mbx spurious intr", QLC_SIZEOF(stats.mbx_spurious_intr),
+	 QLC_OFF(stats.mbx_spurious_intr)},
+>>>>>>> common/deprecated/android-3.18
 };
 
 static const char qlcnic_device_gstrings_stats[][ETH_GSTRING_LEN] = {
@@ -1037,6 +1042,11 @@ int qlcnic_do_lb_test(struct qlcnic_adapter *adapter, u8 mode)
 
 	for (i = 0; i < QLCNIC_NUM_ILB_PKT; i++) {
 		skb = netdev_alloc_skb(adapter->netdev, QLCNIC_ILB_PKT_SIZE);
+<<<<<<< HEAD
+=======
+		if (!skb)
+			goto error;
+>>>>>>> common/deprecated/android-3.18
 		qlcnic_create_loopback_buff(skb->data, adapter->mac_addr);
 		skb_put(skb, QLCNIC_ILB_PKT_SIZE);
 		adapter->ahw->diag_cnt = 0;
@@ -1060,6 +1070,10 @@ int qlcnic_do_lb_test(struct qlcnic_adapter *adapter, u8 mode)
 			cnt++;
 	}
 	if (cnt != i) {
+<<<<<<< HEAD
+=======
+error:
+>>>>>>> common/deprecated/android-3.18
 		dev_err(&adapter->pdev->dev,
 			"LB Test: failed, TX[%d], RX[%d]\n", i, cnt);
 		if (mode != QLCNIC_ILB_MODE)

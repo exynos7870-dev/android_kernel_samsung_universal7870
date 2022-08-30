@@ -710,12 +710,22 @@ static int xgbe_start(struct xgbe_prv_data *pdata)
 {
 	struct xgbe_hw_if *hw_if = &pdata->hw_if;
 	struct net_device *netdev = pdata->netdev;
+<<<<<<< HEAD
+=======
+	int ret;
+>>>>>>> common/deprecated/android-3.18
 
 	DBGPR("-->xgbe_start\n");
 
 	xgbe_set_rx_mode(netdev);
 
+<<<<<<< HEAD
 	hw_if->init(pdata);
+=======
+	ret = hw_if->init(pdata);
+	if (ret)
+		return ret;
+>>>>>>> common/deprecated/android-3.18
 
 	phy_start(pdata->phydev);
 
@@ -1202,7 +1212,11 @@ static int xgbe_close(struct net_device *netdev)
 	return 0;
 }
 
+<<<<<<< HEAD
 static int xgbe_xmit(struct sk_buff *skb, struct net_device *netdev)
+=======
+static netdev_tx_t xgbe_xmit(struct sk_buff *skb, struct net_device *netdev)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct xgbe_prv_data *pdata = netdev_priv(netdev);
 	struct xgbe_hw_if *hw_if = &pdata->hw_if;
@@ -1211,7 +1225,11 @@ static int xgbe_xmit(struct sk_buff *skb, struct net_device *netdev)
 	struct xgbe_ring *ring;
 	struct xgbe_packet_data *packet;
 	unsigned long flags;
+<<<<<<< HEAD
 	int ret;
+=======
+	netdev_tx_t ret;
+>>>>>>> common/deprecated/android-3.18
 
 	DBGPR("-->xgbe_xmit: skb->len = %d\n", skb->len);
 

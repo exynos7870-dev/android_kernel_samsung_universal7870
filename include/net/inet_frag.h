@@ -4,15 +4,25 @@
 #include <linux/percpu_counter.h>
 
 struct netns_frags {
+<<<<<<< HEAD
 	/* The percpu_counter "mem" need to be cacheline aligned.
 	 *  mem.count must not share cacheline with other writers
 	 */
 	struct percpu_counter   mem ____cacheline_aligned_in_smp;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* sysctls */
 	int			timeout;
 	int			high_thresh;
 	int			low_thresh;
+<<<<<<< HEAD
+=======
+	/* The percpu_counter "mem" need to be cacheline aligned.
+	 *  mem.count must not share cacheline with other writers
+	 */
+	struct percpu_counter   mem ____cacheline_aligned_in_smp;
+>>>>>>> common/deprecated/android-3.18
 };
 
 /**

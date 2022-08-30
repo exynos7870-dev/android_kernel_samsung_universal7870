@@ -19,6 +19,12 @@ struct pci_bus;
 struct device;
 
 struct hw_pci {
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_PCI_DOMAINS
+	int		domain;
+#endif
+>>>>>>> common/deprecated/android-3.18
 	struct pci_ops	*ops;
 	int		nr_controllers;
 	void		**private_data;
@@ -41,6 +47,12 @@ struct hw_pci {
  * Per-controller structure
  */
 struct pci_sys_data {
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_PCI_DOMAINS
+	int		domain;
+#endif
+>>>>>>> common/deprecated/android-3.18
 	struct list_head node;
 	int		busnr;		/* primary bus number			*/
 	u64		mem_offset;	/* bus->cpu memory mapping offset	*/

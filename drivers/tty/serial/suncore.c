@@ -112,6 +112,10 @@ void sunserial_console_termios(struct console *con, struct device_node *uart_dp)
 		mode = of_get_property(dp, mode_prop, NULL);
 		if (!mode)
 			mode = "9600,8,n,1,-";
+<<<<<<< HEAD
+=======
+		of_node_put(dp);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	cflag = CREAD | HUPCL | CLOCAL;

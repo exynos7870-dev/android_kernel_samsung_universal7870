@@ -1204,6 +1204,12 @@ int nfs_updatepage(struct file *file, struct page *page,
 	dprintk("NFS:       nfs_updatepage(%pD2 %d@%lld)\n",
 		file, count, (long long)(page_file_offset(page) + offset));
 
+<<<<<<< HEAD
+=======
+	if (!count)
+		goto out;
+
+>>>>>>> common/deprecated/android-3.18
 	if (nfs_can_extend_write(file, page, inode)) {
 		count = max(count + offset, nfs_page_length(page));
 		offset = 0;
@@ -1214,7 +1220,11 @@ int nfs_updatepage(struct file *file, struct page *page,
 		nfs_set_pageerror(page);
 	else
 		__set_page_dirty_nobuffers(page);
+<<<<<<< HEAD
 
+=======
+out:
+>>>>>>> common/deprecated/android-3.18
 	dprintk("NFS:       nfs_updatepage returns %d (isize %lld)\n",
 			status, (long long)i_size_read(inode));
 	return status;
@@ -1252,6 +1262,10 @@ static void nfs_initiate_write(struct nfs_pgio_header *hdr,
 static void nfs_redirty_request(struct nfs_page *req)
 {
 	nfs_mark_request_dirty(req);
+<<<<<<< HEAD
+=======
+	set_bit(NFS_CONTEXT_RESEND_WRITES, &req->wb_context->flags);
+>>>>>>> common/deprecated/android-3.18
 	nfs_unlock_request(req);
 	nfs_end_page_writeback(req);
 	nfs_release_request(req);
@@ -1642,6 +1656,11 @@ static void nfs_commit_release_pages(struct nfs_commit_data *data)
 		set_bit(NFS_CONTEXT_RESEND_WRITES, &req->wb_context->flags);
 	next:
 		nfs_unlock_and_release_request(req);
+<<<<<<< HEAD
+=======
+		/* Latency breaker */
+		cond_resched();
+>>>>>>> common/deprecated/android-3.18
 	}
 	nfss = NFS_SERVER(data->inode);
 	if (atomic_long_read(&nfss->writeback) < NFS_CONGESTION_OFF_THRESH)

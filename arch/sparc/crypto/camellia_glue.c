@@ -274,6 +274,10 @@ static struct crypto_alg algs[] = { {
 		.blkcipher = {
 			.min_keysize	= CAMELLIA_MIN_KEY_SIZE,
 			.max_keysize	= CAMELLIA_MAX_KEY_SIZE,
+<<<<<<< HEAD
+=======
+			.ivsize		= CAMELLIA_BLOCK_SIZE,
+>>>>>>> common/deprecated/android-3.18
 			.setkey		= camellia_set_key,
 			.encrypt	= cbc_encrypt,
 			.decrypt	= cbc_decrypt,

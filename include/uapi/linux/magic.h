@@ -60,6 +60,11 @@
 
 #define STACK_END_MAGIC		0x57AC6E9D
 
+<<<<<<< HEAD
+=======
+#define TRACEFS_MAGIC          0x74726163
+
+>>>>>>> common/deprecated/android-3.18
 #define V9FS_MAGIC		0x01021997
 
 #define BDEVFS_MAGIC            0x62646576

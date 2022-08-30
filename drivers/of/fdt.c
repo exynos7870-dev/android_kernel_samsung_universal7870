@@ -380,6 +380,12 @@ static void __unflatten_device_tree(void *blob,
 
 	/* Allocate memory for the expanded device tree */
 	mem = dt_alloc(size + 4, __alignof__(struct device_node));
+<<<<<<< HEAD
+=======
+	if (!mem)
+		return;
+
+>>>>>>> common/deprecated/android-3.18
 	memset(mem, 0, size);
 
 	*(__be32 *)(mem + size) = cpu_to_be32(0xdeadbeef);
@@ -582,9 +588,18 @@ int __init of_scan_flat_dt(int (*it)(unsigned long node,
 	const char *pathp;
 	int offset, rc = 0, depth = -1;
 
+<<<<<<< HEAD
         for (offset = fdt_next_node(blob, -1, &depth);
              offset >= 0 && depth >= 0 && !rc;
              offset = fdt_next_node(blob, offset, &depth)) {
+=======
+	if (!blob)
+		return 0;
+
+	for (offset = fdt_next_node(blob, -1, &depth);
+	     offset >= 0 && depth >= 0 && !rc;
+	     offset = fdt_next_node(blob, offset, &depth)) {
+>>>>>>> common/deprecated/android-3.18
 
 		pathp = fdt_get_name(blob, offset, NULL);
 		if (*pathp == '/')

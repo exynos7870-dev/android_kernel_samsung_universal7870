@@ -65,12 +65,21 @@ static struct rtnl_link_stats64 *internal_dev_get_stats(struct net_device *netde
 }
 
 /* Called with rcu_read_lock_bh. */
+<<<<<<< HEAD
 static int internal_dev_xmit(struct sk_buff *skb, struct net_device *netdev)
+=======
+static netdev_tx_t
+internal_dev_xmit(struct sk_buff *skb, struct net_device *netdev)
+>>>>>>> common/deprecated/android-3.18
 {
 	rcu_read_lock();
 	ovs_vport_receive(internal_dev_priv(netdev)->vport, skb, NULL);
 	rcu_read_unlock();
+<<<<<<< HEAD
 	return 0;
+=======
+	return NETDEV_TX_OK;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int internal_dev_open(struct net_device *netdev)

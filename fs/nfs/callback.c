@@ -128,7 +128,11 @@ nfs41_callback_svc(void *vrqstp)
 		if (try_to_freeze())
 			continue;
 
+<<<<<<< HEAD
 		prepare_to_wait(&serv->sv_cb_waitq, &wq, TASK_UNINTERRUPTIBLE);
+=======
+		prepare_to_wait(&serv->sv_cb_waitq, &wq, TASK_INTERRUPTIBLE);
+>>>>>>> common/deprecated/android-3.18
 		spin_lock_bh(&serv->sv_cb_lock);
 		if (!list_empty(&serv->sv_cb_list)) {
 			req = list_first_entry(&serv->sv_cb_list,
@@ -142,10 +146,17 @@ nfs41_callback_svc(void *vrqstp)
 				error);
 		} else {
 			spin_unlock_bh(&serv->sv_cb_lock);
+<<<<<<< HEAD
 			/* schedule_timeout to game the hung task watchdog */
 			schedule_timeout(60 * HZ);
 			finish_wait(&serv->sv_cb_waitq, &wq);
 		}
+=======
+			schedule();
+			finish_wait(&serv->sv_cb_waitq, &wq);
+		}
+		flush_signals(current);
+>>>>>>> common/deprecated/android-3.18
 	}
 	return 0;
 }
@@ -303,6 +314,10 @@ static int nfs_callback_up_net(int minorversion, struct svc_serv *serv, struct n
 err_socks:
 	svc_rpcb_cleanup(serv, net);
 err_bind:
+<<<<<<< HEAD
+=======
+	nn->cb_users[minorversion]--;
+>>>>>>> common/deprecated/android-3.18
 	dprintk("NFS: Couldn't create callback socket: err = %d; "
 			"net = %p\n", ret, net);
 	return ret;

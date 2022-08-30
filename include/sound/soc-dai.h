@@ -247,8 +247,13 @@ struct snd_soc_dai {
 	struct snd_soc_dai_driver *driver;
 
 	/* DAI runtime info */
+<<<<<<< HEAD
 	unsigned int capture_active:4;		/* stream is in use */
 	unsigned int playback_active:4;		/* stream is in use */
+=======
+	unsigned int capture_active:1;		/* stream is in use */
+	unsigned int playback_active:1;		/* stream is in use */
+>>>>>>> common/deprecated/android-3.18
 	unsigned int symmetric_rates:1;
 	unsigned int symmetric_channels:1;
 	unsigned int symmetric_samplebits:1;

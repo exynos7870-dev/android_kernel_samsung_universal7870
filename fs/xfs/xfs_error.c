@@ -166,9 +166,15 @@ xfs_verifier_error(
 {
 	struct xfs_mount *mp = bp->b_target->bt_mount;
 
+<<<<<<< HEAD
 	xfs_alert(mp, "Metadata %s detected at %pF, block 0x%llx",
 		  bp->b_error == -EFSBADCRC ? "CRC error" : "corruption",
 		  __return_address, bp->b_bn);
+=======
+	xfs_alert(mp, "Metadata %s detected at %pF, %s block 0x%llx",
+		  bp->b_error == -EFSBADCRC ? "CRC error" : "corruption",
+		  __return_address, bp->b_ops->name, bp->b_bn);
+>>>>>>> common/deprecated/android-3.18
 
 	xfs_alert(mp, "Unmount and run xfs_repair");
 

@@ -745,6 +745,17 @@ static const struct dmi_system_id intel_no_lvds[] = {
 			DMI_EXACT_MATCH(DMI_BOARD_NAME, "D525MW"),
 		},
 	},
+<<<<<<< HEAD
+=======
+	{
+		.callback = intel_no_lvds_dmi_callback,
+		.ident = "Radiant P845",
+		.matches = {
+			DMI_MATCH(DMI_SYS_VENDOR, "Radiant Systems Inc"),
+			DMI_MATCH(DMI_PRODUCT_NAME, "P845"),
+		},
+	},
+>>>>>>> common/deprecated/android-3.18
 
 	{ }	/* terminating entry */
 };
@@ -809,12 +820,35 @@ static int intel_dual_link_lvds_callback(const struct dmi_system_id *id)
 static const struct dmi_system_id intel_dual_link_lvds[] = {
 	{
 		.callback = intel_dual_link_lvds_callback,
+<<<<<<< HEAD
 		.ident = "Apple MacBook Pro (Core i5/i7 Series)",
+=======
+		.ident = "Apple MacBook Pro 15\" (2010)",
+		.matches = {
+			DMI_MATCH(DMI_SYS_VENDOR, "Apple Inc."),
+			DMI_MATCH(DMI_PRODUCT_NAME, "MacBookPro6,2"),
+		},
+	},
+	{
+		.callback = intel_dual_link_lvds_callback,
+		.ident = "Apple MacBook Pro 15\" (2011)",
+>>>>>>> common/deprecated/android-3.18
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Apple Inc."),
 			DMI_MATCH(DMI_PRODUCT_NAME, "MacBookPro8,2"),
 		},
 	},
+<<<<<<< HEAD
+=======
+	{
+		.callback = intel_dual_link_lvds_callback,
+		.ident = "Apple MacBook Pro 15\" (2012)",
+		.matches = {
+			DMI_MATCH(DMI_SYS_VENDOR, "Apple Inc."),
+			DMI_MATCH(DMI_PRODUCT_NAME, "MacBookPro9,1"),
+		},
+	},
+>>>>>>> common/deprecated/android-3.18
 	{ }	/* terminating entry */
 };
 

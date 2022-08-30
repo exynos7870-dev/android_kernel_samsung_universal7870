@@ -15,6 +15,17 @@ SUBSYS(cpu)
 SUBSYS(cpuacct)
 #endif
 
+<<<<<<< HEAD
+=======
+#if IS_ENABLED(CONFIG_CGROUP_SCHEDTUNE)
+SUBSYS(schedtune)
+#endif
+
+#if IS_ENABLED(CONFIG_BLK_CGROUP)
+SUBSYS(blkio)
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 #if IS_ENABLED(CONFIG_MEMCG)
 SUBSYS(memory)
 #endif
@@ -31,10 +42,13 @@ SUBSYS(freezer)
 SUBSYS(net_cls)
 #endif
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_BLK_CGROUP)
 SUBSYS(blkio)
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #if IS_ENABLED(CONFIG_CGROUP_PERF)
 SUBSYS(perf_event)
 #endif

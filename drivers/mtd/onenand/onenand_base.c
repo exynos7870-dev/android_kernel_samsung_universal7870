@@ -2605,6 +2605,10 @@ static int onenand_default_block_markbad(struct mtd_info *mtd, loff_t ofs)
  */
 static int onenand_block_markbad(struct mtd_info *mtd, loff_t ofs)
 {
+<<<<<<< HEAD
+=======
+	struct onenand_chip *this = mtd->priv;
+>>>>>>> common/deprecated/android-3.18
 	int ret;
 
 	ret = onenand_block_isbad(mtd, ofs);
@@ -2616,7 +2620,11 @@ static int onenand_block_markbad(struct mtd_info *mtd, loff_t ofs)
 	}
 
 	onenand_get_device(mtd, FL_WRITING);
+<<<<<<< HEAD
 	ret = mtd_block_markbad(mtd, ofs);
+=======
+	ret = this->block_markbad(mtd, ofs);
+>>>>>>> common/deprecated/android-3.18
 	onenand_release_device(mtd);
 	return ret;
 }

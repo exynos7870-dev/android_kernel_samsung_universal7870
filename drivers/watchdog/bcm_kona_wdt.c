@@ -299,6 +299,11 @@ static int bcm_kona_wdt_probe(struct platform_device *pdev)
 	if (!wdt)
 		return -ENOMEM;
 
+<<<<<<< HEAD
+=======
+	spin_lock_init(&wdt->lock);
+
+>>>>>>> common/deprecated/android-3.18
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	wdt->base = devm_ioremap_resource(dev, res);
 	if (IS_ERR(wdt->base))
@@ -311,7 +316,10 @@ static int bcm_kona_wdt_probe(struct platform_device *pdev)
 		return ret;
 	}
 
+<<<<<<< HEAD
 	spin_lock_init(&wdt->lock);
+=======
+>>>>>>> common/deprecated/android-3.18
 	platform_set_drvdata(pdev, wdt);
 	watchdog_set_drvdata(&bcm_kona_wdt_wdd, wdt);
 

@@ -1069,7 +1069,11 @@ static int dvb_demux_do_ioctl(struct file *file,
 		break;
 
 	default:
+<<<<<<< HEAD
 		ret = -EINVAL;
+=======
+		ret = -ENOTTY;
+>>>>>>> common/deprecated/android-3.18
 		break;
 	}
 	mutex_unlock(&dmxdev->mutex);

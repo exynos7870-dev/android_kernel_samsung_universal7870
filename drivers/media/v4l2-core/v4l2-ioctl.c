@@ -2466,7 +2466,11 @@ video_usercopy(struct file *file, unsigned int cmd, unsigned long arg,
 	       v4l2_kioctl func)
 {
 	char	sbuf[128];
+<<<<<<< HEAD
 	void    *mbuf = NULL;
+=======
+	void    *mbuf = NULL, *array_buf = NULL;
+>>>>>>> common/deprecated/android-3.18
 	void	*parg = (void *)arg;
 	long	err  = -EINVAL;
 	bool	has_array_args;
@@ -2521,6 +2525,7 @@ video_usercopy(struct file *file, unsigned int cmd, unsigned long arg,
 	has_array_args = err;
 
 	if (has_array_args) {
+<<<<<<< HEAD
 		/*
 		 * When adding new types of array args, make sure that the
 		 * parent argument to ioctl (which contains the pointer to the
@@ -2535,12 +2540,30 @@ video_usercopy(struct file *file, unsigned int cmd, unsigned long arg,
 		if (copy_from_user(mbuf, user_ptr, array_size))
 			goto out_array_args;
 		*kernel_ptr = mbuf;
+=======
+		array_buf = kmalloc(array_size, GFP_KERNEL);
+		err = -ENOMEM;
+		if (array_buf == NULL)
+			goto out_array_args;
+		err = -EFAULT;
+		if (copy_from_user(array_buf, user_ptr, array_size))
+			goto out_array_args;
+		*kernel_ptr = array_buf;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/* Handles IOCTL */
 	err = func(file, cmd, parg);
+<<<<<<< HEAD
 	if (err == -ENOIOCTLCMD)
 		err = -ENOTTY;
+=======
+	if (err == -ENOTTY || err == -ENOIOCTLCMD) {
+		err = -ENOTTY;
+		goto out;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	if (err == 0) {
 		if (cmd == VIDIOC_DQBUF)
 			trace_v4l2_dqbuf(video_devdata(file)->minor, parg);
@@ -2550,7 +2573,11 @@ video_usercopy(struct file *file, unsigned int cmd, unsigned long arg,
 
 	if (has_array_args) {
 		*kernel_ptr = (void __force *)user_ptr;
+<<<<<<< HEAD
 		if (copy_to_user(user_ptr, mbuf, array_size))
+=======
+		if (copy_to_user(user_ptr, array_buf, array_size))
+>>>>>>> common/deprecated/android-3.18
 			err = -EFAULT;
 		goto out_array_args;
 	}
@@ -2570,6 +2597,10 @@ out_array_args:
 	}
 
 out:
+<<<<<<< HEAD
+=======
+	kfree(array_buf);
+>>>>>>> common/deprecated/android-3.18
 	kfree(mbuf);
 	return err;
 }

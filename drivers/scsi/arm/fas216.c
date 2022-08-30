@@ -2010,7 +2010,11 @@ static void fas216_rq_sns_done(FAS216_Info *info, struct scsi_cmnd *SCpnt,
 		 * have valid data in the sense buffer that could
 		 * confuse the higher levels.
 		 */
+<<<<<<< HEAD
 		memset(SCpnt->sense_buffer, 0, sizeof(SCpnt->sense_buffer));
+=======
+		memset(SCpnt->sense_buffer, 0, SCSI_SENSE_BUFFERSIZE);
+>>>>>>> common/deprecated/android-3.18
 //printk("scsi%d.%c: sense buffer: ", info->host->host_no, '0' + SCpnt->device->id);
 //{ int i; for (i = 0; i < 32; i++) printk("%02x ", SCpnt->sense_buffer[i]); printk("\n"); }
 	/*

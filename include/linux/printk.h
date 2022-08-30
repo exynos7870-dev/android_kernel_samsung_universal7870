@@ -18,9 +18,12 @@ static inline int printk_get_level(const char *buffer)
 	if (buffer[0] == KERN_SOH_ASCII && buffer[1]) {
 		switch (buffer[1]) {
 		case '0' ... '7':
+<<<<<<< HEAD
 #ifdef CONFIG_SEC_DEBUG_AUTO_SUMMARY
 		case 'B' ... 'J':
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 		case 'd':	/* KERN_DEFAULT */
 			return buffer[1];
 		}
@@ -110,6 +113,7 @@ struct va_format {
 
 /*
  * Dummy printk for disabled debugging statements to use whilst maintaining
+<<<<<<< HEAD
  * gcc's format and side-effect checking.
  */
 static inline __printf(1, 2)
@@ -117,6 +121,15 @@ int no_printk(const char *fmt, ...)
 {
 	return 0;
 }
+=======
+ * gcc's format checking.
+ */
+#define no_printk(fmt, ...)			\
+do {						\
+	if (0)					\
+		printk(fmt, ##__VA_ARGS__);	\
+} while (0)
+>>>>>>> common/deprecated/android-3.18
 
 #ifdef CONFIG_EARLY_PRINTK
 extern asmlinkage __printf(1, 2)
@@ -239,6 +252,7 @@ extern asmlinkage void dump_stack(void) __cold;
 	printk(KERN_ALERT pr_fmt(fmt), ##__VA_ARGS__)
 #define pr_crit(fmt, ...) \
 	printk(KERN_CRIT pr_fmt(fmt), ##__VA_ARGS__)
+<<<<<<< HEAD
 #if defined(CONFIG_SEC_BAT_AUT) && !defined(CONFIG_SAMSUNG_PRODUCT_SHIP)
 #define BAT_AUTOMAION_TEST_PREFIX_ERR "<3>@BATAUTERR@"
 #define BAT_AUTOMAION_TEST_PREFIX_WARN "<3>@BATAUTWARN@"
@@ -248,6 +262,10 @@ extern asmlinkage void dump_stack(void) __cold;
 #define pr_err(fmt, ...) \
 	printk(KERN_ERR pr_fmt(fmt), ##__VA_ARGS__)
 #endif
+=======
+#define pr_err(fmt, ...) \
+	printk(KERN_ERR pr_fmt(fmt), ##__VA_ARGS__)
+>>>>>>> common/deprecated/android-3.18
 #define pr_warning(fmt, ...) \
 	printk(KERN_WARNING pr_fmt(fmt), ##__VA_ARGS__)
 #define pr_warn pr_warning
@@ -258,6 +276,7 @@ extern asmlinkage void dump_stack(void) __cold;
 #define pr_cont(fmt, ...) \
 	printk(KERN_CONT fmt, ##__VA_ARGS__)
 
+<<<<<<< HEAD
 #ifdef CONFIG_SEC_DEBUG_AUTO_SUMMARY
 #define pr_auto(index, fmt, ...) \
 	printk(KERN_AUTO index pr_fmt(fmt), ##__VA_ARGS__)
@@ -283,6 +302,8 @@ extern asmlinkage void dump_stack(void) __cold;
 #define pr_auto_once(index)
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /* pr_devel() should produce zero code unless DEBUG is defined */
 #ifdef DEBUG
 #define pr_devel(fmt, ...) \

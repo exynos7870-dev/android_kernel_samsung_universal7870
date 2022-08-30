@@ -454,7 +454,11 @@ static ssize_t fsp_attr_set_setreg(struct psmouse *psmouse, void *data,
 
 	fsp_reg_write_enable(psmouse, false);
 
+<<<<<<< HEAD
 	return count;
+=======
+	return retval;
+>>>>>>> common/deprecated/android-3.18
 }
 
 PSMOUSE_DEFINE_WO_ATTR(setreg, S_IWUSR, NULL, fsp_attr_set_setreg);

@@ -311,7 +311,11 @@ static int genregs64_set(struct task_struct *target,
 	}
 
 	if (!ret) {
+<<<<<<< HEAD
 		unsigned long y;
+=======
+		unsigned long y = regs->y;
+>>>>>>> common/deprecated/android-3.18
 
 		ret = user_regset_copyin(&pos, &count, &kbuf, &ubuf,
 					 &y,

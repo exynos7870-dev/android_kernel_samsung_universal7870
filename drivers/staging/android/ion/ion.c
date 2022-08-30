@@ -15,8 +15,13 @@
  *
  */
 
+<<<<<<< HEAD
 #include <linux/device.h>
 #include <linux/atomic.h>
+=======
+#include <linux/atomic.h>
+#include <linux/device.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/err.h>
 #include <linux/file.h>
 #include <linux/freezer.h>
@@ -37,6 +42,7 @@
 #include <linux/debugfs.h>
 #include <linux/dma-buf.h>
 #include <linux/idr.h>
+<<<<<<< HEAD
 #include <linux/exynos_iovmm.h>
 #include <linux/exynos_ion.h>
 #include <linux/highmem.h>
@@ -46,6 +52,10 @@
 #include <asm/tlbflush.h>
 
 #define CREATE_TRACE_POINTS
+=======
+
+#include "ion.h"
+>>>>>>> common/deprecated/android-3.18
 #include "ion_priv.h"
 #include "compat_ion.h"
 
@@ -70,6 +80,7 @@ struct ion_device {
 	struct dentry *debug_root;
 	struct dentry *heaps_debug_root;
 	struct dentry *clients_debug_root;
+<<<<<<< HEAD
 	struct semaphore vm_sem;
 	atomic_t page_idx;
 	struct vm_struct *reserved_vm_area;
@@ -82,6 +93,8 @@ struct ion_device {
 	struct ion_eventlog eventlog[ION_EVENT_LOG_MAX];
 	atomic_t event_idx;
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 /**
@@ -128,7 +141,10 @@ struct ion_client {
  */
 struct ion_handle {
 	struct kref ref;
+<<<<<<< HEAD
 	unsigned int user_ref_count;
+=======
+>>>>>>> common/deprecated/android-3.18
 	struct ion_client *client;
 	struct ion_buffer *buffer;
 	struct rb_node node;
@@ -136,7 +152,20 @@ struct ion_handle {
 	int id;
 };
 
+<<<<<<< HEAD
 struct ion_device *g_idev;
+=======
+bool ion_buffer_fault_user_mappings(struct ion_buffer *buffer)
+{
+	return (buffer->flags & ION_FLAG_CACHED) &&
+		!(buffer->flags & ION_FLAG_CACHED_NEEDS_SYNC);
+}
+
+bool ion_buffer_cached(struct ion_buffer *buffer)
+{
+	return !!(buffer->flags & ION_FLAG_CACHED);
+}
+>>>>>>> common/deprecated/android-3.18
 
 static inline struct page *ion_buffer_page(struct page *page)
 {
@@ -158,6 +187,7 @@ static inline void ion_buffer_page_clean(struct page **page)
 	*page = (struct page *)((unsigned long)(*page) & ~(1UL));
 }
 
+<<<<<<< HEAD
 void ion_debug_heap_usage_show(struct ion_heap *heap)
 {
 	struct scatterlist *sg;
@@ -370,6 +400,8 @@ static void ion_buffer_task_remove_all(struct ion_buffer *buffer)
 #define ion_buffer_task_remove_all(buffer)		do { } while (0)
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /* this function should only be called while dev->lock is held */
 static void ion_buffer_add(struct ion_device *dev,
 			   struct ion_buffer *buffer)
@@ -394,9 +426,12 @@ static void ion_buffer_add(struct ion_device *dev,
 
 	rb_link_node(&buffer->node, parent, p);
 	rb_insert_color(&buffer->node, &dev->buffers);
+<<<<<<< HEAD
 
 	ion_buffer_set_task_info(buffer);
 	ion_buffer_task_add(buffer, dev->dev.this_device);
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 
 /* this function should only be called while dev->lock is held */
@@ -417,7 +452,10 @@ static struct ion_buffer *ion_buffer_create(struct ion_heap *heap,
 
 	buffer->heap = heap;
 	buffer->flags = flags;
+<<<<<<< HEAD
 	buffer->size = len;
+=======
+>>>>>>> common/deprecated/android-3.18
 	kref_init(&buffer->ref);
 
 	ret = heap->ops->allocate(heap, buffer, len, align, flags);
@@ -434,16 +472,27 @@ static struct ion_buffer *ion_buffer_create(struct ion_heap *heap,
 	}
 
 	buffer->dev = dev;
+<<<<<<< HEAD
+=======
+	buffer->size = len;
+>>>>>>> common/deprecated/android-3.18
 
 	table = heap->ops->map_dma(heap, buffer);
 	if (WARN_ONCE(table == NULL,
 			"heap->ops->map_dma should return ERR_PTR on error"))
 		table = ERR_PTR(-EINVAL);
 	if (IS_ERR(table)) {
+<<<<<<< HEAD
 		heap->ops->free(buffer);
 		kfree(buffer);
 		return ERR_CAST(table);
 	}
+=======
+		ret = -EINVAL;
+		goto err1;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	buffer->sg_table = table;
 	if (ion_buffer_fault_user_mappings(buffer)) {
 		int num_pages = PAGE_ALIGN(buffer->size) / PAGE_SIZE;
@@ -453,7 +502,11 @@ static struct ion_buffer *ion_buffer_create(struct ion_heap *heap,
 		buffer->pages = vmalloc(sizeof(struct page *) * num_pages);
 		if (!buffer->pages) {
 			ret = -ENOMEM;
+<<<<<<< HEAD
 			goto err1;
+=======
+			goto err;
+>>>>>>> common/deprecated/android-3.18
 		}
 
 		for_each_sg(table->sgl, sg, table->nents, i) {
@@ -467,7 +520,10 @@ static struct ion_buffer *ion_buffer_create(struct ion_heap *heap,
 	buffer->dev = dev;
 	buffer->size = len;
 	INIT_LIST_HEAD(&buffer->vmas);
+<<<<<<< HEAD
 	INIT_LIST_HEAD(&buffer->iovas);
+=======
+>>>>>>> common/deprecated/android-3.18
 	mutex_init(&buffer->lock);
 	/* this will set up dma addresses for the sglist -- it is not
 	   technically correct as per the dma api -- a specific
@@ -477,15 +533,28 @@ static struct ion_buffer *ion_buffer_create(struct ion_heap *heap,
 	   allocation via dma_map_sg. The implicit contract here is that
 	   memory coming from the heaps is ready for dma, ie if it has a
 	   cached mapping that mapping has been invalidated */
+<<<<<<< HEAD
 	for_each_sg(buffer->sg_table->sgl, sg, buffer->sg_table->nents, i)
 		sg_dma_address(sg) = sg_phys(sg);
+=======
+	for_each_sg(buffer->sg_table->sgl, sg, buffer->sg_table->nents, i) {
+		sg_dma_address(sg) = sg_phys(sg);
+		sg_dma_len(sg) = sg->length;
+	}
+>>>>>>> common/deprecated/android-3.18
 	mutex_lock(&dev->buffer_lock);
 	ion_buffer_add(dev, buffer);
 	mutex_unlock(&dev->buffer_lock);
 	return buffer;
 
+<<<<<<< HEAD
 err1:
 	heap->ops->unmap_dma(heap, buffer);
+=======
+err:
+	heap->ops->unmap_dma(heap, buffer);
+err1:
+>>>>>>> common/deprecated/android-3.18
 	heap->ops->free(buffer);
 err2:
 	kfree(buffer);
@@ -494,6 +563,7 @@ err2:
 
 void ion_buffer_destroy(struct ion_buffer *buffer)
 {
+<<<<<<< HEAD
 	struct ion_iovm_map *iovm_map;
 	struct ion_iovm_map *tmp;
 
@@ -510,15 +580,22 @@ void ion_buffer_destroy(struct ion_buffer *buffer)
 		kfree(iovm_map);
 	}
 
+=======
+	if (WARN_ON(buffer->kmap_cnt > 0))
+		buffer->heap->ops->unmap_kernel(buffer->heap, buffer);
+>>>>>>> common/deprecated/android-3.18
 	buffer->heap->ops->unmap_dma(buffer->heap, buffer);
 	buffer->heap->ops->free(buffer);
 	if (buffer->pages)
 		vfree(buffer->pages);
+<<<<<<< HEAD
 
 	ion_buffer_task_remove_all(buffer);
 	ION_EVENT_FREE(buffer, ION_EVENT_DONE());
 	trace_ion_free_end((unsigned long) buffer, buffer->size,
 				buffer->private_flags & ION_PRIV_FLAG_SHRINKER_FREE);
+=======
+>>>>>>> common/deprecated/android-3.18
 	kfree(buffer);
 }
 
@@ -579,6 +656,7 @@ static void ion_buffer_remove_from_handle(struct ion_buffer *buffer)
 	mutex_unlock(&buffer->lock);
 }
 
+<<<<<<< HEAD
 static bool ion_handle_validate(struct ion_client *client,
 				struct ion_handle *handle)
 {
@@ -586,6 +664,8 @@ static bool ion_handle_validate(struct ion_client *client,
 	return idr_find(&client->idr, handle->id) == handle;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static struct ion_handle *ion_handle_create(struct ion_client *client,
 				     struct ion_buffer *buffer)
 {
@@ -638,7 +718,12 @@ static void ion_handle_get(struct ion_handle *handle)
 }
 
 /* Must hold the client lock */
+<<<<<<< HEAD
 static struct ion_handle* ion_handle_get_check_overflow(struct ion_handle *handle)
+=======
+static struct ion_handle *ion_handle_get_check_overflow(
+					struct ion_handle *handle)
+>>>>>>> common/deprecated/android-3.18
 {
 	if (atomic_read(&handle->ref.refcount) + 1 == 0)
 		return ERR_PTR(-EOVERFLOW);
@@ -655,6 +740,7 @@ static int ion_handle_put_nolock(struct ion_handle *handle)
 	return ret;
 }
 
+<<<<<<< HEAD
 int ion_handle_put(struct ion_client *client, struct ion_handle *handle)
 {
 	bool valid_handle;
@@ -668,12 +754,21 @@ int ion_handle_put(struct ion_client *client, struct ion_handle *handle)
 		mutex_unlock(&client->lock);
 		return -EINVAL;
 	}
+=======
+int ion_handle_put(struct ion_handle *handle)
+{
+	struct ion_client *client = handle->client;
+	int ret;
+
+	mutex_lock(&client->lock);
+>>>>>>> common/deprecated/android-3.18
 	ret = ion_handle_put_nolock(handle);
 	mutex_unlock(&client->lock);
 
 	return ret;
 }
 
+<<<<<<< HEAD
 /* Must hold the client lock */
 static void user_ion_handle_get(struct ion_handle *handle)
 {
@@ -718,6 +813,8 @@ static int user_ion_handle_put_nolock(struct ion_handle *handle)
 	return ret;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static struct ion_handle *ion_handle_lookup(struct ion_client *client,
 					    struct ion_buffer *buffer)
 {
@@ -748,6 +845,7 @@ static struct ion_handle *ion_handle_get_by_id_nolock(struct ion_client *client,
 	return ERR_PTR(-EINVAL);
 }
 
+<<<<<<< HEAD
 struct ion_handle *ion_handle_get_by_id(struct ion_client *client,
 						int id)
 {
@@ -758,6 +856,13 @@ struct ion_handle *ion_handle_get_by_id(struct ion_client *client,
 	mutex_unlock(&client->lock);
 
 	return handle;
+=======
+static bool ion_handle_validate(struct ion_client *client,
+				struct ion_handle *handle)
+{
+	WARN_ON(!mutex_is_locked(&client->lock));
+	return idr_find(&client->idr, handle->id) == handle;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int ion_handle_add(struct ion_client *client, struct ion_handle *handle)
@@ -768,10 +873,15 @@ static int ion_handle_add(struct ion_client *client, struct ion_handle *handle)
 	struct ion_handle *entry;
 
 	id = idr_alloc(&client->idr, handle, 1, 0, GFP_KERNEL);
+<<<<<<< HEAD
 	if (id < 0) {
 		pr_err("%s: Fail to get bad id (ret %d)\n", __func__, id);
 		return id;
 	}
+=======
+	if (id < 0)
+		return id;
+>>>>>>> common/deprecated/android-3.18
 
 	handle->id = id;
 
@@ -793,11 +903,17 @@ static int ion_handle_add(struct ion_client *client, struct ion_handle *handle)
 	return 0;
 }
 
+<<<<<<< HEAD
 unsigned int ion_parse_heap_id(unsigned int heap_id_mask, unsigned int flags);
 
 static struct ion_handle *__ion_alloc(struct ion_client *client, size_t len,
 			     size_t align, unsigned int heap_id_mask,
 			     unsigned int flags, bool grab_handle)
+=======
+struct ion_handle *ion_alloc(struct ion_client *client, size_t len,
+			     size_t align, unsigned int heap_id_mask,
+			     unsigned int flags)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct ion_handle *handle;
 	struct ion_device *dev = client->dev;
@@ -805,9 +921,12 @@ static struct ion_handle *__ion_alloc(struct ion_client *client, size_t len,
 	struct ion_heap *heap;
 	int ret;
 
+<<<<<<< HEAD
 	ION_EVENT_BEGIN();
 	trace_ion_alloc_start(client->name, 0, len, align, heap_id_mask, flags);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	pr_debug("%s: len %zu align %zu heap_id_mask %u flags %x\n", __func__,
 		 len, align, heap_id_mask, flags);
 	/*
@@ -817,6 +936,7 @@ static struct ion_handle *__ion_alloc(struct ion_client *client, size_t len,
 	 * succeeded or all heaps have been tried
 	 */
 	len = PAGE_ALIGN(len);
+<<<<<<< HEAD
 	if (WARN_ON(!len)) {
 		trace_ion_alloc_fail(client->name, EINVAL, len,
 				align, heap_id_mask, flags);
@@ -829,6 +949,11 @@ static struct ion_handle *__ion_alloc(struct ion_client *client, size_t len,
 				align, heap_id_mask, flags);
 		return ERR_PTR(-EINVAL);
 	}
+=======
+
+	if (!len)
+		return ERR_PTR(-EINVAL);
+>>>>>>> common/deprecated/android-3.18
 
 	down_read(&dev->lock);
 	plist_for_each_entry(heap, &dev->heaps, node) {
@@ -841,6 +966,7 @@ static struct ion_handle *__ion_alloc(struct ion_client *client, size_t len,
 	}
 	up_read(&dev->lock);
 
+<<<<<<< HEAD
 	if (buffer == NULL) {
 		trace_ion_alloc_fail(client->name, ENODEV, len,
 				align, heap_id_mask, flags);
@@ -852,6 +978,13 @@ static struct ion_handle *__ion_alloc(struct ion_client *client, size_t len,
 					len, align, heap_id_mask, flags);
 		return ERR_CAST(buffer);
 	}
+=======
+	if (buffer == NULL)
+		return ERR_PTR(-ENODEV);
+
+	if (IS_ERR(buffer))
+		return ERR_CAST(buffer);
+>>>>>>> common/deprecated/android-3.18
 
 	handle = ion_handle_create(client, buffer);
 
@@ -861,6 +994,7 @@ static struct ion_handle *__ion_alloc(struct ion_client *client, size_t len,
 	 */
 	ion_buffer_put(buffer);
 
+<<<<<<< HEAD
 	if (IS_ERR(handle)) {
 		trace_ion_alloc_fail(client->name, (unsigned long) buffer,
 					len, align, heap_id_mask, flags);
@@ -892,6 +1026,21 @@ struct ion_handle *ion_alloc(struct ion_client *client, size_t len,
 {
 	return __ion_alloc(client, len, align, heap_id_mask, flags, false);
 }
+=======
+	if (IS_ERR(handle))
+		return handle;
+
+	mutex_lock(&client->lock);
+	ret = ion_handle_add(client, handle);
+	mutex_unlock(&client->lock);
+	if (ret) {
+		ion_handle_put(handle);
+		handle = ERR_PTR(ret);
+	}
+
+	return handle;
+}
+>>>>>>> common/deprecated/android-3.18
 EXPORT_SYMBOL(ion_alloc);
 
 static void ion_free_nolock(struct ion_client *client, struct ion_handle *handle)
@@ -909,6 +1058,7 @@ static void ion_free_nolock(struct ion_client *client, struct ion_handle *handle
 	ion_handle_put_nolock(handle);
 }
 
+<<<<<<< HEAD
 static void user_ion_free_nolock(struct ion_client *client, struct ion_handle *handle)
 {
 	bool valid_handle;
@@ -927,6 +1077,8 @@ static void user_ion_free_nolock(struct ion_client *client, struct ion_handle *h
 	user_ion_handle_put_nolock(handle);
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 void ion_free(struct ion_client *client, struct ion_handle *handle)
 {
 	BUG_ON(client != handle->client);
@@ -979,9 +1131,12 @@ static void *ion_buffer_kmap_get(struct ion_buffer *buffer)
 		return vaddr;
 	buffer->vaddr = vaddr;
 	buffer->kmap_cnt++;
+<<<<<<< HEAD
 
 	ion_buffer_make_ready(buffer);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	return vaddr;
 }
 
@@ -1071,6 +1226,7 @@ static int ion_debug_client_show(struct seq_file *s, void *unused)
 	struct ion_client *client = s->private;
 	struct rb_node *n;
 	size_t sizes[ION_NUM_HEAP_IDS] = {0};
+<<<<<<< HEAD
 	size_t sizes_pss[ION_NUM_HEAP_IDS] = {0};
 	const char *names[ION_NUM_HEAP_IDS] = {NULL};
 	int i;
@@ -1095,10 +1251,16 @@ static int ion_debug_client_show(struct seq_file *s, void *unused)
 	seq_printf(s, "----------------------------------------------"
 			"--------------------------------------------\n");
 
+=======
+	const char *names[ION_NUM_HEAP_IDS] = {NULL};
+	int i;
+
+>>>>>>> common/deprecated/android-3.18
 	mutex_lock(&client->lock);
 	for (n = rb_first(&client->handles); n; n = rb_next(n)) {
 		struct ion_handle *handle = rb_entry(n, struct ion_handle,
 						     node);
+<<<<<<< HEAD
 		struct ion_buffer *buffer = handle->buffer;
 		unsigned int id = buffer->heap->id;
 
@@ -1123,6 +1285,21 @@ static int ion_debug_client_show(struct seq_file *s, void *unused)
 			continue;
 		seq_printf(s, "%16.16s: %16zu %18zu\n",
 				names[i], sizes[i], sizes_pss[i]);
+=======
+		unsigned int id = handle->buffer->heap->id;
+
+		if (!names[id])
+			names[id] = handle->buffer->heap->name;
+		sizes[id] += handle->buffer->size;
+	}
+	mutex_unlock(&client->lock);
+
+	seq_printf(s, "%16.16s: %16.16s\n", "heap_name", "size_in_bytes");
+	for (i = 0; i < ION_NUM_HEAP_IDS; i++) {
+		if (!names[i])
+			continue;
+		seq_printf(s, "%16.16s: %16zu\n", names[i], sizes[i]);
+>>>>>>> common/deprecated/android-3.18
 	}
 	return 0;
 }
@@ -1251,15 +1428,21 @@ void ion_client_destroy(struct ion_client *client)
 	struct rb_node *n;
 
 	pr_debug("%s: %d\n", __func__, __LINE__);
+<<<<<<< HEAD
 
 	mutex_lock(&client->lock);
+=======
+>>>>>>> common/deprecated/android-3.18
 	while ((n = rb_first(&client->handles))) {
 		struct ion_handle *handle = rb_entry(n, struct ion_handle,
 						     node);
 		ion_handle_destroy(&handle->ref);
 	}
 
+<<<<<<< HEAD
 	mutex_unlock(&client->lock);
+=======
+>>>>>>> common/deprecated/android-3.18
 	idr_destroy(&client->idr);
 
 	down_write(&dev->lock);
@@ -1306,9 +1489,12 @@ static struct sg_table *ion_map_dma_buf(struct dma_buf_attachment *attachment,
 	struct ion_buffer *buffer = dmabuf->priv;
 
 	ion_buffer_sync_for_device(buffer, attachment->dev, direction);
+<<<<<<< HEAD
 
 	ion_buffer_task_add_lock(buffer, attachment->dev);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	return buffer->sg_table;
 }
 
@@ -1316,7 +1502,10 @@ static void ion_unmap_dma_buf(struct dma_buf_attachment *attachment,
 			      struct sg_table *table,
 			      enum dma_data_direction direction)
 {
+<<<<<<< HEAD
 	ion_buffer_task_remove_lock(attachment->dmabuf->priv, attachment->dev);
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 
 void ion_pages_sync_for_device(struct device *dev, struct page *page,
@@ -1348,11 +1537,14 @@ static void ion_buffer_sync_for_device(struct ion_buffer *buffer,
 	int pages = PAGE_ALIGN(buffer->size) / PAGE_SIZE;
 	int i;
 
+<<<<<<< HEAD
 	ion_buffer_make_ready_lock(buffer);
 
 	if (!ion_buffer_cached(buffer))
 		return;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	pr_debug("%s: syncing for device %s\n", __func__,
 		 dev ? dev_name(dev) : "null");
 
@@ -1409,7 +1601,11 @@ static void ion_vm_open(struct vm_area_struct *vma)
 	mutex_lock(&buffer->lock);
 	list_add(&vma_list->list, &buffer->vmas);
 	mutex_unlock(&buffer->lock);
+<<<<<<< HEAD
 	pr_debug("%s: adding %pK\n", __func__, vma);
+=======
+	pr_debug("%s: adding %p\n", __func__, vma);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void ion_vm_close(struct vm_area_struct *vma)
@@ -1424,7 +1620,11 @@ static void ion_vm_close(struct vm_area_struct *vma)
 			continue;
 		list_del(&vma_list->list);
 		kfree(vma_list);
+<<<<<<< HEAD
 		pr_debug("%s: deleting %pK\n", __func__, vma);
+=======
+		pr_debug("%s: deleting %p\n", __func__, vma);
+>>>>>>> common/deprecated/android-3.18
 		break;
 	}
 	mutex_unlock(&buffer->lock);
@@ -1441,6 +1641,7 @@ static int ion_mmap(struct dma_buf *dmabuf, struct vm_area_struct *vma)
 	struct ion_buffer *buffer = dmabuf->priv;
 	int ret = 0;
 
+<<<<<<< HEAD
 	ION_EVENT_BEGIN();
 
 	if (buffer->flags & ION_FLAG_NOZEROED) {
@@ -1462,35 +1663,46 @@ static int ion_mmap(struct dma_buf *dmabuf, struct vm_area_struct *vma)
 		return -EINVAL;
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (!buffer->heap->ops->map_user) {
 		pr_err("%s: this heap does not define a method for mapping to userspace\n",
 			__func__);
 		return -EINVAL;
 	}
 
+<<<<<<< HEAD
 	trace_ion_mmap_start((unsigned long) buffer, buffer->size,
 			!(buffer->flags & ION_FLAG_CACHED_NEEDS_SYNC));
 
 	ion_buffer_make_ready_lock(buffer);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (ion_buffer_fault_user_mappings(buffer)) {
 		vma->vm_flags |= VM_IO | VM_PFNMAP | VM_DONTEXPAND |
 							VM_DONTDUMP;
 		vma->vm_private_data = buffer;
 		vma->vm_ops = &ion_vma_ops;
 		ion_vm_open(vma);
+<<<<<<< HEAD
 		ION_EVENT_MMAP(buffer, ION_EVENT_DONE());
 		trace_ion_mmap_end((unsigned long) buffer, buffer->size,
 				!(buffer->flags & ION_FLAG_CACHED_NEEDS_SYNC));
+=======
+>>>>>>> common/deprecated/android-3.18
 		return 0;
 	}
 
 	if (!(buffer->flags & ION_FLAG_CACHED))
 		vma->vm_page_prot = pgprot_writecombine(vma->vm_page_prot);
 
+<<<<<<< HEAD
 	/* Default writeable */
 	vma->vm_page_prot = pte_mkdirty(vma->vm_page_prot);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	mutex_lock(&buffer->lock);
 	/* now map it to userspace */
 	ret = buffer->heap->ops->map_user(buffer->heap, buffer, vma);
@@ -1500,10 +1712,13 @@ static int ion_mmap(struct dma_buf *dmabuf, struct vm_area_struct *vma)
 		pr_err("%s: failure mapping buffer to userspace\n",
 		       __func__);
 
+<<<<<<< HEAD
 	ION_EVENT_MMAP(buffer, ION_EVENT_DONE());
 	trace_ion_mmap_end((unsigned long) buffer, buffer->size,
 			!(buffer->flags & ION_FLAG_CACHED_NEEDS_SYNC));
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	return ret;
 }
 
@@ -1569,23 +1784,44 @@ static struct dma_buf_ops dma_buf_ops = {
 	.kunmap = ion_dma_buf_kunmap,
 };
 
+<<<<<<< HEAD
 struct dma_buf *ion_share_dma_buf(struct ion_client *client,
 						struct ion_handle *handle)
+=======
+static struct dma_buf *__ion_share_dma_buf(struct ion_client *client,
+					   struct ion_handle *handle,
+					   bool lock_client)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct ion_buffer *buffer;
 	struct dma_buf *dmabuf;
 	bool valid_handle;
 
+<<<<<<< HEAD
 	mutex_lock(&client->lock);
 	valid_handle = ion_handle_validate(client, handle);
 	if (!valid_handle) {
 		WARN(1, "%s: invalid handle passed to share.\n", __func__);
 		mutex_unlock(&client->lock);
+=======
+	if (lock_client)
+		mutex_lock(&client->lock);
+	valid_handle = ion_handle_validate(client, handle);
+	if (!valid_handle) {
+		WARN(1, "%s: invalid handle passed to share.\n", __func__);
+		if (lock_client)
+			mutex_unlock(&client->lock);
+>>>>>>> common/deprecated/android-3.18
 		return ERR_PTR(-EINVAL);
 	}
 	buffer = handle->buffer;
 	ion_buffer_get(buffer);
+<<<<<<< HEAD
 	mutex_unlock(&client->lock);
+=======
+	if (lock_client)
+		mutex_unlock(&client->lock);
+>>>>>>> common/deprecated/android-3.18
 
 	dmabuf = dma_buf_export(buffer, &dma_buf_ops, buffer->size, O_RDWR,
 				NULL);
@@ -1596,14 +1832,31 @@ struct dma_buf *ion_share_dma_buf(struct ion_client *client,
 
 	return dmabuf;
 }
+<<<<<<< HEAD
 EXPORT_SYMBOL(ion_share_dma_buf);
 
 int ion_share_dma_buf_fd(struct ion_client *client, struct ion_handle *handle)
+=======
+
+struct dma_buf *ion_share_dma_buf(struct ion_client *client,
+				  struct ion_handle *handle)
+{
+	return __ion_share_dma_buf(client, handle, true);
+}
+EXPORT_SYMBOL(ion_share_dma_buf);
+
+static int __ion_share_dma_buf_fd(struct ion_client *client,
+				  struct ion_handle *handle, bool lock_client)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct dma_buf *dmabuf;
 	int fd;
 
+<<<<<<< HEAD
 	dmabuf = ion_share_dma_buf(client, handle);
+=======
+	dmabuf = __ion_share_dma_buf(client, handle, lock_client);
+>>>>>>> common/deprecated/android-3.18
 	if (IS_ERR(dmabuf))
 		return PTR_ERR(dmabuf);
 
@@ -1613,8 +1866,24 @@ int ion_share_dma_buf_fd(struct ion_client *client, struct ion_handle *handle)
 
 	return fd;
 }
+<<<<<<< HEAD
 EXPORT_SYMBOL(ion_share_dma_buf_fd);
 
+=======
+
+int ion_share_dma_buf_fd(struct ion_client *client, struct ion_handle *handle)
+{
+	return __ion_share_dma_buf_fd(client, handle, true);
+}
+EXPORT_SYMBOL(ion_share_dma_buf_fd);
+
+static int ion_share_dma_buf_fd_nolock(struct ion_client *client,
+				       struct ion_handle *handle)
+{
+	return __ion_share_dma_buf_fd(client, handle, false);
+}
+
+>>>>>>> common/deprecated/android-3.18
 struct ion_handle *ion_import_dma_buf(struct ion_client *client, int fd)
 {
 	struct dma_buf *dmabuf;
@@ -1653,7 +1922,11 @@ struct ion_handle *ion_import_dma_buf(struct ion_client *client, int fd)
 	ret = ion_handle_add(client, handle);
 	mutex_unlock(&client->lock);
 	if (ret) {
+<<<<<<< HEAD
 		ion_handle_put(client, handle);
+=======
+		ion_handle_put(handle);
+>>>>>>> common/deprecated/android-3.18
 		handle = ERR_PTR(ret);
 	}
 
@@ -1663,6 +1936,7 @@ end:
 }
 EXPORT_SYMBOL(ion_import_dma_buf);
 
+<<<<<<< HEAD
 int ion_cached_needsync_dmabuf(struct dma_buf *dmabuf)
 {
 	struct ion_buffer *buffer = dmabuf->priv;
@@ -1675,6 +1949,8 @@ int ion_cached_needsync_dmabuf(struct dma_buf *dmabuf)
 }
 EXPORT_SYMBOL(ion_cached_needsync_dmabuf);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static int ion_sync_for_device(struct ion_client *client, int fd)
 {
 	struct dma_buf *dmabuf;
@@ -1693,6 +1969,7 @@ static int ion_sync_for_device(struct ion_client *client, int fd)
 	}
 	buffer = dmabuf->priv;
 
+<<<<<<< HEAD
 	if (!ion_buffer_cached(buffer) ||
 			ion_buffer_fault_user_mappings(buffer)) {
 		dma_buf_put(dmabuf);
@@ -1726,10 +2003,15 @@ static int ion_sync_for_device(struct ion_client *client, int fd)
 				DMA_BIDIRECTIONAL, buffer->size,
 				buffer->vaddr, 0, false);
 
+=======
+	dma_sync_sg_for_device(NULL, buffer->sg_table->sgl,
+			       buffer->sg_table->nents, DMA_BIDIRECTIONAL);
+>>>>>>> common/deprecated/android-3.18
 	dma_buf_put(dmabuf);
 	return 0;
 }
 
+<<<<<<< HEAD
 static int ion_sync_partial_for_device(struct ion_client *client, int fd,
 					off_t offset, size_t len)
 {
@@ -1850,12 +2132,17 @@ static long ion_alloc_preload(struct ion_client *client,
 	return 0;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /* fix up the cases where the ioctl direction bits are incorrect */
 static unsigned int ion_ioctl_dir(unsigned int cmd)
 {
 	switch (cmd) {
 	case ION_IOC_SYNC:
+<<<<<<< HEAD
 	case ION_IOC_SYNC_PARTIAL:
+=======
+>>>>>>> common/deprecated/android-3.18
 	case ION_IOC_FREE:
 	case ION_IOC_CUSTOM:
 		return _IOC_WRITE;
@@ -1874,11 +2161,17 @@ static long ion_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 
 	union {
 		struct ion_fd_data fd;
+<<<<<<< HEAD
 		struct ion_fd_partial_data fd_partial;
 		struct ion_allocation_data allocation;
 		struct ion_handle_data handle;
 		struct ion_custom_data custom;
 		struct ion_preload_data preload;
+=======
+		struct ion_allocation_data allocation;
+		struct ion_handle_data handle;
+		struct ion_custom_data custom;
+>>>>>>> common/deprecated/android-3.18
 	} data;
 
 	dir = ion_ioctl_dir(cmd);
@@ -1895,6 +2188,7 @@ static long ion_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	{
 		struct ion_handle *handle;
 
+<<<<<<< HEAD
 		handle = __ion_alloc(client, data.allocation.len,
 						data.allocation.align,
 						data.allocation.heap_id_mask,
@@ -1908,6 +2202,15 @@ static long ion_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			return PTR_ERR(handle);
 		}
 		pass_to_user(handle);
+=======
+		handle = ion_alloc(client, data.allocation.len,
+						data.allocation.align,
+						data.allocation.heap_id_mask,
+						data.allocation.flags);
+		if (IS_ERR(handle))
+			return PTR_ERR(handle);
+
+>>>>>>> common/deprecated/android-3.18
 		data.allocation.handle = handle->id;
 
 		cleanup_handle = handle;
@@ -1923,7 +2226,11 @@ static long ion_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			mutex_unlock(&client->lock);
 			return PTR_ERR(handle);
 		}
+<<<<<<< HEAD
 		user_ion_free_nolock(client, handle);
+=======
+		ion_free_nolock(client, handle);
+>>>>>>> common/deprecated/android-3.18
 		ion_handle_put_nolock(handle);
 		mutex_unlock(&client->lock);
 		break;
@@ -1933,11 +2240,23 @@ static long ion_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	{
 		struct ion_handle *handle;
 
+<<<<<<< HEAD
 		handle = ion_handle_get_by_id(client, data.handle.handle);
 		if (IS_ERR(handle))
 			return PTR_ERR(handle);
 		data.fd.fd = ion_share_dma_buf_fd(client, handle);
 		ion_handle_put(client, handle);
+=======
+		mutex_lock(&client->lock);
+		handle = ion_handle_get_by_id_nolock(client, data.handle.handle);
+		if (IS_ERR(handle)) {
+			mutex_unlock(&client->lock);
+			return PTR_ERR(handle);
+		}
+		data.fd.fd = ion_share_dma_buf_fd_nolock(client, handle);
+		ion_handle_put_nolock(handle);
+		mutex_unlock(&client->lock);
+>>>>>>> common/deprecated/android-3.18
 		if (data.fd.fd < 0)
 			ret = data.fd.fd;
 		break;
@@ -1947,6 +2266,7 @@ static long ion_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		struct ion_handle *handle;
 
 		handle = ion_import_dma_buf(client, data.fd.fd);
+<<<<<<< HEAD
 		if (IS_ERR(handle)) {
 			ret = PTR_ERR(handle);
 		} else {
@@ -1956,6 +2276,12 @@ static long ion_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			else
 				data.handle.handle = handle->id;
 		}
+=======
+		if (IS_ERR(handle))
+			ret = PTR_ERR(handle);
+		else
+			data.handle.handle = handle->id;
+>>>>>>> common/deprecated/android-3.18
 		break;
 	}
 	case ION_IOC_SYNC:
@@ -1963,12 +2289,15 @@ static long ion_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		ret = ion_sync_for_device(client, data.fd.fd);
 		break;
 	}
+<<<<<<< HEAD
 	case ION_IOC_SYNC_PARTIAL:
 	{
 		ret = ion_sync_partial_for_device(client, data.fd_partial.fd,
 			data.fd_partial.offset, data.fd_partial.len);
 		break;
 	}
+=======
+>>>>>>> common/deprecated/android-3.18
 	case ION_IOC_CUSTOM:
 	{
 		if (!dev->custom_ioctl)
@@ -1977,6 +2306,7 @@ static long ion_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 						data.custom.arg);
 		break;
 	}
+<<<<<<< HEAD
 	case ION_IOC_PRELOAD_ALLOC:
 	{
 		struct ion_preload_object *obj;
@@ -2007,12 +2337,15 @@ static long ion_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		kfree(obj);
 		return ret;
 	}
+=======
+>>>>>>> common/deprecated/android-3.18
 	default:
 		return -ENOTTY;
 	}
 
 	if (dir & _IOC_READ) {
 		if (copy_to_user((void __user *)arg, &data, _IOC_SIZE(cmd))) {
+<<<<<<< HEAD
 			if (cleanup_handle) {
 				mutex_lock(&client->lock);
 				user_ion_free_nolock(client, cleanup_handle);
@@ -2024,6 +2357,13 @@ static long ion_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	}
 	if (cleanup_handle)
 		ion_handle_put(client,cleanup_handle);
+=======
+			if (cleanup_handle)
+				ion_free(client, cleanup_handle);
+			return -EFAULT;
+		}
+	}
+>>>>>>> common/deprecated/android-3.18
 	return ret;
 }
 
@@ -2090,8 +2430,11 @@ static int ion_debug_heap_show(struct seq_file *s, void *unused)
 	seq_printf(s, "%16.s %16.s %16.s\n", "client", "pid", "size");
 	seq_puts(s, "----------------------------------------------------\n");
 
+<<<<<<< HEAD
 	down_read(&dev->lock);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	for (n = rb_first(&dev->clients); n; n = rb_next(n)) {
 		struct ion_client *client = rb_entry(n, struct ion_client,
 						     node);
@@ -2140,8 +2483,11 @@ static int ion_debug_heap_show(struct seq_file *s, void *unused)
 	if (heap->debug_show)
 		heap->debug_show(heap, s, unused);
 
+<<<<<<< HEAD
 	up_read(&dev->lock);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -2157,7 +2503,10 @@ static const struct file_operations debug_heap_fops = {
 	.release = single_release,
 };
 
+<<<<<<< HEAD
 #ifdef DEBUG_HEAP_SHRINKER
+=======
+>>>>>>> common/deprecated/android-3.18
 static int debug_shrink_set(void *data, u64 val)
 {
 	struct ion_heap *heap = data;
@@ -2165,6 +2514,7 @@ static int debug_shrink_set(void *data, u64 val)
 	int objs;
 
 	sc.gfp_mask = -1;
+<<<<<<< HEAD
 	sc.nr_to_scan = 0;
 
 	if (!val)
@@ -2174,6 +2524,16 @@ static int debug_shrink_set(void *data, u64 val)
 	sc.nr_to_scan = objs;
 
 	heap->shrinker.shrink(&heap->shrinker, &sc);
+=======
+	sc.nr_to_scan = val;
+
+	if (!val) {
+		objs = heap->shrinker.count_objects(&heap->shrinker, &sc);
+		sc.nr_to_scan = objs;
+	}
+
+	heap->shrinker.scan_objects(&heap->shrinker, &sc);
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -2186,14 +2546,21 @@ static int debug_shrink_get(void *data, u64 *val)
 	sc.gfp_mask = -1;
 	sc.nr_to_scan = 0;
 
+<<<<<<< HEAD
 	objs = heap->shrinker.shrink(&heap->shrinker, &sc);
+=======
+	objs = heap->shrinker.count_objects(&heap->shrinker, &sc);
+>>>>>>> common/deprecated/android-3.18
 	*val = objs;
 	return 0;
 }
 
 DEFINE_SIMPLE_ATTRIBUTE(debug_shrink_fops, debug_shrink_get,
 			debug_shrink_set, "%llu\n");
+<<<<<<< HEAD
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 void ion_device_add_heap(struct ion_device *dev, struct ion_heap *heap)
 {
@@ -2228,8 +2595,12 @@ void ion_device_add_heap(struct ion_device *dev, struct ion_heap *heap)
 			path, heap->name);
 	}
 
+<<<<<<< HEAD
 #ifdef DEBUG_HEAP_SHRINKER
 	if (heap->shrinker.shrink) {
+=======
+	if (heap->shrinker.count_objects && heap->shrinker.scan_objects) {
+>>>>>>> common/deprecated/android-3.18
 		char debug_name[64];
 
 		snprintf(debug_name, 64, "%s_shrink", heap->name);
@@ -2244,6 +2615,7 @@ void ion_device_add_heap(struct ion_device *dev, struct ion_heap *heap)
 				path, debug_name);
 		}
 	}
+<<<<<<< HEAD
 #endif
 	up_write(&dev->lock);
 }
@@ -2620,6 +2992,12 @@ static const struct file_operations debug_event_fops = {
 };
 #endif
 
+=======
+
+	up_write(&dev->lock);
+}
+
+>>>>>>> common/deprecated/android-3.18
 struct ion_device *ion_device_create(long (*custom_ioctl)
 				     (struct ion_client *client,
 				      unsigned int cmd,
@@ -2639,7 +3017,10 @@ struct ion_device *ion_device_create(long (*custom_ioctl)
 	ret = misc_register(&idev->dev);
 	if (ret) {
 		pr_err("ion: failed to register misc device.\n");
+<<<<<<< HEAD
 		kfree(idev);
+=======
+>>>>>>> common/deprecated/android-3.18
 		return ERR_PTR(ret);
 	}
 
@@ -2655,6 +3036,7 @@ struct ion_device *ion_device_create(long (*custom_ioctl)
 	}
 	idev->clients_debug_root = debugfs_create_dir("clients",
 						idev->debug_root);
+<<<<<<< HEAD
 	if (!idev->clients_debug_root) {
 		pr_err("ion: failed to create debugfs clients directory.\n");
 		goto debugfs_done;
@@ -2676,6 +3058,10 @@ struct ion_device *ion_device_create(long (*custom_ioctl)
 	if (!idev->event_debug_file)
 		pr_err("%s: failed to create event debug file\n", __func__);
 #endif
+=======
+	if (!idev->clients_debug_root)
+		pr_err("ion: failed to create debugfs clients directory.\n");
+>>>>>>> common/deprecated/android-3.18
 
 debugfs_done:
 
@@ -2685,6 +3071,7 @@ debugfs_done:
 	init_rwsem(&idev->lock);
 	plist_head_init(&idev->heaps);
 	idev->clients = RB_ROOT;
+<<<<<<< HEAD
 
 	if (IS_ENABLED(CONFIG_HIGHMEM)) {
 		ret = ion_device_reserve_vm(idev);
@@ -2695,6 +3082,8 @@ debugfs_done:
 	/* backup of ion device: assumes there is only one ion device */
 	g_idev = idev;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	return idev;
 }
 
@@ -2703,10 +3092,13 @@ void ion_device_destroy(struct ion_device *dev)
 	misc_deregister(&dev->dev);
 	debugfs_remove_recursive(dev->debug_root);
 	/* XXX need to free the heaps and clients ? */
+<<<<<<< HEAD
 
 	if (IS_ENABLED(CONFIG_HIGHMEM))
 		free_vm_area(dev->reserved_vm_area);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	kfree(dev);
 }
 
@@ -2744,6 +3136,7 @@ void __init ion_reserve(struct ion_platform_data *data)
 			data->heaps[i].size);
 	}
 }
+<<<<<<< HEAD
 
 static struct ion_iovm_map *ion_buffer_iova_create(struct ion_buffer *buffer,
 		struct device *dev, enum dma_data_direction dir, int iommu_prot)
@@ -2884,3 +3277,5 @@ void ion_iovmm_unmap(struct dma_buf_attachment *attachment, dma_addr_t iova)
 
 	mutex_unlock(&buffer->lock);
 }
+=======
+>>>>>>> common/deprecated/android-3.18

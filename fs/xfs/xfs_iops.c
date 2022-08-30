@@ -761,7 +761,11 @@ xfs_setattr_size(
 	ASSERT(xfs_isilocked(ip, XFS_IOLOCK_EXCL));
 	ASSERT(S_ISREG(ip->i_d.di_mode));
 	ASSERT((iattr->ia_valid & (ATTR_UID|ATTR_GID|ATTR_ATIME|ATTR_ATIME_SET|
+<<<<<<< HEAD
 		ATTR_MTIME_SET|ATTR_KILL_PRIV|ATTR_TIMES_SET)) == 0);
+=======
+		ATTR_MTIME_SET|ATTR_TIMES_SET)) == 0);
+>>>>>>> common/deprecated/android-3.18
 
 	oldsize = inode->i_size;
 	newsize = iattr->ia_size;

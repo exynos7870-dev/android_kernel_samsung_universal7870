@@ -6,7 +6,11 @@
  * The algorithm is described in:
  * "TCP-Illinois: A Loss and Delay-Based Congestion Control Algorithm
  *  for High-Speed Networks"
+<<<<<<< HEAD
  * http://www.ifp.illinois.edu/~srikant/Papers/liubassri06perf.pdf
+=======
+ * http://tamerbasar.csl.illinois.edu/LiuBasarSrikantPerfEvalArtJun2008.pdf
+>>>>>>> common/deprecated/android-3.18
  *
  * Implemented from description in paper and ns-2 simulation.
  * Copyright (C) 2007 Stephen Hemminger <shemminger@linux-foundation.org>

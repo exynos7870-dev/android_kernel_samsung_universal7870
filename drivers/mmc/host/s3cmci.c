@@ -21,6 +21,10 @@
 #include <linux/debugfs.h>
 #include <linux/seq_file.h>
 #include <linux/gpio.h>
+<<<<<<< HEAD
+=======
+#include <linux/interrupt.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/irq.h>
 #include <linux/io.h>
 

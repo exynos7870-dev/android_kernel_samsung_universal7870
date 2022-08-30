@@ -351,8 +351,13 @@ static irqreturn_t rcar_thermal_irq(int irq, void *data)
 	rcar_thermal_for_each_priv(priv, common) {
 		if (rcar_thermal_had_changed(priv, status)) {
 			rcar_thermal_irq_disable(priv);
+<<<<<<< HEAD
 			schedule_delayed_work(&priv->work,
 					      msecs_to_jiffies(300));
+=======
+			queue_delayed_work(system_freezable_wq, &priv->work,
+					   msecs_to_jiffies(300));
+>>>>>>> common/deprecated/android-3.18
 		}
 	}
 
@@ -372,6 +377,10 @@ static int rcar_thermal_probe(struct platform_device *pdev)
 	int i;
 	int ret = -ENODEV;
 	int idle = IDLE_INTERVAL;
+<<<<<<< HEAD
+=======
+	u32 enr_bits = 0;
+>>>>>>> common/deprecated/android-3.18
 
 	common = devm_kzalloc(dev, sizeof(*common), GFP_KERNEL);
 	if (!common)
@@ -408,9 +417,12 @@ static int rcar_thermal_probe(struct platform_device *pdev)
 		if (IS_ERR(common->base))
 			return PTR_ERR(common->base);
 
+<<<<<<< HEAD
 		/* enable temperature comparation */
 		rcar_thermal_common_write(common, ENR, 0x00030303);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		idle = 0; /* polling delay is not needed */
 	}
 
@@ -452,8 +464,20 @@ static int rcar_thermal_probe(struct platform_device *pdev)
 			rcar_thermal_irq_enable(priv);
 
 		list_move_tail(&priv->list, &common->head);
+<<<<<<< HEAD
 	}
 
+=======
+
+		/* update ENR bits */
+		enr_bits |= 3 << (i * 8);
+	}
+
+	/* enable temperature comparation */
+	if (irq)
+		rcar_thermal_common_write(common, ENR, enr_bits);
+
+>>>>>>> common/deprecated/android-3.18
 	platform_set_drvdata(pdev, common);
 
 	dev_info(dev, "%d sensor probed\n", i);

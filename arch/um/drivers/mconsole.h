@@ -7,7 +7,11 @@
 #ifndef __MCONSOLE_H__
 #define __MCONSOLE_H__
 
+<<<<<<< HEAD
 #ifndef __KERNEL__
+=======
+#ifdef __UM_HOST__
+>>>>>>> common/deprecated/android-3.18
 #include <stdint.h>
 #define u32 uint32_t
 #endif

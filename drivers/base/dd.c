@@ -283,7 +283,15 @@ static int really_probe(struct device *dev, struct device_driver *drv)
 	atomic_inc(&probe_count);
 	pr_debug("bus: '%s': %s: probing driver %s with device %s\n",
 		 drv->bus->name, __func__, drv->name, dev_name(dev));
+<<<<<<< HEAD
 	WARN_ON(!list_empty(&dev->devres_head));
+=======
+	if (!list_empty(&dev->devres_head)) {
+		dev_crit(dev, "Resources present before probing\n");
+		ret = -EBUSY;
+		goto done;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	dev->driver = drv;
 
@@ -343,7 +351,11 @@ probe_failed:
 	ret = 0;
 done:
 	atomic_dec(&probe_count);
+<<<<<<< HEAD
 	wake_up(&probe_waitqueue);
+=======
+	wake_up_all(&probe_waitqueue);
+>>>>>>> common/deprecated/android-3.18
 	return ret;
 }
 
@@ -361,6 +373,10 @@ int driver_probe_done(void)
 		return -EBUSY;
 	return 0;
 }
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL_GPL(driver_probe_done);
+>>>>>>> common/deprecated/android-3.18
 
 /**
  * wait_for_device_probe

@@ -35,6 +35,10 @@
 #define XOR_OPERATION_MODE_XOR		0
 #define XOR_OPERATION_MODE_MEMCPY	2
 #define XOR_DESCRIPTOR_SWAP		BIT(14)
+<<<<<<< HEAD
+=======
+#define XOR_DESC_SUCCESS		0x40000000
+>>>>>>> common/deprecated/android-3.18
 
 #define XOR_DESC_DMA_OWNED		BIT(31)
 #define XOR_DESC_EOD_INT_EN		BIT(31)

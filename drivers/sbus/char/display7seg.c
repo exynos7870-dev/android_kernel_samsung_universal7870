@@ -221,6 +221,10 @@ static int d7s_probe(struct platform_device *op)
 	dev_set_drvdata(&op->dev, p);
 	d7s_device = p;
 	err = 0;
+<<<<<<< HEAD
+=======
+	of_node_put(opts);
+>>>>>>> common/deprecated/android-3.18
 
 out:
 	return err;

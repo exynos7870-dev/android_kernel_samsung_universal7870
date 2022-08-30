@@ -81,7 +81,10 @@ struct netns_ipv6 {
 
 #if IS_ENABLED(CONFIG_NF_DEFRAG_IPV6)
 struct netns_nf_frag {
+<<<<<<< HEAD
 	struct netns_sysctl_ipv6 sysctl;
+=======
+>>>>>>> common/deprecated/android-3.18
 	struct netns_frags	frags;
 };
 #endif

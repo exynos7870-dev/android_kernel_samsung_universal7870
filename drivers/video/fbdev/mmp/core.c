@@ -23,6 +23,10 @@
 #include <linux/slab.h>
 #include <linux/dma-mapping.h>
 #include <linux/export.h>
+<<<<<<< HEAD
+=======
+#include <linux/module.h>
+>>>>>>> common/deprecated/android-3.18
 #include <video/mmp_disp.h>
 
 static struct mmp_overlay *path_get_overlay(struct mmp_path *path,
@@ -249,3 +253,10 @@ void mmp_unregister_path(struct mmp_path *path)
 	mutex_unlock(&disp_lock);
 }
 EXPORT_SYMBOL_GPL(mmp_unregister_path);
+<<<<<<< HEAD
+=======
+
+MODULE_AUTHOR("Zhou Zhu <zzhu3@marvell.com>");
+MODULE_DESCRIPTION("Marvell MMP display framework");
+MODULE_LICENSE("GPL");
+>>>>>>> common/deprecated/android-3.18

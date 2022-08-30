@@ -141,7 +141,13 @@ static void __speakup_paste_selection(struct work_struct *work)
 	struct tty_ldisc *ld;
 	DECLARE_WAITQUEUE(wait, current);
 
+<<<<<<< HEAD
 	ld = tty_ldisc_ref_wait(tty);
+=======
+	ld = tty_ldisc_ref(tty);
+	if (!ld)
+		goto tty_unref;
+>>>>>>> common/deprecated/android-3.18
 	tty_buffer_lock_exclusive(&vc->port);
 
 	add_wait_queue(&vc->paste_wait, &wait);
@@ -161,6 +167,10 @@ static void __speakup_paste_selection(struct work_struct *work)
 
 	tty_buffer_unlock_exclusive(&vc->port);
 	tty_ldisc_deref(ld);
+<<<<<<< HEAD
+=======
+tty_unref:
+>>>>>>> common/deprecated/android-3.18
 	tty_kref_put(tty);
 }
 

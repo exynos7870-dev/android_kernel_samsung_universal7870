@@ -44,8 +44,11 @@ enum ab8505_regulator_id {
 	AB8505_LDO_ANAMIC2,
 	AB8505_LDO_AUX8,
 	AB8505_LDO_ANA,
+<<<<<<< HEAD
 	AB8505_SYSCLKREQ_2,
 	AB8505_SYSCLKREQ_4,
+=======
+>>>>>>> common/deprecated/android-3.18
 	AB8505_NUM_REGULATORS,
 };
 

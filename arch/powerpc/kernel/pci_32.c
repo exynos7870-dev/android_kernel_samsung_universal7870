@@ -11,6 +11,10 @@
 #include <linux/sched.h>
 #include <linux/errno.h>
 #include <linux/bootmem.h>
+<<<<<<< HEAD
+=======
+#include <linux/syscalls.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/irq.h>
 #include <linux/list.h>
 #include <linux/of.h>

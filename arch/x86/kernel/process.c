@@ -29,6 +29,10 @@
 #include <asm/fpu-internal.h>
 #include <asm/debugreg.h>
 #include <asm/nmi.h>
+<<<<<<< HEAD
+=======
+#include <asm/tlbflush.h>
+>>>>>>> common/deprecated/android-3.18
 
 /*
  * per-CPU TSS segments. Threads are completely 'soft' on Linux,
@@ -127,11 +131,14 @@ void flush_thread(void)
 		free_thread_xstate(tsk);
 }
 
+<<<<<<< HEAD
 static void hard_disable_TSC(void)
 {
 	write_cr4(read_cr4() | X86_CR4_TSD);
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 void disable_TSC(void)
 {
 	preempt_disable();
@@ -140,6 +147,7 @@ void disable_TSC(void)
 		 * Must flip the CPU state synchronously with
 		 * TIF_NOTSC in the current running context.
 		 */
+<<<<<<< HEAD
 		hard_disable_TSC();
 	preempt_enable();
 }
@@ -149,6 +157,12 @@ static void hard_enable_TSC(void)
 	write_cr4(read_cr4() & ~X86_CR4_TSD);
 }
 
+=======
+		cr4_set_bits(X86_CR4_TSD);
+	preempt_enable();
+}
+
+>>>>>>> common/deprecated/android-3.18
 static void enable_TSC(void)
 {
 	preempt_disable();
@@ -157,7 +171,11 @@ static void enable_TSC(void)
 		 * Must flip the CPU state synchronously with
 		 * TIF_NOTSC in the current running context.
 		 */
+<<<<<<< HEAD
 		hard_enable_TSC();
+=======
+		cr4_clear_bits(X86_CR4_TSD);
+>>>>>>> common/deprecated/android-3.18
 	preempt_enable();
 }
 
@@ -185,6 +203,7 @@ int set_tsc_mode(unsigned int val)
 	return 0;
 }
 
+<<<<<<< HEAD
 void __switch_to_xtra(struct task_struct *prev_p, struct task_struct *next_p,
 		      struct tss_struct *tss)
 {
@@ -214,19 +233,62 @@ void __switch_to_xtra(struct task_struct *prev_p, struct task_struct *next_p,
 	}
 
 	if (test_tsk_thread_flag(next_p, TIF_IO_BITMAP)) {
+=======
+static inline void switch_to_bitmap(struct tss_struct *tss,
+				    struct thread_struct *prev,
+				    struct thread_struct *next,
+				    unsigned long tifp, unsigned long tifn)
+{
+	if (tifn & _TIF_IO_BITMAP) {
+>>>>>>> common/deprecated/android-3.18
 		/*
 		 * Copy the relevant range of the IO bitmap.
 		 * Normally this is 128 bytes or less:
 		 */
 		memcpy(tss->io_bitmap, next->io_bitmap_ptr,
 		       max(prev->io_bitmap_max, next->io_bitmap_max));
+<<<<<<< HEAD
 	} else if (test_tsk_thread_flag(prev_p, TIF_IO_BITMAP)) {
+=======
+	} else if (tifp & _TIF_IO_BITMAP) {
+>>>>>>> common/deprecated/android-3.18
 		/*
 		 * Clear any possible leftover bits:
 		 */
 		memset(tss->io_bitmap, 0xff, prev->io_bitmap_max);
 	}
+<<<<<<< HEAD
 	propagate_user_return_notify(prev_p, next_p);
+=======
+}
+
+void __switch_to_xtra(struct task_struct *prev_p, struct task_struct *next_p,
+		      struct tss_struct *tss)
+{
+	struct thread_struct *prev, *next;
+	unsigned long tifp, tifn;
+
+	prev = &prev_p->thread;
+	next = &next_p->thread;
+
+	tifn = READ_ONCE(task_thread_info(next_p)->flags);
+	tifp = READ_ONCE(task_thread_info(prev_p)->flags);
+	switch_to_bitmap(tss, prev, next, tifp, tifn);
+
+	propagate_user_return_notify(prev_p, next_p);
+
+	if ((tifp ^ tifn) & _TIF_BLOCKSTEP) {
+		unsigned long debugctl = get_debugctlmsr();
+
+		debugctl &= ~DEBUGCTLMSR_BTF;
+		if (tifn & _TIF_BLOCKSTEP)
+			debugctl |= DEBUGCTLMSR_BTF;
+		update_debugctlmsr(debugctl);
+	}
+
+	if ((tifp ^ tifn) & _TIF_NOTSC)
+		cr4_toggle_bits(X86_CR4_TSD);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
@@ -416,6 +478,10 @@ static int prefer_mwait_c1_over_halt(const struct cpuinfo_x86 *c)
 static void mwait_idle(void)
 {
 	if (!current_set_polling_and_test()) {
+<<<<<<< HEAD
+=======
+		trace_cpu_idle_rcuidle(1, smp_processor_id());
+>>>>>>> common/deprecated/android-3.18
 		if (this_cpu_has(X86_BUG_CLFLUSH_MONITOR)) {
 			smp_mb(); /* quirk */
 			clflush((void *)&current_thread_info()->flags);
@@ -427,6 +493,10 @@ static void mwait_idle(void)
 			__sti_mwait(0, 0);
 		else
 			local_irq_enable();
+<<<<<<< HEAD
+=======
+		trace_cpu_idle_rcuidle(PWR_EVENT_EXIT, smp_processor_id());
+>>>>>>> common/deprecated/android-3.18
 	} else {
 		local_irq_enable();
 	}

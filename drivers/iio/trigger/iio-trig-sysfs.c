@@ -173,7 +173,11 @@ static int iio_sysfs_trigger_probe(int id)
 	return 0;
 
 out2:
+<<<<<<< HEAD
 	iio_trigger_put(t->trig);
+=======
+	iio_trigger_free(t->trig);
+>>>>>>> common/deprecated/android-3.18
 free_t:
 	kfree(t);
 out1:

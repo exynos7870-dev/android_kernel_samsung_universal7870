@@ -184,7 +184,11 @@ static int sunxi_wdt_start(struct watchdog_device *wdt_dev)
 	/* Set system reset function */
 	reg = readl(wdt_base + regs->wdt_cfg);
 	reg &= ~(regs->wdt_reset_mask);
+<<<<<<< HEAD
 	reg |= ~(regs->wdt_reset_val);
+=======
+	reg |= regs->wdt_reset_val;
+>>>>>>> common/deprecated/android-3.18
 	writel(reg, wdt_base + regs->wdt_cfg);
 
 	/* Enable watchdog */

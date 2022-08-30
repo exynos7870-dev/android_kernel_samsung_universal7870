@@ -1479,7 +1479,11 @@ static long vphn_get_associativity(unsigned long cpu,
 
 	switch (rc) {
 	case H_FUNCTION:
+<<<<<<< HEAD
 		printk(KERN_INFO
+=======
+		printk_once(KERN_INFO
+>>>>>>> common/deprecated/android-3.18
 			"VPHN is not supported. Disabling polling...\n");
 		stop_topology_update();
 		break;

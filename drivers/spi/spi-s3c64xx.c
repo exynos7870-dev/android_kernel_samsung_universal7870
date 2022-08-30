@@ -19,11 +19,17 @@
 
 #include <linux/init.h>
 #include <linux/module.h>
+<<<<<<< HEAD
 #include <linux/workqueue.h>
 #include <linux/interrupt.h>
 #include <linux/delay.h>
 #include <linux/clk.h>
 #include <linux/clk-private.h>
+=======
+#include <linux/interrupt.h>
+#include <linux/delay.h>
+#include <linux/clk.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/dma-mapping.h>
 #include <linux/dmaengine.h>
 #include <linux/platform_device.h>
@@ -32,6 +38,7 @@
 #include <linux/gpio.h>
 #include <linux/of.h>
 #include <linux/of_gpio.h>
+<<<<<<< HEAD
 #include <soc/samsung/exynos-powermode.h>
 
 #include <linux/platform_data/spi-s3c64xx.h>
@@ -48,6 +55,13 @@ static LIST_HEAD(drvdata_list);
 
 #define MAX_SPI_PORTS		10
 #define SPI_AUTOSUSPEND_TIMEOUT		(100)
+=======
+
+#include <linux/platform_data/spi-s3c64xx.h>
+
+#define MAX_SPI_PORTS		3
+#define S3C64XX_SPI_QUIRK_POLL		(1 << 0)
+>>>>>>> common/deprecated/android-3.18
 
 /* Registers and bit-fields */
 
@@ -89,8 +103,11 @@ static LIST_HEAD(drvdata_list);
 #define S3C64XX_SPI_MODE_TXDMA_ON		(1<<1)
 #define S3C64XX_SPI_MODE_4BURST			(1<<0)
 
+<<<<<<< HEAD
 #define S3C64XX_SPI_SLAVE_NSC_CNT_2		(2<<4)
 #define S3C64XX_SPI_SLAVE_NSC_CNT_1		(1<<4)
+=======
+>>>>>>> common/deprecated/android-3.18
 #define S3C64XX_SPI_SLAVE_AUTO			(1<<1)
 #define S3C64XX_SPI_SLAVE_SIG_INACT		(1<<0)
 
@@ -140,15 +157,28 @@ static LIST_HEAD(drvdata_list);
 
 #define S3C64XX_SPI_TRAILCNT		S3C64XX_SPI_MAX_TRAILCNT
 
+<<<<<<< HEAD
 #define S3C64XX_SPI_DMA_4BURST_LEN	0x4
 #define S3C64XX_SPI_DMA_1BURST_LEN	0x1
 
 #define msecs_to_loops(t) (loops_per_jiffy / 1000 * HZ * t)
+=======
+#define msecs_to_loops(t) (loops_per_jiffy / 1000 * HZ * t)
+#define is_polling(x)	(x->port_conf->quirks & S3C64XX_SPI_QUIRK_POLL)
+>>>>>>> common/deprecated/android-3.18
 
 #define RXBUSY    (1<<2)
 #define TXBUSY    (1<<3)
 
+<<<<<<< HEAD
 #define SPI_DBG_MODE (0x1 << 0)
+=======
+struct s3c64xx_spi_dma_data {
+	struct dma_chan *ch;
+	enum dma_transfer_direction direction;
+	unsigned int dmach;
+};
+>>>>>>> common/deprecated/android-3.18
 
 /**
  * struct s3c64xx_spi_info - SPI Controller hardware info
@@ -168,10 +198,15 @@ struct s3c64xx_spi_port_config {
 	int	fifo_lvl_mask[MAX_SPI_PORTS];
 	int	rx_lvl_offset;
 	int	tx_st_done;
+<<<<<<< HEAD
+=======
+	int	quirks;
+>>>>>>> common/deprecated/android-3.18
 	bool	high_speed;
 	bool	clk_from_cmu;
 };
 
+<<<<<<< HEAD
 static ssize_t
 spi_dbg_show(struct device *dev, struct device_attribute *attr, char *buf)
 {
@@ -250,6 +285,47 @@ static void s3c64xx_spi_dump_reg(struct s3c64xx_spi_driver_data *sdd)
 				readl(regs + S3C64XX_SPI_PACKET_CNT));
 
 }
+=======
+/**
+ * struct s3c64xx_spi_driver_data - Runtime info holder for SPI driver.
+ * @clk: Pointer to the spi clock.
+ * @src_clk: Pointer to the clock used to generate SPI signals.
+ * @master: Pointer to the SPI Protocol master.
+ * @cntrlr_info: Platform specific data for the controller this driver manages.
+ * @tgl_spi: Pointer to the last CS left untoggled by the cs_change hint.
+ * @lock: Controller specific lock.
+ * @state: Set of FLAGS to indicate status.
+ * @rx_dmach: Controller's DMA channel for Rx.
+ * @tx_dmach: Controller's DMA channel for Tx.
+ * @sfr_start: BUS address of SPI controller regs.
+ * @regs: Pointer to ioremap'ed controller registers.
+ * @irq: interrupt
+ * @xfer_completion: To indicate completion of xfer task.
+ * @cur_mode: Stores the active configuration of the controller.
+ * @cur_bpw: Stores the active bits per word settings.
+ * @cur_speed: Stores the active xfer clock speed.
+ */
+struct s3c64xx_spi_driver_data {
+	void __iomem                    *regs;
+	struct clk                      *clk;
+	struct clk                      *src_clk;
+	struct platform_device          *pdev;
+	struct spi_master               *master;
+	struct s3c64xx_spi_info  *cntrlr_info;
+	struct spi_device               *tgl_spi;
+	spinlock_t                      lock;
+	unsigned long                   sfr_start;
+	struct completion               xfer_completion;
+	unsigned                        state;
+	unsigned                        cur_mode, cur_bpw;
+	unsigned                        cur_speed;
+	struct s3c64xx_spi_dma_data	rx_dma;
+	struct s3c64xx_spi_dma_data	tx_dma;
+	struct s3c64xx_spi_port_config	*port_conf;
+	unsigned int			port_id;
+};
+
+>>>>>>> common/deprecated/android-3.18
 static void flush_fifo(struct s3c64xx_spi_driver_data *sdd)
 {
 	void __iomem *regs = sdd->regs;
@@ -326,6 +402,7 @@ static void s3c64xx_spi_dmacb(void *data)
 	spin_unlock_irqrestore(&sdd->lock, flags);
 }
 
+<<<<<<< HEAD
 /* FIXME: remove this section once arch/arm/mach-s3c64xx uses dmaengine */
 
 static struct s3c2410_dma_client s3c64xx_spi_dma_client = {
@@ -339,10 +416,21 @@ static void prepare_dma(struct s3c64xx_spi_dma_data *dma,
 	struct samsung_dma_prep info;
 	struct samsung_dma_config config;
 	u32 modecfg;
+=======
+static void prepare_dma(struct s3c64xx_spi_dma_data *dma,
+			struct sg_table *sgt)
+{
+	struct s3c64xx_spi_driver_data *sdd;
+	struct dma_slave_config config;
+	struct dma_async_tx_descriptor *desc;
+
+	memset(&config, 0, sizeof(config));
+>>>>>>> common/deprecated/android-3.18
 
 	if (dma->direction == DMA_DEV_TO_MEM) {
 		sdd = container_of((void *)dma,
 			struct s3c64xx_spi_driver_data, rx_dma);
+<<<<<<< HEAD
 		config.direction = sdd->rx_dma.direction;
 		config.fifo = sdd->sfr_start + S3C64XX_SPI_RX_DATA;
 		config.width = sdd->cur_bpw / 8;
@@ -439,11 +527,85 @@ static int s3c64xx_spi_prepare_transfer(struct spi_master *spi)
 		s3c64xx_spi_hwinit(sdd, sdd->port_id);
 
 	return 0;
+=======
+		config.direction = dma->direction;
+		config.src_addr = sdd->sfr_start + S3C64XX_SPI_RX_DATA;
+		config.src_addr_width = sdd->cur_bpw / 8;
+		config.src_maxburst = 1;
+		dmaengine_slave_config(dma->ch, &config);
+	} else {
+		sdd = container_of((void *)dma,
+			struct s3c64xx_spi_driver_data, tx_dma);
+		config.direction = dma->direction;
+		config.dst_addr = sdd->sfr_start + S3C64XX_SPI_TX_DATA;
+		config.dst_addr_width = sdd->cur_bpw / 8;
+		config.dst_maxburst = 1;
+		dmaengine_slave_config(dma->ch, &config);
+	}
+
+	desc = dmaengine_prep_slave_sg(dma->ch, sgt->sgl, sgt->nents,
+				       dma->direction, DMA_PREP_INTERRUPT);
+
+	desc->callback = s3c64xx_spi_dmacb;
+	desc->callback_param = dma;
+
+	dmaengine_submit(desc);
+	dma_async_issue_pending(dma->ch);
+}
+
+static int s3c64xx_spi_prepare_transfer(struct spi_master *spi)
+{
+	struct s3c64xx_spi_driver_data *sdd = spi_master_get_devdata(spi);
+	dma_filter_fn filter = sdd->cntrlr_info->filter;
+	struct device *dev = &sdd->pdev->dev;
+	dma_cap_mask_t mask;
+	int ret;
+
+	if (!is_polling(sdd)) {
+		dma_cap_zero(mask);
+		dma_cap_set(DMA_SLAVE, mask);
+
+		/* Acquire DMA channels */
+		sdd->rx_dma.ch = dma_request_slave_channel_compat(mask, filter,
+				   (void *)sdd->rx_dma.dmach, dev, "rx");
+		if (!sdd->rx_dma.ch) {
+			dev_err(dev, "Failed to get RX DMA channel\n");
+			ret = -EBUSY;
+			goto out;
+		}
+		spi->dma_rx = sdd->rx_dma.ch;
+
+		sdd->tx_dma.ch = dma_request_slave_channel_compat(mask, filter,
+				   (void *)sdd->tx_dma.dmach, dev, "tx");
+		if (!sdd->tx_dma.ch) {
+			dev_err(dev, "Failed to get TX DMA channel\n");
+			ret = -EBUSY;
+			goto out_rx;
+		}
+		spi->dma_tx = sdd->tx_dma.ch;
+	}
+
+	ret = pm_runtime_get_sync(&sdd->pdev->dev);
+	if (ret < 0) {
+		dev_err(dev, "Failed to enable device: %d\n", ret);
+		goto out_tx;
+	}
+
+	return 0;
+
+out_tx:
+	dma_release_channel(sdd->tx_dma.ch);
+out_rx:
+	dma_release_channel(sdd->rx_dma.ch);
+out:
+	return ret;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int s3c64xx_spi_unprepare_transfer(struct spi_master *spi)
 {
 	struct s3c64xx_spi_driver_data *sdd = spi_master_get_devdata(spi);
+<<<<<<< HEAD
 #ifdef CONFIG_PM_RUNTIME
 	int ret;
 #endif
@@ -487,6 +649,26 @@ static void s3c64xx_spi_dma_stop(struct s3c64xx_spi_driver_data *sdd,
 #else
 	sdd->ops->stop((enum dma_ch)dma->ch);
 #endif
+=======
+
+	/* Free DMA channels */
+	if (!is_polling(sdd)) {
+		dma_release_channel(sdd->rx_dma.ch);
+		dma_release_channel(sdd->tx_dma.ch);
+	}
+
+	pm_runtime_put(&sdd->pdev->dev);
+	return 0;
+}
+
+static bool s3c64xx_spi_can_dma(struct spi_master *master,
+				struct spi_device *spi,
+				struct spi_transfer *xfer)
+{
+	struct s3c64xx_spi_driver_data *sdd = spi_master_get_devdata(master);
+
+	return xfer->len > (FIFO_LVL_MASK(sdd) >> 1) + 1;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void enable_datapath(struct s3c64xx_spi_driver_data *sdd,
@@ -494,11 +676,19 @@ static void enable_datapath(struct s3c64xx_spi_driver_data *sdd,
 				struct spi_transfer *xfer, int dma_mode)
 {
 	void __iomem *regs = sdd->regs;
+<<<<<<< HEAD
 	u32 modecfg, chcfg, dma_burst_len;
+=======
+	u32 modecfg, chcfg;
+
+	modecfg = readl(regs + S3C64XX_SPI_MODE_CFG);
+	modecfg &= ~(S3C64XX_SPI_MODE_TXDMA_ON | S3C64XX_SPI_MODE_RXDMA_ON);
+>>>>>>> common/deprecated/android-3.18
 
 	chcfg = readl(regs + S3C64XX_SPI_CH_CFG);
 	chcfg &= ~S3C64XX_SPI_CH_TXCH_ON;
 
+<<<<<<< HEAD
 	modecfg = readl(regs + S3C64XX_SPI_MODE_CFG);
 	modecfg &= ~S3C64XX_SPI_MODE_4BURST;
 
@@ -508,6 +698,10 @@ static void enable_datapath(struct s3c64xx_spi_driver_data *sdd,
 		dma_burst_len = (sdd->cur_bpw / 8) * S3C64XX_SPI_DMA_4BURST_LEN;
 		if (!(xfer->len % dma_burst_len))
 			modecfg |= S3C64XX_SPI_MODE_4BURST;
+=======
+	if (dma_mode) {
+		chcfg &= ~S3C64XX_SPI_CH_RXCH_ON;
+>>>>>>> common/deprecated/android-3.18
 	} else {
 		/* Always shift in data in FIFO, even if xfer is Tx only,
 		 * this helps setting PCKT_CNT value for generating clocks
@@ -519,16 +713,23 @@ static void enable_datapath(struct s3c64xx_spi_driver_data *sdd,
 					regs + S3C64XX_SPI_PACKET_CNT);
 	}
 
+<<<<<<< HEAD
 	writel(modecfg, regs + S3C64XX_SPI_MODE_CFG);
 	modecfg = readl(regs + S3C64XX_SPI_MODE_CFG);
 	modecfg &= ~(S3C64XX_SPI_MODE_TXDMA_ON | S3C64XX_SPI_MODE_RXDMA_ON);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (xfer->tx_buf != NULL) {
 		sdd->state |= TXBUSY;
 		chcfg |= S3C64XX_SPI_CH_TXCH_ON;
 		if (dma_mode) {
 			modecfg |= S3C64XX_SPI_MODE_TXDMA_ON;
+<<<<<<< HEAD
 			prepare_dma(&sdd->tx_dma, xfer->len, xfer->tx_dma);
+=======
+			prepare_dma(&sdd->tx_dma, &xfer->tx_sg);
+>>>>>>> common/deprecated/android-3.18
 		} else {
 			switch (sdd->cur_bpw) {
 			case 32:
@@ -560,7 +761,11 @@ static void enable_datapath(struct s3c64xx_spi_driver_data *sdd,
 			writel(((xfer->len * 8 / sdd->cur_bpw) & 0xffff)
 					| S3C64XX_SPI_PACKET_CNT_EN,
 					regs + S3C64XX_SPI_PACKET_CNT);
+<<<<<<< HEAD
 			prepare_dma(&sdd->rx_dma, xfer->len, xfer->rx_dma);
+=======
+			prepare_dma(&sdd->rx_dma, &xfer->rx_sg);
+>>>>>>> common/deprecated/android-3.18
 		}
 	}
 
@@ -568,6 +773,7 @@ static void enable_datapath(struct s3c64xx_spi_driver_data *sdd,
 	writel(chcfg, regs + S3C64XX_SPI_CH_CFG);
 }
 
+<<<<<<< HEAD
 static inline void enable_cs(struct s3c64xx_spi_driver_data *sdd,
 						struct spi_device *spi)
 {
@@ -611,10 +817,40 @@ static int wait_for_xfer(struct s3c64xx_spi_driver_data *sdd,
 {
 	void __iomem *regs = sdd->regs;
 	unsigned long val;
+=======
+static u32 s3c64xx_spi_wait_for_timeout(struct s3c64xx_spi_driver_data *sdd,
+					int timeout_ms)
+{
+	void __iomem *regs = sdd->regs;
+	unsigned long val = 1;
+	u32 status;
+
+	/* max fifo depth available */
+	u32 max_fifo = (FIFO_LVL_MASK(sdd) >> 1) + 1;
+
+	if (timeout_ms)
+		val = msecs_to_loops(timeout_ms);
+
+	do {
+		status = readl(regs + S3C64XX_SPI_STATUS);
+	} while (RX_FIFO_LVL(status, sdd) < max_fifo && --val);
+
+	/* return the actual received data length */
+	return RX_FIFO_LVL(status, sdd);
+}
+
+static int wait_for_dma(struct s3c64xx_spi_driver_data *sdd,
+			struct spi_transfer *xfer)
+{
+	void __iomem *regs = sdd->regs;
+	unsigned long val;
+	u32 status;
+>>>>>>> common/deprecated/android-3.18
 	int ms;
 
 	/* millisecs to xfer 'len' bytes @ 'cur_speed' */
 	ms = xfer->len * 8 * 1000 / sdd->cur_speed;
+<<<<<<< HEAD
 	ms = (ms * 10) + 30; /* some tolerance */
 	ms = max(ms, 100); /* minimum timeout */
 
@@ -699,11 +935,111 @@ static inline void disable_cs(struct s3c64xx_spi_driver_data *sdd,
 			? 0 : S3C64XX_SPI_SLAVE_SIG_INACT,
 		       sdd->regs + S3C64XX_SPI_SLAVE_SEL);
 	}
+=======
+	ms += 10; /* some tolerance */
+
+	val = msecs_to_jiffies(ms) + 10;
+	val = wait_for_completion_timeout(&sdd->xfer_completion, val);
+
+	/*
+	 * If the previous xfer was completed within timeout, then
+	 * proceed further else return -EIO.
+	 * DmaTx returns after simply writing data in the FIFO,
+	 * w/o waiting for real transmission on the bus to finish.
+	 * DmaRx returns only after Dma read data from FIFO which
+	 * needs bus transmission to finish, so we don't worry if
+	 * Xfer involved Rx(with or without Tx).
+	 */
+	if (val && !xfer->rx_buf) {
+		val = msecs_to_loops(10);
+		status = readl(regs + S3C64XX_SPI_STATUS);
+		while ((TX_FIFO_LVL(status, sdd)
+			|| !S3C64XX_SPI_ST_TX_DONE(status, sdd))
+		       && --val) {
+			cpu_relax();
+			status = readl(regs + S3C64XX_SPI_STATUS);
+		}
+
+	}
+
+	/* If timed out while checking rx/tx status return error */
+	if (!val)
+		return -EIO;
+
+	return 0;
+}
+
+static int wait_for_pio(struct s3c64xx_spi_driver_data *sdd,
+			struct spi_transfer *xfer)
+{
+	void __iomem *regs = sdd->regs;
+	unsigned long val;
+	u32 status;
+	int loops;
+	u32 cpy_len;
+	u8 *buf;
+	int ms;
+
+	/* millisecs to xfer 'len' bytes @ 'cur_speed' */
+	ms = xfer->len * 8 * 1000 / sdd->cur_speed;
+	ms += 10; /* some tolerance */
+
+	val = msecs_to_loops(ms);
+	do {
+		status = readl(regs + S3C64XX_SPI_STATUS);
+	} while (RX_FIFO_LVL(status, sdd) < xfer->len && --val);
+
+
+	/* If it was only Tx */
+	if (!xfer->rx_buf) {
+		sdd->state &= ~TXBUSY;
+		return 0;
+	}
+
+	/*
+	 * If the receive length is bigger than the controller fifo
+	 * size, calculate the loops and read the fifo as many times.
+	 * loops = length / max fifo size (calculated by using the
+	 * fifo mask).
+	 * For any size less than the fifo size the below code is
+	 * executed atleast once.
+	 */
+	loops = xfer->len / ((FIFO_LVL_MASK(sdd) >> 1) + 1);
+	buf = xfer->rx_buf;
+	do {
+		/* wait for data to be received in the fifo */
+		cpy_len = s3c64xx_spi_wait_for_timeout(sdd,
+						       (loops ? ms : 0));
+
+		switch (sdd->cur_bpw) {
+		case 32:
+			ioread32_rep(regs + S3C64XX_SPI_RX_DATA,
+				     buf, cpy_len / 4);
+			break;
+		case 16:
+			ioread16_rep(regs + S3C64XX_SPI_RX_DATA,
+				     buf, cpy_len / 2);
+			break;
+		default:
+			ioread8_rep(regs + S3C64XX_SPI_RX_DATA,
+				    buf, cpy_len);
+			break;
+		}
+
+		buf = buf + cpy_len;
+	} while (loops--);
+	sdd->state &= ~RXBUSY;
+
+	return 0;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void s3c64xx_spi_config(struct s3c64xx_spi_driver_data *sdd)
 {
+<<<<<<< HEAD
 	struct s3c64xx_spi_info *sci = sdd->cntrlr_info;
+=======
+>>>>>>> common/deprecated/android-3.18
 	void __iomem *regs = sdd->regs;
 	u32 val;
 
@@ -739,6 +1075,7 @@ static void s3c64xx_spi_config(struct s3c64xx_spi_driver_data *sdd)
 	case 32:
 		val |= S3C64XX_SPI_MODE_BUS_TSZ_WORD;
 		val |= S3C64XX_SPI_MODE_CH_TSZ_WORD;
+<<<<<<< HEAD
 		if (sci->swap_mode == SWAP_MODE) {
 			writel(S3C64XX_SPI_SWAP_TX_EN |
 				S3C64XX_SPI_SWAP_TX_BYTE |
@@ -748,10 +1085,13 @@ static void s3c64xx_spi_config(struct s3c64xx_spi_driver_data *sdd)
 				S3C64XX_SPI_SWAP_RX_HALF_WORD,
 				regs + S3C64XX_SPI_SWAP_CFG);
 		}
+=======
+>>>>>>> common/deprecated/android-3.18
 		break;
 	case 16:
 		val |= S3C64XX_SPI_MODE_BUS_TSZ_HALFWORD;
 		val |= S3C64XX_SPI_MODE_CH_TSZ_HALFWORD;
+<<<<<<< HEAD
 		if (sci->swap_mode == SWAP_MODE) {
 			writel(S3C64XX_SPI_SWAP_TX_EN |
 				S3C64XX_SPI_SWAP_TX_BYTE |
@@ -759,12 +1099,17 @@ static void s3c64xx_spi_config(struct s3c64xx_spi_driver_data *sdd)
 				S3C64XX_SPI_SWAP_RX_BYTE,
 				regs + S3C64XX_SPI_SWAP_CFG);
 		}
+=======
+>>>>>>> common/deprecated/android-3.18
 		break;
 	default:
 		val |= S3C64XX_SPI_MODE_BUS_TSZ_BYTE;
 		val |= S3C64XX_SPI_MODE_CH_TSZ_BYTE;
+<<<<<<< HEAD
 		if (sci->swap_mode == SWAP_MODE)
 			writel(0, regs + S3C64XX_SPI_SWAP_CFG);
+=======
+>>>>>>> common/deprecated/android-3.18
 		break;
 	}
 
@@ -775,7 +1120,10 @@ static void s3c64xx_spi_config(struct s3c64xx_spi_driver_data *sdd)
 		/* There is half-multiplier before the SPI */
 		clk_set_rate(sdd->src_clk, sdd->cur_speed * 2);
 		/* Enable Clock */
+<<<<<<< HEAD
 		exynos_update_ip_idle_status(sdd->idle_ip_index, 0);
+=======
+>>>>>>> common/deprecated/android-3.18
 		clk_prepare_enable(sdd->src_clk);
 	} else {
 		/* Configure Clock */
@@ -790,15 +1138,19 @@ static void s3c64xx_spi_config(struct s3c64xx_spi_driver_data *sdd)
 		val |= S3C64XX_SPI_ENCLK_ENABLE;
 		writel(val, regs + S3C64XX_SPI_CLK_CFG);
 	}
+<<<<<<< HEAD
 
 	if (sci->dbg_mode & SPI_DBG_MODE) {
 		dev_err(&sdd->pdev->dev, "SPI_MODE_%d", sdd->cur_mode & 0x3);
 		dev_err(&sdd->pdev->dev, "BTS : %d", sdd->cur_bpw);
 	}
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 
 #define XFER_DMAADDR_INVALID DMA_BIT_MASK(32)
 
+<<<<<<< HEAD
 static int s3c64xx_spi_map_mssg(struct s3c64xx_spi_driver_data *sdd,
 						struct spi_message *msg)
 {
@@ -891,6 +1243,14 @@ static int s3c64xx_spi_transfer_one_message(struct spi_master *master,
 	unsigned fifo_lvl = (FIFO_LVL_MASK(sdd) >> 1) + 1;
 	u32 speed;
 	u8 bpw;
+=======
+static int s3c64xx_spi_prepare_message(struct spi_master *master,
+				       struct spi_message *msg)
+{
+	struct s3c64xx_spi_driver_data *sdd = spi_master_get_devdata(master);
+	struct spi_device *spi = msg->spi;
+	struct s3c64xx_spi_csinfo *cs = spi->controller_data;
+>>>>>>> common/deprecated/android-3.18
 
 	/* If Master's(controller) state differs from that needed by Slave */
 	if (sdd->cur_speed != spi->max_speed_hz
@@ -902,6 +1262,7 @@ static int s3c64xx_spi_transfer_one_message(struct spi_master *master,
 		s3c64xx_spi_config(sdd);
 	}
 
+<<<<<<< HEAD
 	/* Map all the transfers if needed */
 	if (s3c64xx_spi_map_mssg(sdd, msg)) {
 		dev_err(&spi->dev,
@@ -1055,6 +1416,82 @@ out:
 	spi_finalize_current_message(master);
 
 	return 0;
+=======
+	/* Configure feedback delay */
+	writel(cs->fb_delay & 0x3, sdd->regs + S3C64XX_SPI_FB_CLK);
+
+	return 0;
+}
+
+static int s3c64xx_spi_transfer_one(struct spi_master *master,
+				    struct spi_device *spi,
+				    struct spi_transfer *xfer)
+{
+	struct s3c64xx_spi_driver_data *sdd = spi_master_get_devdata(master);
+	int status;
+	u32 speed;
+	u8 bpw;
+	unsigned long flags;
+	int use_dma;
+
+	reinit_completion(&sdd->xfer_completion);
+
+	/* Only BPW and Speed may change across transfers */
+	bpw = xfer->bits_per_word;
+	speed = xfer->speed_hz ? : spi->max_speed_hz;
+
+	if (bpw != sdd->cur_bpw || speed != sdd->cur_speed) {
+		sdd->cur_bpw = bpw;
+		sdd->cur_speed = speed;
+		s3c64xx_spi_config(sdd);
+	}
+
+	/* Polling method for xfers not bigger than FIFO capacity */
+	use_dma = 0;
+	if (!is_polling(sdd) &&
+	    (sdd->rx_dma.ch && sdd->tx_dma.ch &&
+	     (xfer->len > ((FIFO_LVL_MASK(sdd) >> 1) + 1))))
+		use_dma = 1;
+
+	spin_lock_irqsave(&sdd->lock, flags);
+
+	/* Pending only which is to be done */
+	sdd->state &= ~RXBUSY;
+	sdd->state &= ~TXBUSY;
+
+	enable_datapath(sdd, spi, xfer, use_dma);
+
+	/* Start the signals */
+	writel(0, sdd->regs + S3C64XX_SPI_SLAVE_SEL);
+
+	spin_unlock_irqrestore(&sdd->lock, flags);
+
+	if (use_dma)
+		status = wait_for_dma(sdd, xfer);
+	else
+		status = wait_for_pio(sdd, xfer);
+
+	if (status) {
+		dev_err(&spi->dev, "I/O Error: rx-%d tx-%d res:rx-%c tx-%c len-%d\n",
+			xfer->rx_buf ? 1 : 0, xfer->tx_buf ? 1 : 0,
+			(sdd->state & RXBUSY) ? 'f' : 'p',
+			(sdd->state & TXBUSY) ? 'f' : 'p',
+			xfer->len);
+
+		if (use_dma) {
+			if (xfer->tx_buf != NULL
+			    && (sdd->state & TXBUSY))
+				dmaengine_terminate_all(sdd->tx_dma.ch);
+			if (xfer->rx_buf != NULL
+			    && (sdd->state & RXBUSY))
+				dmaengine_terminate_all(sdd->rx_dma.ch);
+		}
+	} else {
+		flush_fifo(sdd);
+	}
+
+	return status;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static struct s3c64xx_spi_csinfo *s3c64xx_get_slave_ctrldata(
@@ -1063,7 +1500,10 @@ static struct s3c64xx_spi_csinfo *s3c64xx_get_slave_ctrldata(
 	struct s3c64xx_spi_csinfo *cs;
 	struct device_node *slave_np, *data_np = NULL;
 	u32 fb_delay = 0;
+<<<<<<< HEAD
 	u32 cs_mode = 0;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	slave_np = spi->dev.of_node;
 	if (!slave_np) {
@@ -1079,11 +1519,15 @@ static struct s3c64xx_spi_csinfo *s3c64xx_get_slave_ctrldata(
 
 	cs = kzalloc(sizeof(*cs), GFP_KERNEL);
 	if (!cs) {
+<<<<<<< HEAD
 		dev_err(&spi->dev, "could not allocate memory for controller data\n");
+=======
+>>>>>>> common/deprecated/android-3.18
 		of_node_put(data_np);
 		return ERR_PTR(-ENOMEM);
 	}
 
+<<<<<<< HEAD
 	if (of_get_property(data_np, "cs-gpio", NULL)) {
 		cs->line = of_get_named_gpio(data_np, "cs-gpio", 0);
 		if (!gpio_is_valid(cs->line))
@@ -1105,6 +1549,10 @@ static struct s3c64xx_spi_csinfo *s3c64xx_get_slave_ctrldata(
 			cs->cs_mode = MANUAL_CS_MODE;
 	}
 
+=======
+	of_property_read_u32(data_np, "samsung,spi-feedback-delay", &fb_delay);
+	cs->fb_delay = fb_delay;
+>>>>>>> common/deprecated/android-3.18
 	of_node_put(data_np);
 	return cs;
 }
@@ -1120,6 +1568,7 @@ static int s3c64xx_spi_setup(struct spi_device *spi)
 	struct s3c64xx_spi_csinfo *cs = spi->controller_data;
 	struct s3c64xx_spi_driver_data *sdd;
 	struct s3c64xx_spi_info *sci;
+<<<<<<< HEAD
 	struct spi_message *msg;
 	unsigned long flags;
 	int err;
@@ -1128,6 +1577,21 @@ static int s3c64xx_spi_setup(struct spi_device *spi)
 	if (!cs && spi->dev.of_node) {
 		cs = s3c64xx_get_slave_ctrldata(spi);
 		spi->controller_data = cs;
+=======
+	int err;
+
+	sdd = spi_master_get_devdata(spi->master);
+	if (spi->dev.of_node) {
+		cs = s3c64xx_get_slave_ctrldata(spi);
+		spi->controller_data = cs;
+	} else if (cs) {
+		/* On non-DT platforms the SPI core will set spi->cs_gpio
+		 * to -ENOENT. The GPIO pin used to drive the chip select
+		 * is defined by using platform data so spi->cs_gpio value
+		 * has to be override to have the proper GPIO pin number.
+		 */
+		spi->cs_gpio = cs->line;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (IS_ERR_OR_NULL(cs)) {
@@ -1135,6 +1599,7 @@ static int s3c64xx_spi_setup(struct spi_device *spi)
 		return -ENODEV;
 	}
 
+<<<<<<< HEAD
 #ifdef ENABLE_SENSORS_FPRINT_SECURE
 	if (sdd->port_id == CONFIG_SENSORS_FP_SPI_NUMBER)
 		return 0;
@@ -1147,11 +1612,20 @@ static int s3c64xx_spi_setup(struct spi_device *spi)
 	if (!spi_get_ctldata(spi)) {
 		if(cs->line != 0) {
 			err = gpio_request_one(cs->line, GPIOF_OUT_INIT_HIGH,
+=======
+	if (!spi_get_ctldata(spi)) {
+		if (gpio_is_valid(spi->cs_gpio)) {
+			err = gpio_request_one(spi->cs_gpio, GPIOF_OUT_INIT_HIGH,
+>>>>>>> common/deprecated/android-3.18
 					       dev_name(&spi->dev));
 			if (err) {
 				dev_err(&spi->dev,
 					"Failed to get /CS gpio [%d]: %d\n",
+<<<<<<< HEAD
 					cs->line, err);
+=======
+					spi->cs_gpio, err);
+>>>>>>> common/deprecated/android-3.18
 				goto err_gpio_req;
 			}
 		}
@@ -1161,6 +1635,7 @@ static int s3c64xx_spi_setup(struct spi_device *spi)
 
 	sci = sdd->cntrlr_info;
 
+<<<<<<< HEAD
 	spin_lock_irqsave(&sdd->lock, flags);
 
 	list_for_each_entry(msg, &sdd->queue, queue) {
@@ -1188,28 +1663,43 @@ static int s3c64xx_spi_setup(struct spi_device *spi)
 #ifdef CONFIG_PM_RUNTIME
 	pm_runtime_get_sync(&sdd->pdev->dev);
 #endif
+=======
+	pm_runtime_get_sync(&sdd->pdev->dev);
+>>>>>>> common/deprecated/android-3.18
 
 	/* Check if we can provide the requested rate */
 	if (!sdd->port_conf->clk_from_cmu) {
 		u32 psr, speed;
 
 		/* Max possible */
+<<<<<<< HEAD
 		speed = (unsigned int)clk_get_rate(sdd->src_clk) / 2 / (0 + 1);
 		if (!speed) {
 			dev_err(&spi->dev, "clock rate of speed is 0\n");
 			err = -EINVAL;
 			goto setup_exit;
 		}
+=======
+		speed = clk_get_rate(sdd->src_clk) / 2 / (0 + 1);
+>>>>>>> common/deprecated/android-3.18
 
 		if (spi->max_speed_hz > speed)
 			spi->max_speed_hz = speed;
 
+<<<<<<< HEAD
 		psr = (unsigned int)clk_get_rate(sdd->src_clk) / 2 / spi->max_speed_hz - 1;
+=======
+		psr = clk_get_rate(sdd->src_clk) / 2 / spi->max_speed_hz - 1;
+>>>>>>> common/deprecated/android-3.18
 		psr &= S3C64XX_SPI_PSR_MASK;
 		if (psr == S3C64XX_SPI_PSR_MASK)
 			psr--;
 
+<<<<<<< HEAD
 		speed = (unsigned int)clk_get_rate(sdd->src_clk) / 2 / (psr + 1);
+=======
+		speed = clk_get_rate(sdd->src_clk) / 2 / (psr + 1);
+>>>>>>> common/deprecated/android-3.18
 		if (spi->max_speed_hz < speed) {
 			if (psr+1 < S3C64XX_SPI_PSR_MASK) {
 				psr++;
@@ -1219,7 +1709,11 @@ static int s3c64xx_spi_setup(struct spi_device *spi)
 			}
 		}
 
+<<<<<<< HEAD
 		speed = (unsigned int)clk_get_rate(sdd->src_clk) / 2 / (psr + 1);
+=======
+		speed = clk_get_rate(sdd->src_clk) / 2 / (psr + 1);
+>>>>>>> common/deprecated/android-3.18
 		if (spi->max_speed_hz >= speed) {
 			spi->max_speed_hz = speed;
 		} else {
@@ -1230,6 +1724,7 @@ static int s3c64xx_spi_setup(struct spi_device *spi)
 		}
 	}
 
+<<<<<<< HEAD
 	disable_cs(sdd, spi);
 
 #ifdef CONFIG_PM_RUNTIME
@@ -1252,6 +1747,19 @@ setup_exit:
 
 err_msgq:
 	gpio_free(cs->line);
+=======
+	pm_runtime_put(&sdd->pdev->dev);
+	writel(S3C64XX_SPI_SLAVE_SIG_INACT, sdd->regs + S3C64XX_SPI_SLAVE_SEL);
+	return 0;
+
+setup_exit:
+	pm_runtime_put(&sdd->pdev->dev);
+	/* setup() returns with device de-selected */
+	writel(S3C64XX_SPI_SLAVE_SIG_INACT, sdd->regs + S3C64XX_SPI_SLAVE_SEL);
+
+	if (gpio_is_valid(spi->cs_gpio))
+		gpio_free(spi->cs_gpio);
+>>>>>>> common/deprecated/android-3.18
 	spi_set_ctldata(spi, NULL);
 
 err_gpio_req:
@@ -1265,11 +1773,28 @@ static void s3c64xx_spi_cleanup(struct spi_device *spi)
 {
 	struct s3c64xx_spi_csinfo *cs = spi_get_ctldata(spi);
 
+<<<<<<< HEAD
 	if (cs) {
 		gpio_free(cs->line);
 		if (spi->dev.of_node)
 			kfree(cs);
 	}
+=======
+	if (gpio_is_valid(spi->cs_gpio)) {
+		gpio_free(spi->cs_gpio);
+		if (spi->dev.of_node)
+			kfree(cs);
+		else {
+			/* On non-DT platforms, the SPI core sets
+			 * spi->cs_gpio to -ENOENT and .setup()
+			 * overrides it with the GPIO pin value
+			 * passed using platform data.
+			 */
+			spi->cs_gpio = -ENOENT;
+		}
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	spi_set_ctldata(spi, NULL);
 }
 
@@ -1311,6 +1836,7 @@ static void s3c64xx_spi_hwinit(struct s3c64xx_spi_driver_data *sdd, int channel)
 	void __iomem *regs = sdd->regs;
 	unsigned int val;
 
+<<<<<<< HEAD
 #ifdef ENABLE_SENSORS_FPRINT_SECURE
 	if (channel == CONFIG_SENSORS_FP_SPI_NUMBER)
 		return;
@@ -1320,6 +1846,8 @@ static void s3c64xx_spi_hwinit(struct s3c64xx_spi_driver_data *sdd, int channel)
 		return;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	sdd->cur_speed = 0;
 
 	writel(S3C64XX_SPI_SLAVE_SIG_INACT, sdd->regs + S3C64XX_SPI_SLAVE_SEL);
@@ -1350,8 +1878,11 @@ static void s3c64xx_spi_hwinit(struct s3c64xx_spi_driver_data *sdd, int channel)
 	writel(val, regs + S3C64XX_SPI_MODE_CFG);
 
 	flush_fifo(sdd);
+<<<<<<< HEAD
 
 	sci->need_hw_init = 0;
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 
 #ifdef CONFIG_OF
@@ -1359,6 +1890,7 @@ static struct s3c64xx_spi_info *s3c64xx_spi_parse_dt(struct device *dev)
 {
 	struct s3c64xx_spi_info *sci;
 	u32 temp;
+<<<<<<< HEAD
 	const char *domain;
 
 	sci = devm_kzalloc(dev, sizeof(*sci), GFP_KERNEL);
@@ -1381,6 +1913,12 @@ static struct s3c64xx_spi_info *s3c64xx_spi_parse_dt(struct device *dev)
 		sci->secure_mode = SECURE_MODE;
 	else
 		sci->secure_mode = NONSECURE_MODE;
+=======
+
+	sci = devm_kzalloc(dev, sizeof(*sci), GFP_KERNEL);
+	if (!sci)
+		return ERR_PTR(-ENOMEM);
+>>>>>>> common/deprecated/android-3.18
 
 	if (of_property_read_u32(dev->of_node, "samsung,spi-src-clk", &temp)) {
 		dev_warn(dev, "spi bus clock parent not specified, using clock at index 0 as parent\n");
@@ -1396,6 +1934,7 @@ static struct s3c64xx_spi_info *s3c64xx_spi_parse_dt(struct device *dev)
 		sci->num_cs = temp;
 	}
 
+<<<<<<< HEAD
 	sci->domain = DOMAIN_TOP;
 	if (!of_property_read_string(dev->of_node, "domain", &domain)) {
 		if (strncmp(domain, "isp", 3) == 0)
@@ -1404,12 +1943,18 @@ static struct s3c64xx_spi_info *s3c64xx_spi_parse_dt(struct device *dev)
 			sci->domain = DOMAIN_CAM1;
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	return sci;
 }
 #else
 static struct s3c64xx_spi_info *s3c64xx_spi_parse_dt(struct device *dev)
 {
+<<<<<<< HEAD
 	return dev->platform_data;
+=======
+	return dev_get_platdata(dev);
+>>>>>>> common/deprecated/android-3.18
 }
 #endif
 
@@ -1429,6 +1974,7 @@ static inline struct s3c64xx_spi_port_config *s3c64xx_spi_get_port_config(
 			 platform_get_device_id(pdev)->driver_data;
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_CPU_IDLE
 static int s3c64xx_spi_notifier(struct notifier_block *self,
 				unsigned long cmd, void *v)
@@ -1450,16 +1996,25 @@ static struct notifier_block s3c64xx_spi_notifier_block = {
 };
 #endif /* CONFIG_CPU_IDLE */
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static int s3c64xx_spi_probe(struct platform_device *pdev)
 {
 	struct resource	*mem_res;
 	struct resource	*res;
 	struct s3c64xx_spi_driver_data *sdd;
+<<<<<<< HEAD
 	struct s3c64xx_spi_info *sci = pdev->dev.platform_data;
 	struct spi_master *master;
 	int ret, irq;
 	char clk_name[16];
 	int fifosize;
+=======
+	struct s3c64xx_spi_info *sci = dev_get_platdata(&pdev->dev);
+	struct spi_master *master;
+	int ret, irq;
+	char clk_name[16];
+>>>>>>> common/deprecated/android-3.18
 
 	if (!sci && pdev->dev.of_node) {
 		sci = s3c64xx_spi_parse_dt(&pdev->dev);
@@ -1472,11 +2027,14 @@ static int s3c64xx_spi_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 
+<<<<<<< HEAD
 #if !defined(CONFIG_VIDEO_EXYNOS_FIMC_IS) && !defined(CONFIG_VIDEO_EXYNOS_FIMC_IS2)
 	if (sci->domain != DOMAIN_TOP)
 		return -ENODEV;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	mem_res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	if (mem_res == NULL) {
 		dev_err(&pdev->dev, "Unable to get SPI MEM resource\n");
@@ -1504,11 +2062,14 @@ static int s3c64xx_spi_probe(struct platform_device *pdev)
 	sdd->cntrlr_info = sci;
 	sdd->pdev = pdev;
 	sdd->sfr_start = mem_res->start;
+<<<<<<< HEAD
 	sdd->is_probed = 0;
 	sdd->ops = NULL;
 
 	sdd->idle_ip_index = exynos_get_idle_ip_index(dev_name(&pdev->dev));
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (pdev->dev.of_node) {
 		ret = of_alias_get_id(pdev->dev.of_node, "spi");
 		if (ret < 0) {
@@ -1516,13 +2077,18 @@ static int s3c64xx_spi_probe(struct platform_device *pdev)
 				ret);
 			goto err0;
 		}
+<<<<<<< HEAD
 		pdev->id = sdd->port_id = ret;
+=======
+		sdd->port_id = ret;
+>>>>>>> common/deprecated/android-3.18
 	} else {
 		sdd->port_id = pdev->id;
 	}
 
 	sdd->cur_bpw = 8;
 
+<<<<<<< HEAD
 	if (sci->dma_mode == DMA_MODE) {
 		if (!sdd->pdev->dev.of_node) {
 			res = platform_get_resource(pdev, IORESOURCE_DMA,  0);
@@ -1546,11 +2112,33 @@ static int s3c64xx_spi_probe(struct platform_device *pdev)
 		sdd->rx_dma.direction = DMA_DEV_TO_MEM;
 	}
 
+=======
+	if (!sdd->pdev->dev.of_node) {
+		res = platform_get_resource(pdev, IORESOURCE_DMA,  0);
+		if (!res) {
+			dev_warn(&pdev->dev, "Unable to get SPI tx dma resource. Switching to poll mode\n");
+			sdd->port_conf->quirks = S3C64XX_SPI_QUIRK_POLL;
+		} else
+			sdd->tx_dma.dmach = res->start;
+
+		res = platform_get_resource(pdev, IORESOURCE_DMA,  1);
+		if (!res) {
+			dev_warn(&pdev->dev, "Unable to get SPI rx dma resource. Switching to poll mode\n");
+			sdd->port_conf->quirks = S3C64XX_SPI_QUIRK_POLL;
+		} else
+			sdd->rx_dma.dmach = res->start;
+	}
+
+	sdd->tx_dma.direction = DMA_MEM_TO_DEV;
+	sdd->rx_dma.direction = DMA_DEV_TO_MEM;
+
+>>>>>>> common/deprecated/android-3.18
 	master->dev.of_node = pdev->dev.of_node;
 	master->bus_num = sdd->port_id;
 	master->setup = s3c64xx_spi_setup;
 	master->cleanup = s3c64xx_spi_cleanup;
 	master->prepare_transfer_hardware = s3c64xx_spi_prepare_transfer;
+<<<<<<< HEAD
 	master->transfer_one_message = s3c64xx_spi_transfer_one_message;
 	master->unprepare_transfer_hardware = s3c64xx_spi_unprepare_transfer;
 	master->num_chipselect = sci->num_cs;
@@ -1558,6 +2146,20 @@ static int s3c64xx_spi_probe(struct platform_device *pdev)
 	master->bits_per_word_mask = BIT(32 - 1) | BIT(16 - 1) | BIT(8 - 1);
 	/* the spi->mode bits understood by this driver: */
 	master->mode_bits = SPI_CPOL | SPI_CPHA | SPI_CS_HIGH;
+=======
+	master->prepare_message = s3c64xx_spi_prepare_message;
+	master->transfer_one = s3c64xx_spi_transfer_one;
+	master->unprepare_transfer_hardware = s3c64xx_spi_unprepare_transfer;
+	master->num_chipselect = sci->num_cs;
+	master->dma_alignment = 8;
+	master->bits_per_word_mask = SPI_BPW_MASK(32) | SPI_BPW_MASK(16) |
+					SPI_BPW_MASK(8);
+	/* the spi->mode bits understood by this driver: */
+	master->mode_bits = SPI_CPOL | SPI_CPHA | SPI_CS_HIGH;
+	master->auto_runtime_pm = true;
+	if (!is_polling(sdd))
+		master->can_dma = s3c64xx_spi_can_dma;
+>>>>>>> common/deprecated/android-3.18
 
 	sdd->regs = devm_ioremap_resource(&pdev->dev, mem_res);
 	if (IS_ERR(sdd->regs)) {
@@ -1579,7 +2181,17 @@ static int s3c64xx_spi_probe(struct platform_device *pdev)
 		goto err0;
 	}
 
+<<<<<<< HEAD
 	snprintf(clk_name, sizeof(clk_name), "spi_busclk%d", sci->src_clk_nr);
+=======
+	if (clk_prepare_enable(sdd->clk)) {
+		dev_err(&pdev->dev, "Couldn't enable clock 'spi'\n");
+		ret = -EBUSY;
+		goto err0;
+	}
+
+	sprintf(clk_name, "spi_busclk%d", sci->src_clk_nr);
+>>>>>>> common/deprecated/android-3.18
 	sdd->src_clk = devm_clk_get(&pdev->dev, clk_name);
 	if (IS_ERR(sdd->src_clk)) {
 		dev_err(&pdev->dev,
@@ -1587,6 +2199,7 @@ static int s3c64xx_spi_probe(struct platform_device *pdev)
 		ret = PTR_ERR(sdd->src_clk);
 		goto err2;
 	}
+<<<<<<< HEAD
 #ifdef CONFIG_PM_RUNTIME
 	pm_runtime_use_autosuspend(&pdev->dev);
 	pm_runtime_enable(&pdev->dev);
@@ -1620,12 +2233,15 @@ static int s3c64xx_spi_probe(struct platform_device *pdev)
 		ret = -EBUSY;
 		goto err0;
 	}
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	if (clk_prepare_enable(sdd->src_clk)) {
 		dev_err(&pdev->dev, "Couldn't enable clock '%s'\n", clk_name);
 		ret = -EBUSY;
 		goto err2;
 	}
+<<<<<<< HEAD
 #endif
 
 	if (of_property_read_u32(pdev->dev.of_node, "spi-clkoff-time",
@@ -1647,13 +2263,18 @@ static int s3c64xx_spi_probe(struct platform_device *pdev)
 		dev_info(&pdev->dev, "PORT %d fifo_lvl_mask = 0x%x\n",
 			sdd->port_id, sdd->port_conf->fifo_lvl_mask[sdd->port_id]);
 	}
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	/* Setup Deufult Mode */
 	s3c64xx_spi_hwinit(sdd, sdd->port_id);
 
 	spin_lock_init(&sdd->lock);
 	init_completion(&sdd->xfer_completion);
+<<<<<<< HEAD
 	INIT_LIST_HEAD(&sdd->queue);
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	ret = devm_request_irq(&pdev->dev, irq, s3c64xx_spi_irq, 0,
 				"spi-s3c64xx", sdd);
@@ -1663,6 +2284,7 @@ static int s3c64xx_spi_probe(struct platform_device *pdev)
 		goto err3;
 	}
 
+<<<<<<< HEAD
 	if (1
 #ifdef ENABLE_SENSORS_FPRINT_SECURE
 			&& sdd->port_id != CONFIG_SENSORS_FP_SPI_NUMBER
@@ -1716,11 +2338,38 @@ err3:
 #ifdef CONFIG_PM_RUNTIME
 	pm_runtime_disable(&pdev->dev);
 #endif
+=======
+	writel(S3C64XX_SPI_INT_RX_OVERRUN_EN | S3C64XX_SPI_INT_RX_UNDERRUN_EN |
+	       S3C64XX_SPI_INT_TX_OVERRUN_EN | S3C64XX_SPI_INT_TX_UNDERRUN_EN,
+	       sdd->regs + S3C64XX_SPI_INT_EN);
+
+	pm_runtime_set_active(&pdev->dev);
+	pm_runtime_enable(&pdev->dev);
+
+	ret = devm_spi_register_master(&pdev->dev, master);
+	if (ret != 0) {
+		dev_err(&pdev->dev, "cannot register SPI master: %d\n", ret);
+		goto err3;
+	}
+
+	dev_dbg(&pdev->dev, "Samsung SoC SPI Driver loaded for Bus SPI-%d with %d Slaves attached\n",
+					sdd->port_id, master->num_chipselect);
+	dev_dbg(&pdev->dev, "\tIOmem=[%pR]\tDMA=[Rx-%d, Tx-%d]\n",
+					mem_res,
+					sdd->rx_dma.dmach, sdd->tx_dma.dmach);
+
+	return 0;
+
+err3:
+>>>>>>> common/deprecated/android-3.18
 	clk_disable_unprepare(sdd->src_clk);
 err2:
 	clk_disable_unprepare(sdd->clk);
 err0:
+<<<<<<< HEAD
 	platform_set_drvdata(pdev, NULL);
+=======
+>>>>>>> common/deprecated/android-3.18
 	spi_master_put(master);
 
 	return ret;
@@ -1731,11 +2380,15 @@ static int s3c64xx_spi_remove(struct platform_device *pdev)
 	struct spi_master *master = spi_master_get(platform_get_drvdata(pdev));
 	struct s3c64xx_spi_driver_data *sdd = spi_master_get_devdata(master);
 
+<<<<<<< HEAD
 #ifdef CONFIG_PM_RUNTIME
 	pm_runtime_disable(&pdev->dev);
 #endif
 
 	spi_unregister_master(master);
+=======
+	pm_runtime_disable(&pdev->dev);
+>>>>>>> common/deprecated/android-3.18
 
 	writel(0, sdd->regs + S3C64XX_SPI_INT_EN);
 
@@ -1743,15 +2396,19 @@ static int s3c64xx_spi_remove(struct platform_device *pdev)
 
 	clk_disable_unprepare(sdd->clk);
 
+<<<<<<< HEAD
 	exynos_update_ip_idle_status(sdd->idle_ip_index, 1);
 
 	platform_set_drvdata(pdev, NULL);
 	spi_master_put(master);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
 #ifdef CONFIG_PM_SLEEP
+<<<<<<< HEAD
 static int s3c64xx_spi_suspend_operation(struct device *dev)
 {
 	struct spi_master *master = dev_get_drvdata(dev);
@@ -1775,16 +2432,37 @@ static int s3c64xx_spi_suspend_operation(struct device *dev)
 		exynos_update_ip_idle_status(sdd->idle_ip_index, 1);
 	}
 #endif
+=======
+static int s3c64xx_spi_suspend(struct device *dev)
+{
+	struct spi_master *master = dev_get_drvdata(dev);
+	struct s3c64xx_spi_driver_data *sdd = spi_master_get_devdata(master);
+
+	int ret = spi_master_suspend(master);
+	if (ret)
+		return ret;
+
+	if (!pm_runtime_suspended(dev)) {
+		clk_disable_unprepare(sdd->clk);
+		clk_disable_unprepare(sdd->src_clk);
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	sdd->cur_speed = 0; /* Output Clock is stopped */
 
 	return 0;
 }
 
+<<<<<<< HEAD
 static int s3c64xx_spi_resume_operation(struct device *dev)
+=======
+static int s3c64xx_spi_resume(struct device *dev)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct spi_master *master = dev_get_drvdata(dev);
 	struct s3c64xx_spi_driver_data *sdd = spi_master_get_devdata(master);
 	struct s3c64xx_spi_info *sci = sdd->cntrlr_info;
+<<<<<<< HEAD
 	int ret;
 
 	if (sci->domain == DOMAIN_TOP) {
@@ -1883,10 +2561,25 @@ static int s3c64xx_spi_suspend(struct device *dev)
 static int s3c64xx_spi_resume(struct device *dev)
 {
 	return 0;
+=======
+
+	if (sci->cfg_gpio)
+		sci->cfg_gpio();
+
+	if (!pm_runtime_suspended(dev)) {
+		clk_prepare_enable(sdd->src_clk);
+		clk_prepare_enable(sdd->clk);
+	}
+
+	s3c64xx_spi_hwinit(sdd, sdd->port_id);
+
+	return spi_master_resume(master);
+>>>>>>> common/deprecated/android-3.18
 }
 #endif /* CONFIG_PM_SLEEP */
 
 #ifdef CONFIG_PM_RUNTIME
+<<<<<<< HEAD
 static void s3c64xx_spi_pin_ctrl(struct device *dev, int en)
 {
 	struct spi_master *master = dev_get_drvdata(dev);
@@ -1906,10 +2599,13 @@ static void s3c64xx_spi_pin_ctrl(struct device *dev, int en)
 	}
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static int s3c64xx_spi_runtime_suspend(struct device *dev)
 {
 	struct spi_master *master = dev_get_drvdata(dev);
 	struct s3c64xx_spi_driver_data *sdd = spi_master_get_devdata(master);
+<<<<<<< HEAD
 	struct s3c64xx_spi_info *sci = sdd->cntrlr_info;
 
 	if (sdd->clk->enable_count)
@@ -1937,6 +2633,11 @@ static int s3c64xx_spi_runtime_suspend(struct device *dev)
 	}
 
 	s3c64xx_spi_pin_ctrl(dev, 0);
+=======
+
+	clk_disable_unprepare(sdd->clk);
+	clk_disable_unprepare(sdd->src_clk);
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }
@@ -1945,6 +2646,7 @@ static int s3c64xx_spi_runtime_resume(struct device *dev)
 {
 	struct spi_master *master = dev_get_drvdata(dev);
 	struct s3c64xx_spi_driver_data *sdd = spi_master_get_devdata(master);
+<<<<<<< HEAD
 	struct s3c64xx_spi_info *sci = sdd->cntrlr_info;
 
 	s3c64xx_spi_pin_ctrl(dev, 1);
@@ -1971,15 +2673,33 @@ static int s3c64xx_spi_runtime_resume(struct device *dev)
 	}
 #endif
 
+=======
+	int ret;
+
+	ret = clk_prepare_enable(sdd->src_clk);
+	if (ret != 0)
+		return ret;
+
+	ret = clk_prepare_enable(sdd->clk);
+	if (ret != 0) {
+		clk_disable_unprepare(sdd->src_clk);
+		return ret;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 #endif /* CONFIG_PM_RUNTIME */
 
 static const struct dev_pm_ops s3c64xx_spi_pm = {
+<<<<<<< HEAD
 	.suspend = s3c64xx_spi_suspend,
 	.resume = s3c64xx_spi_resume,
 	.suspend_noirq = s3c64xx_spi_suspend_noirq,
 	.resume_noirq = s3c64xx_spi_resume_noirq,
+=======
+	SET_SYSTEM_SLEEP_PM_OPS(s3c64xx_spi_suspend, s3c64xx_spi_resume)
+>>>>>>> common/deprecated/android-3.18
 	SET_RUNTIME_PM_OPS(s3c64xx_spi_runtime_suspend,
 			   s3c64xx_spi_runtime_resume, NULL)
 };
@@ -2012,6 +2732,7 @@ static struct s3c64xx_spi_port_config exynos4_spi_port_config = {
 	.clk_from_cmu	= true,
 };
 
+<<<<<<< HEAD
 static struct s3c64xx_spi_port_config exynos5_spi_port_config = {
 	.fifo_lvl_mask	= { 0x1ff, 0x7F, 0x7F, 0x1ff, 0x1ff },
 	.rx_lvl_offset	= 15,
@@ -2046,10 +2767,18 @@ static struct s3c64xx_spi_port_config exynos758x_spi_port_config = {
 
 static struct s3c64xx_spi_port_config exynos_spi_port_config = {
 	.fifo_lvl_mask	= { 0, },
+=======
+static struct s3c64xx_spi_port_config exynos5440_spi_port_config = {
+	.fifo_lvl_mask	= { 0x1ff },
+>>>>>>> common/deprecated/android-3.18
 	.rx_lvl_offset	= 15,
 	.tx_st_done	= 25,
 	.high_speed	= true,
 	.clk_from_cmu	= true,
+<<<<<<< HEAD
+=======
+	.quirks		= S3C64XX_SPI_QUIRK_POLL,
+>>>>>>> common/deprecated/android-3.18
 };
 
 static struct platform_device_id s3c64xx_spi_driver_ids[] = {
@@ -2065,6 +2794,7 @@ static struct platform_device_id s3c64xx_spi_driver_ids[] = {
 	}, {
 		.name		= "exynos4210-spi",
 		.driver_data	= (kernel_ulong_t)&exynos4_spi_port_config,
+<<<<<<< HEAD
 	}, {
 		.name		= "exynos5410-spi",
 		.driver_data	= (kernel_ulong_t)&exynos5_spi_port_config,
@@ -2080,10 +2810,13 @@ static struct platform_device_id s3c64xx_spi_driver_ids[] = {
 	}, {
 		.name		= "exynos-spi",
 		.driver_data	= (kernel_ulong_t)&exynos_spi_port_config,
+=======
+>>>>>>> common/deprecated/android-3.18
 	},
 	{ },
 };
 
+<<<<<<< HEAD
 #ifdef CONFIG_OF
 static const struct of_device_id s3c64xx_spi_dt_match[] = {
 	{ .compatible = "samsung,exynos4210-spi",
@@ -2103,11 +2836,31 @@ static const struct of_device_id s3c64xx_spi_dt_match[] = {
 	},
 	{ .compatible = "samsung,exynos-spi",
 			.data = (void *)&exynos_spi_port_config,
+=======
+static const struct of_device_id s3c64xx_spi_dt_match[] = {
+	{ .compatible = "samsung,s3c2443-spi",
+			.data = (void *)&s3c2443_spi_port_config,
+	},
+	{ .compatible = "samsung,s3c6410-spi",
+			.data = (void *)&s3c6410_spi_port_config,
+	},
+	{ .compatible = "samsung,s5pv210-spi",
+			.data = (void *)&s5pv210_spi_port_config,
+	},
+	{ .compatible = "samsung,exynos4210-spi",
+			.data = (void *)&exynos4_spi_port_config,
+	},
+	{ .compatible = "samsung,exynos5440-spi",
+			.data = (void *)&exynos5440_spi_port_config,
+>>>>>>> common/deprecated/android-3.18
 	},
 	{ },
 };
 MODULE_DEVICE_TABLE(of, s3c64xx_spi_dt_match);
+<<<<<<< HEAD
 #endif /* CONFIG_OF */
+=======
+>>>>>>> common/deprecated/android-3.18
 
 static struct platform_driver s3c64xx_spi_driver = {
 	.driver = {
@@ -2116,11 +2869,16 @@ static struct platform_driver s3c64xx_spi_driver = {
 		.pm = &s3c64xx_spi_pm,
 		.of_match_table = of_match_ptr(s3c64xx_spi_dt_match),
 	},
+<<<<<<< HEAD
+=======
+	.probe = s3c64xx_spi_probe,
+>>>>>>> common/deprecated/android-3.18
 	.remove = s3c64xx_spi_remove,
 	.id_table = s3c64xx_spi_driver_ids,
 };
 MODULE_ALIAS("platform:s3c64xx-spi");
 
+<<<<<<< HEAD
 static int __init s3c64xx_spi_init(void)
 {
 #ifdef CONFIG_CPU_IDLE
@@ -2135,6 +2893,9 @@ static void __exit s3c64xx_spi_exit(void)
 	platform_driver_unregister(&s3c64xx_spi_driver);
 }
 module_exit(s3c64xx_spi_exit);
+=======
+module_platform_driver(s3c64xx_spi_driver);
+>>>>>>> common/deprecated/android-3.18
 
 MODULE_AUTHOR("Jaswinder Singh <jassi.brar@samsung.com>");
 MODULE_DESCRIPTION("S3C64XX SPI Controller Driver");

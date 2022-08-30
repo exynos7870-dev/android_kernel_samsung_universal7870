@@ -23,6 +23,10 @@
 #define SPIDEV_H
 
 #include <linux/types.h>
+<<<<<<< HEAD
+=======
+#include <linux/ioctl.h>
+>>>>>>> common/deprecated/android-3.18
 
 /* User space versions of kernel symbols for SPI clocking modes,
  * matching <linux/spi/spi.h>

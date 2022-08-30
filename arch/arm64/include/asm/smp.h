@@ -20,10 +20,13 @@
 #include <linux/cpumask.h>
 #include <linux/thread_info.h>
 
+<<<<<<< HEAD
 #ifndef CONFIG_SMP
 # error "<asm/smp.h> included in non-SMP build"
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #define raw_smp_processor_id() (current_thread_info()->cpu)
 
 struct seq_file;

@@ -249,7 +249,11 @@ TRACE_EVENT(kvm_inj_virq,
 #define kvm_trace_sym_exc						\
 	EXS(DE), EXS(DB), EXS(BP), EXS(OF), EXS(BR), EXS(UD), EXS(NM),	\
 	EXS(DF), EXS(TS), EXS(NP), EXS(SS), EXS(GP), EXS(PF),		\
+<<<<<<< HEAD
 	EXS(MF), EXS(MC)
+=======
+	EXS(MF), EXS(AC), EXS(MC)
+>>>>>>> common/deprecated/android-3.18
 
 /*
  * Tracepoint for kvm interrupt injection:
@@ -415,13 +419,21 @@ TRACE_EVENT(kvm_apic_ipi,
 );
 
 TRACE_EVENT(kvm_apic_accept_irq,
+<<<<<<< HEAD
 	    TP_PROTO(__u32 apicid, __u16 dm, __u8 tm, __u8 vec),
+=======
+	    TP_PROTO(__u32 apicid, __u16 dm, __u16 tm, __u8 vec),
+>>>>>>> common/deprecated/android-3.18
 	    TP_ARGS(apicid, dm, tm, vec),
 
 	TP_STRUCT__entry(
 		__field(	__u32,		apicid		)
 		__field(	__u16,		dm		)
+<<<<<<< HEAD
 		__field(	__u8,		tm		)
+=======
+		__field(	__u16,		tm		)
+>>>>>>> common/deprecated/android-3.18
 		__field(	__u8,		vec		)
 	),
 

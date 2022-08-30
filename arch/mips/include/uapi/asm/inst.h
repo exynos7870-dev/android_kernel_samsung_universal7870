@@ -262,8 +262,13 @@ enum mm_32a_minor_op {
 	mm_ext_op = 0x02c,
 	mm_pool32axf_op = 0x03c,
 	mm_srl32_op = 0x040,
+<<<<<<< HEAD
 	mm_sra_op = 0x080,
 	mm_srlv32_op = 0x090,
+=======
+	mm_srlv32_op = 0x050,
+	mm_sra_op = 0x080,
+>>>>>>> common/deprecated/android-3.18
 	mm_rotr_op = 0x0c0,
 	mm_lwxs_op = 0x118,
 	mm_addu32_op = 0x150,

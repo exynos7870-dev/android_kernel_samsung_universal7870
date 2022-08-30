@@ -405,6 +405,11 @@ static int as3722_i2c_probe(struct i2c_client *i2c,
 		goto scrub;
 	}
 
+<<<<<<< HEAD
+=======
+	device_init_wakeup(as3722->dev, true);
+
+>>>>>>> common/deprecated/android-3.18
 	dev_dbg(as3722->dev, "AS3722 core driver initialized successfully\n");
 	return 0;
 
@@ -422,6 +427,32 @@ static int as3722_i2c_remove(struct i2c_client *i2c)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+static int __maybe_unused as3722_i2c_suspend(struct device *dev)
+{
+	struct as3722 *as3722 = dev_get_drvdata(dev);
+
+	if (device_may_wakeup(dev))
+		enable_irq_wake(as3722->chip_irq);
+	disable_irq(as3722->chip_irq);
+
+	return 0;
+}
+
+static int __maybe_unused as3722_i2c_resume(struct device *dev)
+{
+	struct as3722 *as3722 = dev_get_drvdata(dev);
+
+	enable_irq(as3722->chip_irq);
+
+	if (device_may_wakeup(dev))
+		disable_irq_wake(as3722->chip_irq);
+
+	return 0;
+}
+
+>>>>>>> common/deprecated/android-3.18
 static const struct of_device_id as3722_of_match[] = {
 	{ .compatible = "ams,as3722", },
 	{},
@@ -434,11 +465,22 @@ static const struct i2c_device_id as3722_i2c_id[] = {
 };
 MODULE_DEVICE_TABLE(i2c, as3722_i2c_id);
 
+<<<<<<< HEAD
+=======
+static const struct dev_pm_ops as3722_pm_ops = {
+	SET_SYSTEM_SLEEP_PM_OPS(as3722_i2c_suspend, as3722_i2c_resume)
+};
+
+>>>>>>> common/deprecated/android-3.18
 static struct i2c_driver as3722_i2c_driver = {
 	.driver = {
 		.name = "as3722",
 		.owner = THIS_MODULE,
 		.of_match_table = as3722_of_match,
+<<<<<<< HEAD
+=======
+		.pm = &as3722_pm_ops,
+>>>>>>> common/deprecated/android-3.18
 	},
 	.probe = as3722_i2c_probe,
 	.remove = as3722_i2c_remove,

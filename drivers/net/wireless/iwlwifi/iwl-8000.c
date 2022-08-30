@@ -69,7 +69,11 @@
 #include "iwl-agn-hw.h"
 
 /* Highest firmware API version supported */
+<<<<<<< HEAD
 #define IWL8000_UCODE_API_MAX	10
+=======
+#define IWL8000_UCODE_API_MAX	12
+>>>>>>> common/deprecated/android-3.18
 
 /* Oldest version we won't warn about */
 #define IWL8000_UCODE_API_OK	8

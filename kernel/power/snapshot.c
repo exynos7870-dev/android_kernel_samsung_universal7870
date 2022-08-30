@@ -764,9 +764,15 @@ static bool memory_bm_pfn_present(struct memory_bitmap *bm, unsigned long pfn)
  */
 static bool rtree_next_node(struct memory_bitmap *bm)
 {
+<<<<<<< HEAD
 	bm->cur.node = list_entry(bm->cur.node->list.next,
 				  struct rtree_node, list);
 	if (&bm->cur.node->list != &bm->cur.zone->leaves) {
+=======
+	if (!list_is_last(&bm->cur.node->list, &bm->cur.zone->leaves)) {
+		bm->cur.node = list_entry(bm->cur.node->list.next,
+					  struct rtree_node, list);
+>>>>>>> common/deprecated/android-3.18
 		bm->cur.node_pfn += BM_BITS_PER_BLOCK;
 		bm->cur.node_bit  = 0;
 		touch_softlockup_watchdog();
@@ -774,9 +780,15 @@ static bool rtree_next_node(struct memory_bitmap *bm)
 	}
 
 	/* No more nodes, goto next zone */
+<<<<<<< HEAD
 	bm->cur.zone = list_entry(bm->cur.zone->list.next,
 				  struct mem_zone_bm_rtree, list);
 	if (&bm->cur.zone->list != &bm->zones) {
+=======
+	if (!list_is_last(&bm->cur.zone->list, &bm->zones)) {
+		bm->cur.zone = list_entry(bm->cur.zone->list.next,
+				  struct mem_zone_bm_rtree, list);
+>>>>>>> common/deprecated/android-3.18
 		bm->cur.node = list_entry(bm->cur.zone->leaves.next,
 					  struct rtree_node, list);
 		bm->cur.node_pfn = 0;

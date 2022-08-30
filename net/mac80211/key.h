@@ -111,6 +111,11 @@ struct ieee80211_key {
 	} debugfs;
 #endif
 
+<<<<<<< HEAD
+=======
+	unsigned int color;
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * key config, must be last because it contains key
 	 * material as variable length member

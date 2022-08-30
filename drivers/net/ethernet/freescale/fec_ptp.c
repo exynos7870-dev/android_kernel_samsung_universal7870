@@ -412,9 +412,22 @@ static int fec_ptp_gettime(struct ptp_clock_info *ptp, struct timespec *ts)
 	u32 remainder;
 	unsigned long flags;
 
+<<<<<<< HEAD
 	spin_lock_irqsave(&adapter->tmreg_lock, flags);
 	ns = timecounter_read(&adapter->tc);
 	spin_unlock_irqrestore(&adapter->tmreg_lock, flags);
+=======
+	mutex_lock(&adapter->ptp_clk_mutex);
+	/* Check the ptp clock */
+	if (!adapter->ptp_clk_on) {
+		mutex_unlock(&adapter->ptp_clk_mutex);
+		return -EINVAL;
+	}
+	spin_lock_irqsave(&adapter->tmreg_lock, flags);
+	ns = timecounter_read(&adapter->tc);
+	spin_unlock_irqrestore(&adapter->tmreg_lock, flags);
+	mutex_unlock(&adapter->ptp_clk_mutex);
+>>>>>>> common/deprecated/android-3.18
 
 	ts->tv_sec = div_u64_rem(ns, 1000000000ULL, &remainder);
 	ts->tv_nsec = remainder;
@@ -603,6 +616,13 @@ void fec_ptp_init(struct platform_device *pdev)
 	fep->ptp_caps.enable = fec_ptp_enable;
 
 	fep->cycle_speed = clk_get_rate(fep->clk_ptp);
+<<<<<<< HEAD
+=======
+	if (!fep->cycle_speed) {
+		fep->cycle_speed = NSEC_PER_SEC;
+		dev_err(&fep->pdev->dev, "clk_ptp clock rate is zero\n");
+	}
+>>>>>>> common/deprecated/android-3.18
 	fep->ptp_inc = NSEC_PER_SEC / fep->cycle_speed;
 
 	spin_lock_init(&fep->tmreg_lock);
@@ -620,6 +640,19 @@ void fec_ptp_init(struct platform_device *pdev)
 	schedule_delayed_work(&fep->time_keep, HZ);
 }
 
+<<<<<<< HEAD
+=======
+void fec_ptp_stop(struct platform_device *pdev)
+{
+	struct net_device *ndev = platform_get_drvdata(pdev);
+	struct fec_enet_private *fep = netdev_priv(ndev);
+
+	cancel_delayed_work_sync(&fep->time_keep);
+	if (fep->ptp_clock)
+		ptp_clock_unregister(fep->ptp_clock);
+}
+
+>>>>>>> common/deprecated/android-3.18
 /**
  * fec_ptp_check_pps_event
  * @fep: the fec_enet_private structure handle

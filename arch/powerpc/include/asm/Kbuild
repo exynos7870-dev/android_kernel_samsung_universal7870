@@ -8,3 +8,7 @@ generic-y += rwsem.h
 generic-y += scatterlist.h
 generic-y += trace_clock.h
 generic-y += vtime.h
+<<<<<<< HEAD
+=======
+generic-y += word-at-a-time.h
+>>>>>>> common/deprecated/android-3.18

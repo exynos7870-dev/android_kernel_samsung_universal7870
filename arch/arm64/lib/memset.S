@@ -213,4 +213,8 @@ ENTRY(memset)
 	ands	count, count, zva_bits_x
 	b.ne	.Ltail_maybe_long
 	ret
+<<<<<<< HEAD
 ENDPROC(memset)
+=======
+ENDPIPROC(memset)
+>>>>>>> common/deprecated/android-3.18

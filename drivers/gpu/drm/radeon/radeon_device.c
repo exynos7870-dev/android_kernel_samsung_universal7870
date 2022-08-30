@@ -127,6 +127,13 @@ static struct radeon_px_quirk radeon_px_quirk_list[] = {
 	 * https://bugzilla.kernel.org/show_bug.cgi?id=51381
 	 */
 	{ PCI_VENDOR_ID_ATI, 0x6840, 0x1043, 0x2122, RADEON_PX_QUIRK_DISABLE_PX },
+<<<<<<< HEAD
+=======
+	/* Asus K53TK laptop with AMD A6-3420M APU and Radeon 7670m GPU
+	 * https://bugs.freedesktop.org/show_bug.cgi?id=101491
+	 */
+	{ PCI_VENDOR_ID_ATI, 0x6741, 0x1043, 0x2122, RADEON_PX_QUIRK_DISABLE_PX },
+>>>>>>> common/deprecated/android-3.18
 	/* macbook pro 8.2 */
 	{ PCI_VENDOR_ID_ATI, 0x6741, PCI_VENDOR_ID_APPLE, 0x00e2, RADEON_PX_QUIRK_LONG_WAKEUP },
 	{ 0, 0, 0, 0, 0 },
@@ -599,6 +606,26 @@ void radeon_gtt_location(struct radeon_device *rdev, struct radeon_mc *mc)
 /*
  * GPU helpers function.
  */
+<<<<<<< HEAD
+=======
+
+/**
+ * radeon_device_is_virtual - check if we are running is a virtual environment
+ *
+ * Check if the asic has been passed through to a VM (all asics).
+ * Used at driver startup.
+ * Returns true if virtual or false if not.
+ */
+static bool radeon_device_is_virtual(void)
+{
+#ifdef CONFIG_X86
+	return boot_cpu_has(X86_FEATURE_HYPERVISOR);
+#else
+	return false;
+#endif
+}
+
+>>>>>>> common/deprecated/android-3.18
 /**
  * radeon_card_posted - check if the hw has already been initialized
  *
@@ -612,6 +639,14 @@ bool radeon_card_posted(struct radeon_device *rdev)
 {
 	uint32_t reg;
 
+<<<<<<< HEAD
+=======
+	/* for pass through, always force asic_init for CI */
+	if (rdev->family >= CHIP_BONAIRE &&
+	    radeon_device_is_virtual())
+		return false;
+
+>>>>>>> common/deprecated/android-3.18
 	/* required for EFI mode on macbook2,1 which uses an r5xx asic */
 	if (efi_enabled(EFI_BOOT) &&
 	    (rdev->pdev->subsystem_vendor == PCI_VENDOR_ID_APPLE) &&
@@ -1426,6 +1461,24 @@ int radeon_device_init(struct radeon_device *rdev,
 	if (r)
 		DRM_ERROR("ib ring test failed (%d).\n", r);
 
+<<<<<<< HEAD
+=======
+	/*
+	 * Turks/Thames GPU will freeze whole laptop if DPM is not restarted
+	 * after the CP ring have chew one packet at least. Hence here we stop
+	 * and restart DPM after the radeon_ib_ring_tests().
+	 */
+	if (rdev->pm.dpm_enabled &&
+	    (rdev->pm.pm_method == PM_METHOD_DPM) &&
+	    (rdev->family == CHIP_TURKS) &&
+	    (rdev->flags & RADEON_IS_MOBILITY)) {
+		mutex_lock(&rdev->pm.mutex);
+		radeon_dpm_disable(rdev);
+		radeon_dpm_enable(rdev);
+		mutex_unlock(&rdev->pm.mutex);
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	if ((radeon_testing & 1)) {
 		if (rdev->accel_working)
 			radeon_test_moves(rdev);

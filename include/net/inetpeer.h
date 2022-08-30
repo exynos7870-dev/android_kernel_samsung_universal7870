@@ -35,6 +35,10 @@ struct inet_peer {
 
 	u32			metrics[RTAX_MAX];
 	u32			rate_tokens;	/* rate limiting for ICMP */
+<<<<<<< HEAD
+=======
+	u32			n_redirects;
+>>>>>>> common/deprecated/android-3.18
 	unsigned long		rate_last;
 	union {
 		struct list_head	gc_list;

@@ -49,6 +49,10 @@ void v4l2_fh_init(struct v4l2_fh *fh, struct video_device *vdev)
 	INIT_LIST_HEAD(&fh->available);
 	INIT_LIST_HEAD(&fh->subscribed);
 	fh->sequence = -1;
+<<<<<<< HEAD
+=======
+	mutex_init(&fh->subscribe_lock);
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL_GPL(v4l2_fh_init);
 
@@ -93,6 +97,10 @@ void v4l2_fh_exit(struct v4l2_fh *fh)
 	if (fh->vdev == NULL)
 		return;
 	v4l2_event_unsubscribe_all(fh);
+<<<<<<< HEAD
+=======
+	mutex_destroy(&fh->subscribe_lock);
+>>>>>>> common/deprecated/android-3.18
 	fh->vdev = NULL;
 }
 EXPORT_SYMBOL_GPL(v4l2_fh_exit);
@@ -105,6 +113,10 @@ int v4l2_fh_release(struct file *filp)
 		v4l2_fh_del(fh);
 		v4l2_fh_exit(fh);
 		kfree(fh);
+<<<<<<< HEAD
+=======
+		filp->private_data = NULL;
+>>>>>>> common/deprecated/android-3.18
 	}
 	return 0;
 }

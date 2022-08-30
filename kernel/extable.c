@@ -66,7 +66,11 @@ static inline int init_kernel_text(unsigned long addr)
 	return 0;
 }
 
+<<<<<<< HEAD
 int core_kernel_text(unsigned long addr)
+=======
+int notrace core_kernel_text(unsigned long addr)
+>>>>>>> common/deprecated/android-3.18
 {
 	if (addr >= (unsigned long)_stext &&
 	    addr < (unsigned long)_etext)

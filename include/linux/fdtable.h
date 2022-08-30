@@ -9,6 +9,10 @@
 #include <linux/compiler.h>
 #include <linux/spinlock.h>
 #include <linux/rcupdate.h>
+<<<<<<< HEAD
+=======
+#include <linux/nospec.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/types.h>
 #include <linux/init.h>
 #include <linux/fs.h>
@@ -76,8 +80,15 @@ static inline struct file *__fcheck_files(struct files_struct *files, unsigned i
 {
 	struct fdtable *fdt = rcu_dereference_raw(files->fdt);
 
+<<<<<<< HEAD
 	if (fd < fdt->max_fds)
 		return rcu_dereference_raw(fdt->fd[fd]);
+=======
+	if (fd < fdt->max_fds) {
+		fd = array_index_nospec(fd, fdt->max_fds);
+		return rcu_dereference_raw(fdt->fd[fd]);
+	}
+>>>>>>> common/deprecated/android-3.18
 	return NULL;
 }
 

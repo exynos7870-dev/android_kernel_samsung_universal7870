@@ -127,7 +127,11 @@ void big_key_revoke(struct key *key)
 
 	/* clear the quota */
 	key_payload_reserve(key, 0);
+<<<<<<< HEAD
 	if (key_is_instantiated(key) && key->type_data.x[1] > BIG_KEY_FILE_THRESHOLD)
+=======
+	if (key_is_positive(key) && key->type_data.x[1] > BIG_KEY_FILE_THRESHOLD)
+>>>>>>> common/deprecated/android-3.18
 		vfs_truncate(path, 0);
 }
 
@@ -156,7 +160,11 @@ void big_key_describe(const struct key *key, struct seq_file *m)
 
 	seq_puts(m, key->description);
 
+<<<<<<< HEAD
 	if (key_is_instantiated(key))
+=======
+	if (key_is_positive(key))
+>>>>>>> common/deprecated/android-3.18
 		seq_printf(m, ": %lu [%s]",
 			   datalen,
 			   datalen > BIG_KEY_FILE_THRESHOLD ? "file" : "buff");

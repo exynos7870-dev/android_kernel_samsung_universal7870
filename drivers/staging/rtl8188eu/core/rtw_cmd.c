@@ -718,13 +718,21 @@ u8 rtw_addbareq_cmd(struct adapter *padapter, u8 tid, u8 *addr)
 	u8	res = _SUCCESS;
 
 
+<<<<<<< HEAD
 	ph2c = kzalloc(sizeof(struct cmd_obj), GFP_KERNEL);
+=======
+	ph2c = kzalloc(sizeof(struct cmd_obj), GFP_ATOMIC);
+>>>>>>> common/deprecated/android-3.18
 	if (ph2c == NULL) {
 		res = _FAIL;
 		goto exit;
 	}
 
+<<<<<<< HEAD
 	paddbareq_parm = kzalloc(sizeof(struct addBaReq_parm), GFP_KERNEL);
+=======
+	paddbareq_parm = kzalloc(sizeof(struct addBaReq_parm), GFP_ATOMIC);
+>>>>>>> common/deprecated/android-3.18
 	if (paddbareq_parm == NULL) {
 		kfree(ph2c);
 		res = _FAIL;

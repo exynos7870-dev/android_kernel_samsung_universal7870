@@ -342,10 +342,20 @@ static int idmouse_probe(struct usb_interface *interface,
 	int result;
 
 	/* check if we have gotten the data or the hid interface */
+<<<<<<< HEAD
 	iface_desc = &interface->altsetting[0];
 	if (iface_desc->desc.bInterfaceClass != 0x0A)
 		return -ENODEV;
 
+=======
+	iface_desc = interface->cur_altsetting;
+	if (iface_desc->desc.bInterfaceClass != 0x0A)
+		return -ENODEV;
+
+	if (iface_desc->desc.bNumEndpoints < 1)
+		return -ENODEV;
+
+>>>>>>> common/deprecated/android-3.18
 	/* allocate memory for our device state and initialize it */
 	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
 	if (dev == NULL)

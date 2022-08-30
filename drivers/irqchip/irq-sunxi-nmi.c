@@ -50,12 +50,20 @@ static struct sunxi_sc_nmi_reg_offs sun6i_reg_offs = {
 static inline void sunxi_sc_nmi_write(struct irq_chip_generic *gc, u32 off,
 				      u32 val)
 {
+<<<<<<< HEAD
 	irq_reg_writel(val, gc->reg_base + off);
+=======
+	irq_reg_writel(gc, val, off);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static inline u32 sunxi_sc_nmi_read(struct irq_chip_generic *gc, u32 off)
 {
+<<<<<<< HEAD
 	return irq_reg_readl(gc->reg_base + off);
+=======
+	return irq_reg_readl(gc, off);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void sunxi_sc_nmi_handle_irq(unsigned int irq, struct irq_desc *desc)
@@ -104,7 +112,11 @@ static int sunxi_sc_nmi_set_type(struct irq_data *data, unsigned int flow_type)
 	irqd_set_trigger_type(data, flow_type);
 	irq_setup_alt_chip(data, flow_type);
 
+<<<<<<< HEAD
 	for (i = 0; i <= gc->num_ct; i++, ct++)
+=======
+	for (i = 0; i < gc->num_ct; i++, ct++)
+>>>>>>> common/deprecated/android-3.18
 		if (ct->type & flow_type)
 			ctrl_off = ct->regs.type;
 

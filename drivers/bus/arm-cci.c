@@ -976,6 +976,12 @@ static int cci_probe(void)
 	if (!np)
 		return -ENODEV;
 
+<<<<<<< HEAD
+=======
+	if (!of_device_is_available(np))
+		return -ENODEV;
+
+>>>>>>> common/deprecated/android-3.18
 	cci_config = of_match_node(arm_cci_matches, np)->data;
 	if (!cci_config)
 		return -ENODEV;

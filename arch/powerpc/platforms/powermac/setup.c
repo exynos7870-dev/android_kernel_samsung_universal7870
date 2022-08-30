@@ -359,6 +359,10 @@ static int pmac_late_init(void)
 }
 machine_late_initcall(powermac, pmac_late_init);
 
+<<<<<<< HEAD
+=======
+void note_bootable_part(dev_t dev, int part, int goodness);
+>>>>>>> common/deprecated/android-3.18
 /*
  * This is __init_refok because we check for "initializing" before
  * touching any of the __init sensitive things and "initializing"

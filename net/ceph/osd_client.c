@@ -1263,8 +1263,11 @@ static void __unregister_linger_request(struct ceph_osd_client *osdc,
 		if (list_empty(&req->r_osd_item))
 			req->r_osd = NULL;
 	}
+<<<<<<< HEAD
 
 	list_del_init(&req->r_req_lru_item); /* can be on notarget */
+=======
+>>>>>>> common/deprecated/android-3.18
 	ceph_osdc_put_request(req);
 }
 
@@ -1974,6 +1977,7 @@ static void kick_requests(struct ceph_osd_client *osdc, bool force_resend,
 		err = __map_request(osdc, req,
 				    force_resend || force_resend_writes);
 		dout("__map_request returned %d\n", err);
+<<<<<<< HEAD
 		if (err == 0)
 			continue;  /* no change and no osd was specified */
 		if (err < 0)
@@ -1988,6 +1992,31 @@ static void kick_requests(struct ceph_osd_client *osdc, bool force_resend,
 		     req->r_osd ? req->r_osd->o_osd : -1);
 		__register_request(osdc, req);
 		__unregister_linger_request(osdc, req);
+=======
+		if (err < 0)
+			continue;  /* hrm! */
+		if (req->r_osd == NULL || err > 0) {
+			if (req->r_osd == NULL) {
+				dout("lingering %p tid %llu maps to no osd\n",
+				     req, req->r_tid);
+				/*
+				 * A homeless lingering request makes
+				 * no sense, as it's job is to keep
+				 * a particular OSD connection open.
+				 * Request a newer map and kick the
+				 * request, knowing that it won't be
+				 * resent until we actually get a map
+				 * that can tell us where to send it.
+				 */
+				needmap++;
+			}
+
+			dout("kicking lingering %p tid %llu osd%d\n", req,
+			     req->r_tid, req->r_osd ? req->r_osd->o_osd : -1);
+			__register_request(osdc, req);
+			__unregister_linger_request(osdc, req);
+		}
+>>>>>>> common/deprecated/android-3.18
 	}
 	reset_changed_osds(osdc);
 	mutex_unlock(&osdc->request_mutex);

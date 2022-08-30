@@ -1115,7 +1115,11 @@ static void uli526x_timer(unsigned long data)
 				netif_carrier_off(dev);
 			}
 		}
+<<<<<<< HEAD
 		db->init=0;
+=======
+	db->init = 0;
+>>>>>>> common/deprecated/android-3.18
 
 	/* Timer active again */
 	db->timer.expires = ULI526X_TIMER_WUT;
@@ -1813,8 +1817,13 @@ static int __init uli526x_init_module(void)
 	if (cr6set)
 		uli526x_cr6_user_set = cr6set;
 
+<<<<<<< HEAD
  	switch (mode) {
    	case ULI526X_10MHF:
+=======
+	switch (mode) {
+	case ULI526X_10MHF:
+>>>>>>> common/deprecated/android-3.18
 	case ULI526X_100MHF:
 	case ULI526X_10MFD:
 	case ULI526X_100MFD:

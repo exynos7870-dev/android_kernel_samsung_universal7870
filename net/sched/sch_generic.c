@@ -49,6 +49,10 @@ static inline int dev_requeue_skb(struct sk_buff *skb, struct Qdisc *q)
 {
 	q->gso_skb = skb;
 	q->qstats.requeues++;
+<<<<<<< HEAD
+=======
+	qdisc_qstats_backlog_inc(q, skb);
+>>>>>>> common/deprecated/android-3.18
 	q->q.qlen++;	/* it's still part of the queue */
 	__netif_schedule(q);
 
@@ -92,6 +96,10 @@ static struct sk_buff *dequeue_skb(struct Qdisc *q, bool *validate,
 		txq = skb_get_tx_queue(txq->dev, skb);
 		if (!netif_xmit_frozen_or_stopped(txq)) {
 			q->gso_skb = NULL;
+<<<<<<< HEAD
+=======
+			qdisc_qstats_backlog_dec(q, skb);
+>>>>>>> common/deprecated/android-3.18
 			q->q.qlen--;
 		} else
 			skb = NULL;
@@ -159,12 +167,22 @@ int sch_direct_xmit(struct sk_buff *skb, struct Qdisc *q,
 	if (validate)
 		skb = validate_xmit_skb_list(skb, dev);
 
+<<<<<<< HEAD
 	if (skb) {
+=======
+	if (likely(skb)) {
+>>>>>>> common/deprecated/android-3.18
 		HARD_TX_LOCK(dev, txq, smp_processor_id());
 		if (!netif_xmit_frozen_or_stopped(txq))
 			skb = dev_hard_start_xmit(skb, dev, txq, &ret);
 
 		HARD_TX_UNLOCK(dev, txq);
+<<<<<<< HEAD
+=======
+	} else {
+		spin_lock(root_lock);
+		return qdisc_qlen(q);
+>>>>>>> common/deprecated/android-3.18
 	}
 	spin_lock(root_lock);
 
@@ -324,6 +342,10 @@ void __netdev_watchdog_up(struct net_device *dev)
 			dev_hold(dev);
 	}
 }
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL_GPL(__netdev_watchdog_up);
+>>>>>>> common/deprecated/android-3.18
 
 static void dev_watchdog_up(struct net_device *dev)
 {
@@ -629,18 +651,31 @@ struct Qdisc *qdisc_create_dflt(struct netdev_queue *dev_queue,
 	struct Qdisc *sch;
 
 	if (!try_module_get(ops->owner))
+<<<<<<< HEAD
 		goto errout;
 
 	sch = qdisc_alloc(dev_queue, ops);
 	if (IS_ERR(sch))
 		goto errout;
+=======
+		return NULL;
+
+	sch = qdisc_alloc(dev_queue, ops);
+	if (IS_ERR(sch)) {
+		module_put(ops->owner);
+		return NULL;
+	}
+>>>>>>> common/deprecated/android-3.18
 	sch->parent = parentid;
 
 	if (!ops->init || ops->init(sch, NULL) == 0)
 		return sch;
 
 	qdisc_destroy(sch);
+<<<<<<< HEAD
 errout:
+=======
+>>>>>>> common/deprecated/android-3.18
 	return NULL;
 }
 EXPORT_SYMBOL(qdisc_create_dflt);
@@ -666,15 +701,30 @@ static void qdisc_rcu_free(struct rcu_head *head)
 {
 	struct Qdisc *qdisc = container_of(head, struct Qdisc, rcu_head);
 
+<<<<<<< HEAD
 	if (qdisc_is_percpu_stats(qdisc))
 		free_percpu(qdisc->cpu_bstats);
+=======
+	if (qdisc_is_percpu_stats(qdisc)) {
+		free_percpu(qdisc->cpu_bstats);
+		free_percpu(qdisc->cpu_qstats);
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	kfree((char *) qdisc - qdisc->padded);
 }
 
 void qdisc_destroy(struct Qdisc *qdisc)
 {
+<<<<<<< HEAD
 	const struct Qdisc_ops  *ops = qdisc->ops;
+=======
+	const struct Qdisc_ops *ops;
+
+	if (!qdisc)
+		return;
+	ops = qdisc->ops;
+>>>>>>> common/deprecated/android-3.18
 
 	if (qdisc->flags & TCQ_F_BUILTIN ||
 	    !atomic_dec_and_test(&qdisc->refcnt))

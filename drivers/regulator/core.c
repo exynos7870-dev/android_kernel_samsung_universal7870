@@ -110,6 +110,14 @@ static struct regulator *create_regulator(struct regulator_dev *rdev,
 					  struct device *dev,
 					  const char *supply_name);
 
+<<<<<<< HEAD
+=======
+static struct regulator_dev *dev_to_rdev(struct device *dev)
+{
+	return container_of(dev, struct regulator_dev, dev);
+}
+
+>>>>>>> common/deprecated/android-3.18
 static const char *rdev_get_name(struct regulator_dev *rdev)
 {
 	if (rdev->constraints && rdev->constraints->name)
@@ -774,7 +782,11 @@ static int suspend_prepare(struct regulator_dev *rdev, suspend_state_t state)
 static void print_constraints(struct regulator_dev *rdev)
 {
 	struct regulation_constraints *constraints = rdev->constraints;
+<<<<<<< HEAD
 	char buf[80] = "";
+=======
+	char buf[160] = "";
+>>>>>>> common/deprecated/android-3.18
 	int count = 0;
 	int ret;
 
@@ -995,32 +1007,52 @@ static int set_machine_constraints(struct regulator_dev *rdev,
 
 	ret = machine_constraints_voltage(rdev, rdev->constraints);
 	if (ret != 0)
+<<<<<<< HEAD
 		goto out;
 
 	ret = machine_constraints_current(rdev, rdev->constraints);
 	if (ret != 0)
 		goto out;
+=======
+		return ret;
+
+	ret = machine_constraints_current(rdev, rdev->constraints);
+	if (ret != 0)
+		return ret;
+>>>>>>> common/deprecated/android-3.18
 
 	/* do we need to setup our suspend state */
 	if (rdev->constraints->initial_state) {
 		ret = suspend_prepare(rdev, rdev->constraints->initial_state);
 		if (ret < 0) {
 			rdev_err(rdev, "failed to set suspend state\n");
+<<<<<<< HEAD
 			goto out;
+=======
+			return ret;
+>>>>>>> common/deprecated/android-3.18
 		}
 	}
 
 	if (rdev->constraints->initial_mode) {
 		if (!ops->set_mode) {
 			rdev_err(rdev, "no set_mode operation\n");
+<<<<<<< HEAD
 			ret = -EINVAL;
 			goto out;
+=======
+			return -EINVAL;
+>>>>>>> common/deprecated/android-3.18
 		}
 
 		ret = ops->set_mode(rdev, rdev->constraints->initial_mode);
 		if (ret < 0) {
 			rdev_err(rdev, "failed to set initial mode: %d\n", ret);
+<<<<<<< HEAD
 			goto out;
+=======
+			return ret;
+>>>>>>> common/deprecated/android-3.18
 		}
 	}
 
@@ -1031,7 +1063,11 @@ static int set_machine_constraints(struct regulator_dev *rdev,
 		ret = _regulator_do_enable(rdev);
 		if (ret < 0 && ret != -EINVAL) {
 			rdev_err(rdev, "failed to enable\n");
+<<<<<<< HEAD
 			goto out;
+=======
+			return ret;
+>>>>>>> common/deprecated/android-3.18
 		}
 	}
 
@@ -1040,16 +1076,23 @@ static int set_machine_constraints(struct regulator_dev *rdev,
 		ret = ops->set_ramp_delay(rdev, rdev->constraints->ramp_delay);
 		if (ret < 0) {
 			rdev_err(rdev, "failed to set ramp_delay\n");
+<<<<<<< HEAD
 			goto out;
+=======
+			return ret;
+>>>>>>> common/deprecated/android-3.18
 		}
 	}
 
 	print_constraints(rdev);
 	return 0;
+<<<<<<< HEAD
 out:
 	kfree(rdev->constraints);
 	rdev->constraints = NULL;
 	return ret;
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -1266,6 +1309,7 @@ static void regulator_supply_alias(struct device **dev, const char **supply)
 	}
 }
 
+<<<<<<< HEAD
 static int _regulator_get_disable_time(struct regulator_dev *rdev)
 {
 	if (!rdev->desc->ops->disable_time)
@@ -1273,6 +1317,8 @@ static int _regulator_get_disable_time(struct regulator_dev *rdev)
 	return rdev->desc->ops->disable_time(rdev);
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static struct regulator_dev *regulator_dev_lookup(struct device *dev,
 						  const char *supply,
 						  int *ret)
@@ -1947,6 +1993,7 @@ EXPORT_SYMBOL_GPL(regulator_enable);
 
 static int _regulator_do_disable(struct regulator_dev *rdev)
 {
+<<<<<<< HEAD
 	int ret, delay;
 
 	/* Query before disabling in case configuration dependent.  */
@@ -1957,6 +2004,9 @@ static int _regulator_do_disable(struct regulator_dev *rdev)
 		rdev_warn(rdev, "disable_time() failed: %d\n", ret);
 		delay = 0;
 	}
+=======
+	int ret;
+>>>>>>> common/deprecated/android-3.18
 
 	trace_regulator_disable(rdev_get_name(rdev));
 
@@ -1980,6 +2030,7 @@ static int _regulator_do_disable(struct regulator_dev *rdev)
 	if (rdev->desc->off_on_delay)
 		rdev->last_off_jiffy = jiffies;
 
+<<<<<<< HEAD
 	/* Allow the regulator to ramp; it would be useful to extend
 	 * this for bulk operations so that the regulators can ramp
 	 * together.  */
@@ -1992,6 +2043,8 @@ static int _regulator_do_disable(struct regulator_dev *rdev)
 		udelay(delay);
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	trace_regulator_disable_complete(rdev_get_name(rdev));
 
 	return 0;
@@ -2442,6 +2495,7 @@ int regulator_is_supported_voltage(struct regulator *regulator,
 }
 EXPORT_SYMBOL_GPL(regulator_is_supported_voltage);
 
+<<<<<<< HEAD
 /**
  * regulator_get_max_support_voltage - standard get_max_supporting_volt()
  *
@@ -2474,6 +2528,8 @@ int regulator_get_min_support_voltage(struct regulator *regulator)
 }
 EXPORT_SYMBOL_GPL(regulator_get_min_support_voltage);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static int _regulator_call_set_voltage(struct regulator_dev *rdev,
 				       int min_uV, int max_uV,
 				       unsigned *selector)
@@ -2694,10 +2750,13 @@ int regulator_set_voltage(struct regulator *regulator, int min_uV, int max_uV)
 	regulator->min_uV = min_uV;
 	regulator->max_uV = max_uV;
 
+<<<<<<< HEAD
 	if ((rdev->open_count < rdev->constraints->expected_consumer)
 			&& rdev->constraints->expected_consumer)
 		goto out;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	ret = regulator_check_consumers(rdev, &min_uV, &max_uV);
 	if (ret < 0)
 		goto out2;
@@ -3808,7 +3867,11 @@ scrub:
 	if (rdev->supply)
 		_regulator_put(rdev->supply);
 	regulator_ena_gpio_free(rdev);
+<<<<<<< HEAD
 	kfree(rdev->constraints);
+=======
+
+>>>>>>> common/deprecated/android-3.18
 wash:
 	device_unregister(&rdev->dev);
 	/* device core frees rdev */
@@ -4060,6 +4123,7 @@ static int __init regulator_init(void)
 /* init early to allow our consumers to complete system booting */
 core_initcall(regulator_init);
 
+<<<<<<< HEAD
 static int __init regulator_init_complete(void)
 {
 	struct regulator_dev *rdev;
@@ -4067,6 +4131,59 @@ static int __init regulator_init_complete(void)
 	struct regulation_constraints *c;
 	int enabled, ret;
 
+=======
+static int __init regulator_late_cleanup(struct device *dev, void *data)
+{
+	struct regulator_dev *rdev = dev_to_rdev(dev);
+	const struct regulator_ops *ops = rdev->desc->ops;
+	struct regulation_constraints *c = rdev->constraints;
+	int enabled, ret;
+
+	if (c && c->always_on)
+		return 0;
+
+	if (c && !(c->valid_ops_mask & REGULATOR_CHANGE_STATUS))
+		return 0;
+
+	mutex_lock(&rdev->mutex);
+
+	if (rdev->use_count)
+		goto unlock;
+
+	/* If we can't read the status assume it's on. */
+	if (ops->is_enabled)
+		enabled = ops->is_enabled(rdev);
+	else
+		enabled = 1;
+
+	if (!enabled)
+		goto unlock;
+
+	if (have_full_constraints()) {
+		/* We log since this may kill the system if it goes
+		 * wrong. */
+		rdev_info(rdev, "disabling\n");
+		ret = _regulator_do_disable(rdev);
+		if (ret != 0)
+			rdev_err(rdev, "couldn't disable: %d\n", ret);
+	} else {
+		/* The intention is that in future we will
+		 * assume that full constraints are provided
+		 * so warn even if we aren't going to do
+		 * anything here.
+		 */
+		rdev_warn(rdev, "incomplete constraints, leaving on\n");
+	}
+
+unlock:
+	mutex_unlock(&rdev->mutex);
+
+	return 0;
+}
+
+static int __init regulator_init_complete(void)
+{
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Since DT doesn't provide an idiomatic mechanism for
 	 * enabling full constraints and since it's much more natural
@@ -4076,13 +4193,17 @@ static int __init regulator_init_complete(void)
 	if (of_have_populated_dt())
 		has_full_constraints = true;
 
+<<<<<<< HEAD
 	mutex_lock(&regulator_list_mutex);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* If we have a full configuration then disable any regulators
 	 * we have permission to change the status for and which are
 	 * not in use or always_on.  This is effectively the default
 	 * for DT and ACPI as they have full constraints.
 	 */
+<<<<<<< HEAD
 	list_for_each_entry(rdev, &regulator_list, list) {
 		ops = rdev->desc->ops;
 		c = rdev->constraints;
@@ -4128,6 +4249,10 @@ unlock:
 	}
 
 	mutex_unlock(&regulator_list_mutex);
+=======
+	class_for_each_device(&regulator_class, NULL, NULL,
+			      regulator_late_cleanup);
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }

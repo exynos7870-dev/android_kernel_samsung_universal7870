@@ -362,7 +362,11 @@ static void afs_callback_updater(struct work_struct *work)
 {
 	struct afs_server *server;
 	struct afs_vnode *vnode, *xvnode;
+<<<<<<< HEAD
 	time_t now;
+=======
+	time64_t now;
+>>>>>>> common/deprecated/android-3.18
 	long timeout;
 	int ret;
 
@@ -370,7 +374,11 @@ static void afs_callback_updater(struct work_struct *work)
 
 	_enter("");
 
+<<<<<<< HEAD
 	now = get_seconds();
+=======
+	now = ktime_get_real_seconds();
+>>>>>>> common/deprecated/android-3.18
 
 	/* find the first vnode to update */
 	spin_lock(&server->cb_lock);
@@ -424,7 +432,12 @@ static void afs_callback_updater(struct work_struct *work)
 
 	/* and then reschedule */
 	_debug("reschedule");
+<<<<<<< HEAD
 	vnode->update_at = get_seconds() + afs_vnode_update_timeout;
+=======
+	vnode->update_at = ktime_get_real_seconds() +
+			afs_vnode_update_timeout;
+>>>>>>> common/deprecated/android-3.18
 
 	spin_lock(&server->cb_lock);
 

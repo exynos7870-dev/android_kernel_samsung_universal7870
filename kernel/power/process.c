@@ -19,8 +19,14 @@
 #include <linux/kmod.h>
 #include <trace/events/power.h>
 #include <linux/wakeup_reason.h>
+<<<<<<< HEAD
 
 /* 
+=======
+#include <linux/cpuset.h>
+
+/*
+>>>>>>> common/deprecated/android-3.18
  * Timeout for stopping processes
  */
 unsigned int __read_mostly freeze_timeout_msecs = 20 * MSEC_PER_SEC;
@@ -239,6 +245,11 @@ void thaw_processes(void)
 	__usermodehelper_set_disable_depth(UMH_FREEZING);
 	thaw_workqueues();
 
+<<<<<<< HEAD
+=======
+	cpuset_wait_for_hotplug();
+
+>>>>>>> common/deprecated/android-3.18
 	read_lock(&tasklist_lock);
 	for_each_process_thread(g, p) {
 		/* No other threads should have PF_SUSPEND_TASK set */

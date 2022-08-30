@@ -34,7 +34,11 @@
 #include <linux/i2c.h>
 #include "dvb_frontend.h"
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_TUA6100)
+=======
+#if IS_REACHABLE(CONFIG_DVB_TUA6100)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend *tua6100_attach(struct dvb_frontend *fe, int addr, struct i2c_adapter *i2c);
 #else
 static inline struct dvb_frontend* tua6100_attach(struct dvb_frontend *fe, int addr, struct i2c_adapter *i2c)

@@ -39,7 +39,11 @@
 
 int ocrdma_query_pkey(struct ib_device *ibdev, u8 port, u16 index, u16 *pkey)
 {
+<<<<<<< HEAD
 	if (index > 1)
+=======
+	if (index > 0)
+>>>>>>> common/deprecated/android-3.18
 		return -EINVAL;
 
 	*pkey = 0xffff;

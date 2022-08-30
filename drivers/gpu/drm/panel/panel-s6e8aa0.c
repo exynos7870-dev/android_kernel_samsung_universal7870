@@ -835,7 +835,11 @@ static void s6e8aa0_read_mtp_id(struct s6e8aa0 *ctx)
 	int ret, i;
 
 	ret = s6e8aa0_dcs_read(ctx, 0xd1, id, ARRAY_SIZE(id));
+<<<<<<< HEAD
 	if (ret < ARRAY_SIZE(id) || id[0] == 0x00) {
+=======
+	if (ret < 0 || ret < ARRAY_SIZE(id) || id[0] == 0x00) {
+>>>>>>> common/deprecated/android-3.18
 		dev_err(ctx->dev, "read id failed\n");
 		ctx->error = -EIO;
 		return;

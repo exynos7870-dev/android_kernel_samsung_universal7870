@@ -95,7 +95,11 @@ static const struct usb_device_id id_table[] = {
 		.driver_info = (kernel_ulong_t)&palm_os_4_probe },
 	{ USB_DEVICE(ACER_VENDOR_ID, ACER_S10_ID),
 		.driver_info = (kernel_ulong_t)&palm_os_4_probe },
+<<<<<<< HEAD
 	{ USB_DEVICE(SAMSUNG_VENDOR_ID, SAMSUNG_SCH_I330_ID),
+=======
+	{ USB_DEVICE_INTERFACE_CLASS(SAMSUNG_VENDOR_ID, SAMSUNG_SCH_I330_ID, 0xff),
+>>>>>>> common/deprecated/android-3.18
 		.driver_info = (kernel_ulong_t)&palm_os_4_probe },
 	{ USB_DEVICE(SAMSUNG_VENDOR_ID, SAMSUNG_SPH_I500_ID),
 		.driver_info = (kernel_ulong_t)&palm_os_4_probe },
@@ -338,6 +342,7 @@ static int palm_os_3_probe(struct usb_serial *serial,
 		goto exit;
 	}
 
+<<<<<<< HEAD
 	if (retval == sizeof(*connection_info)) {
 			connection_info = (struct visor_connection_info *)
 							transfer_buffer;
@@ -373,12 +378,53 @@ static int palm_os_3_probe(struct usb_serial *serial,
 	/*
 	* Handle devices that report invalid stuff here.
 	*/
+=======
+	if (retval != sizeof(*connection_info)) {
+		dev_err(dev, "Invalid connection information received from device\n");
+		retval = -ENODEV;
+		goto exit;
+	}
+
+	connection_info = (struct visor_connection_info *)transfer_buffer;
+
+	num_ports = le16_to_cpu(connection_info->num_ports);
+
+	/* Handle devices that report invalid stuff here. */
+>>>>>>> common/deprecated/android-3.18
 	if (num_ports == 0 || num_ports > 2) {
 		dev_warn(dev, "%s: No valid connect info available\n",
 			serial->type->description);
 		num_ports = 2;
 	}
 
+<<<<<<< HEAD
+=======
+	for (i = 0; i < num_ports; ++i) {
+		switch (connection_info->connections[i].port_function_id) {
+		case VISOR_FUNCTION_GENERIC:
+			string = "Generic";
+			break;
+		case VISOR_FUNCTION_DEBUGGER:
+			string = "Debugger";
+			break;
+		case VISOR_FUNCTION_HOTSYNC:
+			string = "HotSync";
+			break;
+		case VISOR_FUNCTION_CONSOLE:
+			string = "Console";
+			break;
+		case VISOR_FUNCTION_REMOTE_FILE_SYS:
+			string = "Remote File System";
+			break;
+		default:
+			string = "unknown";
+			break;
+		}
+		dev_info(dev, "%s: port %d, is for %s use\n",
+			serial->type->description,
+			connection_info->connections[i].port, string);
+	}
+>>>>>>> common/deprecated/android-3.18
 	dev_info(dev, "%s: Number of ports: %d\n", serial->type->description,
 		num_ports);
 
@@ -544,6 +590,14 @@ static int treo_attach(struct usb_serial *serial)
 		(serial->num_interrupt_in == 0))
 		return 0;
 
+<<<<<<< HEAD
+=======
+	if (serial->num_bulk_in < 2 || serial->num_interrupt_in < 2) {
+		dev_err(&serial->interface->dev, "missing endpoints\n");
+		return -ENODEV;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	* It appears that Treos and Kyoceras want to use the
 	* 1st bulk in endpoint to communicate with the 2nd bulk out endpoint,
@@ -597,8 +651,15 @@ static int clie_5_attach(struct usb_serial *serial)
 	 */
 
 	/* some sanity check */
+<<<<<<< HEAD
 	if (serial->num_ports < 2)
 		return -1;
+=======
+	if (serial->num_bulk_out < 2) {
+		dev_err(&serial->interface->dev, "missing bulk out endpoints\n");
+		return -ENODEV;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	/* port 0 now uses the modified endpoint Address */
 	port = serial->port[0];

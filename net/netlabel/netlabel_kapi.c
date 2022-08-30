@@ -605,6 +605,15 @@ int netlbl_catmap_getlong(struct netlbl_lsm_catmap *catmap,
 	if ((off & (BITS_PER_LONG - 1)) != 0)
 		return -EINVAL;
 
+<<<<<<< HEAD
+=======
+	/* a null catmap is equivalent to an empty one */
+	if (!catmap) {
+		*offset = (u32)-1;
+		return 0;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	if (off < catmap->startbit) {
 		off = catmap->startbit;
 		*offset = off;
@@ -824,7 +833,15 @@ socket_setattr_return:
  */
 void netlbl_sock_delattr(struct sock *sk)
 {
+<<<<<<< HEAD
 	cipso_v4_sock_delattr(sk);
+=======
+	switch (sk->sk_family) {
+	case AF_INET:
+		cipso_v4_sock_delattr(sk);
+		break;
+	}
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -987,7 +1004,15 @@ req_setattr_return:
 */
 void netlbl_req_delattr(struct request_sock *req)
 {
+<<<<<<< HEAD
 	cipso_v4_req_delattr(req);
+=======
+	switch (req->rsk_ops->family) {
+	case AF_INET:
+		cipso_v4_req_delattr(req);
+		break;
+	}
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**

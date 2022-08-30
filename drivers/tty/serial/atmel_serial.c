@@ -311,8 +311,12 @@ void atmel_config_rs485(struct uart_port *port, struct serial_rs485 *rs485conf)
 	if (rs485conf->flags & SER_RS485_ENABLED) {
 		dev_dbg(port->dev, "Setting UART to RS485\n");
 		atmel_port->tx_done_mask = ATMEL_US_TXEMPTY;
+<<<<<<< HEAD
 		if ((rs485conf->delay_rts_after_send) > 0)
 			UART_PUT_TTGR(port, rs485conf->delay_rts_after_send);
+=======
+		UART_PUT_TTGR(port, rs485conf->delay_rts_after_send);
+>>>>>>> common/deprecated/android-3.18
 		mode |= ATMEL_US_USMODE_RS485;
 	} else {
 		dev_dbg(port->dev, "Setting UART to RS232\n");
@@ -733,6 +737,14 @@ static void atmel_complete_tx_dma(void *arg)
 	/* Do we really need this? */
 	if (!uart_circ_empty(xmit))
 		tasklet_schedule(&atmel_port->tasklet);
+<<<<<<< HEAD
+=======
+	else if ((atmel_port->rs485.flags & SER_RS485_ENABLED) &&
+		 !(atmel_port->rs485.flags & SER_RS485_RX_DURING_TX)) {
+		/* DMA done, stop TX, start RX for RS485 */
+		atmel_start_rx(port);
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	spin_unlock_irqrestore(&port->lock, flags);
 }
@@ -805,12 +817,15 @@ static void atmel_tx_dma(struct uart_port *port)
 		desc->callback = atmel_complete_tx_dma;
 		desc->callback_param = atmel_port;
 		atmel_port->cookie_tx = dmaengine_submit(desc);
+<<<<<<< HEAD
 
 	} else {
 		if (atmel_port->rs485.flags & SER_RS485_ENABLED) {
 			/* DMA done, stop TX, start RX for RS485 */
 			atmel_start_rx(port);
 		}
+=======
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (uart_circ_chars_pending(xmit) < WAKEUP_CHARS)
@@ -1045,6 +1060,13 @@ static int atmel_prepare_rx_dma(struct uart_port *port)
 				sg_dma_len(&atmel_port->sg_rx)/2,
 				DMA_DEV_TO_MEM,
 				DMA_PREP_INTERRUPT);
+<<<<<<< HEAD
+=======
+	if (!desc) {
+		dev_err(port->dev, "Preparing DMA cyclic failed\n");
+		goto chan_err;
+	}
+>>>>>>> common/deprecated/android-3.18
 	desc->callback = atmel_complete_rx_dma;
 	desc->callback_param = port;
 	atmel_port->desc_rx = desc;
@@ -1644,6 +1666,10 @@ static void atmel_get_ip_name(struct uart_port *port)
 		switch (version) {
 		case 0x302:
 		case 0x10213:
+<<<<<<< HEAD
+=======
+		case 0x10302:
+>>>>>>> common/deprecated/android-3.18
 			dev_dbg(port->dev, "This version is usart\n");
 			atmel_port->is_usart = true;
 			break;
@@ -1868,6 +1894,14 @@ static void atmel_flush_buffer(struct uart_port *port)
 		UART_PUT_TCR(port, 0);
 		atmel_port->pdc_tx.ofs = 0;
 	}
+<<<<<<< HEAD
+=======
+	/*
+	 * in uart_flush_buffer(), the xmit circular buffer has just
+	 * been cleared, so we have to reset tx_len accordingly.
+	 */
+	sg_dma_len(&atmel_port->sg_tx) = 0;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
@@ -2016,9 +2050,13 @@ static void atmel_set_termios(struct uart_port *port, struct ktermios *termios,
 	mode &= ~ATMEL_US_USMODE;
 
 	if (atmel_port->rs485.flags & SER_RS485_ENABLED) {
+<<<<<<< HEAD
 		if ((atmel_port->rs485.delay_rts_after_send) > 0)
 			UART_PUT_TTGR(port,
 					atmel_port->rs485.delay_rts_after_send);
+=======
+		UART_PUT_TTGR(port, atmel_port->rs485.delay_rts_after_send);
+>>>>>>> common/deprecated/android-3.18
 		mode |= ATMEL_US_USMODE_RS485;
 	}
 

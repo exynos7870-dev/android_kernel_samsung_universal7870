@@ -628,6 +628,39 @@ out:
 }
 
 
+<<<<<<< HEAD
+=======
+static inline int is_loop_device(struct file *file)
+{
+	struct inode *i = file->f_mapping->host;
+
+	return i && S_ISBLK(i->i_mode) && MAJOR(i->i_rdev) == LOOP_MAJOR;
+}
+
+static int loop_validate_file(struct file *file, struct block_device *bdev)
+{
+	struct inode	*inode = file->f_mapping->host;
+	struct file	*f = file;
+
+	/* Avoid recursion */
+	while (is_loop_device(f)) {
+		struct loop_device *l;
+
+		if (f->f_mapping->host->i_bdev == bdev)
+			return -EBADF;
+
+		l = f->f_mapping->host->i_bdev->bd_disk->private_data;
+		if (l->lo_state == Lo_unbound) {
+			return -EINVAL;
+		}
+		f = l->lo_backing_file;
+	}
+	if (!S_ISREG(inode->i_mode) && !S_ISBLK(inode->i_mode))
+		return -EINVAL;
+	return 0;
+}
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * loop_change_fd switched the backing store of a loopback device to
  * a new file. This is useful for operating system installers to free up
@@ -657,14 +690,24 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
 	if (!file)
 		goto out;
 
+<<<<<<< HEAD
+=======
+	error = loop_validate_file(file, bdev);
+	if (error)
+		goto out_putf;
+
+>>>>>>> common/deprecated/android-3.18
 	inode = file->f_mapping->host;
 	old_file = lo->lo_backing_file;
 
 	error = -EINVAL;
 
+<<<<<<< HEAD
 	if (!S_ISREG(inode->i_mode) && !S_ISBLK(inode->i_mode))
 		goto out_putf;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* size of the new backing store needs to be the same */
 	if (get_loop_size(lo, file) != get_loop_size(lo, old_file))
 		goto out_putf;
@@ -685,6 +728,7 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
 	return error;
 }
 
+<<<<<<< HEAD
 static inline int is_loop_device(struct file *file)
 {
 	struct inode *i = file->f_mapping->host;
@@ -692,6 +736,8 @@ static inline int is_loop_device(struct file *file)
 	return i && S_ISBLK(i->i_mode) && MAJOR(i->i_rdev) == LOOP_MAJOR;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /* loop sysfs attributes */
 
 static ssize_t loop_attr_show(struct device *dev, char *page,
@@ -779,16 +825,29 @@ static struct attribute_group loop_attribute_group = {
 	.attrs= loop_attrs,
 };
 
+<<<<<<< HEAD
 static int loop_sysfs_init(struct loop_device *lo)
 {
 	return sysfs_create_group(&disk_to_dev(lo->lo_disk)->kobj,
 				  &loop_attribute_group);
+=======
+static void loop_sysfs_init(struct loop_device *lo)
+{
+	lo->sysfs_inited = !sysfs_create_group(&disk_to_dev(lo->lo_disk)->kobj,
+						&loop_attribute_group);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void loop_sysfs_exit(struct loop_device *lo)
 {
+<<<<<<< HEAD
 	sysfs_remove_group(&disk_to_dev(lo->lo_disk)->kobj,
 			   &loop_attribute_group);
+=======
+	if (lo->sysfs_inited)
+		sysfs_remove_group(&disk_to_dev(lo->lo_disk)->kobj,
+				   &loop_attribute_group);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void loop_config_discard(struct loop_device *lo)
@@ -823,7 +882,11 @@ static void loop_config_discard(struct loop_device *lo)
 static int loop_set_fd(struct loop_device *lo, fmode_t mode,
 		       struct block_device *bdev, unsigned int arg)
 {
+<<<<<<< HEAD
 	struct file	*file, *f;
+=======
+	struct file	*file;
+>>>>>>> common/deprecated/android-3.18
 	struct inode	*inode;
 	struct address_space *mapping;
 	unsigned lo_blocksize;
@@ -843,6 +906,7 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
 	if (lo->lo_state != Lo_unbound)
 		goto out_putf;
 
+<<<<<<< HEAD
 	/* Avoid recursion */
 	f = file;
 	while (is_loop_device(f)) {
@@ -858,14 +922,22 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
 		}
 		f = l->lo_backing_file;
 	}
+=======
+	error = loop_validate_file(file, bdev);
+	if (error)
+		goto out_putf;
+>>>>>>> common/deprecated/android-3.18
 
 	mapping = file->f_mapping;
 	inode = mapping->host;
 
+<<<<<<< HEAD
 	error = -EINVAL;
 	if (!S_ISREG(inode->i_mode) && !S_ISBLK(inode->i_mode))
 		goto out_putf;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (!(file->f_mode & FMODE_WRITE) || !(mode & FMODE_WRITE) ||
 	    !file->f_op->write)
 		lo_flags |= LO_FLAGS_READ_ONLY;

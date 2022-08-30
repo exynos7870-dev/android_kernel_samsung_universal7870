@@ -139,6 +139,10 @@
 		regulator-name = "emac-3v3";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
+<<<<<<< HEAD
+=======
+		startup-delay-us = <20000>;
+>>>>>>> common/deprecated/android-3.18
 		enable-active-high;
 		gpio = <&pio 7 15 0>;
 	};

@@ -332,9 +332,12 @@ config COMPAT
 config SYSVIPC_COMPAT
 	def_bool y if COMPAT && SYSVIPC
 
+<<<<<<< HEAD
 config KEYS_COMPAT
 	def_bool y if COMPAT && KEYS
 
+=======
+>>>>>>> common/deprecated/android-3.18
 config SMP
 	def_bool y
 	prompt "Symmetric multi-processing support"

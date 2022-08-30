@@ -37,7 +37,10 @@ config VIDEO_PCI_SKELETON
 # Used by drivers that need tuner.ko
 config VIDEO_TUNER
 	tristate
+<<<<<<< HEAD
 	depends on MEDIA_TUNER
+=======
+>>>>>>> common/deprecated/android-3.18
 
 # Used by drivers that need v4l2-mem2mem.ko
 config V4L2_MEM2MEM_DEV
@@ -93,6 +96,7 @@ config VIDEOBUF2_DMA_SG
 	select VIDEOBUF2_CORE
 	select VIDEOBUF2_MEMOPS
 
+<<<<<<< HEAD
 config  VIDEOBUF2_ION
 	bool "Video buffer 2 by Android ION"
 	depends on ION_EXYNOS
@@ -101,6 +105,8 @@ config  VIDEOBUF2_ION
 	help
 	  Internal memory management for Video Buffer 2 by ION
 
+=======
+>>>>>>> common/deprecated/android-3.18
 config VIDEOBUF2_DVB
 	tristate
 	select VIDEOBUF2_CORE

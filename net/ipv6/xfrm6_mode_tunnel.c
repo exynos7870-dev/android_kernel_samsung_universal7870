@@ -24,7 +24,11 @@ static inline void ipip6_ecn_decapsulate(struct sk_buff *skb)
 	struct ipv6hdr *inner_iph = ipipv6_hdr(skb);
 
 	if (INET_ECN_is_ce(ipv6_get_dsfield(outer_iph)))
+<<<<<<< HEAD
 		IP6_ECN_set_ce(inner_iph);
+=======
+		IP6_ECN_set_ce(skb, inner_iph);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /* Add encapsulation header.

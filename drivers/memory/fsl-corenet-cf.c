@@ -186,10 +186,15 @@ static int ccf_probe(struct platform_device *pdev)
 	dev_set_drvdata(&pdev->dev, ccf);
 
 	irq = platform_get_irq(pdev, 0);
+<<<<<<< HEAD
 	if (!irq) {
 		dev_err(&pdev->dev, "%s: no irq\n", __func__);
 		return -ENXIO;
 	}
+=======
+	if (irq < 0)
+		return irq;
+>>>>>>> common/deprecated/android-3.18
 
 	ret = devm_request_irq(&pdev->dev, irq, ccf_irq, 0, pdev->name, ccf);
 	if (ret) {

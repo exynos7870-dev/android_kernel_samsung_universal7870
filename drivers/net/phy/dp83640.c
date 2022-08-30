@@ -47,7 +47,11 @@
 #define PSF_TX		0x1000
 #define EXT_EVENT	1
 #define CAL_EVENT	7
+<<<<<<< HEAD
 #define CAL_TRIGGER	7
+=======
+#define CAL_TRIGGER	1
+>>>>>>> common/deprecated/android-3.18
 #define DP83640_N_PINS	12
 
 #define MII_DP83640_MICR 0x11
@@ -68,6 +72,11 @@
 /* phyter seems to miss the mark by 16 ns */
 #define ADJTIME_FIX	16
 
+<<<<<<< HEAD
+=======
+#define SKB_TIMESTAMP_TIMEOUT	2 /* jiffies */
+
+>>>>>>> common/deprecated/android-3.18
 #if defined(__BIG_ENDIAN)
 #define ENDIAN_FLAG	0
 #elif defined(__LITTLE_ENDIAN)
@@ -110,7 +119,11 @@ struct dp83640_private {
 	struct list_head list;
 	struct dp83640_clock *clock;
 	struct phy_device *phydev;
+<<<<<<< HEAD
 	struct work_struct ts_work;
+=======
+	struct delayed_work ts_work;
+>>>>>>> common/deprecated/android-3.18
 	int hwts_tx_en;
 	int hwts_rx_en;
 	int layer;
@@ -284,7 +297,11 @@ static void phy2rxts(struct phy_rxts *p, struct rxts *rxts)
 	rxts->seqid = p->seqid;
 	rxts->msgtype = (p->msgtype >> 12) & 0xf;
 	rxts->hash = p->msgtype & 0x0fff;
+<<<<<<< HEAD
 	rxts->tmo = jiffies + 2;
+=======
+	rxts->tmo = jiffies + SKB_TIMESTAMP_TIMEOUT;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static u64 phy2txts(struct phy_txts *p)
@@ -495,7 +512,13 @@ static int ptp_dp83640_enable(struct ptp_clock_info *ptp,
 			else
 				evnt |= EVNT_RISE;
 		}
+<<<<<<< HEAD
 		ext_write(0, phydev, PAGE5, PTP_EVNT, evnt);
+=======
+		mutex_lock(&clock->extreg_lock);
+		ext_write(0, phydev, PAGE5, PTP_EVNT, evnt);
+		mutex_unlock(&clock->extreg_lock);
+>>>>>>> common/deprecated/android-3.18
 		return 0;
 
 	case PTP_CLK_REQ_PEROUT:
@@ -531,6 +554,11 @@ static u8 status_frame_src[6] = { 0x08, 0x00, 0x17, 0x0B, 0x6B, 0x0F };
 
 static void enable_status_frames(struct phy_device *phydev, bool on)
 {
+<<<<<<< HEAD
+=======
+	struct dp83640_private *dp83640 = phydev->priv;
+	struct dp83640_clock *clock = dp83640->clock;
+>>>>>>> common/deprecated/android-3.18
 	u16 cfg0 = 0, ver;
 
 	if (on)
@@ -538,9 +566,19 @@ static void enable_status_frames(struct phy_device *phydev, bool on)
 
 	ver = (PSF_PTPVER & VERSIONPTP_MASK) << VERSIONPTP_SHIFT;
 
+<<<<<<< HEAD
 	ext_write(0, phydev, PAGE5, PSF_CFG0, cfg0);
 	ext_write(0, phydev, PAGE6, PSF_CFG1, ver);
 
+=======
+	mutex_lock(&clock->extreg_lock);
+
+	ext_write(0, phydev, PAGE5, PSF_CFG0, cfg0);
+	ext_write(0, phydev, PAGE6, PSF_CFG1, ver);
+
+	mutex_unlock(&clock->extreg_lock);
+
+>>>>>>> common/deprecated/android-3.18
 	if (!phydev->attached_dev) {
 		pr_warn("expected to find an attached netdevice\n");
 		return;
@@ -824,6 +862,14 @@ static void decode_rxts(struct dp83640_private *dp83640,
 	struct skb_shared_hwtstamps *shhwtstamps = NULL;
 	struct sk_buff *skb;
 	unsigned long flags;
+<<<<<<< HEAD
+=======
+	u8 overflow;
+
+	overflow = (phy_rxts->ns_hi >> 14) & 0x3;
+	if (overflow)
+		pr_debug("rx timestamp queue overflow, count %d\n", overflow);
+>>>>>>> common/deprecated/android-3.18
 
 	spin_lock_irqsave(&dp83640->rx_lock, flags);
 
@@ -837,7 +883,11 @@ static void decode_rxts(struct dp83640_private *dp83640,
 	list_del_init(&rxts->list);
 	phy2rxts(phy_rxts, rxts);
 
+<<<<<<< HEAD
 	spin_lock_irqsave(&dp83640->rx_queue.lock, flags);
+=======
+	spin_lock(&dp83640->rx_queue.lock);
+>>>>>>> common/deprecated/android-3.18
 	skb_queue_walk(&dp83640->rx_queue, skb) {
 		struct dp83640_skb_info *skb_info;
 
@@ -852,7 +902,11 @@ static void decode_rxts(struct dp83640_private *dp83640,
 			break;
 		}
 	}
+<<<<<<< HEAD
 	spin_unlock_irqrestore(&dp83640->rx_queue.lock, flags);
+=======
+	spin_unlock(&dp83640->rx_queue.lock);
+>>>>>>> common/deprecated/android-3.18
 
 	if (!shhwtstamps)
 		list_add_tail(&rxts->list, &dp83640->rxts);
@@ -864,6 +918,7 @@ static void decode_txts(struct dp83640_private *dp83640,
 			struct phy_txts *phy_txts)
 {
 	struct skb_shared_hwtstamps shhwtstamps;
+<<<<<<< HEAD
 	struct sk_buff *skb;
 	u64 ns;
 
@@ -871,10 +926,39 @@ static void decode_txts(struct dp83640_private *dp83640,
 
 	skb = skb_dequeue(&dp83640->tx_queue);
 
+=======
+	struct dp83640_skb_info *skb_info;
+	struct sk_buff *skb;
+	u8 overflow;
+	u64 ns;
+
+	/* We must already have the skb that triggered this. */
+again:
+	skb = skb_dequeue(&dp83640->tx_queue);
+>>>>>>> common/deprecated/android-3.18
 	if (!skb) {
 		pr_debug("have timestamp but tx_queue empty\n");
 		return;
 	}
+<<<<<<< HEAD
+=======
+
+	overflow = (phy_txts->ns_hi >> 14) & 0x3;
+	if (overflow) {
+		pr_debug("tx timestamp queue overflow, count %d\n", overflow);
+		while (skb) {
+			kfree_skb(skb);
+			skb = skb_dequeue(&dp83640->tx_queue);
+		}
+		return;
+	}
+	skb_info = (struct dp83640_skb_info *)skb->cb;
+	if (time_after(jiffies, skb_info->tmo)) {
+		kfree_skb(skb);
+		goto again;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	ns = phy2txts(phy_txts);
 	memset(&shhwtstamps, 0, sizeof(shhwtstamps));
 	shhwtstamps.hwtstamp = ns_to_ktime(ns);
@@ -1064,7 +1148,11 @@ static struct dp83640_clock *dp83640_clock_get_bus(struct mii_bus *bus)
 		goto out;
 	}
 	dp83640_clock_init(clock, bus);
+<<<<<<< HEAD
 	list_add_tail(&phyter_clocks, &clock->list);
+=======
+	list_add_tail(&clock->list, &phyter_clocks);
+>>>>>>> common/deprecated/android-3.18
 out:
 	mutex_unlock(&phyter_clocks_lock);
 
@@ -1094,7 +1182,11 @@ static int dp83640_probe(struct phy_device *phydev)
 		goto no_memory;
 
 	dp83640->phydev = phydev;
+<<<<<<< HEAD
 	INIT_WORK(&dp83640->ts_work, rx_timestamp_work);
+=======
+	INIT_DELAYED_WORK(&dp83640->ts_work, rx_timestamp_work);
+>>>>>>> common/deprecated/android-3.18
 
 	INIT_LIST_HEAD(&dp83640->rxts);
 	INIT_LIST_HEAD(&dp83640->rxpool);
@@ -1141,7 +1233,11 @@ static void dp83640_remove(struct phy_device *phydev)
 		return;
 
 	enable_status_frames(phydev, false);
+<<<<<<< HEAD
 	cancel_work_sync(&dp83640->ts_work);
+=======
+	cancel_delayed_work_sync(&dp83640->ts_work);
+>>>>>>> common/deprecated/android-3.18
 
 	skb_queue_purge(&dp83640->rx_queue);
 	skb_queue_purge(&dp83640->tx_queue);
@@ -1165,6 +1261,26 @@ static void dp83640_remove(struct phy_device *phydev)
 	kfree(dp83640);
 }
 
+<<<<<<< HEAD
+=======
+static int dp83640_soft_reset(struct phy_device *phydev)
+{
+	int ret;
+
+	ret = genphy_soft_reset(phydev);
+	if (ret < 0)
+		return ret;
+
+	/* From DP83640 datasheet: "Software driver code must wait 3 us
+	 * following a software reset before allowing further serial MII
+	 * operations with the DP83640."
+	 */
+	udelay(10);		/* Taking udelay inaccuracy into account */
+
+	return 0;
+}
+
+>>>>>>> common/deprecated/android-3.18
 static int dp83640_config_init(struct phy_device *phydev)
 {
 	struct dp83640_private *dp83640 = phydev->priv;
@@ -1172,11 +1288,26 @@ static int dp83640_config_init(struct phy_device *phydev)
 
 	if (clock->chosen && !list_empty(&clock->phylist))
 		recalibrate(clock);
+<<<<<<< HEAD
 	else
 		enable_broadcast(phydev, clock->page, 1);
 
 	enable_status_frames(phydev, true);
 	ext_write(0, phydev, PAGE4, PTP_CTL, PTP_ENABLE);
+=======
+	else {
+		mutex_lock(&clock->extreg_lock);
+		enable_broadcast(phydev, clock->page, 1);
+		mutex_unlock(&clock->extreg_lock);
+	}
+
+	enable_status_frames(phydev, true);
+
+	mutex_lock(&clock->extreg_lock);
+	ext_write(0, phydev, PAGE4, PTP_CTL, PTP_ENABLE);
+	mutex_unlock(&clock->extreg_lock);
+
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
@@ -1268,6 +1399,10 @@ static int dp83640_hwtstamp(struct phy_device *phydev, struct ifreq *ifr)
 		dp83640->hwts_rx_en = 1;
 		dp83640->layer = LAYER4;
 		dp83640->version = 1;
+<<<<<<< HEAD
+=======
+		cfg.rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_EVENT;
+>>>>>>> common/deprecated/android-3.18
 		break;
 	case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
 	case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
@@ -1275,6 +1410,10 @@ static int dp83640_hwtstamp(struct phy_device *phydev, struct ifreq *ifr)
 		dp83640->hwts_rx_en = 1;
 		dp83640->layer = LAYER4;
 		dp83640->version = 2;
+<<<<<<< HEAD
+=======
+		cfg.rx_filter = HWTSTAMP_FILTER_PTP_V2_L4_EVENT;
+>>>>>>> common/deprecated/android-3.18
 		break;
 	case HWTSTAMP_FILTER_PTP_V2_L2_EVENT:
 	case HWTSTAMP_FILTER_PTP_V2_L2_SYNC:
@@ -1282,6 +1421,10 @@ static int dp83640_hwtstamp(struct phy_device *phydev, struct ifreq *ifr)
 		dp83640->hwts_rx_en = 1;
 		dp83640->layer = LAYER2;
 		dp83640->version = 2;
+<<<<<<< HEAD
+=======
+		cfg.rx_filter = HWTSTAMP_FILTER_PTP_V2_L2_EVENT;
+>>>>>>> common/deprecated/android-3.18
 		break;
 	case HWTSTAMP_FILTER_PTP_V2_EVENT:
 	case HWTSTAMP_FILTER_PTP_V2_SYNC:
@@ -1289,6 +1432,10 @@ static int dp83640_hwtstamp(struct phy_device *phydev, struct ifreq *ifr)
 		dp83640->hwts_rx_en = 1;
 		dp83640->layer = LAYER4|LAYER2;
 		dp83640->version = 2;
+<<<<<<< HEAD
+=======
+		cfg.rx_filter = HWTSTAMP_FILTER_PTP_V2_EVENT;
+>>>>>>> common/deprecated/android-3.18
 		break;
 	default:
 		return -ERANGE;
@@ -1328,7 +1475,11 @@ static int dp83640_hwtstamp(struct phy_device *phydev, struct ifreq *ifr)
 static void rx_timestamp_work(struct work_struct *work)
 {
 	struct dp83640_private *dp83640 =
+<<<<<<< HEAD
 		container_of(work, struct dp83640_private, ts_work);
+=======
+		container_of(work, struct dp83640_private, ts_work.work);
+>>>>>>> common/deprecated/android-3.18
 	struct sk_buff *skb;
 
 	/* Deliver expired packets. */
@@ -1345,7 +1496,11 @@ static void rx_timestamp_work(struct work_struct *work)
 	}
 
 	if (!skb_queue_empty(&dp83640->rx_queue))
+<<<<<<< HEAD
 		schedule_work(&dp83640->ts_work);
+=======
+		schedule_delayed_work(&dp83640->ts_work, SKB_TIMESTAMP_TIMEOUT);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static bool dp83640_rxtstamp(struct phy_device *phydev,
@@ -1384,9 +1539,17 @@ static bool dp83640_rxtstamp(struct phy_device *phydev,
 
 	if (!shhwtstamps) {
 		skb_info->ptp_type = type;
+<<<<<<< HEAD
 		skb_info->tmo = jiffies + 2;
 		skb_queue_tail(&dp83640->rx_queue, skb);
 		schedule_work(&dp83640->ts_work);
+=======
+		skb_info->tmo = jiffies + SKB_TIMESTAMP_TIMEOUT;
+		skb_queue_tail(&dp83640->rx_queue, skb);
+		schedule_delayed_work(&dp83640->ts_work, SKB_TIMESTAMP_TIMEOUT);
+	} else {
+		netif_rx_ni(skb);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	return true;
@@ -1395,6 +1558,10 @@ static bool dp83640_rxtstamp(struct phy_device *phydev,
 static void dp83640_txtstamp(struct phy_device *phydev,
 			     struct sk_buff *skb, int type)
 {
+<<<<<<< HEAD
+=======
+	struct dp83640_skb_info *skb_info = (struct dp83640_skb_info *)skb->cb;
+>>>>>>> common/deprecated/android-3.18
 	struct dp83640_private *dp83640 = phydev->priv;
 
 	switch (dp83640->hwts_tx_en) {
@@ -1407,6 +1574,10 @@ static void dp83640_txtstamp(struct phy_device *phydev,
 		/* fall through */
 	case HWTSTAMP_TX_ON:
 		skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
+<<<<<<< HEAD
+=======
+		skb_info->tmo = jiffies + SKB_TIMESTAMP_TIMEOUT;
+>>>>>>> common/deprecated/android-3.18
 		skb_queue_tail(&dp83640->tx_queue, skb);
 		break;
 
@@ -1455,6 +1626,10 @@ static struct phy_driver dp83640_driver = {
 	.flags		= PHY_HAS_INTERRUPT,
 	.probe		= dp83640_probe,
 	.remove		= dp83640_remove,
+<<<<<<< HEAD
+=======
+	.soft_reset	= dp83640_soft_reset,
+>>>>>>> common/deprecated/android-3.18
 	.config_init	= dp83640_config_init,
 	.config_aneg	= genphy_config_aneg,
 	.read_status	= genphy_read_status,

@@ -21,13 +21,22 @@
 #include <linux/mailbox_client.h>
 #include <linux/mailbox_controller.h>
 
+<<<<<<< HEAD
 #include "mailbox.h"
+=======
+#define TXDONE_BY_IRQ	BIT(0) /* controller has remote RTR irq */
+#define TXDONE_BY_POLL	BIT(1) /* controller can read status of last TX */
+#define TXDONE_BY_ACK	BIT(2) /* S/W ACK recevied by Client ticks the TX */
+>>>>>>> common/deprecated/android-3.18
 
 static LIST_HEAD(mbox_cons);
 static DEFINE_MUTEX(con_mutex);
 
+<<<<<<< HEAD
 static int poll_txdone(unsigned long data);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static int add_to_rbuf(struct mbox_chan *chan, void *mssg)
 {
 	int idx;
@@ -55,11 +64,16 @@ static int add_to_rbuf(struct mbox_chan *chan, void *mssg)
 	return idx;
 }
 
+<<<<<<< HEAD
 static int msg_submit(struct mbox_chan *chan)
+=======
+static void msg_submit(struct mbox_chan *chan)
+>>>>>>> common/deprecated/android-3.18
 {
 	unsigned count, idx;
 	unsigned long flags;
 	void *data;
+<<<<<<< HEAD
 	int err = -EBUSY;
 	int ret = 0;
 
@@ -69,6 +83,14 @@ static int msg_submit(struct mbox_chan *chan)
 		ret = -ENOENT;
 		goto exit;
 	}
+=======
+	int err;
+
+	spin_lock_irqsave(&chan->lock, flags);
+
+	if (!chan->msg_count || chan->active_req)
+		goto exit;
+>>>>>>> common/deprecated/android-3.18
 
 	count = chan->msg_count;
 	idx = chan->msg_free;
@@ -79,13 +101,17 @@ static int msg_submit(struct mbox_chan *chan)
 
 	data = chan->msg_data[idx];
 
+<<<<<<< HEAD
 	if (chan->cl->tx_prepare)
 		chan->cl->tx_prepare(chan->cl, data);
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* Try to submit a message to the MBOX controller */
 	err = chan->mbox->ops->send_data(chan, data);
 	if (!err) {
 		chan->active_req = data;
 		chan->msg_count--;
+<<<<<<< HEAD
 	} else {
 		pr_err("mailbox: cm3 send fail\n");
 		spin_unlock_irqrestore(&chan->lock, flags);
@@ -101,6 +127,11 @@ exit:
 	}
 
 	return ret;
+=======
+	}
+exit:
+	spin_unlock_irqrestore(&chan->lock, flags);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void tx_tick(struct mbox_chan *chan, int r)
@@ -113,6 +144,7 @@ static void tx_tick(struct mbox_chan *chan, int r)
 	chan->active_req = NULL;
 	spin_unlock_irqrestore(&chan->lock, flags);
 
+<<<<<<< HEAD
 	/* Notify the client */
 	if (mssg && chan->cl->tx_done)
 		chan->cl->tx_done(chan->cl, mssg, r);
@@ -127,11 +159,33 @@ static int poll_txdone(unsigned long data)
 	int txdone;
 	int i;
 	int ret = 0;
+=======
+	/* Submit next message */
+	msg_submit(chan);
+
+	if (!mssg)
+		return;
+
+	/* Notify the client */
+	if (chan->cl->tx_done)
+		chan->cl->tx_done(chan->cl, mssg, r);
+
+	if (r != -ETIME && chan->cl->tx_block)
+		complete(&chan->tx_complete);
+}
+
+static void poll_txdone(unsigned long data)
+{
+	struct mbox_controller *mbox = (struct mbox_controller *)data;
+	bool txdone, resched = false;
+	int i;
+>>>>>>> common/deprecated/android-3.18
 
 	for (i = 0; i < mbox->num_chans; i++) {
 		struct mbox_chan *chan = &mbox->chans[i];
 
 		if (chan->active_req && chan->cl) {
+<<<<<<< HEAD
 			txdone = chan->mbox->ops->last_tx_done(chan);
 			if (!txdone) {
 				tx_tick(chan, MBOX_OK);
@@ -144,6 +198,18 @@ static int poll_txdone(unsigned long data)
 	}
 
 	return ret;
+=======
+			resched = true;
+			txdone = chan->mbox->ops->last_tx_done(chan);
+			if (txdone)
+				tx_tick(chan, 0);
+		}
+	}
+
+	if (resched)
+		mod_timer(&mbox->poll, jiffies +
+				msecs_to_jiffies(mbox->txpoll_period));
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -256,7 +322,11 @@ EXPORT_SYMBOL_GPL(mbox_client_peek_data);
  */
 int mbox_send_message(struct mbox_chan *chan, void *mssg)
 {
+<<<<<<< HEAD
 	int t, ret;
+=======
+	int t;
+>>>>>>> common/deprecated/android-3.18
 
 	if (!chan || !chan->cl)
 		return -EINVAL;
@@ -267,12 +337,21 @@ int mbox_send_message(struct mbox_chan *chan, void *mssg)
 		return t;
 	}
 
+<<<<<<< HEAD
 	ret = msg_submit(chan);
 	if (ret) {
 		return -EIO;
 	}
 
 	if (chan->cl->tx_block && chan->active_req) {
+=======
+	msg_submit(chan);
+
+	if (chan->txdone_method	== TXDONE_BY_POLL)
+		poll_txdone((unsigned long)chan->mbox);
+
+	if (chan->cl->tx_block) {
+>>>>>>> common/deprecated/android-3.18
 		unsigned long wait;
 		int ret;
 
@@ -283,8 +362,13 @@ int mbox_send_message(struct mbox_chan *chan, void *mssg)
 
 		ret = wait_for_completion_timeout(&chan->tx_complete, wait);
 		if (ret == 0) {
+<<<<<<< HEAD
 			t = -EIO;
 			tx_tick(chan, -EIO);
+=======
+			t = -ETIME;
+			tx_tick(chan, t);
+>>>>>>> common/deprecated/android-3.18
 		}
 	}
 
@@ -332,7 +416,11 @@ struct mbox_chan *mbox_request_channel(struct mbox_client *cl, int index)
 		return ERR_PTR(-ENODEV);
 	}
 
+<<<<<<< HEAD
 	chan = ERR_PTR(-EPROBE_DEFER);
+=======
+	chan = NULL;
+>>>>>>> common/deprecated/android-3.18
 	list_for_each_entry(mbox, &mbox_cons, node)
 		if (mbox->dev->of_node == spec.np) {
 			chan = mbox->of_xlate(mbox, &spec);
@@ -341,12 +429,16 @@ struct mbox_chan *mbox_request_channel(struct mbox_client *cl, int index)
 
 	of_node_put(spec.np);
 
+<<<<<<< HEAD
 	if (IS_ERR(chan)) {
 		mutex_unlock(&con_mutex);
 		return chan;
 	}
 
 	if (chan->cl || !try_module_get(mbox->dev->driver->owner)) {
+=======
+	if (!chan || chan->cl || !try_module_get(mbox->dev->driver->owner)) {
+>>>>>>> common/deprecated/android-3.18
 		dev_dbg(dev, "%s: mailbox not free\n", __func__);
 		mutex_unlock(&con_mutex);
 		return ERR_PTR(-EBUSY);
@@ -409,7 +501,11 @@ of_mbox_index_xlate(struct mbox_controller *mbox,
 	int ind = sp->args[0];
 
 	if (ind >= mbox->num_chans)
+<<<<<<< HEAD
 		return ERR_PTR(-EINVAL);
+=======
+		return NULL;
+>>>>>>> common/deprecated/android-3.18
 
 	return &mbox->chans[ind];
 }
@@ -436,7 +532,13 @@ int mbox_controller_register(struct mbox_controller *mbox)
 		txdone = TXDONE_BY_ACK;
 
 	if (txdone == TXDONE_BY_POLL) {
+<<<<<<< HEAD
 		mbox->poll.data = (unsigned long)mbox;
+=======
+		mbox->poll.function = &poll_txdone;
+		mbox->poll.data = (unsigned long)mbox;
+		init_timer(&mbox->poll);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	for (i = 0; i < mbox->num_chans; i++) {

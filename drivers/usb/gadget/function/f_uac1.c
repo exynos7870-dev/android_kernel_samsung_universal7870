@@ -332,7 +332,13 @@ static int f_audio_out_ep_complete(struct usb_ep *ep, struct usb_request *req)
 
 	/* Copy buffer is full, add it to the play_queue */
 	if (audio_buf_size - copy_buf->actual < req->actual) {
+<<<<<<< HEAD
 		list_add_tail(&copy_buf->list, &audio->play_queue);
+=======
+		spin_lock_irq(&audio->lock);
+		list_add_tail(&copy_buf->list, &audio->play_queue);
+		spin_unlock_irq(&audio->lock);
+>>>>>>> common/deprecated/android-3.18
 		schedule_work(&audio->playback_work);
 		copy_buf = f_audio_buffer_alloc(audio_buf_size);
 		if (IS_ERR(copy_buf))
@@ -897,7 +903,10 @@ static void f_audio_free_inst(struct usb_function_instance *f)
 	struct f_uac1_opts *opts;
 
 	opts = container_of(f, struct f_uac1_opts, func_inst);
+<<<<<<< HEAD
 	gaudio_cleanup(opts->card);
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (opts->fn_play_alloc)
 		kfree(opts->fn_play);
 	if (opts->fn_cap_alloc)
@@ -935,6 +944,10 @@ static void f_audio_free(struct usb_function *f)
 	struct f_audio *audio = func_to_audio(f);
 	struct f_uac1_opts *opts;
 
+<<<<<<< HEAD
+=======
+	gaudio_cleanup(&audio->card);
+>>>>>>> common/deprecated/android-3.18
 	opts = container_of(f->fi, struct f_uac1_opts, func_inst);
 	kfree(audio);
 	mutex_lock(&opts->lock);

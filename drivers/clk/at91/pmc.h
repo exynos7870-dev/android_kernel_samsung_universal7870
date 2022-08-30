@@ -120,7 +120,11 @@ extern void __init of_at91sam9x5_clk_smd_setup(struct device_node *np,
 					       struct at91_pmc *pmc);
 #endif
 
+<<<<<<< HEAD
 #if defined(CONFIG_HAVE_AT91_SMD)
+=======
+#if defined(CONFIG_HAVE_AT91_H32MX)
+>>>>>>> common/deprecated/android-3.18
 extern void __init of_sama5d4_clk_h32mx_setup(struct device_node *np,
 					      struct at91_pmc *pmc);
 #endif

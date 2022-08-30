@@ -170,7 +170,11 @@ u32 fc_get_pr_transport_id(
 	 */
 	ptr = &se_nacl->initiatorname[0];
 
+<<<<<<< HEAD
 	for (i = 0; i < 24; ) {
+=======
+	for (i = 0; i < 23; ) {
+>>>>>>> common/deprecated/android-3.18
 		if (!strncmp(&ptr[i], ":", 1)) {
 			i++;
 			continue;

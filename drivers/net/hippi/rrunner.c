@@ -1250,7 +1250,11 @@ static int rr_open(struct net_device *dev)
 		rrpriv->info = NULL;
 	}
 	if (rrpriv->rx_ctrl) {
+<<<<<<< HEAD
 		pci_free_consistent(pdev, sizeof(struct ring_ctrl),
+=======
+		pci_free_consistent(pdev, 256 * sizeof(struct ring_ctrl),
+>>>>>>> common/deprecated/android-3.18
 				    rrpriv->rx_ctrl, rrpriv->rx_ctrl_dma);
 		rrpriv->rx_ctrl = NULL;
 	}
@@ -1381,8 +1385,13 @@ static int rr_close(struct net_device *dev)
 			    rrpriv->info_dma);
 	rrpriv->info = NULL;
 
+<<<<<<< HEAD
 	free_irq(pdev->irq, dev);
 	spin_unlock_irqrestore(&rrpriv->lock, flags);
+=======
+	spin_unlock_irqrestore(&rrpriv->lock, flags);
+	free_irq(pdev->irq, dev);
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }

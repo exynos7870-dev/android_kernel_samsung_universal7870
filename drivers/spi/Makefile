@@ -3,7 +3,10 @@
 #
 
 ccflags-$(CONFIG_SPI_DEBUG) := -DDEBUG
+<<<<<<< HEAD
 ccflags-y := $(KBUILD_FP_SENSOR_CFLAGS)
+=======
+>>>>>>> common/deprecated/android-3.18
 
 # small core, mostly translating board-specific
 # config declarations into driver model code

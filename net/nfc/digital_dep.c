@@ -567,6 +567,11 @@ static void digital_tg_recv_dep_req(struct nfc_digital_dev *ddev, void *arg,
 	skb_pull(resp, size);
 
 	rc = nfc_tm_data_received(ddev->nfc_dev, resp);
+<<<<<<< HEAD
+=======
+	if (rc)
+		resp = NULL;
+>>>>>>> common/deprecated/android-3.18
 
 exit:
 	if (rc)

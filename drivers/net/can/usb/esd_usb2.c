@@ -334,7 +334,11 @@ static void esd_usb2_rx_can_msg(struct esd_usb2_net_priv *priv,
 		}
 
 		cf->can_id = id & ESD_IDMASK;
+<<<<<<< HEAD
 		cf->can_dlc = get_can_dlc(msg->msg.rx.dlc);
+=======
+		cf->can_dlc = get_can_dlc(msg->msg.rx.dlc & ~ESD_RTR);
+>>>>>>> common/deprecated/android-3.18
 
 		if (id & ESD_EXTID)
 			cf->can_id |= CAN_EFF_FLAG;
@@ -395,6 +399,11 @@ static void esd_usb2_read_bulk_callback(struct urb *urb)
 		break;
 
 	case -ENOENT:
+<<<<<<< HEAD
+=======
+	case -EPIPE:
+	case -EPROTO:
+>>>>>>> common/deprecated/android-3.18
 	case -ESHUTDOWN:
 		return;
 

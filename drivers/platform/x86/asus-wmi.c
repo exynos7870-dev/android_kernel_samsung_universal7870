@@ -387,6 +387,7 @@ static void kbd_led_update(struct work_struct *work)
 
 	asus = container_of(work, struct asus_wmi, kbd_led_work);
 
+<<<<<<< HEAD
 	/*
 	 * bits 0-2: level
 	 * bit 7: light on/off
@@ -394,6 +395,9 @@ static void kbd_led_update(struct work_struct *work)
 	if (asus->kbd_led_wk > 0)
 		ctrl_param = 0x80 | (asus->kbd_led_wk & 0x7F);
 
+=======
+	ctrl_param = 0x80 | (asus->kbd_led_wk & 0x7F);
+>>>>>>> common/deprecated/android-3.18
 	asus_wmi_set_devstate(ASUS_WMI_DEVID_KBD_BACKLIGHT, ctrl_param, NULL);
 }
 
@@ -1782,8 +1786,15 @@ static int asus_wmi_add(struct platform_device *pdev)
 		err = asus_wmi_backlight_init(asus);
 		if (err && err != -ENODEV)
 			goto fail_backlight;
+<<<<<<< HEAD
 	} else
 		pr_info("Backlight controlled by ACPI video driver\n");
+=======
+	} else {
+		err = asus_wmi_set_devstate(ASUS_WMI_DEVID_BACKLIGHT, 2, NULL);
+		pr_info("Backlight controlled by ACPI video driver\n");
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	status = wmi_install_notify_handler(asus->driver->event_guid,
 					    asus_wmi_notify, asus);

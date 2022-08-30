@@ -20,13 +20,18 @@
 #include <linux/kernel.h>
 #include <linux/slab.h>
 #include <linux/platform_device.h>
+<<<<<<< HEAD
 #include <linux/mutex.h>
 #include <linux/platform_data/dwc3-exynos.h>
 #include <linux/mutex.h>
+=======
+#include <linux/platform_data/dwc3-exynos.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/dma-mapping.h>
 #include <linux/clk.h>
 #include <linux/usb/otg.h>
 #include <linux/usb/usb_phy_generic.h>
+<<<<<<< HEAD
 #include <linux/usb/samsung_usb.h>
 #include <linux/of.h>
 #include <linux/of_platform.h>
@@ -69,12 +74,18 @@ struct dwc3_exynos_drvdata {
 	int cpu_type;
 	int ip_type;
 };
+=======
+#include <linux/of.h>
+#include <linux/of_platform.h>
+#include <linux/regulator/consumer.h>
+>>>>>>> common/deprecated/android-3.18
 
 struct dwc3_exynos {
 	struct platform_device	*usb2_phy;
 	struct platform_device	*usb3_phy;
 	struct device		*dev;
 
+<<<<<<< HEAD
 	struct regulator	*vdd33;
 	struct regulator	*vdd10;
 
@@ -454,6 +465,12 @@ static void dwc3_exynos_rsw_init(struct dwc3_exynos *exynos)
 	if (IS_ERR(pinctrl))
 		dev_info(exynos->dev, "failed to configure pins\n");
 }
+=======
+	struct clk		*clk;
+	struct regulator	*vdd33;
+	struct regulator	*vdd10;
+};
+>>>>>>> common/deprecated/android-3.18
 
 static int dwc3_exynos_register_phys(struct dwc3_exynos *exynos)
 {
@@ -519,6 +536,7 @@ static int dwc3_exynos_remove_child(struct device *dev, void *unused)
 	return 0;
 }
 
+<<<<<<< HEAD
 static int dwc3_exynos_clk_prepare(struct dwc3_exynos *exynos)
 {
 	int i;
@@ -659,6 +677,8 @@ err:
 	return -EINVAL;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static int dwc3_exynos_probe(struct platform_device *pdev)
 {
 	struct dwc3_exynos	*exynos;
@@ -682,6 +702,7 @@ static int dwc3_exynos_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, exynos);
 
+<<<<<<< HEAD
 	ret = dwc3_exynos_register_phys(exynos);
 	if (ret) {
 		dev_err(dev, "couldn't register PHYs\n");
@@ -731,10 +752,31 @@ static int dwc3_exynos_probe(struct platform_device *pdev)
 			dev_err(dev, "Failed to enable VDD33 supply\n");
 			goto err2;
 		}
+=======
+	exynos->dev	= dev;
+
+	exynos->clk = devm_clk_get(dev, "usbdrd30");
+	if (IS_ERR(exynos->clk)) {
+		dev_err(dev, "couldn't get clock\n");
+		return -EINVAL;
+	}
+	clk_prepare_enable(exynos->clk);
+
+	exynos->vdd33 = devm_regulator_get(dev, "vdd33");
+	if (IS_ERR(exynos->vdd33)) {
+		ret = PTR_ERR(exynos->vdd33);
+		goto err2;
+	}
+	ret = regulator_enable(exynos->vdd33);
+	if (ret) {
+		dev_err(dev, "Failed to enable VDD33 supply\n");
+		goto err2;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	exynos->vdd10 = devm_regulator_get(dev, "vdd10");
 	if (IS_ERR(exynos->vdd10)) {
+<<<<<<< HEAD
 		dev_dbg(dev, "couldn't get regulator vdd10\n");
 		exynos->vdd10 = NULL;
 	}
@@ -744,22 +786,46 @@ static int dwc3_exynos_probe(struct platform_device *pdev)
 			dev_err(dev, "Failed to enable VDD10 supply\n");
 			goto err3;
 		}
+=======
+		ret = PTR_ERR(exynos->vdd10);
+		goto err3;
+	}
+	ret = regulator_enable(exynos->vdd10);
+	if (ret) {
+		dev_err(dev, "Failed to enable VDD10 supply\n");
+		goto err3;
+	}
+
+	ret = dwc3_exynos_register_phys(exynos);
+	if (ret) {
+		dev_err(dev, "couldn't register PHYs\n");
+		goto err4;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (node) {
 		ret = of_platform_populate(node, NULL, NULL, dev);
 		if (ret) {
 			dev_err(dev, "failed to add dwc3 core\n");
+<<<<<<< HEAD
 			goto err4;
+=======
+			goto err5;
+>>>>>>> common/deprecated/android-3.18
 		}
 	} else {
 		dev_err(dev, "no device node, failed to add dwc3 core\n");
 		ret = -ENODEV;
+<<<<<<< HEAD
 		goto err4;
+=======
+		goto err5;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	return 0;
 
+<<<<<<< HEAD
 err4:
 	if (exynos->vdd10)
 		regulator_disable(exynos->vdd10);
@@ -771,6 +837,17 @@ err2:
 	dwc3_exynos_clk_disable(exynos);
 	dwc3_exynos_clk_unprepare(exynos);
 	pm_runtime_set_suspended(&pdev->dev);
+=======
+err5:
+	platform_device_unregister(exynos->usb2_phy);
+	platform_device_unregister(exynos->usb3_phy);
+err4:
+	regulator_disable(exynos->vdd10);
+err3:
+	regulator_disable(exynos->vdd33);
+err2:
+	clk_disable_unprepare(exynos->clk);
+>>>>>>> common/deprecated/android-3.18
 	return ret;
 }
 
@@ -782,6 +859,7 @@ static int dwc3_exynos_remove(struct platform_device *pdev)
 	platform_device_unregister(exynos->usb2_phy);
 	platform_device_unregister(exynos->usb3_phy);
 
+<<<<<<< HEAD
 	if (exynos->vdd33)
 		regulator_disable(exynos->vdd33);
 	if (exynos->vdd10)
@@ -793,10 +871,17 @@ static int dwc3_exynos_remove(struct platform_device *pdev)
 		pm_runtime_set_suspended(&pdev->dev);
 	}
 	dwc3_exynos_clk_unprepare(exynos);
+=======
+	clk_disable_unprepare(exynos->clk);
+
+	regulator_disable(exynos->vdd33);
+	regulator_disable(exynos->vdd10);
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_PM_RUNTIME
 static int dwc3_exynos_runtime_suspend(struct device *dev)
 {
@@ -844,6 +929,14 @@ static int dwc3_exynos_runtime_resume(struct device *dev)
 
 	return 0;
 }
+=======
+#ifdef CONFIG_OF
+static const struct of_device_id exynos_dwc3_match[] = {
+	{ .compatible = "samsung,exynos5250-dwusb3" },
+	{},
+};
+MODULE_DEVICE_TABLE(of, exynos_dwc3_match);
+>>>>>>> common/deprecated/android-3.18
 #endif
 
 #ifdef CONFIG_PM_SLEEP
@@ -851,6 +944,7 @@ static int dwc3_exynos_suspend(struct device *dev)
 {
 	struct dwc3_exynos *exynos = dev_get_drvdata(dev);
 
+<<<<<<< HEAD
 	dev_dbg(dev, "%s\n", __func__);
 
 	if (pm_runtime_suspended(dev))
@@ -862,6 +956,12 @@ static int dwc3_exynos_suspend(struct device *dev)
 		regulator_disable(exynos->vdd33);
 	if (exynos->vdd10)
 		regulator_disable(exynos->vdd10);
+=======
+	clk_disable(exynos->clk);
+
+	regulator_disable(exynos->vdd33);
+	regulator_disable(exynos->vdd10);
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }
@@ -869,6 +969,7 @@ static int dwc3_exynos_suspend(struct device *dev)
 static int dwc3_exynos_resume(struct device *dev)
 {
 	struct dwc3_exynos *exynos = dev_get_drvdata(dev);
+<<<<<<< HEAD
 	int ret = 0;
 
 	if (exynos->vdd33) {
@@ -892,6 +993,22 @@ static int dwc3_exynos_resume(struct device *dev)
 		dev_err(dev, "%s: clk_enable failed\n", __func__);
 		return ret;
 	}
+=======
+	int ret;
+
+	ret = regulator_enable(exynos->vdd33);
+	if (ret) {
+		dev_err(dev, "Failed to enable VDD33 supply\n");
+		return ret;
+	}
+	ret = regulator_enable(exynos->vdd10);
+	if (ret) {
+		dev_err(dev, "Failed to enable VDD10 supply\n");
+		return ret;
+	}
+
+	clk_enable(exynos->clk);
+>>>>>>> common/deprecated/android-3.18
 
 	/* runtime set active to reflect active state. */
 	pm_runtime_disable(dev);
@@ -903,8 +1020,11 @@ static int dwc3_exynos_resume(struct device *dev)
 
 static const struct dev_pm_ops dwc3_exynos_dev_pm_ops = {
 	SET_SYSTEM_SLEEP_PM_OPS(dwc3_exynos_suspend, dwc3_exynos_resume)
+<<<<<<< HEAD
 	SET_RUNTIME_PM_OPS(dwc3_exynos_runtime_suspend,
 			dwc3_exynos_runtime_resume, NULL)
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 #define DEV_PM_OPS	(&dwc3_exynos_dev_pm_ops)

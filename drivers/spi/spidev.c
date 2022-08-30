@@ -581,6 +581,12 @@ static int spidev_release(struct inode *inode, struct file *filp)
 		if (dofree)
 			kfree(spidev);
 	}
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_SPI_SLAVE
+	spi_slave_abort(spidev->spi);
+#endif
+>>>>>>> common/deprecated/android-3.18
 	mutex_unlock(&device_list_lock);
 
 	return status;
@@ -665,13 +671,21 @@ static int spidev_remove(struct spi_device *spi)
 {
 	struct spidev_data	*spidev = spi_get_drvdata(spi);
 
+<<<<<<< HEAD
+=======
+	/* prevent new opens */
+	mutex_lock(&device_list_lock);
+>>>>>>> common/deprecated/android-3.18
 	/* make sure ops on existing fds can abort cleanly */
 	spin_lock_irq(&spidev->spi_lock);
 	spidev->spi = NULL;
 	spin_unlock_irq(&spidev->spi_lock);
 
+<<<<<<< HEAD
 	/* prevent new opens */
 	mutex_lock(&device_list_lock);
+=======
+>>>>>>> common/deprecated/android-3.18
 	list_del(&spidev->device_entry);
 	device_destroy(spidev_class, spidev->devt);
 	clear_bit(MINOR(spidev->devt), minors);

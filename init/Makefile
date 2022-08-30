@@ -7,11 +7,14 @@ obj-y                          += noinitramfs.o
 obj-$(CONFIG_BLK_DEV_INITRD)   += initramfs.o
 obj-$(CONFIG_GENERIC_CALIBRATE_DELAY) += calibrate.o
 
+<<<<<<< HEAD
 ifeq ($(CONFIG_TIMA_RKP), y)
 obj-y += _vmm.o vmm.o
 obj-y += ld.o
 endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 ifneq ($(CONFIG_ARCH_INIT_TASK),y)
 obj-y                          += init_task.o
 endif
@@ -20,6 +23,10 @@ mounts-y			:= do_mounts.o
 mounts-$(CONFIG_BLK_DEV_RAM)	+= do_mounts_rd.o
 mounts-$(CONFIG_BLK_DEV_INITRD)	+= do_mounts_initrd.o
 mounts-$(CONFIG_BLK_DEV_MD)	+= do_mounts_md.o
+<<<<<<< HEAD
+=======
+mounts-$(CONFIG_BLK_DEV_DM)	+= do_mounts_dm.o
+>>>>>>> common/deprecated/android-3.18
 
 # dependencies on generated files need to be listed explicitly
 $(obj)/version.o: include/generated/compile.h

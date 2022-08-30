@@ -1221,7 +1221,14 @@ static int nf_tables_newchain(struct sock *nlsk, struct sk_buff *skb,
 
 	if (nla[NFTA_CHAIN_POLICY]) {
 		if ((chain != NULL &&
+<<<<<<< HEAD
 		    !(chain->flags & NFT_BASE_CHAIN)) ||
+=======
+		    !(chain->flags & NFT_BASE_CHAIN)))
+			return -EOPNOTSUPP;
+
+		if (chain == NULL &&
+>>>>>>> common/deprecated/android-3.18
 		    nla[NFTA_CHAIN_HOOK] == NULL)
 			return -EOPNOTSUPP;
 
@@ -1866,7 +1873,11 @@ static void nf_tables_rule_destroy(const struct nft_ctx *ctx,
 	 * is called on error from nf_tables_newrule().
 	 */
 	expr = nft_expr_first(rule);
+<<<<<<< HEAD
 	while (expr->ops && expr != nft_expr_last(rule)) {
+=======
+	while (expr != nft_expr_last(rule) && expr->ops) {
+>>>>>>> common/deprecated/android-3.18
 		nf_tables_expr_destroy(ctx, expr);
 		expr = nft_expr_next(expr);
 	}
@@ -2686,12 +2697,21 @@ static int nf_tables_newset(struct sock *nlsk, struct sk_buff *skb,
 
 	err = nft_trans_set_add(&ctx, NFT_MSG_NEWSET, set);
 	if (err < 0)
+<<<<<<< HEAD
 		goto err2;
+=======
+		goto err3;
+>>>>>>> common/deprecated/android-3.18
 
 	list_add_tail_rcu(&set->list, &table->sets);
 	table->use++;
 	return 0;
 
+<<<<<<< HEAD
+=======
+err3:
+	ops->destroy(set);
+>>>>>>> common/deprecated/android-3.18
 err2:
 	kfree(set);
 err1:
@@ -3153,6 +3173,10 @@ static int nft_add_set_elem(struct nft_ctx *ctx, struct nft_set *set,
 		dreg = nft_type_to_reg(set->dtype);
 		list_for_each_entry(binding, &set->bindings, list) {
 			struct nft_ctx bind_ctx = {
+<<<<<<< HEAD
+=======
+				.net	= ctx->net,
+>>>>>>> common/deprecated/android-3.18
 				.afi	= ctx->afi,
 				.table	= ctx->table,
 				.chain	= (struct nft_chain *)binding->chain,

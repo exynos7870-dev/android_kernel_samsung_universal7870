@@ -338,6 +338,11 @@ static int __hw_perf_event_init(struct perf_event *event)
 		break;
 
 	case PERF_TYPE_HARDWARE:
+<<<<<<< HEAD
+=======
+		if (is_sampling_event(event))	/* No sampling support */
+			return -ENOENT;
+>>>>>>> common/deprecated/android-3.18
 		ev = attr->config;
 		/* Count user space (problem-state) only */
 		if (!attr->exclude_user && attr->exclude_kernel) {

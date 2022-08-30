@@ -41,7 +41,11 @@
 #if defined(CONFIG_PPC_BOOK3E_64)
 #define MSR_64BIT	MSR_CM
 
+<<<<<<< HEAD
 #define MSR_		(MSR_ME | MSR_CE)
+=======
+#define MSR_		(MSR_ME | MSR_RI | MSR_CE)
+>>>>>>> common/deprecated/android-3.18
 #define MSR_KERNEL	(MSR_ | MSR_64BIT)
 #define MSR_USER32	(MSR_ | MSR_PR | MSR_EE)
 #define MSR_USER64	(MSR_USER32 | MSR_64BIT)

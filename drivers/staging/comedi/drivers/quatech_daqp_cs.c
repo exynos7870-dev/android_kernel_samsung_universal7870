@@ -646,7 +646,11 @@ static int daqp_ao_insn_write(struct comedi_device *dev,
 	/* Make sure D/A update mode is direct update */
 	outb(0, dev->iobase + DAQP_AUX);
 
+<<<<<<< HEAD
 	for (i = 0; i > insn->n; i++) {
+=======
+	for (i = 0; i < insn->n; i++) {
+>>>>>>> common/deprecated/android-3.18
 		unsigned val = data[i];
 
 		s->readback[chan] = val;

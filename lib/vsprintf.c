@@ -1240,7 +1240,11 @@ char *address_val(char *buf, char *end, const void *addr,
 	return number(buf, end, num, spec);
 }
 
+<<<<<<< HEAD
 int kptr_restrict __read_mostly = 4;
+=======
+int kptr_restrict __read_mostly;
+>>>>>>> common/deprecated/android-3.18
 
 /*
  * Show a '%p' thing.  A kernel extension is that the '%p' is followed
@@ -1728,7 +1732,11 @@ int vsnprintf(char *buf, size_t size, const char *fmt, va_list args)
 
 	/* Reject out-of-range values early.  Large positive sizes are
 	   used for unknown buffer sizes. */
+<<<<<<< HEAD
 	if (WARN_ON_ONCE((int) size < 0))
+=======
+	if (WARN_ON_ONCE(size > INT_MAX))
+>>>>>>> common/deprecated/android-3.18
 		return 0;
 
 	str = buf;

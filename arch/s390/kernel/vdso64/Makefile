@@ -29,7 +29,11 @@ GCOV_PROFILE := n
 $(obj)/vdso64_wrapper.o : $(obj)/vdso64.so
 
 # link rule for the .so file, .lds has to be first
+<<<<<<< HEAD
 $(obj)/vdso64.so.dbg: $(src)/vdso64.lds $(obj-vdso64)
+=======
+$(obj)/vdso64.so.dbg: $(src)/vdso64.lds $(obj-vdso64) FORCE
+>>>>>>> common/deprecated/android-3.18
 	$(call if_changed,vdso64ld)
 
 # strip rule for the .so file
@@ -38,12 +42,20 @@ $(obj)/%.so: $(obj)/%.so.dbg FORCE
 	$(call if_changed,objcopy)
 
 # assembly rules for the .S files
+<<<<<<< HEAD
 $(obj-vdso64): %.o: %.S
+=======
+$(obj-vdso64): %.o: %.S FORCE
+>>>>>>> common/deprecated/android-3.18
 	$(call if_changed_dep,vdso64as)
 
 # actual build commands
 quiet_cmd_vdso64ld = VDSO64L $@
+<<<<<<< HEAD
       cmd_vdso64ld = $(CC) $(c_flags) -Wl,-T $^ -o $@
+=======
+      cmd_vdso64ld = $(CC) $(c_flags) -Wl,-T $(filter %.lds %.o,$^) -o $@
+>>>>>>> common/deprecated/android-3.18
 quiet_cmd_vdso64as = VDSO64A $@
       cmd_vdso64as = $(CC) $(a_flags) -c -o $@ $<
 

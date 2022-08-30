@@ -178,11 +178,16 @@ ext2_get_acl(struct inode *inode, int type)
 	return acl;
 }
 
+<<<<<<< HEAD
 /*
  * inode->i_mutex: down
  */
 int
 ext2_set_acl(struct inode *inode, struct posix_acl *acl, int type)
+=======
+static int
+__ext2_set_acl(struct inode *inode, struct posix_acl *acl, int type)
+>>>>>>> common/deprecated/android-3.18
 {
 	int name_index;
 	void *value = NULL;
@@ -192,6 +197,7 @@ ext2_set_acl(struct inode *inode, struct posix_acl *acl, int type)
 	switch(type) {
 		case ACL_TYPE_ACCESS:
 			name_index = EXT2_XATTR_INDEX_POSIX_ACL_ACCESS;
+<<<<<<< HEAD
 			if (acl) {
 				error = posix_acl_equiv_mode(acl, &inode->i_mode);
 				if (error < 0)
@@ -203,6 +209,8 @@ ext2_set_acl(struct inode *inode, struct posix_acl *acl, int type)
 						acl = NULL;
 				}
 			}
+=======
+>>>>>>> common/deprecated/android-3.18
 			break;
 
 		case ACL_TYPE_DEFAULT:
@@ -229,6 +237,27 @@ ext2_set_acl(struct inode *inode, struct posix_acl *acl, int type)
 }
 
 /*
+<<<<<<< HEAD
+=======
+ * inode->i_mutex: down
+ */
+int
+ext2_set_acl(struct inode *inode, struct posix_acl *acl, int type)
+{
+	int error;
+
+	if (type == ACL_TYPE_ACCESS && acl) {
+		error = posix_acl_update_mode(inode, &inode->i_mode, &acl);
+		if (error)
+			return error;
+		inode->i_ctime = CURRENT_TIME_SEC;
+		mark_inode_dirty(inode);
+	}
+	return __ext2_set_acl(inode, acl, type);
+}
+
+/*
+>>>>>>> common/deprecated/android-3.18
  * Initialize the ACLs of a new inode. Called from ext2_new_inode.
  *
  * dir->i_mutex: down
@@ -245,12 +274,20 @@ ext2_init_acl(struct inode *inode, struct inode *dir)
 		return error;
 
 	if (default_acl) {
+<<<<<<< HEAD
 		error = ext2_set_acl(inode, default_acl, ACL_TYPE_DEFAULT);
+=======
+		error = __ext2_set_acl(inode, default_acl, ACL_TYPE_DEFAULT);
+>>>>>>> common/deprecated/android-3.18
 		posix_acl_release(default_acl);
 	}
 	if (acl) {
 		if (!error)
+<<<<<<< HEAD
 			error = ext2_set_acl(inode, acl, ACL_TYPE_ACCESS);
+=======
+			error = __ext2_set_acl(inode, acl, ACL_TYPE_ACCESS);
+>>>>>>> common/deprecated/android-3.18
 		posix_acl_release(acl);
 	}
 	return error;

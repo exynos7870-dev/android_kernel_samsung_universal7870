@@ -3998,6 +3998,10 @@ static void __exit scsi_debug_exit(void)
 	if (dif_storep)
 		vfree(dif_storep);
 
+<<<<<<< HEAD
+=======
+	vfree(map_storep);
+>>>>>>> common/deprecated/android-3.18
 	vfree(fake_storep);
 }
 

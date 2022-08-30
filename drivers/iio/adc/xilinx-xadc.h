@@ -145,9 +145,15 @@ static inline int xadc_write_adc_reg(struct xadc *xadc, unsigned int reg,
 #define XADC_REG_MAX_VCCPINT	0x28
 #define XADC_REG_MAX_VCCPAUX	0x29
 #define XADC_REG_MAX_VCCO_DDR	0x2a
+<<<<<<< HEAD
 #define XADC_REG_MIN_VCCPINT	0x2b
 #define XADC_REG_MIN_VCCPAUX	0x2c
 #define XADC_REG_MIN_VCCO_DDR	0x2d
+=======
+#define XADC_REG_MIN_VCCPINT	0x2c
+#define XADC_REG_MIN_VCCPAUX	0x2d
+#define XADC_REG_MIN_VCCO_DDR	0x2e
+>>>>>>> common/deprecated/android-3.18
 
 #define XADC_REG_CONF0		0x40
 #define XADC_REG_CONF1		0x41

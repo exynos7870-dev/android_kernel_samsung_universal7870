@@ -221,7 +221,11 @@ void __init clkdev_add_table(struct clk_lookup *cl, size_t num)
 }
 
 #define MAX_DEV_ID	20
+<<<<<<< HEAD
 #define MAX_CON_ID	40
+=======
+#define MAX_CON_ID	16
+>>>>>>> common/deprecated/android-3.18
 
 struct clk_lookup_alloc {
 	struct clk_lookup cl;

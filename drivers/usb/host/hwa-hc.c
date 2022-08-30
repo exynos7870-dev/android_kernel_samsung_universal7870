@@ -173,7 +173,11 @@ out:
 	return result;
 
 error_set_cluster_id:
+<<<<<<< HEAD
 	wusb_cluster_id_put(wusbhc->cluster_id);
+=======
+	wusb_cluster_id_put(addr);
+>>>>>>> common/deprecated/android-3.18
 error_cluster_id_get:
 	goto out;
 
@@ -654,7 +658,11 @@ static int hwahc_security_create(struct hwahc *hwahc)
 	top = itr + itr_size;
 	result = __usb_get_extra_descriptor(usb_dev->rawdescriptors[index],
 			le16_to_cpu(usb_dev->actconfig->desc.wTotalLength),
+<<<<<<< HEAD
 			USB_DT_SECURITY, (void **) &secd);
+=======
+			USB_DT_SECURITY, (void **) &secd, sizeof(*secd));
+>>>>>>> common/deprecated/android-3.18
 	if (result == -1) {
 		dev_warn(dev, "BUG? WUSB host has no security descriptors\n");
 		return 0;

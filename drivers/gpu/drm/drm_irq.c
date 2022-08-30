@@ -131,12 +131,20 @@ static void drm_update_vblank_count(struct drm_device *dev, int crtc)
 
 	/* Reinitialize corresponding vblank timestamp if high-precision query
 	 * available. Skip this step if query unsupported or failed. Will
+<<<<<<< HEAD
 	 * reinitialize delayed at next vblank interrupt in that case.
 	 */
 	if (rc) {
 		tslot = atomic_read(&vblank->count) + diff;
 		vblanktimestamp(dev, crtc, tslot) = t_vblank;
 	}
+=======
+	 * reinitialize delayed at next vblank interrupt in that case and
+	 * assign 0 for now, to mark the vblanktimestamp as invalid.
+	 */
+	tslot = atomic_read(&vblank->count) + diff;
+	vblanktimestamp(dev, crtc, tslot) = rc ? t_vblank : (struct timeval) {0, 0};
+>>>>>>> common/deprecated/android-3.18
 
 	smp_mb__before_atomic();
 	atomic_add(diff, &vblank->count);
@@ -1039,9 +1047,15 @@ void drm_vblank_put(struct drm_device *dev, int crtc)
 	if (atomic_dec_and_test(&vblank->refcount)) {
 		if (drm_vblank_offdelay == 0)
 			return;
+<<<<<<< HEAD
 		else if (dev->vblank_disable_immediate || drm_vblank_offdelay < 0)
 			vblank_disable_fn((unsigned long)vblank);
 		else
+=======
+		else if (drm_vblank_offdelay < 0)
+			vblank_disable_fn((unsigned long)vblank);
+		else if (!dev->vblank_disable_immediate)
+>>>>>>> common/deprecated/android-3.18
 			mod_timer(&vblank->disable_timer,
 				  jiffies + ((drm_vblank_offdelay * HZ)/1000));
 	}
@@ -1225,8 +1239,12 @@ void drm_vblank_on(struct drm_device *dev, int crtc)
 	 * re-enable interrupts if there are users left, or the
 	 * user wishes vblank interrupts to be enabled all the time.
 	 */
+<<<<<<< HEAD
 	if (atomic_read(&vblank->refcount) != 0 ||
 	    (!dev->vblank_disable_immediate && drm_vblank_offdelay == 0))
+=======
+	if (atomic_read(&vblank->refcount) != 0 || drm_vblank_offdelay == 0)
+>>>>>>> common/deprecated/android-3.18
 		WARN_ON(drm_vblank_enable(dev, crtc));
 	spin_unlock_irqrestore(&dev->vbl_lock, irqflags);
 }
@@ -1665,6 +1683,19 @@ bool drm_handle_vblank(struct drm_device *dev, int crtc)
 	wake_up(&vblank->queue);
 	drm_handle_vblank_events(dev, crtc);
 
+<<<<<<< HEAD
+=======
+	/* With instant-off, we defer disabling the interrupt until after
+	 * we finish processing the following vblank. The disable has to
+	 * be last (after drm_handle_vblank_events) so that the timestamp
+	 * is always accurate.
+	 */
+	if (dev->vblank_disable_immediate &&
+	    drm_vblank_offdelay > 0 &&
+	    !atomic_read(&vblank->refcount))
+		vblank_disable_fn((unsigned long)vblank);
+
+>>>>>>> common/deprecated/android-3.18
 	spin_unlock_irqrestore(&dev->event_lock, irqflags);
 
 	return true;

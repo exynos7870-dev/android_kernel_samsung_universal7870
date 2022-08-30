@@ -71,7 +71,11 @@
 #define VF610_ADC_ADSTS_MASK		0x300
 #define VF610_ADC_ADLPC_EN		0x80
 #define VF610_ADC_ADHSC_EN		0x400
+<<<<<<< HEAD
 #define VF610_ADC_REFSEL_VALT		0x100
+=======
+#define VF610_ADC_REFSEL_VALT		0x800
+>>>>>>> common/deprecated/android-3.18
 #define VF610_ADC_REFSEL_VBG		0x1000
 #define VF610_ADC_ADTRG_HARD		0x2000
 #define VF610_ADC_AVGS_8		0x4000

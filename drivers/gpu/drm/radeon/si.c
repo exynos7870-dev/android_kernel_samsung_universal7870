@@ -4285,7 +4285,11 @@ static int si_pcie_gart_enable(struct radeon_device *rdev)
 	/* empty context1-15 */
 	/* set vm size, must be a multiple of 4 */
 	WREG32(VM_CONTEXT1_PAGE_TABLE_START_ADDR, 0);
+<<<<<<< HEAD
 	WREG32(VM_CONTEXT1_PAGE_TABLE_END_ADDR, rdev->vm_manager.max_pfn);
+=======
+	WREG32(VM_CONTEXT1_PAGE_TABLE_END_ADDR, rdev->vm_manager.max_pfn - 1);
+>>>>>>> common/deprecated/android-3.18
 	/* Assign the pt base to something valid for now; the pts used for
 	 * the VMs are determined by the application and setup and assigned
 	 * on the fly in the vm part of radeon_gart.c
@@ -5969,8 +5973,13 @@ static int si_irq_init(struct radeon_device *rdev)
 	}
 
 	/* setup interrupt control */
+<<<<<<< HEAD
 	/* set dummy read address to ring address */
 	WREG32(INTERRUPT_CNTL2, rdev->ih.gpu_addr >> 8);
+=======
+	/* set dummy read address to dummy page address */
+	WREG32(INTERRUPT_CNTL2, rdev->dummy_page.addr >> 8);
+>>>>>>> common/deprecated/android-3.18
 	interrupt_cntl = RREG32(INTERRUPT_CNTL);
 	/* IH_DUMMY_RD_OVERRIDE=0 - dummy read disabled with msi, enabled without msi
 	 * IH_DUMMY_RD_OVERRIDE=1 - dummy read controlled by IH_DUMMY_RD_EN

@@ -10,6 +10,10 @@
  *
  */
 
+<<<<<<< HEAD
+=======
+#include <linux/cpufreq.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/device.h>
 #include <linux/err.h>
 #include <linux/init.h>
@@ -27,10 +31,13 @@
 #include <linux/netdevice.h>
 #include <linux/sysfs.h>
 
+<<<<<<< HEAD
 #ifdef CONFIG_ARCH_EXYNOS
 #include <soc/samsung/exynos-cpu_hotplug.h>
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 #include "base.h"
 #include "power/power.h"
 
@@ -430,11 +437,18 @@ static DEVICE_ATTR_RW(uevent);
 static ssize_t online_show(struct device *dev, struct device_attribute *attr,
 			   char *buf)
 {
+<<<<<<< HEAD
 	struct cpu *cpu = container_of(dev, struct cpu, dev);
 	bool val;
 
 	device_lock(dev);
 	val = !!cpu_online(cpu->dev.id);
+=======
+	bool val;
+
+	device_lock(dev);
+	val = !dev->offline;
+>>>>>>> common/deprecated/android-3.18
 	device_unlock(dev);
 	return sprintf(buf, "%u\n", val);
 }
@@ -445,11 +459,14 @@ static ssize_t online_store(struct device *dev, struct device_attribute *attr,
 	bool val;
 	int ret;
 
+<<<<<<< HEAD
 #ifdef CONFIG_ARCH_EXYNOS
 	if (exynos_cpu_hotplug_enabled())
 		return count;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	ret = strtobool(buf, &val);
 	if (ret < 0)
 		return ret;
@@ -719,7 +736,11 @@ class_dir_create_and_add(struct class *class, struct kobject *parent_kobj)
 
 	dir = kzalloc(sizeof(*dir), GFP_KERNEL);
 	if (!dir)
+<<<<<<< HEAD
 		return NULL;
+=======
+		return ERR_PTR(-ENOMEM);
+>>>>>>> common/deprecated/android-3.18
 
 	dir->class = class;
 	kobject_init(&dir->kobj, &class_dir_ktype);
@@ -729,7 +750,11 @@ class_dir_create_and_add(struct class *class, struct kobject *parent_kobj)
 	retval = kobject_add(&dir->kobj, parent_kobj, "%s", class->name);
 	if (retval < 0) {
 		kobject_put(&dir->kobj);
+<<<<<<< HEAD
 		return NULL;
+=======
+		return ERR_PTR(retval);
+>>>>>>> common/deprecated/android-3.18
 	}
 	return &dir->kobj;
 }
@@ -796,6 +821,7 @@ static struct kobject *get_device_parent(struct device *dev,
 	return NULL;
 }
 
+<<<<<<< HEAD
 static void cleanup_glue_dir(struct device *dev, struct kobject *glue_dir)
 {
 	/* see if we live in a "glue" directory */
@@ -804,15 +830,48 @@ static void cleanup_glue_dir(struct device *dev, struct kobject *glue_dir)
 		return;
 
 	mutex_lock(&gdp_mutex);
+=======
+static inline bool live_in_glue_dir(struct kobject *kobj,
+				    struct device *dev)
+{
+	if (!kobj || !dev->class ||
+	    kobj->kset != &dev->class->p->glue_dirs)
+		return false;
+	return true;
+}
+
+static inline struct kobject *get_glue_dir(struct device *dev)
+{
+	return dev->kobj.parent;
+}
+
+/*
+ * make sure cleaning up dir as the last step, we need to make
+ * sure .release handler of kobject is run with holding the
+ * global lock
+ */
+static void cleanup_glue_dir(struct device *dev, struct kobject *glue_dir)
+{
+	/* see if we live in a "glue" directory */
+	if (!live_in_glue_dir(glue_dir, dev))
+		return;
+
+	mutex_lock(&gdp_mutex);
+	if (!kobject_has_children(glue_dir))
+		kobject_del(glue_dir);
+>>>>>>> common/deprecated/android-3.18
 	kobject_put(glue_dir);
 	mutex_unlock(&gdp_mutex);
 }
 
+<<<<<<< HEAD
 static void cleanup_device_parent(struct device *dev)
 {
 	cleanup_glue_dir(dev, dev->kobj.parent);
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static int device_add_class_symlinks(struct device *dev)
 {
 	int error;
@@ -976,6 +1035,10 @@ int device_add(struct device *dev)
 	struct kobject *kobj;
 	struct class_interface *class_intf;
 	int error = -EINVAL;
+<<<<<<< HEAD
+=======
+	struct kobject *glue_dir = NULL;
+>>>>>>> common/deprecated/android-3.18
 
 	dev = get_device(dev);
 	if (!dev)
@@ -1010,6 +1073,13 @@ int device_add(struct device *dev)
 
 	parent = get_device(dev->parent);
 	kobj = get_device_parent(dev, parent);
+<<<<<<< HEAD
+=======
+	if (IS_ERR(kobj)) {
+		error = PTR_ERR(kobj);
+		goto parent_error;
+	}
+>>>>>>> common/deprecated/android-3.18
 	if (kobj)
 		dev->kobj.parent = kobj;
 
@@ -1020,8 +1090,15 @@ int device_add(struct device *dev)
 	/* first, register with generic layer. */
 	/* we require the name to be set before, and pass NULL */
 	error = kobject_add(&dev->kobj, dev->kobj.parent, NULL);
+<<<<<<< HEAD
 	if (error)
 		goto Error;
+=======
+	if (error) {
+		glue_dir = get_glue_dir(dev);
+		goto Error;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	/* notify platform of device entry */
 	if (platform_notify)
@@ -1104,9 +1181,17 @@ done:
 	device_remove_file(dev, &dev_attr_uevent);
  attrError:
 	kobject_uevent(&dev->kobj, KOBJ_REMOVE);
+<<<<<<< HEAD
 	kobject_del(&dev->kobj);
  Error:
 	cleanup_device_parent(dev);
+=======
+	glue_dir = get_glue_dir(dev);
+	kobject_del(&dev->kobj);
+ Error:
+	cleanup_glue_dir(dev, glue_dir);
+parent_error:
+>>>>>>> common/deprecated/android-3.18
 	if (parent)
 		put_device(parent);
 name_error:
@@ -1183,6 +1268,10 @@ EXPORT_SYMBOL_GPL(put_device);
 void device_del(struct device *dev)
 {
 	struct device *parent = dev->parent;
+<<<<<<< HEAD
+=======
+	struct kobject *glue_dir = NULL;
+>>>>>>> common/deprecated/android-3.18
 	struct class_interface *class_intf;
 
 	/* Notify clients of device removal.  This call must come
@@ -1227,8 +1316,14 @@ void device_del(struct device *dev)
 		blocking_notifier_call_chain(&dev->bus->p->bus_notifier,
 					     BUS_NOTIFY_REMOVED_DEVICE, dev);
 	kobject_uevent(&dev->kobj, KOBJ_REMOVE);
+<<<<<<< HEAD
 	cleanup_device_parent(dev);
 	kobject_del(&dev->kobj);
+=======
+	glue_dir = get_glue_dir(dev);
+	kobject_del(&dev->kobj);
+	cleanup_glue_dir(dev, glue_dir);
+>>>>>>> common/deprecated/android-3.18
 	put_device(parent);
 }
 EXPORT_SYMBOL_GPL(device_del);
@@ -1404,14 +1499,21 @@ int __init devices_init(void)
 
 static int device_check_offline(struct device *dev, void *not_used)
 {
+<<<<<<< HEAD
 	struct cpu *cpu = container_of(dev, struct cpu, dev);
+=======
+>>>>>>> common/deprecated/android-3.18
 	int ret;
 
 	ret = device_for_each_child(dev, NULL, device_check_offline);
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
 	return device_supports_offline(dev) && cpu_online(cpu->dev.id) ? -EBUSY : 0;
+=======
+	return device_supports_offline(dev) && !dev->offline ? -EBUSY : 0;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -1427,7 +1529,10 @@ static int device_check_offline(struct device *dev, void *not_used)
  */
 int device_offline(struct device *dev)
 {
+<<<<<<< HEAD
 	struct cpu *cpu = container_of(dev, struct cpu, dev);
+=======
+>>>>>>> common/deprecated/android-3.18
 	int ret;
 
 	if (dev->offline_disabled)
@@ -1439,12 +1544,23 @@ int device_offline(struct device *dev)
 
 	device_lock(dev);
 	if (device_supports_offline(dev)) {
+<<<<<<< HEAD
 		if (!cpu_online(cpu->dev.id)) {
 			ret = 1;
 		} else {
 			ret = dev->bus->offline(dev);
 			if (!ret)
 				kobject_uevent(&dev->kobj, KOBJ_OFFLINE);
+=======
+		if (dev->offline) {
+			ret = 1;
+		} else {
+			ret = dev->bus->offline(dev);
+			if (!ret) {
+				kobject_uevent(&dev->kobj, KOBJ_OFFLINE);
+				dev->offline = true;
+			}
+>>>>>>> common/deprecated/android-3.18
 		}
 	}
 	device_unlock(dev);
@@ -1464,15 +1580,27 @@ int device_offline(struct device *dev)
  */
 int device_online(struct device *dev)
 {
+<<<<<<< HEAD
 	struct cpu *cpu = container_of(dev, struct cpu, dev);
+=======
+>>>>>>> common/deprecated/android-3.18
 	int ret = 0;
 
 	device_lock(dev);
 	if (device_supports_offline(dev)) {
+<<<<<<< HEAD
 		if (!cpu_online(cpu->dev.id)) {
 			ret = dev->bus->online(dev);
 			if (!ret)
 				kobject_uevent(&dev->kobj, KOBJ_ONLINE);
+=======
+		if (dev->offline) {
+			ret = dev->bus->online(dev);
+			if (!ret) {
+				kobject_uevent(&dev->kobj, KOBJ_ONLINE);
+				dev->offline = false;
+			}
+>>>>>>> common/deprecated/android-3.18
 		} else {
 			ret = 1;
 		}
@@ -1879,6 +2007,14 @@ int device_move(struct device *dev, struct device *new_parent,
 	device_pm_lock();
 	new_parent = get_device(new_parent);
 	new_parent_kobj = get_device_parent(dev, new_parent);
+<<<<<<< HEAD
+=======
+	if (IS_ERR(new_parent_kobj)) {
+		error = PTR_ERR(new_parent_kobj);
+		put_device(new_parent);
+		goto out;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	pr_debug("device: '%s': %s: moving to '%s'\n", dev_name(dev),
 		 __func__, new_parent ? dev_name(new_parent) : "<NULL>");
@@ -1930,9 +2066,12 @@ int device_move(struct device *dev, struct device *new_parent,
 	case DPM_ORDER_DEV_LAST:
 		device_pm_move_last(dev);
 		break;
+<<<<<<< HEAD
 	case DPM_ORDER_DEV_FIRST:
 		device_pm_move_first(dev);
 		break;
+=======
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	put_device(old_parent);
@@ -1950,6 +2089,11 @@ void device_shutdown(void)
 {
 	struct device *dev, *parent;
 
+<<<<<<< HEAD
+=======
+	cpufreq_suspend();
+
+>>>>>>> common/deprecated/android-3.18
 	spin_lock(&devices_kset->list_lock);
 	/*
 	 * Walk the devices list backward, shutting down each in turn.
@@ -2148,11 +2292,15 @@ EXPORT_SYMBOL(func);
 define_dev_printk_level(dev_emerg, KERN_EMERG);
 define_dev_printk_level(dev_alert, KERN_ALERT);
 define_dev_printk_level(dev_crit, KERN_CRIT);
+<<<<<<< HEAD
 #if defined(CONFIG_SEC_BAT_AUT) && !defined(CONFIG_SAMSUNG_PRODUCT_SHIP)
 define_dev_printk_level(dev_err, BAT_AUTOMAION_TEST_PREFIX_ERR);
 #else
 define_dev_printk_level(dev_err, KERN_ERR);
 #endif
+=======
+define_dev_printk_level(dev_err, KERN_ERR);
+>>>>>>> common/deprecated/android-3.18
 define_dev_printk_level(dev_warn, KERN_WARNING);
 define_dev_printk_level(dev_notice, KERN_NOTICE);
 define_dev_printk_level(_dev_info, KERN_INFO);

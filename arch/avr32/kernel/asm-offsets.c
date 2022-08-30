@@ -18,7 +18,10 @@ void foo(void)
 	OFFSET(TI_preempt_count, thread_info, preempt_count);
 	OFFSET(TI_rar_saved, thread_info, rar_saved);
 	OFFSET(TI_rsr_saved, thread_info, rsr_saved);
+<<<<<<< HEAD
 	OFFSET(TI_restart_block, thread_info, restart_block);
+=======
+>>>>>>> common/deprecated/android-3.18
 	BLANK();
 	OFFSET(TSK_active_mm, task_struct, active_mm);
 	BLANK();

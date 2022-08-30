@@ -732,6 +732,21 @@ bool ci_dpm_vblank_too_short(struct radeon_device *rdev)
 	u32 vblank_time = r600_dpm_get_vblank_time(rdev);
 	u32 switch_limit = pi->mem_gddr5 ? 450 : 300;
 
+<<<<<<< HEAD
+=======
+	/* disable mclk switching if the refresh is >120Hz, even if the
+        * blanking period would allow it
+        */
+	if (r600_dpm_get_vrefresh(rdev) > 120)
+		return true;
+
+	/* disable mclk switching if the refresh is >120Hz, even if the
+        * blanking period would allow it
+        */
+	if (r600_dpm_get_vrefresh(rdev) > 120)
+		return true;
+
+>>>>>>> common/deprecated/android-3.18
 	if (vblank_time < switch_limit)
 		return true;
 	else
@@ -3871,7 +3886,11 @@ static int ci_set_mc_special_registers(struct radeon_device *rdev,
 					table->mc_reg_table_entry[k].mc_data[j] |= 0x100;
 			}
 			j++;
+<<<<<<< HEAD
 			if (j > SMU7_DISCRETE_MC_REGISTER_ARRAY_SIZE)
+=======
+			if (j >= SMU7_DISCRETE_MC_REGISTER_ARRAY_SIZE)
+>>>>>>> common/deprecated/android-3.18
 				return -EINVAL;
 
 			if (!pi->mem_gddr5) {
@@ -4971,6 +4990,10 @@ static int ci_parse_power_table(struct radeon_device *rdev)
 	if (!rdev->pm.dpm.ps)
 		return -ENOMEM;
 	power_state_offset = (u8 *)state_array->states;
+<<<<<<< HEAD
+=======
+	rdev->pm.dpm.num_ps = 0;
+>>>>>>> common/deprecated/android-3.18
 	for (i = 0; i < state_array->ucNumEntries; i++) {
 		u8 *idx;
 		power_state = (union pplib_power_state *)power_state_offset;
@@ -4980,10 +5003,15 @@ static int ci_parse_power_table(struct radeon_device *rdev)
 		if (!rdev->pm.power_state[i].clock_info)
 			return -EINVAL;
 		ps = kzalloc(sizeof(struct ci_ps), GFP_KERNEL);
+<<<<<<< HEAD
 		if (ps == NULL) {
 			kfree(rdev->pm.dpm.ps);
 			return -ENOMEM;
 		}
+=======
+		if (ps == NULL)
+			return -ENOMEM;
+>>>>>>> common/deprecated/android-3.18
 		rdev->pm.dpm.ps[i].ps_priv = ps;
 		ci_parse_pplib_non_clock_info(rdev, &rdev->pm.dpm.ps[i],
 					      non_clock_info,
@@ -5005,8 +5033,13 @@ static int ci_parse_power_table(struct radeon_device *rdev)
 			k++;
 		}
 		power_state_offset += 2 + power_state->v2.ucNumDPMLevels;
+<<<<<<< HEAD
 	}
 	rdev->pm.dpm.num_ps = state_array->ucNumEntries;
+=======
+		rdev->pm.dpm.num_ps = i + 1;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	/* fill in the vce power states */
 	for (i = 0; i < RADEON_MAX_VCE_LEVELS; i++) {

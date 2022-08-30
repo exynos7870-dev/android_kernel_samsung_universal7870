@@ -153,7 +153,11 @@ struct renesas_usbhs_driver_param {
 	 */
 	int pio_dma_border; /* default is 64byte */
 
+<<<<<<< HEAD
 	u32 type;
+=======
+	uintptr_t type;
+>>>>>>> common/deprecated/android-3.18
 	u32 enable_gpio;
 
 	/*

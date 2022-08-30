@@ -795,6 +795,12 @@ i915_gem_userptr_ioctl(struct drm_device *dev, void *data, struct drm_file *file
 			    I915_USERPTR_UNSYNCHRONIZED))
 		return -EINVAL;
 
+<<<<<<< HEAD
+=======
+	if (!args->user_size)
+		return -EINVAL;
+
+>>>>>>> common/deprecated/android-3.18
 	if (offset_in_page(args->user_ptr | args->user_size))
 		return -EINVAL;
 

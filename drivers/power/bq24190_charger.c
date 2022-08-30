@@ -17,6 +17,7 @@
 #include <linux/power_supply.h>
 #include <linux/gpio.h>
 #include <linux/i2c.h>
+<<<<<<< HEAD
 #if defined(CONFIG_FUELGAUGE_MAX17058_POWER) || defined(CONFIG_FUELGAUGE_S2MG001_POWER)
 #include <linux/workqueue.h>
 #endif
@@ -25,14 +26,20 @@
 #include <linux/muic/muic.h>
 #include <linux/muic/muic_notifier.h>
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #include <linux/power/bq24190_charger.h>
 
 
 #define	BQ24190_MANUFACTURER	"Texas Instruments"
 
+<<<<<<< HEAD
 /* Input Source Control Register */
 #define BQ24190_REG_ISC				0x00
+=======
+#define BQ24190_REG_ISC		0x00 /* Input Source Control */
+>>>>>>> common/deprecated/android-3.18
 #define BQ24190_REG_ISC_EN_HIZ_MASK		BIT(7)
 #define BQ24190_REG_ISC_EN_HIZ_SHIFT		7
 #define BQ24190_REG_ISC_VINDPM_MASK		(BIT(6) | BIT(5) | BIT(4) | \
@@ -41,8 +48,12 @@
 #define BQ24190_REG_ISC_IINLIM_MASK		(BIT(2) | BIT(1) | BIT(0))
 #define BQ24190_REG_ISC_IINLIM_SHIFT		0
 
+<<<<<<< HEAD
 /* Power-On Configuration Register */
 #define BQ24190_REG_POC				0x01
+=======
+#define BQ24190_REG_POC		0x01 /* Power-On Configuration */
+>>>>>>> common/deprecated/android-3.18
 #define BQ24190_REG_POC_RESET_MASK		BIT(7)
 #define BQ24190_REG_POC_RESET_SHIFT		7
 #define BQ24190_REG_POC_WDT_RESET_MASK		BIT(6)
@@ -54,16 +65,24 @@
 #define BQ24190_REG_POC_BOOST_LIM_MASK		BIT(0)
 #define BQ24190_REG_POC_BOOST_LIM_SHIFT		0
 
+<<<<<<< HEAD
 /* Charge Current Control Register */
 #define BQ24190_REG_CCC				0x02
+=======
+#define BQ24190_REG_CCC		0x02 /* Charge Current Control */
+>>>>>>> common/deprecated/android-3.18
 #define BQ24190_REG_CCC_ICHG_MASK		(BIT(7) | BIT(6) | BIT(5) | \
 						 BIT(4) | BIT(3) | BIT(2))
 #define BQ24190_REG_CCC_ICHG_SHIFT		2
 #define BQ24190_REG_CCC_FORCE_20PCT_MASK	BIT(0)
 #define BQ24190_REG_CCC_FORCE_20PCT_SHIFT	0
 
+<<<<<<< HEAD
 /* Pre-charge/Termination Current Cntl Register */
 #define BQ24190_REG_PCTCC			0x03
+=======
+#define BQ24190_REG_PCTCC	0x03 /* Pre-charge/Termination Current Cntl */
+>>>>>>> common/deprecated/android-3.18
 #define BQ24190_REG_PCTCC_IPRECHG_MASK		(BIT(7) | BIT(6) | BIT(5) | \
 						 BIT(4))
 #define BQ24190_REG_PCTCC_IPRECHG_SHIFT		4
@@ -71,8 +90,12 @@
 						 BIT(0))
 #define BQ24190_REG_PCTCC_ITERM_SHIFT		0
 
+<<<<<<< HEAD
 /* Charge Voltage Control Register */
 #define BQ24190_REG_CVC				0x04
+=======
+#define BQ24190_REG_CVC		0x04 /* Charge Voltage Control */
+>>>>>>> common/deprecated/android-3.18
 #define BQ24190_REG_CVC_VREG_MASK		(BIT(7) | BIT(6) | BIT(5) | \
 						 BIT(4) | BIT(3) | BIT(2))
 #define BQ24190_REG_CVC_VREG_SHIFT		2
@@ -81,8 +104,12 @@
 #define BQ24190_REG_CVC_VRECHG_MASK		BIT(0)
 #define BQ24190_REG_CVC_VRECHG_SHIFT		0
 
+<<<<<<< HEAD
 /* Charge Term/Timer Control Register */
 #define BQ24190_REG_CTTC			0x05
+=======
+#define BQ24190_REG_CTTC	0x05 /* Charge Term/Timer Control */
+>>>>>>> common/deprecated/android-3.18
 #define BQ24190_REG_CTTC_EN_TERM_MASK		BIT(7)
 #define BQ24190_REG_CTTC_EN_TERM_SHIFT		7
 #define BQ24190_REG_CTTC_TERM_STAT_MASK		BIT(6)
@@ -96,8 +123,12 @@
 #define BQ24190_REG_CTTC_JEITA_ISET_MASK	BIT(0)
 #define BQ24190_REG_CTTC_JEITA_ISET_SHIFT	0
 
+<<<<<<< HEAD
 /* IR Comp/Thermal Regulation Control Register */
 #define BQ24190_REG_ICTRC			0x06
+=======
+#define BQ24190_REG_ICTRC	0x06 /* IR Comp/Thermal Regulation Control */
+>>>>>>> common/deprecated/android-3.18
 #define BQ24190_REG_ICTRC_BAT_COMP_MASK		(BIT(7) | BIT(6) | BIT(5))
 #define BQ24190_REG_ICTRC_BAT_COMP_SHIFT	5
 #define BQ24190_REG_ICTRC_VCLAMP_MASK		(BIT(4) | BIT(3) | BIT(2))
@@ -105,8 +136,12 @@
 #define BQ24190_REG_ICTRC_TREG_MASK		(BIT(1) | BIT(0))
 #define BQ24190_REG_ICTRC_TREG_SHIFT		0
 
+<<<<<<< HEAD
 /* Misc. Operation Control Register */
 #define BQ24190_REG_MOC				0x07
+=======
+#define BQ24190_REG_MOC		0x07 /* Misc. Operation Control */
+>>>>>>> common/deprecated/android-3.18
 #define BQ24190_REG_MOC_DPDM_EN_MASK		BIT(7)
 #define BQ24190_REG_MOC_DPDM_EN_SHIFT		7
 #define BQ24190_REG_MOC_TMR2X_EN_MASK		BIT(6)
@@ -118,8 +153,12 @@
 #define BQ24190_REG_MOC_INT_MASK_MASK		(BIT(1) | BIT(0))
 #define BQ24190_REG_MOC_INT_MASK_SHIFT		0
 
+<<<<<<< HEAD
 /* System Status Register */
 #define BQ24190_REG_SS				0x08
+=======
+#define BQ24190_REG_SS		0x08 /* System Status */
+>>>>>>> common/deprecated/android-3.18
 #define BQ24190_REG_SS_VBUS_STAT_MASK		(BIT(7) | BIT(6))
 #define BQ24190_REG_SS_VBUS_STAT_SHIFT		6
 #define BQ24190_REG_SS_CHRG_STAT_MASK		(BIT(5) | BIT(4))
@@ -133,8 +172,12 @@
 #define BQ24190_REG_SS_VSYS_STAT_MASK		BIT(0)
 #define BQ24190_REG_SS_VSYS_STAT_SHIFT		0
 
+<<<<<<< HEAD
 /* Fault Register */
 #define BQ24190_REG_F				0x09
+=======
+#define BQ24190_REG_F		0x09 /* Fault */
+>>>>>>> common/deprecated/android-3.18
 #define BQ24190_REG_F_WATCHDOG_FAULT_MASK	BIT(7)
 #define BQ24190_REG_F_WATCHDOG_FAULT_SHIFT	7
 #define BQ24190_REG_F_BOOST_FAULT_MASK		BIT(6)
@@ -146,6 +189,7 @@
 #define BQ24190_REG_F_NTC_FAULT_MASK		(BIT(2) | BIT(1) | BIT(0))
 #define BQ24190_REG_F_NTC_FAULT_SHIFT		0
 
+<<<<<<< HEAD
 /* Vendor/Part/Revision Status Register */
 #define BQ24190_REG_VPRS			0x0A
 #define BQ24190_REG_VPRS_PN_MASK		(BIT(5) | BIT(4) | BIT(3))
@@ -153,6 +197,14 @@
 #define BQ24190_REG_VPRS_PN_24190		0x4
 #define BQ24190_REG_VPRS_PN_24192		0x5 /* Also 24193 */
 #define BQ24190_REG_VPRS_PN_24192I		0x3
+=======
+#define BQ24190_REG_VPRS	0x0A /* Vendor/Part/Revision Status */
+#define BQ24190_REG_VPRS_PN_MASK		(BIT(5) | BIT(4) | BIT(3))
+#define BQ24190_REG_VPRS_PN_SHIFT		3
+#define BQ24190_REG_VPRS_PN_24190			0x4
+#define BQ24190_REG_VPRS_PN_24192			0x5 /* Also 24193 */
+#define BQ24190_REG_VPRS_PN_24192I			0x3
+>>>>>>> common/deprecated/android-3.18
 #define BQ24190_REG_VPRS_TS_PROFILE_MASK	BIT(2)
 #define BQ24190_REG_VPRS_TS_PROFILE_SHIFT	2
 #define BQ24190_REG_VPRS_DEV_REG_MASK		(BIT(1) | BIT(0))
@@ -163,24 +215,32 @@
  * so the first read after a fault returns the latched value and subsequent
  * reads return the current value.  In order to return the fault status
  * to the user, have the interrupt handler save the reg's value and retrieve
+<<<<<<< HEAD
  * it in the appropriate health/status routine.  Each routine has its own
  * flag indicating whether it should use the value stored by the last run
  * of the interrupt handler or do an actual reg read.  That way each routine
  * can report back whatever fault may have occured.
+=======
+ * it in the appropriate health/status routine.
+>>>>>>> common/deprecated/android-3.18
  */
 struct bq24190_dev_info {
 	struct i2c_client		*client;
 	struct device			*dev;
 	struct power_supply		charger;
 	struct power_supply		battery;
+<<<<<<< HEAD
 #if defined(CONFIG_FUELGAUGE_MAX17058_POWER) || defined(CONFIG_FUELGAUGE_S2MG001_POWER)
 	struct delayed_work polling_work;
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	char				model_name[I2C_NAME_SIZE];
 	kernel_ulong_t			model;
 	unsigned int			gpio_int;
 	unsigned int			irq;
 	struct mutex			f_reg_lock;
+<<<<<<< HEAD
 	bool				first_time;
 	bool				charger_health_valid;
 	bool				battery_health_valid;
@@ -199,6 +259,11 @@ struct bq24190_dev_info {
 #if defined(CONFIG_MUIC_NOTIFIER)
 	struct notifier_block		bdi_nb;
 #endif
+=======
+	u8				f_reg;
+	u8				ss_reg;
+	u8				watchdog;
+>>>>>>> common/deprecated/android-3.18
 };
 
 /*
@@ -671,6 +736,7 @@ static int bq24190_charger_get_health(struct bq24190_dev_info *bdi,
 		union power_supply_propval *val)
 {
 	u8 v;
+<<<<<<< HEAD
 	int health, ret;
 
 	mutex_lock(&bdi->f_reg_lock);
@@ -686,6 +752,13 @@ static int bq24190_charger_get_health(struct bq24190_dev_info *bdi,
 		if (ret < 0)
 			return ret;
 	}
+=======
+	int health;
+
+	mutex_lock(&bdi->f_reg_lock);
+	v = bdi->f_reg;
+	mutex_unlock(&bdi->f_reg_lock);
+>>>>>>> common/deprecated/android-3.18
 
 	if (v & BQ24190_REG_F_BOOST_FAULT_MASK) {
 		/*
@@ -962,7 +1035,11 @@ static void bq24190_charger_init(struct power_supply *charger)
 	charger->properties = bq24190_charger_properties;
 	charger->num_properties = ARRAY_SIZE(bq24190_charger_properties);
 	charger->supplied_to = bq24190_charger_supplied_to;
+<<<<<<< HEAD
 	charger->num_supplies = ARRAY_SIZE(bq24190_charger_supplied_to);
+=======
+	charger->num_supplicants = ARRAY_SIZE(bq24190_charger_supplied_to);
+>>>>>>> common/deprecated/android-3.18
 	charger->get_property = bq24190_charger_get_property;
 	charger->set_property = bq24190_charger_set_property;
 	charger->property_is_writeable = bq24190_charger_property_is_writeable;
@@ -977,6 +1054,7 @@ static int bq24190_battery_get_status(struct bq24190_dev_info *bdi,
 	int status, ret;
 
 	mutex_lock(&bdi->f_reg_lock);
+<<<<<<< HEAD
 
 	if (bdi->battery_status_valid) {
 		chrg_fault = bdi->f_reg;
@@ -989,6 +1067,10 @@ static int bq24190_battery_get_status(struct bq24190_dev_info *bdi,
 		if (ret < 0)
 			return ret;
 	}
+=======
+	chrg_fault = bdi->f_reg;
+	mutex_unlock(&bdi->f_reg_lock);
+>>>>>>> common/deprecated/android-3.18
 
 	chrg_fault &= BQ24190_REG_F_CHRG_FAULT_MASK;
 	chrg_fault >>= BQ24190_REG_F_CHRG_FAULT_SHIFT;
@@ -1036,6 +1118,7 @@ static int bq24190_battery_get_health(struct bq24190_dev_info *bdi,
 		union power_supply_propval *val)
 {
 	u8 v;
+<<<<<<< HEAD
 	int health, ret;
 
 	mutex_lock(&bdi->f_reg_lock);
@@ -1051,6 +1134,13 @@ static int bq24190_battery_get_health(struct bq24190_dev_info *bdi,
 		if (ret < 0)
 			return ret;
 	}
+=======
+	int health;
+
+	mutex_lock(&bdi->f_reg_lock);
+	v = bdi->f_reg;
+	mutex_unlock(&bdi->f_reg_lock);
+>>>>>>> common/deprecated/android-3.18
 
 	if (v & BQ24190_REG_F_BAT_FAULT_MASK) {
 		health = POWER_SUPPLY_HEALTH_OVERVOLTAGE;
@@ -1132,6 +1222,7 @@ static int bq24190_battery_set_temp_alert_max(struct bq24190_dev_info *bdi,
 			ARRAY_SIZE(bq24190_ictrc_treg_values), val->intval);
 }
 
+<<<<<<< HEAD
 #if defined(CONFIG_FUELGAUGE_MAX17058_POWER) || defined(CONFIG_FUELGAUGE_S2MG001_POWER)
 static void sec_bat_get_battery_info(
 				struct work_struct *work)
@@ -1166,14 +1257,19 @@ static void sec_bat_get_battery_info(
 }
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static int bq24190_battery_get_property(struct power_supply *psy,
 		enum power_supply_property psp, union power_supply_propval *val)
 {
 	struct bq24190_dev_info *bdi =
 			container_of(psy, struct bq24190_dev_info, battery);
+<<<<<<< HEAD
 #if defined(CONFIG_FUELGAUGE_MAX17058_POWER) || defined(CONFIG_FUELGAUGE_S2MG001_POWER)
 	union power_supply_propval value;
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	int ret;
 
 	dev_dbg(bdi->dev, "prop: %d\n", psp);
@@ -1202,6 +1298,7 @@ static int bq24190_battery_get_property(struct power_supply *psy,
 		val->intval = POWER_SUPPLY_SCOPE_SYSTEM;
 		ret = 0;
 		break;
+<<<<<<< HEAD
 #if defined(CONFIG_FUELGAUGE_MAX17058_POWER) || defined(CONFIG_FUELGAUGE_S2MG001_POWER)
 	case POWER_SUPPLY_PROP_VOLTAGE_NOW:
 		psy_do_property(bdi->fuelgauge_name, get,
@@ -1251,6 +1348,8 @@ static int bq24190_battery_get_property(struct power_supply *psy,
 #endif
 		ret = 0;
 		break;
+=======
+>>>>>>> common/deprecated/android-3.18
 	default:
 		ret = -ENODATA;
 	}
@@ -1310,11 +1409,14 @@ static enum power_supply_property bq24190_battery_properties[] = {
 	POWER_SUPPLY_PROP_TECHNOLOGY,
 	POWER_SUPPLY_PROP_TEMP_ALERT_MAX,
 	POWER_SUPPLY_PROP_SCOPE,
+<<<<<<< HEAD
 #if defined(CONFIG_FUELGAUGE_MAX17058_POWER) || defined(CONFIG_FUELGAUGE_S2MG001_POWER)
 	POWER_SUPPLY_PROP_VOLTAGE_NOW,
 	POWER_SUPPLY_PROP_VOLTAGE_AVG,
 #endif
 	POWER_SUPPLY_PROP_CAPACITY,
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 static void bq24190_battery_init(struct power_supply *battery)
@@ -1331,9 +1433,18 @@ static void bq24190_battery_init(struct power_supply *battery)
 static irqreturn_t bq24190_irq_handler_thread(int irq, void *data)
 {
 	struct bq24190_dev_info *bdi = data;
+<<<<<<< HEAD
 	bool alert_userspace = false;
 	u8 ss_reg, f_reg;
 	int ret;
+=======
+	const u8 battery_mask_ss = BQ24190_REG_SS_CHRG_STAT_MASK;
+	const u8 battery_mask_f = BQ24190_REG_F_BAT_FAULT_MASK
+				| BQ24190_REG_F_NTC_FAULT_MASK;
+	bool alert_charger = false, alert_battery = false;
+	u8 ss_reg = 0, f_reg = 0;
+	int i, ret;
+>>>>>>> common/deprecated/android-3.18
 
 	pm_runtime_get_sync(bdi->dev);
 
@@ -1343,6 +1454,35 @@ static irqreturn_t bq24190_irq_handler_thread(int irq, void *data)
 		goto out;
 	}
 
+<<<<<<< HEAD
+=======
+	i = 0;
+	do {
+		ret = bq24190_read(bdi, BQ24190_REG_F, &f_reg);
+		if (ret < 0) {
+			dev_err(bdi->dev, "Can't read F reg: %d\n", ret);
+			goto out;
+		}
+	} while (f_reg && ++i < 2);
+
+	if (f_reg != bdi->f_reg) {
+		dev_info(bdi->dev,
+			"Fault: boost %d, charge %d, battery %d, ntc %d\n",
+			!!(f_reg & BQ24190_REG_F_BOOST_FAULT_MASK),
+			!!(f_reg & BQ24190_REG_F_CHRG_FAULT_MASK),
+			!!(f_reg & BQ24190_REG_F_BAT_FAULT_MASK),
+			!!(f_reg & BQ24190_REG_F_NTC_FAULT_MASK));
+
+		mutex_lock(&bdi->f_reg_lock);
+		if ((bdi->f_reg & battery_mask_f) != (f_reg & battery_mask_f))
+			alert_battery = true;
+		if ((bdi->f_reg & ~battery_mask_f) != (f_reg & ~battery_mask_f))
+			alert_charger = true;
+		bdi->f_reg = f_reg;
+		mutex_unlock(&bdi->f_reg_lock);
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	if (ss_reg != bdi->ss_reg) {
 		/*
 		 * The device is in host mode so when PG_STAT goes from 1->0
@@ -1359,6 +1499,7 @@ static irqreturn_t bq24190_irq_handler_thread(int irq, void *data)
 					ret);
 		}
 
+<<<<<<< HEAD
 		if (ss_reg & BQ24190_REG_SS_PG_STAT_MASK) {
 			if ((ss_reg & BQ24190_REG_SS_VBUS_STAT_MASK) == 0x80){
 				ret = bq24190_write_mask(bdi, BQ24190_REG_MOC,
@@ -1405,6 +1546,19 @@ static irqreturn_t bq24190_irq_handler_thread(int irq, void *data)
 		power_supply_changed(&bdi->battery);
 		bdi->first_time = false;
 	}
+=======
+		if ((bdi->ss_reg & battery_mask_ss) != (ss_reg & battery_mask_ss))
+			alert_battery = true;
+		if ((bdi->ss_reg & ~battery_mask_ss) != (ss_reg & ~battery_mask_ss))
+			alert_charger = true;
+		bdi->ss_reg = ss_reg;
+	}
+
+	if (alert_charger)
+		power_supply_changed(&bdi->charger);
+	if (alert_battery)
+		power_supply_changed(&bdi->battery);
+>>>>>>> common/deprecated/android-3.18
 
 out:
 	pm_runtime_put_sync(bdi->dev);
@@ -1439,6 +1593,13 @@ static int bq24190_hw_init(struct bq24190_dev_info *bdi)
 		goto out;
 
 	ret = bq24190_set_mode_host(bdi);
+<<<<<<< HEAD
+=======
+	if (ret < 0)
+		goto out;
+
+	ret = bq24190_read(bdi, BQ24190_REG_SS, &bdi->ss_reg);
+>>>>>>> common/deprecated/android-3.18
 out:
 	pm_runtime_put_sync(bdi->dev);
 	return ret;
@@ -1450,12 +1611,15 @@ static int bq24190_setup_dt(struct bq24190_dev_info *bdi)
 	bdi->irq = irq_of_parse_and_map(bdi->dev->of_node, 0);
 	if (bdi->irq <= 0)
 		return -1;
+<<<<<<< HEAD
 #if defined(CONFIG_FUELGAUGE_MAX17058_POWER) || defined(CONFIG_FUELGAUGE_S2MG001_POWER)
 	if (of_property_read_string(bdi->dev->of_node, "battery,fuelgauge_name", (char const **)&bdi->fuelgauge_name)) {
 		dev_err(bdi->dev, "failed to get fuelgauge_name\n");
 		return -EINVAL;
 	}
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }
@@ -1494,6 +1658,7 @@ out:
 	return -1;
 }
 
+<<<<<<< HEAD
 #if defined(CONFIG_MUIC_NOTIFIER)
 static void bq24190_set_otg(struct bq24190_dev_info *bdi,bool enable)
 {
@@ -1542,6 +1707,8 @@ static int bq24190_handle_notification(struct notifier_block *nb,
 }
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static int bq24190_probe(struct i2c_client *client,
 		const struct i2c_device_id *id)
 {
@@ -1565,6 +1732,7 @@ static int bq24190_probe(struct i2c_client *client,
 	bdi->client = client;
 	bdi->dev = dev;
 	bdi->model = id->driver_data;
+<<<<<<< HEAD
 	strncpy(bdi->model_name, id->name, I2C_NAME_SIZE-1);
 	mutex_init(&bdi->f_reg_lock);
 	bdi->first_time = true;
@@ -1574,6 +1742,12 @@ static int bq24190_probe(struct i2c_client *client,
 #if defined(CONFIG_FUELGAUGE_MAX17058_POWER) || defined(CONFIG_FUELGAUGE_S2MG001_POWER)
 	bdi->soc_cnt = -1;
 #endif
+=======
+	strncpy(bdi->model_name, id->name, I2C_NAME_SIZE);
+	mutex_init(&bdi->f_reg_lock);
+	bdi->f_reg = 0;
+	bdi->ss_reg = BQ24190_REG_SS_VBUS_STAT_MASK; /* impossible state */
+>>>>>>> common/deprecated/android-3.18
 
 	i2c_set_clientdata(client, bdi);
 
@@ -1587,12 +1761,28 @@ static int bq24190_probe(struct i2c_client *client,
 		return -EINVAL;
 	}
 
+<<<<<<< HEAD
+=======
+	pm_runtime_enable(dev);
+	pm_runtime_resume(dev);
+
+	ret = bq24190_hw_init(bdi);
+	if (ret < 0) {
+		dev_err(dev, "Hardware init failed\n");
+		goto out1;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	bq24190_charger_init(&bdi->charger);
 
 	ret = power_supply_register(dev, &bdi->charger);
 	if (ret) {
 		dev_err(dev, "Can't register charger\n");
+<<<<<<< HEAD
 		goto out2;
+=======
+		goto out1;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	bq24190_battery_init(&bdi->battery);
@@ -1600,11 +1790,21 @@ static int bq24190_probe(struct i2c_client *client,
 	ret = power_supply_register(dev, &bdi->battery);
 	if (ret) {
 		dev_err(dev, "Can't register battery\n");
+<<<<<<< HEAD
+=======
+		goto out2;
+	}
+
+	ret = bq24190_sysfs_create_group(bdi);
+	if (ret) {
+		dev_err(dev, "Can't create sysfs entries\n");
+>>>>>>> common/deprecated/android-3.18
 		goto out3;
 	}
 
 	ret = devm_request_threaded_irq(dev, bdi->irq, NULL,
 			bq24190_irq_handler_thread,
+<<<<<<< HEAD
 			IRQF_TRIGGER_RISING | IRQF_ONESHOT,
 			"bq24190-charger", bdi);
 	if (ret < 0) {
@@ -1646,6 +1846,25 @@ out3:
 out2:
 	pm_runtime_disable(dev);
 out1:
+=======
+			IRQF_TRIGGER_FALLING | IRQF_ONESHOT,
+			"bq24190-charger", bdi);
+	if (ret < 0) {
+		dev_err(dev, "Can't set up irq handler\n");
+		goto out4;
+	}
+
+	return 0;
+
+out4:
+	bq24190_sysfs_remove_group(bdi);
+out3:
+	power_supply_unregister(&bdi->battery);
+out2:
+	power_supply_unregister(&bdi->charger);
+out1:
+	pm_runtime_disable(dev);
+>>>>>>> common/deprecated/android-3.18
 	if (bdi->gpio_int)
 		gpio_free(bdi->gpio_int);
 
@@ -1689,12 +1908,22 @@ static int bq24190_pm_resume(struct device *dev)
 	struct i2c_client *client = to_i2c_client(dev);
 	struct bq24190_dev_info *bdi = i2c_get_clientdata(client);
 
+<<<<<<< HEAD
 	bdi->charger_health_valid = false;
 	bdi->battery_health_valid = false;
 	bdi->battery_status_valid = false;
 
 	pm_runtime_get_sync(bdi->dev);
 	bq24190_register_reset(bdi);
+=======
+	bdi->f_reg = 0;
+	bdi->ss_reg = BQ24190_REG_SS_VBUS_STAT_MASK; /* impossible state */
+
+	pm_runtime_get_sync(bdi->dev);
+	bq24190_register_reset(bdi);
+	bq24190_set_mode_host(bdi);
+	bq24190_read(bdi, BQ24190_REG_SS, &bdi->ss_reg);
+>>>>>>> common/deprecated/android-3.18
 	pm_runtime_put_sync(bdi->dev);
 
 	/* Things may have changed while suspended so alert upper layer */
@@ -1714,14 +1943,20 @@ static SIMPLE_DEV_PM_OPS(bq24190_pm_ops, bq24190_pm_suspend, bq24190_pm_resume);
  */
 static const struct i2c_device_id bq24190_i2c_ids[] = {
 	{ "bq24190", BQ24190_REG_VPRS_PN_24190 },
+<<<<<<< HEAD
 	{ "bq24193", BQ24190_REG_VPRS_PN_24192 },
+=======
+>>>>>>> common/deprecated/android-3.18
 	{ },
 };
 
 #ifdef CONFIG_OF
 static const struct of_device_id bq24190_of_match[] = {
 	{ .compatible = "ti,bq24190", },
+<<<<<<< HEAD
 	{ .compatible = "ti,bq24193", },
+=======
+>>>>>>> common/deprecated/android-3.18
 	{ },
 };
 MODULE_DEVICE_TABLE(of, bq24190_of_match);

@@ -415,6 +415,11 @@
 
 		touchscreen-size-x = <480>;
 		touchscreen-size-y = <272>;
+<<<<<<< HEAD
+=======
+
+		wakeup-source;
+>>>>>>> common/deprecated/android-3.18
 	};
 
 	tlv320aic3106: tlv320aic3106@1b {

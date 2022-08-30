@@ -22,6 +22,10 @@
 #include <linux/string.h>
 #include <linux/module.h>
 #include <linux/kernel.h>
+<<<<<<< HEAD
+=======
+#include <linux/compat.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/errno.h>
 #include <linux/netdevice.h>
 #include <linux/net.h>
@@ -103,6 +107,21 @@ int pppox_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
 
 EXPORT_SYMBOL(pppox_ioctl);
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_COMPAT
+int pppox_compat_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
+{
+	if (cmd == PPPOEIOCSFWD32)
+		cmd = PPPOEIOCSFWD;
+
+	return pppox_ioctl(sock, cmd, (unsigned long)compat_ptr(arg));
+}
+
+EXPORT_SYMBOL(pppox_compat_ioctl);
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 static int pppox_create(struct net *net, struct socket *sock, int protocol,
 			int kern)
 {

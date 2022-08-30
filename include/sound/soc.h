@@ -80,7 +80,11 @@
 	.access = SNDRV_CTL_ELEM_ACCESS_TLV_READ | \
 	SNDRV_CTL_ELEM_ACCESS_READWRITE, \
 	.tlv.p  = (tlv_array),\
+<<<<<<< HEAD
 	.info = snd_soc_info_volsw_sx, \
+=======
+	.info = snd_soc_info_volsw, \
+>>>>>>> common/deprecated/android-3.18
 	.get = snd_soc_get_volsw_sx,\
 	.put = snd_soc_put_volsw_sx, \
 	.private_value = (unsigned long)&(struct soc_mixer_control) \
@@ -98,6 +102,7 @@
 		{.reg = xreg, .rreg = xreg, .shift = xshift, \
 		 .rshift = xshift, .min = xmin, .max = xmax, \
 		 .platform_max = xmax, .invert = xinvert} }
+<<<<<<< HEAD
 #define SOC_SINGLE_RANGE_EXT_TLV(xname, xreg, xshift, xmin, xmax, xinvert,\
          xhandler_get, xhandler_put, tlv_array) \
 {       .iface = SNDRV_CTL_ELEM_IFACE_MIXER, .name = (xname),\
@@ -110,6 +115,8 @@
                 {.reg = xreg, .rreg = xreg, .shift = xshift, \
                  .rshift = xshift, .min = xmin, .max = xmax, \
                  .platform_max = xmax, .invert = xinvert} }
+=======
+>>>>>>> common/deprecated/android-3.18
 #define SOC_DOUBLE(xname, reg, shift_left, shift_right, max, invert) \
 {	.iface = SNDRV_CTL_ELEM_IFACE_MIXER, .name = (xname),\
 	.info = snd_soc_info_volsw, .get = snd_soc_get_volsw, \
@@ -162,7 +169,11 @@
 	.access = SNDRV_CTL_ELEM_ACCESS_TLV_READ | \
 	SNDRV_CTL_ELEM_ACCESS_READWRITE, \
 	.tlv.p  = (tlv_array), \
+<<<<<<< HEAD
 	.info = snd_soc_info_volsw_sx, \
+=======
+	.info = snd_soc_info_volsw, \
+>>>>>>> common/deprecated/android-3.18
 	.get = snd_soc_get_volsw_sx, \
 	.put = snd_soc_put_volsw_sx, \
 	.private_value = (unsigned long)&(struct soc_mixer_control) \
@@ -546,8 +557,11 @@ int snd_soc_put_enum_double(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol);
 int snd_soc_info_volsw(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_info *uinfo);
+<<<<<<< HEAD
 int snd_soc_info_volsw_sx(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_info *uinfo);
+=======
+>>>>>>> common/deprecated/android-3.18
 #define snd_soc_info_bool_ext		snd_ctl_boolean_mono_info
 int snd_soc_get_volsw(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol);
@@ -1173,10 +1187,15 @@ struct soc_bytes {
 struct soc_bytes_ext {
 	int max;
 	/* used for TLV byte control */
+<<<<<<< HEAD
 	int (*get)(struct snd_kcontrol *kcontrol, unsigned int __user *bytes,
 			unsigned int size);
 	int (*put)(struct snd_kcontrol *kcontrol, const unsigned int __user *bytes,
 			unsigned int size);
+=======
+	int (*get)(unsigned int __user *bytes, unsigned int size);
+	int (*put)(const unsigned int __user *bytes, unsigned int size);
+>>>>>>> common/deprecated/android-3.18
 };
 
 /* multi register control */

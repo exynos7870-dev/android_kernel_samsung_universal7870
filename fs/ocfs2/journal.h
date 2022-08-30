@@ -632,9 +632,17 @@ static inline void ocfs2_update_inode_fsync_trans(handle_t *handle,
 {
 	struct ocfs2_inode_info *oi = OCFS2_I(inode);
 
+<<<<<<< HEAD
 	oi->i_sync_tid = handle->h_transaction->t_tid;
 	if (datasync)
 		oi->i_datasync_tid = handle->h_transaction->t_tid;
+=======
+	if (!is_handle_aborted(handle)) {
+		oi->i_sync_tid = handle->h_transaction->t_tid;
+		if (datasync)
+			oi->i_datasync_tid = handle->h_transaction->t_tid;
+	}
+>>>>>>> common/deprecated/android-3.18
 }
 
 #endif /* OCFS2_JOURNAL_H */

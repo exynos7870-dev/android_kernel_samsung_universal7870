@@ -459,7 +459,11 @@ static int autofs4_d_manage(struct dentry *dentry, bool rcu_walk)
 		 * a mount-trap.
 		 */
 		struct inode *inode;
+<<<<<<< HEAD
 		if (ino->flags & (AUTOFS_INF_EXPIRING | AUTOFS_INF_NO_RCU))
+=======
+		if (ino->flags & AUTOFS_INF_WANT_EXPIRE)
+>>>>>>> common/deprecated/android-3.18
 			return 0;
 		if (d_mountpoint(dentry))
 			return 0;
@@ -753,7 +757,11 @@ static int autofs4_dir_mkdir(struct inode *dir, struct dentry *dentry, umode_t m
 
 	autofs4_del_active(dentry);
 
+<<<<<<< HEAD
 	inode = autofs4_get_inode(dir->i_sb, S_IFDIR | 0555);
+=======
+	inode = autofs4_get_inode(dir->i_sb, S_IFDIR | mode);
+>>>>>>> common/deprecated/android-3.18
 	if (!inode)
 		return -ENOMEM;
 	d_add(dentry, inode);

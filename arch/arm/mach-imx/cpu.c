@@ -130,6 +130,12 @@ struct device * __init imx_soc_device_init(void)
 	case MXC_CPU_IMX6Q:
 		soc_id = "i.MX6Q";
 		break;
+<<<<<<< HEAD
+=======
+	case MXC_CPU_IMX6ULL:
+		soc_id = "i.MX6ULL";
+		break;
+>>>>>>> common/deprecated/android-3.18
 	default:
 		soc_id = "Unknown";
 	}

@@ -544,6 +544,10 @@ static int fsl_asoc_card_probe(struct platform_device *pdev)
 
 asrc_fail:
 	of_node_put(asrc_np);
+<<<<<<< HEAD
+=======
+	put_device(&cpu_pdev->dev);
+>>>>>>> common/deprecated/android-3.18
 fail:
 	of_node_put(codec_np);
 	of_node_put(cpu_np);

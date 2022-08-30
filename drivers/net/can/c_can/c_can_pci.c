@@ -161,6 +161,10 @@ static int c_can_pci_probe(struct pci_dev *pdev,
 
 	dev->irq = pdev->irq;
 	priv->base = addr;
+<<<<<<< HEAD
+=======
+	priv->device = &pdev->dev;
+>>>>>>> common/deprecated/android-3.18
 
 	if (!c_can_pci_data->freq) {
 		dev_err(&pdev->dev, "no clock frequency defined\n");
@@ -177,7 +181,10 @@ static int c_can_pci_probe(struct pci_dev *pdev,
 		break;
 	case BOSCH_D_CAN:
 		priv->regs = reg_map_d_can;
+<<<<<<< HEAD
 		priv->can.ctrlmode_supported |= CAN_CTRLMODE_3_SAMPLES;
+=======
+>>>>>>> common/deprecated/android-3.18
 		break;
 	default:
 		ret = -EINVAL;
@@ -239,12 +246,20 @@ static void c_can_pci_remove(struct pci_dev *pdev)
 {
 	struct net_device *dev = pci_get_drvdata(pdev);
 	struct c_can_priv *priv = netdev_priv(dev);
+<<<<<<< HEAD
+=======
+	void __iomem *addr = priv->base;
+>>>>>>> common/deprecated/android-3.18
 
 	unregister_c_can_dev(dev);
 
 	free_c_can_dev(dev);
 
+<<<<<<< HEAD
 	pci_iounmap(pdev, priv->base);
+=======
+	pci_iounmap(pdev, addr);
+>>>>>>> common/deprecated/android-3.18
 	pci_disable_msi(pdev);
 	pci_clear_master(pdev);
 	pci_release_regions(pdev);

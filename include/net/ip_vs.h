@@ -887,6 +887,10 @@ struct netns_ipvs {
 	struct delayed_work	defense_work;   /* Work handler */
 	int			drop_rate;
 	int			drop_counter;
+<<<<<<< HEAD
+=======
+	int			old_secure_tcp;
+>>>>>>> common/deprecated/android-3.18
 	atomic_t		dropentry;
 	/* locks in ctl.c */
 	spinlock_t		dropentry_lock;  /* drop entry handling */

@@ -102,14 +102,22 @@ static void pxa_load_dmac(struct scatterlist *sg, struct ata_queued_cmd *qc)
 /*
  * Prepare taskfile for submission.
  */
+<<<<<<< HEAD
 static void pxa_qc_prep(struct ata_queued_cmd *qc)
+=======
+static enum ata_completion_errors pxa_qc_prep(struct ata_queued_cmd *qc)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct pata_pxa_data *pd = qc->ap->private_data;
 	int si = 0;
 	struct scatterlist *sg;
 
 	if (!(qc->flags & ATA_QCFLAG_DMAMAP))
+<<<<<<< HEAD
 		return;
+=======
+		return AC_ERR_OK;
+>>>>>>> common/deprecated/android-3.18
 
 	pd->dma_desc_id = 0;
 
@@ -127,6 +135,10 @@ static void pxa_qc_prep(struct ata_queued_cmd *qc)
 	DDADR(pd->dma_channel) = pd->dma_desc_addr;
 	DRCMR(pd->dma_dreq) = DRCMR_MAPVLD | pd->dma_channel;
 
+<<<<<<< HEAD
+=======
+	return AC_ERR_OK;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*

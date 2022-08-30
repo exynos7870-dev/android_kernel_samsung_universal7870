@@ -14,6 +14,11 @@
  *    GNU General Public License for more details.
  */
 
+<<<<<<< HEAD
+=======
+#include <linux/delay.h>
+
+>>>>>>> common/deprecated/android-3.18
 #include "si2168_priv.h"
 
 static const struct dvb_frontend_ops si2168_ops;
@@ -380,6 +385,10 @@ static int si2168_init(struct dvb_frontend *fe)
 		if (ret)
 			goto err;
 
+<<<<<<< HEAD
+=======
+		udelay(100);
+>>>>>>> common/deprecated/android-3.18
 		memcpy(cmd.args, "\x85", 1);
 		cmd.wlen = 1;
 		cmd.rlen = 1;

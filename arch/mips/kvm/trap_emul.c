@@ -449,7 +449,11 @@ static int kvm_trap_emul_set_one_reg(struct kvm_vcpu *vcpu,
 		kvm_mips_write_count(vcpu, v);
 		break;
 	case KVM_REG_MIPS_CP0_COMPARE:
+<<<<<<< HEAD
 		kvm_mips_write_compare(vcpu, v);
+=======
+		kvm_mips_write_compare(vcpu, v, false);
+>>>>>>> common/deprecated/android-3.18
 		break;
 	case KVM_REG_MIPS_CP0_CAUSE:
 		/*

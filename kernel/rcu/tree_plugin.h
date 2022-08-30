@@ -328,6 +328,10 @@ void rcu_read_unlock_special(struct task_struct *t)
 	special = t->rcu_read_unlock_special;
 	if (special.b.need_qs) {
 		rcu_preempt_qs();
+<<<<<<< HEAD
+=======
+		t->rcu_read_unlock_special.b.need_qs = false;
+>>>>>>> common/deprecated/android-3.18
 		if (!t->rcu_read_unlock_special.s) {
 			local_irq_restore(flags);
 			return;
@@ -793,11 +797,14 @@ sync_rcu_preempt_exp_init(struct rcu_state *rsp, struct rcu_node *rnp)
  * In fact, if you are using synchronize_rcu_expedited() in a loop,
  * please restructure your code to batch your updates, and then Use a
  * single synchronize_rcu() instead.
+<<<<<<< HEAD
  *
  * Note that it is illegal to call this function while holding any lock
  * that is acquired by a CPU-hotplug notifier.  And yes, it is also illegal
  * to call this function from a CPU-hotplug notifier.  Failing to observe
  * these restriction will result in deadlock.
+=======
+>>>>>>> common/deprecated/android-3.18
  */
 void synchronize_rcu_expedited(void)
 {
@@ -819,7 +826,15 @@ void synchronize_rcu_expedited(void)
 	 * being boosted.  This simplifies the process of moving tasks
 	 * from leaf to root rcu_node structures.
 	 */
+<<<<<<< HEAD
 	get_online_cpus();
+=======
+	if (!try_get_online_cpus()) {
+		/* CPU-hotplug operation in flight, fall back to normal GP. */
+		wait_rcu_gp(call_rcu);
+		return;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * Acquire lock, falling back to synchronize_rcu() if too many
@@ -2441,6 +2456,10 @@ static int rcu_nocb_kthread(void *arg)
 				cl++;
 			c++;
 			local_bh_enable();
+<<<<<<< HEAD
+=======
+			cond_resched_rcu_qs();
+>>>>>>> common/deprecated/android-3.18
 			list = next;
 		}
 		trace_rcu_batch_end(rdp->rsp->name, c, !!list, 0, 0, 1);

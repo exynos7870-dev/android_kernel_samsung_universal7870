@@ -934,8 +934,13 @@ gpe0_done:
 	lpc_ich_enable_gpio_space(dev);
 
 	lpc_ich_finalize_cell(dev, &lpc_ich_cells[LPC_GPIO]);
+<<<<<<< HEAD
 	ret = mfd_add_devices(&dev->dev, -1, &lpc_ich_cells[LPC_GPIO],
 			      1, NULL, 0, NULL);
+=======
+	ret = mfd_add_devices(&dev->dev, PLATFORM_DEVID_AUTO,
+			      &lpc_ich_cells[LPC_GPIO], 1, NULL, 0, NULL);
+>>>>>>> common/deprecated/android-3.18
 
 gpio_done:
 	if (acpi_conflict)
@@ -1008,8 +1013,13 @@ static int lpc_ich_init_wdt(struct pci_dev *dev)
 	}
 
 	lpc_ich_finalize_cell(dev, &lpc_ich_cells[LPC_WDT]);
+<<<<<<< HEAD
 	ret = mfd_add_devices(&dev->dev, -1, &lpc_ich_cells[LPC_WDT],
 			      1, NULL, 0, NULL);
+=======
+	ret = mfd_add_devices(&dev->dev, PLATFORM_DEVID_AUTO,
+			      &lpc_ich_cells[LPC_WDT], 1, NULL, 0, NULL);
+>>>>>>> common/deprecated/android-3.18
 
 wdt_done:
 	return ret;

@@ -65,14 +65,29 @@ static ssize_t trigger_request_store(struct device *dev,
 	release_firmware(test_firmware);
 	test_firmware = NULL;
 	rc = request_firmware(&test_firmware, name, dev);
+<<<<<<< HEAD
 	if (rc)
 		pr_info("load of '%s' failed: %d\n", name, rc);
 	pr_info("loaded: %zu\n", test_firmware ? test_firmware->size : 0);
+=======
+	if (rc) {
+		pr_info("load of '%s' failed: %d\n", name, rc);
+		goto out;
+	}
+	pr_info("loaded: %zu\n", test_firmware->size);
+	rc = count;
+
+out:
+>>>>>>> common/deprecated/android-3.18
 	mutex_unlock(&test_fw_mutex);
 
 	kfree(name);
 
+<<<<<<< HEAD
 	return count;
+=======
+	return rc;
+>>>>>>> common/deprecated/android-3.18
 }
 static DEVICE_ATTR_WO(trigger_request);
 

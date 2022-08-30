@@ -2215,7 +2215,11 @@ static void rtl8139_poll_controller(struct net_device *dev)
 	struct rtl8139_private *tp = netdev_priv(dev);
 	const int irq = tp->pci_dev->irq;
 
+<<<<<<< HEAD
 	disable_irq(irq);
+=======
+	disable_irq_nosync(irq);
+>>>>>>> common/deprecated/android-3.18
 	rtl8139_interrupt(irq, dev);
 	enable_irq(irq);
 }

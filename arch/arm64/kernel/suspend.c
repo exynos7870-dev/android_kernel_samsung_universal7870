@@ -1,7 +1,17 @@
+<<<<<<< HEAD
 #include <linux/percpu.h>
 #include <linux/slab.h>
 #include <asm/cacheflush.h>
 #include <asm/cpu_ops.h>
+=======
+#include <linux/ftrace.h>
+#include <linux/percpu.h>
+#include <linux/slab.h>
+#include <asm/alternative.h>
+#include <asm/cacheflush.h>
+#include <asm/cpu_ops.h>
+#include <asm/cpufeature.h>
+>>>>>>> common/deprecated/android-3.18
 #include <asm/debug-monitors.h>
 #include <asm/pgtable.h>
 #include <asm/memory.h>
@@ -92,6 +102,16 @@ int __cpu_suspend(unsigned long arg, int (*fn)(unsigned long))
 	local_dbg_save(flags);
 
 	/*
+<<<<<<< HEAD
+=======
+	 * Function graph tracer state gets incosistent when the kernel
+	 * calls functions that never return (aka suspend finishers) hence
+	 * disable graph tracing during their execution.
+	 */
+	pause_graph_tracing();
+
+	/*
+>>>>>>> common/deprecated/android-3.18
 	 * mm context saved on the stack, it will be restored when
 	 * the cpu comes out of reset through the identity mapped
 	 * page tables, so that the thread address space is properly
@@ -111,7 +131,11 @@ int __cpu_suspend(unsigned long arg, int (*fn)(unsigned long))
 		else
 			cpu_switch_mm(mm->pgd, mm);
 
+<<<<<<< HEAD
 		flush_tlb_all();
+=======
+		local_flush_tlb_all();
+>>>>>>> common/deprecated/android-3.18
 
 		/*
 		 * Restore per-cpu offset before any kernel
@@ -120,6 +144,16 @@ int __cpu_suspend(unsigned long arg, int (*fn)(unsigned long))
 		set_my_cpu_offset(per_cpu_offset(smp_processor_id()));
 
 		/*
+<<<<<<< HEAD
+=======
+		 * PSTATE was not saved over suspend/resume, re-enable any
+		 * detected features that might not have been set correctly.
+		 */
+		asm(ALTERNATIVE("nop", SET_PSTATE_PAN(1), ARM64_HAS_PAN,
+				CONFIG_ARM64_PAN));
+
+		/*
+>>>>>>> common/deprecated/android-3.18
 		 * Restore HW breakpoint registers to sane values
 		 * before debug exceptions are possibly reenabled
 		 * through local_dbg_restore.
@@ -128,6 +162,11 @@ int __cpu_suspend(unsigned long arg, int (*fn)(unsigned long))
 			hw_breakpoint_restore(NULL);
 	}
 
+<<<<<<< HEAD
+=======
+	unpause_graph_tracing();
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Restore pstate flags. OS lock and mdscr have been already
 	 * restored, so from this point onwards, debugging is fully

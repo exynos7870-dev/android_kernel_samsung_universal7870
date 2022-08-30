@@ -23,11 +23,14 @@
 
 #include <linux/slab.h>
 #include <asm/unaligned.h>
+<<<<<<< HEAD
 #ifdef CONFIG_HOST_COMPLIANT_TEST
 #include <linux/dma-mapping.h>
 #include <linux/slab.h>
 #include "../core/hub.h"
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #include "xhci.h"
 #include "xhci-trace.h"
@@ -36,6 +39,7 @@
 #define	PORT_RWC_BITS	(PORT_CSC | PORT_PEC | PORT_WRC | PORT_OCC | \
 			 PORT_RC | PORT_PLC | PORT_PE)
 
+<<<<<<< HEAD
 /* 31:28 for port testing in xHCI */
 #ifdef CONFIG_HOST_COMPLIANT_TEST
 #define PORT_TEST(x)		(((x) & 0xf) << 28)     /* Port Test Control */
@@ -45,6 +49,8 @@
 #define PORT_TEST_PKT		PORT_TEST(0x4)
 #define PORT_TEST_FORCE		PORT_TEST(0x5)
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 /* USB 3.0 BOS descriptor and a capability descriptor, combined */
 static u8 usb_bos_descriptor [] = {
 	USB_DT_BOS_SIZE,		/*  __u8 bLength, 5 bytes */
@@ -261,7 +267,11 @@ int xhci_find_slot_id_by_port(struct usb_hcd *hcd, struct xhci_hcd *xhci,
 
 	slot_id = 0;
 	for (i = 0; i < MAX_HC_SLOTS; i++) {
+<<<<<<< HEAD
 		if (!xhci->devs[i])
+=======
+		if (!xhci->devs[i] || !xhci->devs[i]->udev)
+>>>>>>> common/deprecated/android-3.18
 			continue;
 		speed = xhci->devs[i]->udev->speed;
 		if (((speed == USB_SPEED_SUPER) == (hcd->speed == HCD_USB3))
@@ -290,6 +300,12 @@ static int xhci_stop_device(struct xhci_hcd *xhci, int slot_id, int suspend)
 
 	ret = 0;
 	virt_dev = xhci->devs[slot_id];
+<<<<<<< HEAD
+=======
+	if (!virt_dev)
+		return -ENODEV;
+
+>>>>>>> common/deprecated/android-3.18
 	cmd = xhci_alloc_command(xhci, false, true, GFP_NOIO);
 	if (!cmd) {
 		xhci_dbg(xhci, "Couldn't allocate command structure.\n");
@@ -304,6 +320,7 @@ static int xhci_stop_device(struct xhci_hcd *xhci, int slot_id, int suspend)
 						     GFP_NOWAIT);
 			if (!command) {
 				spin_unlock_irqrestore(&xhci->lock, flags);
+<<<<<<< HEAD
 				xhci_free_command(xhci, cmd);
 				return -ENOMEM;
 
@@ -313,6 +330,27 @@ static int xhci_stop_device(struct xhci_hcd *xhci, int slot_id, int suspend)
 		}
 	}
 	xhci_queue_stop_endpoint(xhci, cmd, slot_id, 0, suspend);
+=======
+				ret = -ENOMEM;
+				goto cmd_cleanup;
+			}
+
+			ret = xhci_queue_stop_endpoint(xhci, command, slot_id,
+						       i, suspend);
+			if (ret) {
+				spin_unlock_irqrestore(&xhci->lock, flags);
+				xhci_free_command(xhci, command);
+				goto cmd_cleanup;
+			}
+		}
+	}
+	ret = xhci_queue_stop_endpoint(xhci, cmd, slot_id, 0, suspend);
+	if (ret) {
+		spin_unlock_irqrestore(&xhci->lock, flags);
+		goto cmd_cleanup;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	xhci_ring_cmd_db(xhci);
 	spin_unlock_irqrestore(&xhci->lock, flags);
 
@@ -323,6 +361,11 @@ static int xhci_stop_device(struct xhci_hcd *xhci, int slot_id, int suspend)
 		xhci_warn(xhci, "Timeout while waiting for stop endpoint command\n");
 		ret = -ETIME;
 	}
+<<<<<<< HEAD
+=======
+
+cmd_cleanup:
+>>>>>>> common/deprecated/android-3.18
 	xhci_free_command(xhci, cmd);
 	return ret;
 }
@@ -357,10 +400,13 @@ static void xhci_disable_port(struct usb_hcd *hcd, struct xhci_hcd *xhci,
 		xhci_dbg(xhci, "Ignoring request to disable "
 				"SuperSpeed port.\n");
 		return;
+<<<<<<< HEAD
 #ifdef CONFIG_HOST_COMPLIANT_TEST
 	} else if (hcd->speed == HCD_USB2) {
 		xhci_dbg(xhci, "request to disable High-Speed port.\n");
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/* Write 1 to disable the port */
@@ -436,6 +482,7 @@ static int xhci_get_ports(struct usb_hcd *hcd, __le32 __iomem ***port_array)
 	return max_ports;
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_HOST_COMPLIANT_TEST
 static int xhci_get_portpmsc(struct usb_hcd *hcd, __le32 __iomem ***port_array)
 {
@@ -454,6 +501,8 @@ static int xhci_get_portpmsc(struct usb_hcd *hcd, __le32 __iomem ***port_array)
 }
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 void xhci_set_link_state(struct xhci_hcd *xhci, __le32 __iomem **port_array,
 				int port_id, u32 link_state)
 {
@@ -519,12 +568,15 @@ static void xhci_hub_report_usb3_link_state(struct xhci_hcd *xhci,
 {
 	u32 pls = status_reg & PORT_PLS_MASK;
 
+<<<<<<< HEAD
 	/* resume state is a xHCI internal state.
 	 * Do not report it to usb core.
 	 */
 	if (pls == XDEV_RESUME)
 		return;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* When the CAS bit is set then warm reset
 	 * should be performed on port
 	 */
@@ -547,6 +599,19 @@ static void xhci_hub_report_usb3_link_state(struct xhci_hcd *xhci,
 		pls |= USB_PORT_STAT_CONNECTION;
 	} else {
 		/*
+<<<<<<< HEAD
+=======
+		 * Resume state is an xHCI internal state.  Do not report it to
+		 * usb core, instead, pretend to be U3, thus usb core knows
+		 * it's not ready for transfer.
+		 */
+		if (pls == XDEV_RESUME) {
+			*status |= USB_SS_PORT_LS_U3;
+			return;
+		}
+
+		/*
+>>>>>>> common/deprecated/android-3.18
 		 * If CAS bit isn't set but the Port is already at
 		 * Compliance Mode, fake a connection so the USB core
 		 * notices the Compliance state and resets the port.
@@ -563,6 +628,7 @@ static void xhci_hub_report_usb3_link_state(struct xhci_hcd *xhci,
 	*status |= pls;
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_HOST_COMPLIANT_TEST
 static int single_step_set_feature(struct usb_hcd *hcd, u8 port)
 {
@@ -910,6 +976,8 @@ error:
 }
 #endif/* CONFIG_HOST_COMPLIANT_TEST */
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * Function for Compliance Mode Quirk.
  *
@@ -952,7 +1020,11 @@ static u32 xhci_get_port_status(struct usb_hcd *hcd,
 		struct xhci_bus_state *bus_state,
 		__le32 __iomem **port_array,
 		u16 wIndex, u32 raw_port_status,
+<<<<<<< HEAD
 		unsigned long flags)
+=======
+		unsigned long *flags)
+>>>>>>> common/deprecated/android-3.18
 	__releases(&xhci->lock)
 	__acquires(&xhci->lock)
 {
@@ -971,12 +1043,34 @@ static u32 xhci_get_port_status(struct usb_hcd *hcd,
 		status |= USB_PORT_STAT_C_RESET << 16;
 	/* USB3.0 only */
 	if (hcd->speed == HCD_USB3) {
+<<<<<<< HEAD
 		if ((raw_port_status & PORT_PLC))
+=======
+		/* Port link change with port in resume state should not be
+		 * reported to usbcore, as this is an internal state to be
+		 * handled by xhci driver. Reporting PLC to usbcore may
+		 * cause usbcore clearing PLC first and port change event
+		 * irq won't be generated.
+		 */
+		if ((raw_port_status & PORT_PLC) &&
+			(raw_port_status & PORT_PLS_MASK) != XDEV_RESUME)
+>>>>>>> common/deprecated/android-3.18
 			status |= USB_PORT_STAT_C_LINK_STATE << 16;
 		if ((raw_port_status & PORT_WRC))
 			status |= USB_PORT_STAT_C_BH_RESET << 16;
 		if ((raw_port_status & PORT_CEC))
 			status |= USB_PORT_STAT_C_CONFIG_ERROR << 16;
+<<<<<<< HEAD
+=======
+
+		/* USB3 remote wake resume signaling completed */
+		if (bus_state->port_remote_wakeup & (1 << wIndex) &&
+		    (raw_port_status & PORT_PLS_MASK) != XDEV_RESUME &&
+		    (raw_port_status & PORT_PLS_MASK) != XDEV_RECOVERY) {
+			bus_state->port_remote_wakeup &= ~(1 << wIndex);
+			usb_hcd_end_port_resume(&hcd->self, wIndex);
+		}
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (hcd->speed != HCD_USB3) {
@@ -985,12 +1079,43 @@ static u32 xhci_get_port_status(struct usb_hcd *hcd,
 			status |= USB_PORT_STAT_SUSPEND;
 	}
 	if ((raw_port_status & PORT_PLS_MASK) == XDEV_RESUME &&
+<<<<<<< HEAD
 			!DEV_SUPERSPEED(raw_port_status)) {
 		if ((raw_port_status & PORT_RESET) ||
 				!(raw_port_status & PORT_PE))
 			return 0xffffffff;
 		if (time_after_eq(jiffies,
 					bus_state->resume_done[wIndex])) {
+=======
+	    !DEV_SUPERSPEED(raw_port_status) && hcd->speed < HCD_USB3) {
+		if ((raw_port_status & PORT_RESET) ||
+				!(raw_port_status & PORT_PE))
+			return 0xffffffff;
+		/* did port event handler already start resume timing? */
+		if (!bus_state->resume_done[wIndex]) {
+			/* If not, maybe we are in a host initated resume? */
+			if (test_bit(wIndex, &bus_state->resuming_ports)) {
+				/* Host initated resume doesn't time the resume
+				 * signalling using resume_done[].
+				 * It manually sets RESUME state, sleeps 20ms
+				 * and sets U0 state. This should probably be
+				 * changed, but not right now.
+				 */
+			} else {
+				/* port resume was discovered now and here,
+				 * start resume timing
+				 */
+				unsigned long timeout = jiffies +
+					msecs_to_jiffies(USB_RESUME_TIMEOUT);
+
+				set_bit(wIndex, &bus_state->resuming_ports);
+				bus_state->resume_done[wIndex] = timeout;
+				mod_timer(&hcd->rh_timer, timeout);
+			}
+		/* Has resume been signalled for USB_RESUME_TIME yet? */
+		} else if (time_after_eq(jiffies,
+					 bus_state->resume_done[wIndex])) {
+>>>>>>> common/deprecated/android-3.18
 			int time_left;
 
 			xhci_dbg(xhci, "Resume USB2 port %d\n",
@@ -999,6 +1124,7 @@ static u32 xhci_get_port_status(struct usb_hcd *hcd,
 			clear_bit(wIndex, &bus_state->resuming_ports);
 
 			set_bit(wIndex, &bus_state->rexit_ports);
+<<<<<<< HEAD
 			xhci_set_link_state(xhci, port_array, wIndex,
 					XDEV_U0);
 
@@ -1008,6 +1134,20 @@ static u32 xhci_get_port_status(struct usb_hcd *hcd,
 					msecs_to_jiffies(
 						XHCI_MAX_REXIT_TIMEOUT));
 			spin_lock_irqsave(&xhci->lock, flags);
+=======
+
+			xhci_test_and_clear_bit(xhci, port_array, wIndex,
+						PORT_PLC);
+			xhci_set_link_state(xhci, port_array, wIndex,
+					XDEV_U0);
+
+			spin_unlock_irqrestore(&xhci->lock, *flags);
+			time_left = wait_for_completion_timeout(
+					&bus_state->rexit_done[wIndex],
+					msecs_to_jiffies(
+						XHCI_MAX_REXIT_TIMEOUT_MS));
+			spin_lock_irqsave(&xhci->lock, *flags);
+>>>>>>> common/deprecated/android-3.18
 
 			if (time_left) {
 				slot_id = xhci_find_slot_id_by_port(hcd,
@@ -1020,7 +1160,11 @@ static u32 xhci_get_port_status(struct usb_hcd *hcd,
 			} else {
 				int port_status = readl(port_array[wIndex]);
 				xhci_warn(xhci, "Port resume took longer than %i msec, port status = 0x%x\n",
+<<<<<<< HEAD
 						XHCI_MAX_REXIT_TIMEOUT,
+=======
+						XHCI_MAX_REXIT_TIMEOUT_MS,
+>>>>>>> common/deprecated/android-3.18
 						port_status);
 				status |= USB_PORT_STAT_SUSPEND;
 				clear_bit(wIndex, &bus_state->rexit_ports);
@@ -1031,13 +1175,33 @@ static u32 xhci_get_port_status(struct usb_hcd *hcd,
 		} else {
 			/*
 			 * The resume has been signaling for less than
+<<<<<<< HEAD
 			 * 20ms. Report the port status as SUSPEND,
 			 * let the usbcore check port status again
 			 * and clear resume signaling later.
+=======
+			 * USB_RESUME_TIME. Report the port status as SUSPEND,
+			 * let the usbcore check port status again and clear
+			 * resume signaling later.
+>>>>>>> common/deprecated/android-3.18
 			 */
 			status |= USB_PORT_STAT_SUSPEND;
 		}
 	}
+<<<<<<< HEAD
+=======
+	/*
+	 * Clear stale usb2 resume signalling variables in case port changed
+	 * state during resume signalling. For example on error
+	 */
+	if ((bus_state->resume_done[wIndex] ||
+	     test_bit(wIndex, &bus_state->resuming_ports)) &&
+	    (raw_port_status & PORT_PLS_MASK) != XDEV_U3 &&
+	    (raw_port_status & PORT_PLS_MASK) != XDEV_RESUME) {
+		bus_state->resume_done[wIndex] = 0;
+		clear_bit(wIndex, &bus_state->resuming_ports);
+	}
+>>>>>>> common/deprecated/android-3.18
 	if ((raw_port_status & PORT_PLS_MASK) == XDEV_U0
 			&& (raw_port_status & PORT_POWER)
 			&& (bus_state->suspended_ports & (1 << wIndex))) {
@@ -1092,6 +1256,7 @@ int xhci_hub_control(struct usb_hcd *hcd, u16 typeReq, u16 wValue,
 	u16 link_state = 0;
 	u16 wake_mask = 0;
 	u16 timeout = 0;
+<<<<<<< HEAD
 #ifdef CONFIG_HOST_COMPLIANT_TEST
 	int max_portpmsc;
 	__le32 __iomem **portpmsc_array;
@@ -1099,6 +1264,9 @@ int xhci_hub_control(struct usb_hcd *hcd, u16 typeReq, u16 wValue,
 
 	max_portpmsc = xhci_get_portpmsc(hcd, &portpmsc_array);
 #endif
+=======
+
+>>>>>>> common/deprecated/android-3.18
 	max_ports = xhci_get_ports(hcd, &port_array);
 	bus_state = &xhci->bus_state[hcd_index(hcd)];
 
@@ -1156,7 +1324,11 @@ int xhci_hub_control(struct usb_hcd *hcd, u16 typeReq, u16 wValue,
 			break;
 		}
 		status = xhci_get_port_status(hcd, bus_state, port_array,
+<<<<<<< HEAD
 				wIndex, temp, flags);
+=======
+				wIndex, temp, &flags);
+>>>>>>> common/deprecated/android-3.18
 		if (status == 0xffffffff)
 			goto error;
 
@@ -1167,9 +1339,12 @@ int xhci_hub_control(struct usb_hcd *hcd, u16 typeReq, u16 wValue,
 		put_unaligned(cpu_to_le32(status), (__le32 *) buf);
 		break;
 	case SetPortFeature:
+<<<<<<< HEAD
 #ifdef CONFIG_HOST_COMPLIANT_TEST
 		selector = wIndex >> 8;
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 		if (wValue == USB_PORT_FEAT_LINK_STATE)
 			link_state = (wIndex & 0xff00) >> 3;
 		if (wValue == USB_PORT_FEAT_REMOTE_WAKE_MASK)
@@ -1257,6 +1432,7 @@ int xhci_hub_control(struct usb_hcd *hcd, u16 typeReq, u16 wValue,
 				temp = readl(port_array[wIndex]);
 				break;
 			}
+<<<<<<< HEAD
 
 			/* Software should not attempt to set
 			 * port link state above '3' (U3) and the port
@@ -1268,6 +1444,19 @@ int xhci_hub_control(struct usb_hcd *hcd, u16 typeReq, u16 wValue,
 				goto error;
 			}
 
+=======
+			/* Port must be enabled */
+			if (!(temp & PORT_PE)) {
+				retval = -ENODEV;
+				break;
+			}
+			/* Can't set port link state above '3' (U3) */
+			if (link_state > USB_SS_PORT_LS_U3) {
+				xhci_warn(xhci, "Cannot set port %d link state %d\n",
+					 wIndex, link_state);
+				goto error;
+			}
+>>>>>>> common/deprecated/android-3.18
 			if (link_state == USB_SS_PORT_LS_U3) {
 				slot_id = xhci_find_slot_id_by_port(hcd, xhci,
 						wIndex + 1);
@@ -1319,6 +1508,7 @@ int xhci_hub_control(struct usb_hcd *hcd, u16 typeReq, u16 wValue,
 			temp = readl(port_array[wIndex]);
 			xhci_dbg(xhci, "set port reset, actual port %d status  = 0x%x\n", wIndex, temp);
 			break;
+<<<<<<< HEAD
 
 		/*
 		 * For downstream facing ports (these):  one hub port is put
@@ -1338,6 +1528,8 @@ int xhci_hub_control(struct usb_hcd *hcd, u16 typeReq, u16 wValue,
 			break;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		case USB_PORT_FEAT_REMOTE_WAKE_MASK:
 			xhci_set_remote_wake_mask(xhci, port_array,
 					wIndex, wake_mask);
@@ -1396,6 +1588,7 @@ int xhci_hub_control(struct usb_hcd *hcd, u16 typeReq, u16 wValue,
 				if ((temp & PORT_PE) == 0)
 					goto error;
 
+<<<<<<< HEAD
 				xhci_set_link_state(xhci, port_array, wIndex,
 							XDEV_RESUME);
 				spin_unlock_irqrestore(&xhci->lock, flags);
@@ -1403,6 +1596,17 @@ int xhci_hub_control(struct usb_hcd *hcd, u16 typeReq, u16 wValue,
 				spin_lock_irqsave(&xhci->lock, flags);
 				xhci_set_link_state(xhci, port_array, wIndex,
 							XDEV_U0);
+=======
+				set_bit(wIndex, &bus_state->resuming_ports);
+				xhci_set_link_state(xhci, port_array, wIndex,
+							XDEV_RESUME);
+				spin_unlock_irqrestore(&xhci->lock, flags);
+				msleep(USB_RESUME_TIMEOUT);
+				spin_lock_irqsave(&xhci->lock, flags);
+				xhci_set_link_state(xhci, port_array, wIndex,
+							XDEV_U0);
+				clear_bit(wIndex, &bus_state->resuming_ports);
+>>>>>>> common/deprecated/android-3.18
 			}
 			bus_state->port_c_suspend |= 1 << wIndex;
 
@@ -1524,6 +1728,7 @@ int xhci_bus_suspend(struct usb_hcd *hcd)
 	__le32 __iomem **port_array;
 	struct xhci_bus_state *bus_state;
 	unsigned long flags;
+<<<<<<< HEAD
 
 	max_ports = xhci_get_ports(hcd, &port_array);
 	bus_state = &xhci->bus_state[hcd_index(hcd)];
@@ -1531,6 +1736,18 @@ int xhci_bus_suspend(struct usb_hcd *hcd)
 	spin_lock_irqsave(&xhci->lock, flags);
 
 	if (hcd->self.root_hub->do_remote_wakeup) {
+=======
+	u32 portsc_buf[USB_MAXCHILDREN];
+	bool wake_enabled;
+
+	max_ports = xhci_get_ports(hcd, &port_array);
+	bus_state = &xhci->bus_state[hcd_index(hcd)];
+	wake_enabled = hcd->self.root_hub->do_remote_wakeup;
+
+	spin_lock_irqsave(&xhci->lock, flags);
+
+	if (wake_enabled) {
+>>>>>>> common/deprecated/android-3.18
 		if (bus_state->resuming_ports) {
 			spin_unlock_irqrestore(&xhci->lock, flags);
 			xhci_dbg(xhci, "suspend failed because "
@@ -1538,6 +1755,7 @@ int xhci_bus_suspend(struct usb_hcd *hcd)
 			return -EBUSY;
 		}
 	}
+<<<<<<< HEAD
 
 	port_index = max_ports;
 	bus_state->bus_suspended = 0;
@@ -1558,6 +1776,39 @@ int xhci_bus_suspend(struct usb_hcd *hcd)
 				xhci_stop_device(xhci, slot_id, 1);
 				spin_lock_irqsave(&xhci->lock, flags);
 			}
+=======
+	/*
+	 * Prepare ports for suspend, but don't write anything before all ports
+	 * are checked and we know bus suspend can proceed
+	 */
+	bus_state->bus_suspended = 0;
+	port_index = max_ports;
+	while (port_index--) {
+		u32 t1, t2;
+
+		t1 = readl(port_array[port_index]);
+		t2 = xhci_port_state_to_neutral(t1);
+		portsc_buf[port_index] = 0;
+
+		/* Bail out if a USB3 port has a new device in link training */
+		if ((hcd->speed >= HCD_USB3) &&
+		    (t1 & PORT_PLS_MASK) == XDEV_POLLING) {
+			bus_state->bus_suspended = 0;
+			spin_unlock_irqrestore(&xhci->lock, flags);
+			xhci_dbg(xhci, "Bus suspend bailout, port in polling\n");
+			return -EBUSY;
+		}
+
+		/* suspend ports in U0, or bail out for new connect changes */
+		if ((t1 & PORT_PE) && (t1 & PORT_PLS_MASK) == XDEV_U0) {
+			if ((t1 & PORT_CSC) && wake_enabled) {
+				bus_state->bus_suspended = 0;
+				spin_unlock_irqrestore(&xhci->lock, flags);
+				xhci_dbg(xhci, "Bus suspend bailout, port connect change\n");
+				return -EBUSY;
+			}
+			xhci_dbg(xhci, "port %d not suspended\n", port_index);
+>>>>>>> common/deprecated/android-3.18
 			t2 &= ~PORT_PLS_MASK;
 			t2 |= PORT_LINK_STROBE | XDEV_U3;
 			set_bit(port_index, &bus_state->bus_suspended);
@@ -1566,7 +1817,11 @@ int xhci_bus_suspend(struct usb_hcd *hcd)
 		 * including the USB 3.0 roothub, but only if CONFIG_PM_RUNTIME
 		 * is enabled, so also enable remote wake here.
 		 */
+<<<<<<< HEAD
 		if (hcd->self.root_hub->do_remote_wakeup) {
+=======
+		if (wake_enabled) {
+>>>>>>> common/deprecated/android-3.18
 			if (t1 & PORT_CONNECT) {
 				t2 |= PORT_WKOC_E | PORT_WKDISC_E;
 				t2 &= ~PORT_WKCONN_E;
@@ -1579,14 +1834,76 @@ int xhci_bus_suspend(struct usb_hcd *hcd)
 
 		t1 = xhci_port_state_to_neutral(t1);
 		if (t1 != t2)
+<<<<<<< HEAD
 			writel(t2, port_array[port_index]);
+=======
+			portsc_buf[port_index] = t2;
+	}
+
+	/* write port settings, stopping and suspending ports if needed */
+	port_index = max_ports;
+	while (port_index--) {
+		if (!portsc_buf[port_index])
+			continue;
+		if (test_bit(port_index, &bus_state->bus_suspended)) {
+			int slot_id;
+
+			slot_id = xhci_find_slot_id_by_port(hcd, xhci,
+							    port_index + 1);
+			if (slot_id) {
+				spin_unlock_irqrestore(&xhci->lock, flags);
+				xhci_stop_device(xhci, slot_id, 1);
+				spin_lock_irqsave(&xhci->lock, flags);
+			}
+		}
+		writel(portsc_buf[port_index], port_array[port_index]);
+>>>>>>> common/deprecated/android-3.18
 	}
 	hcd->state = HC_STATE_SUSPENDED;
 	bus_state->next_statechange = jiffies + msecs_to_jiffies(10);
 	spin_unlock_irqrestore(&xhci->lock, flags);
+<<<<<<< HEAD
 	return 0;
 }
 
+=======
+
+	if (bus_state->bus_suspended)
+		usleep_range(5000, 10000);
+
+	return 0;
+}
+
+/*
+ * Workaround for missing Cold Attach Status (CAS) if device re-plugged in S3.
+ * warm reset a USB3 device stuck in polling or compliance mode after resume.
+ * See Intel 100/c230 series PCH specification update Doc #332692-006 Errata #8
+ */
+static bool xhci_port_missing_cas_quirk(int port_index,
+					     __le32 __iomem **port_array)
+{
+	u32 portsc;
+
+	portsc = readl(port_array[port_index]);
+
+	/* if any of these are set we are not stuck */
+	if (portsc & (PORT_CONNECT | PORT_CAS))
+		return false;
+
+	if (((portsc & PORT_PLS_MASK) != XDEV_POLLING) &&
+	    ((portsc & PORT_PLS_MASK) != XDEV_COMP_MODE))
+		return false;
+
+	/* clear wakeup/change bits, and do a warm port reset */
+	portsc &= ~(PORT_RWC_BITS | PORT_CEC | PORT_WAKE_BITS);
+	portsc |= PORT_WR;
+	writel(portsc, port_array[port_index]);
+	/* flush write */
+	readl(port_array[port_index]);
+	return true;
+}
+
+>>>>>>> common/deprecated/android-3.18
 int xhci_bus_resume(struct usb_hcd *hcd)
 {
 	struct xhci_hcd	*xhci = hcd_to_xhci(hcd);
@@ -1621,6 +1938,17 @@ int xhci_bus_resume(struct usb_hcd *hcd)
 		int slot_id;
 
 		temp = readl(port_array[port_index]);
+<<<<<<< HEAD
+=======
+
+		/* warm reset CAS limited ports stuck in polling/compliance */
+		if ((xhci->quirks & XHCI_MISSING_CAS) &&
+		    (hcd->speed >= HCD_USB3) &&
+		    xhci_port_missing_cas_quirk(port_index, port_array)) {
+			xhci_dbg(xhci, "reset stuck port %d\n", port_index);
+			continue;
+		}
+>>>>>>> common/deprecated/android-3.18
 		if (DEV_SUPERSPEED(temp))
 			temp &= ~(PORT_RWC_BITS | PORT_CEC | PORT_WAKE_BITS);
 		else
@@ -1635,7 +1963,11 @@ int xhci_bus_resume(struct usb_hcd *hcd)
 						port_index, XDEV_RESUME);
 
 				spin_unlock_irqrestore(&xhci->lock, flags);
+<<<<<<< HEAD
 				msleep(20);
+=======
+				msleep(USB_RESUME_TIMEOUT);
+>>>>>>> common/deprecated/android-3.18
 				spin_lock_irqsave(&xhci->lock, flags);
 
 				xhci_set_link_state(xhci, port_array,

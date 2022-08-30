@@ -216,7 +216,11 @@
 /* Various constants */
 
 /* Coalescing */
+<<<<<<< HEAD
 #define MVNETA_TXDONE_COAL_PKTS		1
+=======
+#define MVNETA_TXDONE_COAL_PKTS		0	/* interrupt per packet */
+>>>>>>> common/deprecated/android-3.18
 #define MVNETA_RX_COAL_PKTS		32
 #define MVNETA_RX_COAL_USEC		100
 
@@ -304,6 +308,10 @@ struct mvneta_port {
 	unsigned int link;
 	unsigned int duplex;
 	unsigned int speed;
+<<<<<<< HEAD
+=======
+	unsigned int tx_csum_limit;
+>>>>>>> common/deprecated/android-3.18
 };
 
 /* The mvneta_tx_desc and mvneta_rx_desc structures describe the
@@ -747,6 +755,10 @@ static void mvneta_port_up(struct mvneta_port *pp)
 	}
 	mvreg_write(pp, MVNETA_TXQ_CMD, q_map);
 
+<<<<<<< HEAD
+=======
+	q_map = 0;
+>>>>>>> common/deprecated/android-3.18
 	/* Enable all initialized RXQs. */
 	q_map = 0;
 	for (queue = 0; queue < rxq_number; queue++) {
@@ -850,6 +862,13 @@ static void mvneta_port_disable(struct mvneta_port *pp)
 	val &= ~MVNETA_GMAC0_PORT_ENABLE;
 	mvreg_write(pp, MVNETA_GMAC_CTRL_0, val);
 
+<<<<<<< HEAD
+=======
+	pp->link = 0;
+	pp->duplex = -1;
+	pp->speed = 0;
+
+>>>>>>> common/deprecated/android-3.18
 	udelay(200);
 }
 
@@ -2441,8 +2460,15 @@ static int mvneta_change_mtu(struct net_device *dev, int mtu)
 
 	dev->mtu = mtu;
 
+<<<<<<< HEAD
 	if (!netif_running(dev))
 		return 0;
+=======
+	if (!netif_running(dev)) {
+		netdev_update_features(dev);
+		return 0;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	/* The interface is running, so we have to force a
 	 * reallocation of the queues
@@ -2469,11 +2495,34 @@ static int mvneta_change_mtu(struct net_device *dev, int mtu)
 	}
 
 	mvneta_start_dev(pp);
+<<<<<<< HEAD
 	mvneta_port_up(pp);
+=======
+
+	netdev_update_features(dev);
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+static netdev_features_t mvneta_fix_features(struct net_device *dev,
+					     netdev_features_t features)
+{
+	struct mvneta_port *pp = netdev_priv(dev);
+
+	if (pp->tx_csum_limit && dev->mtu > pp->tx_csum_limit) {
+		features &= ~(NETIF_F_IP_CSUM | NETIF_F_TSO);
+		netdev_info(dev,
+			    "Disable IP checksum for MTU greater than %dB\n",
+			    pp->tx_csum_limit);
+	}
+
+	return features;
+}
+
+>>>>>>> common/deprecated/android-3.18
 /* Get mac address */
 static void mvneta_get_mac_addr(struct mvneta_port *pp, unsigned char *addr)
 {
@@ -2791,6 +2840,10 @@ static const struct net_device_ops mvneta_netdev_ops = {
 	.ndo_set_rx_mode     = mvneta_set_rx_mode,
 	.ndo_set_mac_address = mvneta_set_mac_addr,
 	.ndo_change_mtu      = mvneta_change_mtu,
+<<<<<<< HEAD
+=======
+	.ndo_fix_features    = mvneta_fix_features,
+>>>>>>> common/deprecated/android-3.18
 	.ndo_get_stats64     = mvneta_get_stats64,
 	.ndo_do_ioctl        = mvneta_ioctl,
 };
@@ -3029,6 +3082,12 @@ static int mvneta_probe(struct platform_device *pdev)
 		}
 	}
 
+<<<<<<< HEAD
+=======
+	if (of_device_is_compatible(dn, "marvell,armada-370-neta"))
+		pp->tx_csum_limit = 1600;
+
+>>>>>>> common/deprecated/android-3.18
 	pp->tx_ring_size = MVNETA_MAX_TXD;
 	pp->rx_ring_size = MVNETA_MAX_RXD;
 
@@ -3054,7 +3113,11 @@ static int mvneta_probe(struct platform_device *pdev)
 	dev->features = NETIF_F_SG | NETIF_F_IP_CSUM | NETIF_F_TSO;
 	dev->hw_features |= dev->features;
 	dev->vlan_features |= dev->features;
+<<<<<<< HEAD
 	dev->priv_flags |= IFF_UNICAST_FLT;
+=======
+	dev->priv_flags |= IFF_LIVE_ADDR_CHANGE;
+>>>>>>> common/deprecated/android-3.18
 	dev->gso_max_segs = MVNETA_MAX_TSO_SEGS;
 
 	err = register_netdev(dev);
@@ -3101,6 +3164,10 @@ static int mvneta_remove(struct platform_device *pdev)
 
 static const struct of_device_id mvneta_match[] = {
 	{ .compatible = "marvell,armada-370-neta" },
+<<<<<<< HEAD
+=======
+	{ .compatible = "marvell,armada-xp-neta" },
+>>>>>>> common/deprecated/android-3.18
 	{ }
 };
 MODULE_DEVICE_TABLE(of, mvneta_match);

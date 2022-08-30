@@ -26,6 +26,11 @@
 #include <asm/virt.h>
 
 	.text
+<<<<<<< HEAD
+=======
+	.pushsection	.hyp.text, "ax"
+
+>>>>>>> common/deprecated/android-3.18
 	.align 11
 
 ENTRY(__hyp_stub_vectors)

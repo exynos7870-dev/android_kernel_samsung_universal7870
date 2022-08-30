@@ -34,8 +34,16 @@ static struct kexec_file_ops *kexec_file_loaders[] = {
 static void free_transition_pgtable(struct kimage *image)
 {
 	free_page((unsigned long)image->arch.pud);
+<<<<<<< HEAD
 	free_page((unsigned long)image->arch.pmd);
 	free_page((unsigned long)image->arch.pte);
+=======
+	image->arch.pud = NULL;
+	free_page((unsigned long)image->arch.pmd);
+	image->arch.pmd = NULL;
+	free_page((unsigned long)image->arch.pte);
+	image->arch.pte = NULL;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int init_transition_pgtable(struct kimage *image, pgd_t *pgd)
@@ -76,7 +84,10 @@ static int init_transition_pgtable(struct kimage *image, pgd_t *pgd)
 	set_pte(pte, pfn_pte(paddr >> PAGE_SHIFT, PAGE_KERNEL_EXEC));
 	return 0;
 err:
+<<<<<<< HEAD
 	free_transition_pgtable(image);
+=======
+>>>>>>> common/deprecated/android-3.18
 	return result;
 }
 
@@ -516,6 +527,10 @@ int arch_kexec_apply_relocations_add(const Elf64_Ehdr *ehdr,
 				goto overflow;
 			break;
 		case R_X86_64_PC32:
+<<<<<<< HEAD
+=======
+		case R_X86_64_PLT32:
+>>>>>>> common/deprecated/android-3.18
 			value -= (u64)address;
 			*(u32 *)location = value;
 			break;

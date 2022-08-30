@@ -35,6 +35,11 @@ enum {
 	USB_MIXER_U8,
 	USB_MIXER_S16,
 	USB_MIXER_U16,
+<<<<<<< HEAD
+=======
+	USB_MIXER_S32,
+	USB_MIXER_U32,
+>>>>>>> common/deprecated/android-3.18
 };
 
 struct usb_mixer_elem_info {
@@ -54,6 +59,10 @@ struct usb_mixer_elem_info {
 	int cached;
 	int cache_val[MAX_CHANNELS];
 	u8 initialized;
+<<<<<<< HEAD
+=======
+	u8 min_mute;
+>>>>>>> common/deprecated/android-3.18
 };
 
 int snd_usb_create_mixer(struct snd_usb_audio *chip, int ctrlif,

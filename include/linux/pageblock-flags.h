@@ -44,7 +44,11 @@ enum pageblock_bits {
 #ifdef CONFIG_HUGETLB_PAGE_SIZE_VARIABLE
 
 /* Huge page sizes are variable */
+<<<<<<< HEAD
 extern int pageblock_order;
+=======
+extern unsigned int pageblock_order;
+>>>>>>> common/deprecated/android-3.18
 
 #else /* CONFIG_HUGETLB_PAGE_SIZE_VARIABLE */
 

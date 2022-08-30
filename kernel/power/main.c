@@ -15,9 +15,12 @@
 #include <linux/workqueue.h>
 #include <linux/debugfs.h>
 #include <linux/seq_file.h>
+<<<<<<< HEAD
 #if defined(CONFIG_SEC_DEBUG) && defined(CONFIG_REGULATOR_S2MPU05)
 #include <linux/mfd/samsung/s2mpu05.h>
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #include "power.h"
 
@@ -41,6 +44,7 @@ int unregister_pm_notifier(struct notifier_block *nb)
 }
 EXPORT_SYMBOL_GPL(unregister_pm_notifier);
 
+<<<<<<< HEAD
 int pm_notifier_call_chain(unsigned long val)
 {
 	int ret = blocking_notifier_call_chain(&pm_chain_head, val, NULL);
@@ -50,6 +54,24 @@ int pm_notifier_call_chain(unsigned long val)
 
 /* If set, devices may be suspended and resumed asynchronously. */
 int pm_async_enabled = 0;
+=======
+int __pm_notifier_call_chain(unsigned long val, int nr_to_call, int *nr_calls)
+{
+	int ret;
+
+	ret = __blocking_notifier_call_chain(&pm_chain_head, val, NULL,
+						nr_to_call, nr_calls);
+
+	return notifier_to_errno(ret);
+}
+int pm_notifier_call_chain(unsigned long val)
+{
+	return __pm_notifier_call_chain(val, -1, NULL);
+}
+
+/* If set, devices may be suspended and resumed asynchronously. */
+int pm_async_enabled = 1;
+>>>>>>> common/deprecated/android-3.18
 
 static ssize_t pm_async_show(struct kobject *kobj, struct kobj_attribute *attr,
 			     char *buf)
@@ -68,7 +90,11 @@ static ssize_t pm_async_store(struct kobject *kobj, struct kobj_attribute *attr,
 	if (val > 1)
 		return -EINVAL;
 
+<<<<<<< HEAD
 	pm_async_enabled = 0;
+=======
+	pm_async_enabled = val;
+>>>>>>> common/deprecated/android-3.18
 	return n;
 }
 
@@ -586,6 +612,7 @@ power_attr(pm_freeze_timeout);
 
 #endif	/* CONFIG_FREEZER*/
 
+<<<<<<< HEAD
 #if defined(CONFIG_SEC_DEBUG) && defined(CONFIG_REGULATOR_S2MPU05)
 static int reset_enabled = 0;
 
@@ -649,6 +676,8 @@ static struct kobj_attribute selfdischg_usage_attr = {
 };
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static struct attribute * g[] = {
 	&state_attr.attr,
 #ifdef CONFIG_PM_TRACE
@@ -675,12 +704,15 @@ static struct attribute * g[] = {
 #ifdef CONFIG_FREEZER
 	&pm_freeze_timeout_attr.attr,
 #endif
+<<<<<<< HEAD
 #if defined(CONFIG_SEC_DEBUG) && defined(CONFIG_REGULATOR_S2MPU05)
 	&reset_enabled_attr.attr,	/* Support 1-key hard reset */
 #endif
 #ifdef CONFIG_SW_SELF_DISCHARGING
 	&selfdischg_usage_attr.attr,
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	NULL,
 };
 

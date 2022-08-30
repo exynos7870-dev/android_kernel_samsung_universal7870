@@ -307,4 +307,8 @@ CPU_BE( orr	syndrome, diff, has_nul )
 .Lret0:
 	mov	result, #0
 	ret
+<<<<<<< HEAD
 ENDPROC(strncmp)
+=======
+ENDPIPROC(strncmp)
+>>>>>>> common/deprecated/android-3.18

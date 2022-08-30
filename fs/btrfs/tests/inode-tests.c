@@ -235,6 +235,10 @@ static noinline int test_btrfs_get_extent(void)
 		return ret;
 	}
 
+<<<<<<< HEAD
+=======
+	inode->i_mode = S_IFREG;
+>>>>>>> common/deprecated/android-3.18
 	BTRFS_I(inode)->location.type = BTRFS_INODE_ITEM_KEY;
 	BTRFS_I(inode)->location.objectid = BTRFS_FIRST_FREE_OBJECTID;
 	BTRFS_I(inode)->location.offset = 0;

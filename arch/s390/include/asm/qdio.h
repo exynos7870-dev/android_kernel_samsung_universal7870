@@ -271,7 +271,10 @@ struct qdio_outbuf_state {
 	void *user;
 };
 
+<<<<<<< HEAD
 #define QDIO_OUTBUF_STATE_FLAG_NONE	0x00
+=======
+>>>>>>> common/deprecated/android-3.18
 #define QDIO_OUTBUF_STATE_FLAG_PENDING	0x01
 
 #define CHSC_AC1_INITIATE_INPUTQ	0x80

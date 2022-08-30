@@ -52,7 +52,13 @@ struct tc1100_data {
 	u32 jogdial;
 };
 
+<<<<<<< HEAD
 static struct tc1100_data suspend_data;
+=======
+#ifdef CONFIG_PM
+static struct tc1100_data suspend_data;
+#endif
+>>>>>>> common/deprecated/android-3.18
 
 /* --------------------------------------------------------------------------
 				Device Management

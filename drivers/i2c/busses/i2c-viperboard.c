@@ -341,7 +341,11 @@ static int vprbrd_i2c_xfer(struct i2c_adapter *i2c, struct i2c_msg *msgs,
 		}
 		mutex_unlock(&vb->lock);
 	}
+<<<<<<< HEAD
 	return 0;
+=======
+	return num;
+>>>>>>> common/deprecated/android-3.18
 error:
 	mutex_unlock(&vb->lock);
 	return error;

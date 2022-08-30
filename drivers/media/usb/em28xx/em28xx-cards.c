@@ -2001,13 +2001,21 @@ struct em28xx_board em28xx_boards[] = {
 		.input           = { {
 			.type     = EM28XX_VMUX_COMPOSITE1,
 			.vmux     = TVP5150_COMPOSITE1,
+<<<<<<< HEAD
 			.amux     = EM28XX_AUDIO_SRC_LINE,
+=======
+			.amux     = EM28XX_AMUX_LINE_IN,
+>>>>>>> common/deprecated/android-3.18
 			.gpio     = terratec_av350_unmute_gpio,
 
 		}, {
 			.type     = EM28XX_VMUX_SVIDEO,
 			.vmux     = TVP5150_SVIDEO,
+<<<<<<< HEAD
 			.amux     = EM28XX_AUDIO_SRC_LINE,
+=======
+			.amux     = EM28XX_AMUX_LINE_IN,
+>>>>>>> common/deprecated/android-3.18
 			.gpio     = terratec_av350_unmute_gpio,
 		} },
 	},

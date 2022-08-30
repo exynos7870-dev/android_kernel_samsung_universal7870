@@ -306,7 +306,12 @@ static const struct super_operations omfs_sops = {
  */
 static int omfs_get_imap(struct super_block *sb)
 {
+<<<<<<< HEAD
 	unsigned int bitmap_size, count, array_size;
+=======
+	unsigned int bitmap_size, array_size;
+	int count;
+>>>>>>> common/deprecated/android-3.18
 	struct omfs_sb_info *sbi = OMFS_SB(sb);
 	struct buffer_head *bh;
 	unsigned long **ptr;
@@ -359,7 +364,11 @@ nomem:
 }
 
 enum {
+<<<<<<< HEAD
 	Opt_uid, Opt_gid, Opt_umask, Opt_dmask, Opt_fmask
+=======
+	Opt_uid, Opt_gid, Opt_umask, Opt_dmask, Opt_fmask, Opt_err
+>>>>>>> common/deprecated/android-3.18
 };
 
 static const match_table_t tokens = {
@@ -368,6 +377,10 @@ static const match_table_t tokens = {
 	{Opt_umask, "umask=%o"},
 	{Opt_dmask, "dmask=%o"},
 	{Opt_fmask, "fmask=%o"},
+<<<<<<< HEAD
+=======
+	{Opt_err, NULL},
+>>>>>>> common/deprecated/android-3.18
 };
 
 static int parse_options(char *options, struct omfs_sb_info *sbi)

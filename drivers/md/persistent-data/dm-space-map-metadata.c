@@ -204,6 +204,30 @@ static void in(struct sm_metadata *smm)
 	smm->recursion_count++;
 }
 
+<<<<<<< HEAD
+=======
+static int apply_bops(struct sm_metadata *smm)
+{
+	int r = 0;
+
+	while (!brb_empty(&smm->uncommitted)) {
+		struct block_op bop;
+
+		r = brb_pop(&smm->uncommitted, &bop);
+		if (r) {
+			DMERR("bug in bop ring buffer");
+			break;
+		}
+
+		r = commit_bop(smm, &bop);
+		if (r)
+			break;
+	}
+
+	return r;
+}
+
+>>>>>>> common/deprecated/android-3.18
 static int out(struct sm_metadata *smm)
 {
 	int r = 0;
@@ -216,6 +240,7 @@ static int out(struct sm_metadata *smm)
 		return -ENOMEM;
 	}
 
+<<<<<<< HEAD
 	if (smm->recursion_count == 1) {
 		while (!brb_empty(&smm->uncommitted)) {
 			struct block_op bop;
@@ -231,6 +256,10 @@ static int out(struct sm_metadata *smm)
 				break;
 		}
 	}
+=======
+	if (smm->recursion_count == 1)
+		r = apply_bops(smm);
+>>>>>>> common/deprecated/android-3.18
 
 	smm->recursion_count--;
 
@@ -429,7 +458,14 @@ static int sm_metadata_new_block_(struct dm_space_map *sm, dm_block_t *b)
 	enum allocation_event ev;
 	struct sm_metadata *smm = container_of(sm, struct sm_metadata, sm);
 
+<<<<<<< HEAD
 	r = sm_ll_find_free_block(&smm->old_ll, smm->begin, smm->old_ll.nr_blocks, b);
+=======
+	/*
+	 * Any block we allocate has to be free in both the old and current ll.
+	 */
+	r = sm_ll_find_common_free_block(&smm->old_ll, &smm->ll, smm->begin, smm->ll.nr_blocks, b);
+>>>>>>> common/deprecated/android-3.18
 	if (r)
 		return r;
 
@@ -702,6 +738,15 @@ static int sm_metadata_extend(struct dm_space_map *sm, dm_block_t extra_blocks)
 		}
 		old_len = smm->begin;
 
+<<<<<<< HEAD
+=======
+		r = apply_bops(smm);
+		if (r) {
+			DMERR("%s: apply_bops failed", __func__);
+			goto out;
+		}
+
+>>>>>>> common/deprecated/android-3.18
 		r = sm_ll_commit(&smm->ll);
 		if (r)
 			goto out;
@@ -750,6 +795,7 @@ int dm_sm_metadata_create(struct dm_space_map *sm,
 	memcpy(&smm->sm, &bootstrap_ops, sizeof(smm->sm));
 
 	r = sm_ll_new_metadata(&smm->ll, tm);
+<<<<<<< HEAD
 	if (r)
 		return r;
 
@@ -760,6 +806,16 @@ int dm_sm_metadata_create(struct dm_space_map *sm,
 		return r;
 
 	memcpy(&smm->sm, &ops, sizeof(smm->sm));
+=======
+	if (!r) {
+		if (nr_blocks > DM_SM_METADATA_MAX_BLOCKS)
+			nr_blocks = DM_SM_METADATA_MAX_BLOCKS;
+		r = sm_ll_extend(&smm->ll, nr_blocks);
+	}
+	memcpy(&smm->sm, &ops, sizeof(smm->sm));
+	if (r)
+		return r;
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * Now we need to update the newly created data structures with the
@@ -771,6 +827,15 @@ int dm_sm_metadata_create(struct dm_space_map *sm,
 	if (r)
 		return r;
 
+<<<<<<< HEAD
+=======
+	r = apply_bops(smm);
+	if (r) {
+		DMERR("%s: apply_bops failed", __func__);
+		return r;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	return sm_metadata_commit(sm);
 }
 

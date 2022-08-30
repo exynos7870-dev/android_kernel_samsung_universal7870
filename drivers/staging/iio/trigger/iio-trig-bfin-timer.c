@@ -258,7 +258,11 @@ out_free_irq:
 out1:
 	iio_trigger_unregister(st->trig);
 out:
+<<<<<<< HEAD
 	iio_trigger_put(st->trig);
+=======
+	iio_trigger_free(st->trig);
+>>>>>>> common/deprecated/android-3.18
 	return ret;
 }
 
@@ -271,7 +275,11 @@ static int iio_bfin_tmr_trigger_remove(struct platform_device *pdev)
 		peripheral_free(st->t->pin);
 	free_irq(st->irq, st);
 	iio_trigger_unregister(st->trig);
+<<<<<<< HEAD
 	iio_trigger_put(st->trig);
+=======
+	iio_trigger_free(st->trig);
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }

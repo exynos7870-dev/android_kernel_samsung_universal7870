@@ -449,6 +449,10 @@ static int sctp_copy_one_addr(struct net *net, struct sctp_bind_addr *dest,
 		 * well as the remote peer.
 		 */
 		if ((((AF_INET == addr->sa.sa_family) &&
+<<<<<<< HEAD
+=======
+		      (flags & SCTP_ADDR4_ALLOWED) &&
+>>>>>>> common/deprecated/android-3.18
 		      (flags & SCTP_ADDR4_PEERSUPP))) ||
 		    (((AF_INET6 == addr->sa.sa_family) &&
 		      (flags & SCTP_ADDR6_ALLOWED) &&

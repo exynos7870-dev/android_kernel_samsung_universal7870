@@ -24,6 +24,10 @@
    (c) 2013  Wolfram Sang <wsa@the-dreams.de>
    I2C ACPI code Copyright (C) 2014 Intel Corp
    Author: Lan Tianyu <tianyu.lan@intel.com>
+<<<<<<< HEAD
+=======
+   I2C slave support (c) 2014 by Wolfram Sang <wsa@sang-engineering.com>
+>>>>>>> common/deprecated/android-3.18
  */
 
 #include <linux/module.h>
@@ -1414,9 +1418,12 @@ static void of_i2c_register_devices(struct i2c_adapter *adap)
 		if (of_get_property(node, "wakeup-source", NULL))
 			info.flags |= I2C_CLIENT_WAKE;
 
+<<<<<<< HEAD
 		if (of_get_property(node, "ten-bit-address", NULL))
 			info.flags |= I2C_CLIENT_TEN;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		request_module("%s%s", I2C_MODULE_PREFIX, info.type);
 
 		result = i2c_new_device(adap, &info);
@@ -1836,6 +1843,10 @@ int i2c_register_driver(struct module *owner, struct i2c_driver *driver)
 	/* add the driver to the list of i2c drivers in the driver core */
 	driver->driver.owner = owner;
 	driver->driver.bus = &i2c_bus_type;
+<<<<<<< HEAD
+=======
+	INIT_LIST_HEAD(&driver->clients);
+>>>>>>> common/deprecated/android-3.18
 
 	/* When registration returns, the driver core
 	 * will have called probe() for all matching-but-unbound devices.
@@ -1854,7 +1865,10 @@ int i2c_register_driver(struct module *owner, struct i2c_driver *driver)
 
 	pr_debug("i2c-core: driver [%s] registered\n", driver->driver.name);
 
+<<<<<<< HEAD
 	INIT_LIST_HEAD(&driver->clients);
+=======
+>>>>>>> common/deprecated/android-3.18
 	/* Walk the adapters that are already present */
 	i2c_for_each_dev(driver, __process_new_driver);
 
@@ -2765,16 +2779,28 @@ static s32 i2c_smbus_xfer_emulated(struct i2c_adapter *adapter, u16 addr,
 				   the underlying bus driver */
 		break;
 	case I2C_SMBUS_I2C_BLOCK_DATA:
+<<<<<<< HEAD
+=======
+		if (data->block[0] > I2C_SMBUS_BLOCK_MAX) {
+			dev_err(&adapter->dev, "Invalid block %s size %d\n",
+				read_write == I2C_SMBUS_READ ? "read" : "write",
+				data->block[0]);
+			return -EINVAL;
+		}
+>>>>>>> common/deprecated/android-3.18
 		if (read_write == I2C_SMBUS_READ) {
 			msg[1].len = data->block[0];
 		} else {
 			msg[0].len = data->block[0] + 1;
+<<<<<<< HEAD
 			if (msg[0].len > I2C_SMBUS_BLOCK_MAX + 1) {
 				dev_err(&adapter->dev,
 					"Invalid block write size %d\n",
 					data->block[0]);
 				return -EINVAL;
 			}
+=======
+>>>>>>> common/deprecated/android-3.18
 			for (i = 1; i <= data->block[0]; i++)
 				msgbuf0[i] = data->block[i];
 		}
@@ -2905,6 +2931,57 @@ trace:
 }
 EXPORT_SYMBOL(i2c_smbus_xfer);
 
+<<<<<<< HEAD
+=======
+int i2c_slave_register(struct i2c_client *client, i2c_slave_cb_t slave_cb)
+{
+	int ret;
+
+	if (!client || !slave_cb)
+		return -EINVAL;
+
+	if (!(client->flags & I2C_CLIENT_TEN)) {
+		/* Enforce stricter address checking */
+		ret = i2c_check_addr_validity(client->addr);
+		if (ret)
+			return ret;
+	}
+
+	if (!client->adapter->algo->reg_slave)
+		return -EOPNOTSUPP;
+
+	client->slave_cb = slave_cb;
+
+	i2c_lock_adapter(client->adapter);
+	ret = client->adapter->algo->reg_slave(client);
+	i2c_unlock_adapter(client->adapter);
+
+	if (ret)
+		client->slave_cb = NULL;
+
+	return ret;
+}
+EXPORT_SYMBOL_GPL(i2c_slave_register);
+
+int i2c_slave_unregister(struct i2c_client *client)
+{
+	int ret;
+
+	if (!client->adapter->algo->unreg_slave)
+		return -EOPNOTSUPP;
+
+	i2c_lock_adapter(client->adapter);
+	ret = client->adapter->algo->unreg_slave(client);
+	i2c_unlock_adapter(client->adapter);
+
+	if (ret == 0)
+		client->slave_cb = NULL;
+
+	return ret;
+}
+EXPORT_SYMBOL_GPL(i2c_slave_unregister);
+
+>>>>>>> common/deprecated/android-3.18
 MODULE_AUTHOR("Simon G. Vogl <simon@tk.uni-linz.ac.at>");
 MODULE_DESCRIPTION("I2C-Bus main module");
 MODULE_LICENSE("GPL");

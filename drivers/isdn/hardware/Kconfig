@@ -5,5 +5,8 @@ comment "CAPI hardware drivers"
 
 source "drivers/isdn/hardware/avm/Kconfig"
 
+<<<<<<< HEAD
 source "drivers/isdn/hardware/eicon/Kconfig"
 
+=======
+>>>>>>> common/deprecated/android-3.18

@@ -633,11 +633,19 @@ static int virtblk_probe(struct virtio_device *vdev)
 	if (err)
 		goto out_put_disk;
 
+<<<<<<< HEAD
 	q = vblk->disk->queue = blk_mq_init_queue(&vblk->tag_set);
+=======
+	q = blk_mq_init_queue(&vblk->tag_set);
+>>>>>>> common/deprecated/android-3.18
 	if (!q) {
 		err = -ENOMEM;
 		goto out_free_tags;
 	}
+<<<<<<< HEAD
+=======
+	vblk->disk->queue = q;
+>>>>>>> common/deprecated/android-3.18
 
 	q->queuedata = vblk;
 
@@ -747,6 +755,10 @@ out_put_disk:
 	put_disk(vblk->disk);
 out_free_vq:
 	vdev->config->del_vqs(vdev);
+<<<<<<< HEAD
+=======
+	kfree(vblk->vqs);
+>>>>>>> common/deprecated/android-3.18
 out_free_vblk:
 	kfree(vblk);
 out_free_index:

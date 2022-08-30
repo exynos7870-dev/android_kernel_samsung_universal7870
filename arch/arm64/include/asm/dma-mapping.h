@@ -20,7 +20,10 @@
 
 #include <linux/types.h>
 #include <linux/vmalloc.h>
+<<<<<<< HEAD
 #include <linux/dma-debug.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #include <asm-generic/dma-coherent.h>
 
@@ -31,7 +34,10 @@
 extern struct dma_map_ops *dma_ops;
 extern struct dma_map_ops coherent_swiotlb_dma_ops;
 extern struct dma_map_ops noncoherent_swiotlb_dma_ops;
+<<<<<<< HEAD
 extern struct dma_map_ops arm_exynos_dma_mcode_ops;
+=======
+>>>>>>> common/deprecated/android-3.18
 
 static inline struct dma_map_ops *__generic_dma_ops(struct device *dev)
 {

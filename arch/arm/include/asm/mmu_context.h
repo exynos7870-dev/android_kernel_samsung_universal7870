@@ -61,6 +61,10 @@ static inline void check_and_switch_context(struct mm_struct *mm,
 		cpu_switch_mm(mm->pgd, mm);
 }
 
+<<<<<<< HEAD
+=======
+#ifndef MODULE
+>>>>>>> common/deprecated/android-3.18
 #define finish_arch_post_lock_switch \
 	finish_arch_post_lock_switch
 static inline void finish_arch_post_lock_switch(void)
@@ -82,6 +86,10 @@ static inline void finish_arch_post_lock_switch(void)
 		preempt_enable_no_resched();
 	}
 }
+<<<<<<< HEAD
+=======
+#endif /* !MODULE */
+>>>>>>> common/deprecated/android-3.18
 
 #endif	/* CONFIG_MMU */
 

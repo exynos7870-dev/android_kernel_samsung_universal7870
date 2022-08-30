@@ -355,6 +355,28 @@ SYSCALL_DEFINE3(faccessat, int, dfd, const char __user *, filename, int, mode)
 				override_cred->cap_permitted;
 	}
 
+<<<<<<< HEAD
+=======
+	/*
+	 * The new set of credentials can *only* be used in
+	 * task-synchronous circumstances, and does not need
+	 * RCU freeing, unless somebody then takes a separate
+	 * reference to it.
+	 *
+	 * NOTE! This is _only_ true because this credential
+	 * is used purely for override_creds() that installs
+	 * it as the subjective cred. Other threads will be
+	 * accessing ->real_cred, not the subjective cred.
+	 *
+	 * If somebody _does_ make a copy of this (using the
+	 * 'get_current_cred()' function), that will clear the
+	 * non_rcu field, because now that other user may be
+	 * expecting RCU freeing. But normal thread-synchronous
+	 * cred accesses will keep things non-RCY.
+	 */
+	override_cred->non_rcu = 1;
+
+>>>>>>> common/deprecated/android-3.18
 	old_cred = override_creds(override_cred);
 retry:
 	res = user_path_at(dfd, filename, lookup_flags, &path);
@@ -678,18 +700,29 @@ int open_check_o_direct(struct file *f)
 }
 
 static int do_dentry_open(struct file *f,
+<<<<<<< HEAD
+=======
+			  struct inode *inode,
+>>>>>>> common/deprecated/android-3.18
 			  int (*open)(struct inode *, struct file *),
 			  const struct cred *cred)
 {
 	static const struct file_operations empty_fops = {};
+<<<<<<< HEAD
 	struct inode *inode;
+=======
+>>>>>>> common/deprecated/android-3.18
 	int error;
 
 	f->f_mode = OPEN_FMODE(f->f_flags) | FMODE_LSEEK |
 				FMODE_PREAD | FMODE_PWRITE;
 
 	path_get(&f->f_path);
+<<<<<<< HEAD
 	inode = f->f_inode = f->f_path.dentry->d_inode;
+=======
+	f->f_inode = inode;
+>>>>>>> common/deprecated/android-3.18
 	f->f_mapping = inode->i_mapping;
 
 	if (unlikely(f->f_flags & O_PATH)) {
@@ -793,7 +826,12 @@ int finish_open(struct file *file, struct dentry *dentry,
 	BUG_ON(*opened & FILE_OPENED); /* once it's opened, it's opened */
 
 	file->f_path.dentry = dentry;
+<<<<<<< HEAD
 	error = do_dentry_open(file, open, current_cred());
+=======
+	error = do_dentry_open(file, d_backing_inode(dentry), open,
+			       current_cred());
+>>>>>>> common/deprecated/android-3.18
 	if (!error)
 		*opened |= FILE_OPENED;
 
@@ -822,6 +860,27 @@ int finish_no_open(struct file *file, struct dentry *dentry)
 }
 EXPORT_SYMBOL(finish_no_open);
 
+<<<<<<< HEAD
+=======
+/**
+ * vfs_open - open the file at the given path
+ * @path: path to open
+ * @file: newly allocated file with f_flag initialized
+ * @cred: credentials to use
+ */
+int vfs_open(const struct path *path, struct file *file,
+	     const struct cred *cred)
+{
+	struct inode *inode = vfs_select_inode(path->dentry, file->f_flags);
+
+	if (IS_ERR(inode))
+		return PTR_ERR(inode);
+
+	file->f_path = *path;
+	return do_dentry_open(file, inode, NULL, cred);
+}
+
+>>>>>>> common/deprecated/android-3.18
 struct file *dentry_open(const struct path *path, int flags,
 			 const struct cred *cred)
 {
@@ -853,6 +912,7 @@ struct file *dentry_open(const struct path *path, int flags,
 }
 EXPORT_SYMBOL(dentry_open);
 
+<<<<<<< HEAD
 /**
  * vfs_open - open the file at the given path
  * @path: path to open
@@ -873,11 +933,22 @@ int vfs_open(const struct path *path, struct file *filp,
 }
 EXPORT_SYMBOL(vfs_open);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static inline int build_open_flags(int flags, umode_t mode, struct open_flags *op)
 {
 	int lookup_flags = 0;
 	int acc_mode;
 
+<<<<<<< HEAD
+=======
+	/*
+	 * Clear out all open flags we don't know about so that we don't report
+	 * them in fcntl(F_GETFD) or similar interfaces.
+	 */
+	flags &= VALID_OPEN_FLAGS;
+
+>>>>>>> common/deprecated/android-3.18
 	if (flags & (O_CREAT | __O_TMPFILE))
 		op->mode = (mode & S_IALLUGO) | S_IFREG;
 	else
@@ -978,6 +1049,7 @@ struct file *filp_open(const char *filename, int flags, umode_t mode)
 EXPORT_SYMBOL(filp_open);
 
 struct file *file_open_root(struct dentry *dentry, struct vfsmount *mnt,
+<<<<<<< HEAD
 			    const char *filename, int flags)
 {
 	struct open_flags op;
@@ -986,6 +1058,14 @@ struct file *file_open_root(struct dentry *dentry, struct vfsmount *mnt,
 		return ERR_PTR(err);
 	if (flags & O_CREAT)
 		return ERR_PTR(-EINVAL);
+=======
+			    const char *filename, int flags, umode_t mode)
+{
+	struct open_flags op;
+	int err = build_open_flags(flags, mode, &op);
+	if (err)
+		return ERR_PTR(err);
+>>>>>>> common/deprecated/android-3.18
 	if (!filename && (flags & O_DIRECTORY))
 		if (!dentry->d_inode->i_op->lookup)
 			return ERR_PTR(-ENOTDIR);
@@ -1138,3 +1218,24 @@ int nonseekable_open(struct inode *inode, struct file *filp)
 }
 
 EXPORT_SYMBOL(nonseekable_open);
+<<<<<<< HEAD
+=======
+
+/*
+ * stream_open is used by subsystems that want stream-like file descriptors.
+ * Such file descriptors are not seekable and don't have notion of position
+ * (file.f_pos is always 0). Contrary to file descriptors of other regular
+ * files, .read() and .write() can run simultaneously.
+ *
+ * stream_open never fails and is marked to return int so that it could be
+ * directly used as file_operations.open .
+ */
+int stream_open(struct inode *inode, struct file *filp)
+{
+	filp->f_mode &= ~(FMODE_LSEEK | FMODE_PREAD | FMODE_PWRITE | FMODE_ATOMIC_POS);
+	filp->f_mode |= FMODE_STREAM;
+	return 0;
+}
+
+EXPORT_SYMBOL(stream_open);
+>>>>>>> common/deprecated/android-3.18

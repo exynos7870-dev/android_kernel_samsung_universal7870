@@ -447,7 +447,11 @@ void pci_ioremap_set_mem_type(int mem_type)
 
 int pci_ioremap_io(unsigned int offset, phys_addr_t phys_addr)
 {
+<<<<<<< HEAD
 	BUG_ON(offset + SZ_64K > IO_SPACE_LIMIT);
+=======
+	BUG_ON(offset + SZ_64K - 1 > IO_SPACE_LIMIT);
+>>>>>>> common/deprecated/android-3.18
 
 	return ioremap_page_range(PCI_IO_VIRT_BASE + offset,
 				  PCI_IO_VIRT_BASE + offset + SZ_64K,

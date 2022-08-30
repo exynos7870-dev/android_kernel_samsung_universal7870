@@ -297,10 +297,17 @@ void * devres_get(struct device *dev, void *new_res,
 	if (!dr) {
 		add_dr(dev, &new_dr->node);
 		dr = new_dr;
+<<<<<<< HEAD
 		new_dr = NULL;
 	}
 	spin_unlock_irqrestore(&dev->devres_lock, flags);
 	devres_free(new_dr);
+=======
+		new_res = NULL;
+	}
+	spin_unlock_irqrestore(&dev->devres_lock, flags);
+	devres_free(new_res);
+>>>>>>> common/deprecated/android-3.18
 
 	return dr->data;
 }

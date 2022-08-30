@@ -324,7 +324,11 @@ static int proc_sctp_do_hmac_alg(struct ctl_table *ctl, int write,
 	struct ctl_table tbl;
 	bool changed = false;
 	char *none = "none";
+<<<<<<< HEAD
 	char tmp[8];
+=======
+	char tmp[8] = {0};
+>>>>>>> common/deprecated/android-3.18
 	int ret;
 
 	memset(&tbl, 0, sizeof(struct ctl_table));

@@ -19,7 +19,11 @@
  * current->executable is only used by the procfs.  This allows a dispatch
  * table to check for several different types  of binary formats.  We keep
  * trying until we recognize the file or we run out of supported binary
+<<<<<<< HEAD
  * formats. 
+=======
+ * formats.
+>>>>>>> common/deprecated/android-3.18
  */
 
 #include <linux/slab.h>
@@ -56,7 +60,10 @@
 #include <linux/pipe_fs_i.h>
 #include <linux/oom.h>
 #include <linux/compat.h>
+<<<<<<< HEAD
 #include <linux/task_integrity.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 
 #include <asm/uaccess.h>
 #include <asm/mmu_context.h>
@@ -200,7 +207,28 @@ static struct page *get_arg_page(struct linux_binprm *bprm, unsigned long pos,
 
 	if (write) {
 		unsigned long size = bprm->vma->vm_end - bprm->vma->vm_start;
+<<<<<<< HEAD
 		struct rlimit *rlim;
+=======
+		unsigned long ptr_size, limit;
+
+		/*
+		 * Since the stack will hold pointers to the strings, we
+		 * must account for them as well.
+		 *
+		 * The size calculation is the entire vma while each arg page is
+		 * built, so each time we get here it's calculating how far it
+		 * is currently (rather than each call being just the newly
+		 * added size from the arg page).  As a result, we need to
+		 * always add the entire size of the pointers, so that on the
+		 * last call to get_arg_page() we'll actually have the entire
+		 * correct size.
+		 */
+		ptr_size = (bprm->argc + bprm->envc) * sizeof(void *);
+		if (ptr_size > ULONG_MAX - size)
+			goto fail;
+		size += ptr_size;
+>>>>>>> common/deprecated/android-3.18
 
 		acct_arg_size(bprm, size / PAGE_SIZE);
 
@@ -212,12 +240,18 @@ static struct page *get_arg_page(struct linux_binprm *bprm, unsigned long pos,
 			return page;
 
 		/*
+<<<<<<< HEAD
 		 * Limit to 1/4-th the stack size for the argv+env strings.
+=======
+		 * Limit to 1/4 of the max stack size or 3/4 of _STK_LIM
+		 * (whichever is smaller) for the argv+env strings.
+>>>>>>> common/deprecated/android-3.18
 		 * This ensures that:
 		 *  - the remaining binfmt code will not run out of stack space,
 		 *  - the program will have a reasonable amount of stack left
 		 *    to work from.
 		 */
+<<<<<<< HEAD
 		rlim = current->signal->rlim;
 		if (size > ACCESS_ONCE(rlim[RLIMIT_STACK].rlim_cur) / 4) {
 			put_page(page);
@@ -226,6 +260,19 @@ static struct page *get_arg_page(struct linux_binprm *bprm, unsigned long pos,
 	}
 
 	return page;
+=======
+		limit = _STK_LIM / 4 * 3;
+		limit = min(limit, rlimit(RLIMIT_STACK) / 4);
+		if (size > limit)
+			goto fail;
+	}
+
+	return page;
+
+fail:
+	put_page(page);
+	return NULL;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void put_arg_page(struct page *page)
@@ -659,6 +706,12 @@ int setup_arg_pages(struct linux_binprm *bprm,
 	if (stack_base > STACK_SIZE_MAX)
 		stack_base = STACK_SIZE_MAX;
 
+<<<<<<< HEAD
+=======
+	/* Add space for stack randomization. */
+	stack_base += (STACK_RND_MASK << PAGE_SHIFT);
+
+>>>>>>> common/deprecated/android-3.18
 	/* Make sure we didn't let the argument array grow too large. */
 	if (vma->vm_end - vma->vm_start > stack_base)
 		return -ENOMEM;
@@ -825,7 +878,11 @@ static int exec_mmap(struct mm_struct *mm)
 	/* Notify parent that we're no longer interested in the old VM */
 	tsk = current;
 	old_mm = current->mm;
+<<<<<<< HEAD
 	mm_release(tsk, old_mm);
+=======
+	exec_mm_release(tsk, old_mm);
+>>>>>>> common/deprecated/android-3.18
 
 	if (old_mm) {
 		sync_mm_rss(old_mm);
@@ -1028,6 +1085,7 @@ killed:
 	return -EAGAIN;
 }
 
+<<<<<<< HEAD
 char *get_task_comm(char *buf, struct task_struct *tsk)
 {
 	/* buf must be at least sizeof(tsk->comm) in size */
@@ -1037,6 +1095,16 @@ char *get_task_comm(char *buf, struct task_struct *tsk)
 	return buf;
 }
 EXPORT_SYMBOL_GPL(get_task_comm);
+=======
+char *__get_task_comm(char *buf, size_t buf_size, struct task_struct *tsk)
+{
+	task_lock(tsk);
+	strncpy(buf, tsk->comm, buf_size);
+	task_unlock(tsk);
+	return buf;
+}
+EXPORT_SYMBOL_GPL(__get_task_comm);
+>>>>>>> common/deprecated/android-3.18
 
 /*
  * These functions flushes out all traces of the currently running executable
@@ -1081,6 +1149,16 @@ int flush_old_exec(struct linux_binprm * bprm)
 	flush_thread();
 	current->personality &= ~bprm->per_clear;
 
+<<<<<<< HEAD
+=======
+	/*
+	 * We have to apply CLOEXEC before we change whether the process is
+	 * dumpable (in setup_new_exec) to avoid a race with a process in userspace
+	 * trying to access the should-be-closed file descriptors of a process
+	 * undergoing exec(2).
+	 */
+	do_close_on_exec(current->files);
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 
 out:
@@ -1128,9 +1206,14 @@ void setup_new_exec(struct linux_binprm * bprm)
 
 	/* An exec changes our domain. We are no longer part of the thread
 	   group */
+<<<<<<< HEAD
 	current->self_exec_id++;
 	flush_signal_handlers(current, 0);
 	do_close_on_exec(current->files);
+=======
+	WRITE_ONCE(current->self_exec_id, current->self_exec_id + 1);
+	flush_signal_handlers(current, 0);
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL(setup_new_exec);
 
@@ -1221,7 +1304,11 @@ static void check_unsafe_exec(struct linux_binprm *bprm)
 	unsigned n_fs;
 
 	if (p->ptrace) {
+<<<<<<< HEAD
 		if (p->ptrace & PT_PTRACE_CAP)
+=======
+		if (ptracer_capable(p, current_user_ns()))
+>>>>>>> common/deprecated/android-3.18
 			bprm->unsafe |= LSM_UNSAFE_PTRACE_CAP;
 		else
 			bprm->unsafe |= LSM_UNSAFE_PTRACE;
@@ -1413,22 +1500,31 @@ int search_binary_handler(struct linux_binprm *bprm)
 		if (printable(bprm->buf[0]) && printable(bprm->buf[1]) &&
 		    printable(bprm->buf[2]) && printable(bprm->buf[3]))
 			return retval;
+<<<<<<< HEAD
 		if (request_module(
 			      "binfmt-%04x", *(ushort *)(bprm->buf + 2)) < 0) {
 			task_integrity_delayed_reset(current);
 			return retval;
 		}
+=======
+		if (request_module("binfmt-%04x", *(ushort *)(bprm->buf + 2)) < 0)
+			return retval;
+>>>>>>> common/deprecated/android-3.18
 		need_retry = false;
 		goto retry;
 	}
 
+<<<<<<< HEAD
 	if (retval < 0)
 		task_integrity_delayed_reset(current);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	return retval;
 }
 EXPORT_SYMBOL(search_binary_handler);
 
+<<<<<<< HEAD
 #if defined CONFIG_SEC_RESTRICT_FORK
 #if defined CONFIG_SEC_RESTRICT_ROOTING_LOG
 #define PRINT_LOG(...)	printk(KERN_ERR __VA_ARGS__)
@@ -1555,6 +1651,8 @@ out:
 #endif	/* End of CONFIG_SEC_RESTRICT_FORK */
 
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static int exec_binprm(struct linux_binprm *bprm)
 {
 	pid_t old_pid, old_vpid;
@@ -1759,6 +1857,7 @@ SYSCALL_DEFINE3(execve,
 		const char __user *const __user *, argv,
 		const char __user *const __user *, envp)
 {
+<<<<<<< HEAD
 	struct filename *path = getname(filename);
 	if (!IS_ERR(path)) {
 
@@ -1775,6 +1874,8 @@ SYSCALL_DEFINE3(execve,
 #endif	// End of CONFIG_SEC_RESTRICT_FORK
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	return do_execve(getname(filename), argv, envp);
 }
 #ifdef CONFIG_COMPAT

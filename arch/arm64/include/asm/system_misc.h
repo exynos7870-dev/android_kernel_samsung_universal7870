@@ -41,7 +41,10 @@ struct mm_struct;
 extern void show_pte(struct mm_struct *mm, unsigned long addr);
 extern void __show_regs(struct pt_regs *);
 
+<<<<<<< HEAD
 void soft_restart(unsigned long);
+=======
+>>>>>>> common/deprecated/android-3.18
 extern void (*arm_pm_restart)(enum reboot_mode reboot_mode, const char *cmd);
 
 #define UDBG_UNDEFINED	(1 << 0)

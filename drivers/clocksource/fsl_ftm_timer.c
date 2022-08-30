@@ -282,7 +282,11 @@ static int __init __ftm_clk_init(struct device_node *np, char *cnt_name,
 
 static unsigned long __init ftm_clk_init(struct device_node *np)
 {
+<<<<<<< HEAD
 	unsigned long freq;
+=======
+	long freq;
+>>>>>>> common/deprecated/android-3.18
 
 	freq = __ftm_clk_init(np, "ftm-evt-counter-en", "ftm-evt");
 	if (freq <= 0)

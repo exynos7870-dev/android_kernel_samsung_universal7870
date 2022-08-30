@@ -32,8 +32,16 @@ int adis16400_update_scan_mode(struct iio_dev *indio_dev,
 
 	adis->buffer = kzalloc(indio_dev->scan_bytes + sizeof(u16),
 		GFP_KERNEL);
+<<<<<<< HEAD
 	if (!adis->buffer)
 		return -ENOMEM;
+=======
+	if (!adis->buffer) {
+		kfree(adis->xfer);
+		adis->xfer = NULL;
+		return -ENOMEM;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	tx = adis->buffer + indio_dev->scan_bytes;
 

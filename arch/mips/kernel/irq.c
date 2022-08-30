@@ -109,7 +109,11 @@ void __init init_IRQ(void)
 #endif
 }
 
+<<<<<<< HEAD
 #ifdef DEBUG_STACKOVERFLOW
+=======
+#ifdef CONFIG_DEBUG_STACKOVERFLOW
+>>>>>>> common/deprecated/android-3.18
 static inline void check_stack_overflow(void)
 {
 	unsigned long sp;

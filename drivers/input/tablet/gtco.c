@@ -78,6 +78,10 @@ Scott Hill shill@gtcocalcomp.com
 
 /* Max size of a single report */
 #define REPORT_MAX_SIZE       10
+<<<<<<< HEAD
+=======
+#define MAX_COLLECTION_LEVELS  10
+>>>>>>> common/deprecated/android-3.18
 
 
 /* Bitmask whether pen is in range */
@@ -224,8 +228,12 @@ static void parse_hid_report_descriptor(struct gtco *device, char * report,
 	char  maintype = 'x';
 	char  globtype[12];
 	int   indent = 0;
+<<<<<<< HEAD
 	char  indentstr[10] = "";
 
+=======
+	char  indentstr[MAX_COLLECTION_LEVELS + 1] = { 0 };
+>>>>>>> common/deprecated/android-3.18
 
 	dev_dbg(ddev, "======>>>>>>PARSE<<<<<<======\n");
 
@@ -351,6 +359,16 @@ static void parse_hid_report_descriptor(struct gtco *device, char * report,
 			case TAG_MAIN_COL_START:
 				maintype = 'S';
 
+<<<<<<< HEAD
+=======
+				if (indent == MAX_COLLECTION_LEVELS) {
+					dev_err(ddev, "Collection level %d would exceed limit of %d\n",
+						indent + 1,
+						MAX_COLLECTION_LEVELS);
+					break;
+				}
+
+>>>>>>> common/deprecated/android-3.18
 				if (data == 0) {
 					dev_dbg(ddev, "======>>>>>> Physical\n");
 					strcpy(globtype, "Physical");
@@ -370,8 +388,20 @@ static void parse_hid_report_descriptor(struct gtco *device, char * report,
 				break;
 
 			case TAG_MAIN_COL_END:
+<<<<<<< HEAD
 				dev_dbg(ddev, "<<<<<<======\n");
 				maintype = 'E';
+=======
+				maintype = 'E';
+
+				if (indent == 0) {
+					dev_err(ddev, "Collection level already at zero\n");
+					break;
+				}
+
+				dev_dbg(ddev, "<<<<<<======\n");
+
+>>>>>>> common/deprecated/android-3.18
 				indent--;
 				for (x = 0; x < indent; x++)
 					indentstr[x] = '-';
@@ -871,11 +901,23 @@ static int gtco_probe(struct usb_interface *usbinterface,
 		goto err_free_buf;
 	}
 
+<<<<<<< HEAD
 	/*
 	 * The endpoint is always altsetting 0, we know this since we know
 	 * this device only has one interrupt endpoint
 	 */
 	endpoint = &usbinterface->altsetting[0].endpoint[0].desc;
+=======
+	/* Sanity check that a device has an endpoint */
+	if (usbinterface->cur_altsetting->desc.bNumEndpoints < 1) {
+		dev_err(&usbinterface->dev,
+			"Invalid number of endpoints\n");
+		error = -EINVAL;
+		goto err_free_urb;
+	}
+
+	endpoint = &usbinterface->cur_altsetting->endpoint[0].desc;
+>>>>>>> common/deprecated/android-3.18
 
 	/* Some debug */
 	dev_dbg(&usbinterface->dev, "gtco # interfaces: %d\n", usbinterface->num_altsetting);
@@ -892,7 +934,11 @@ static int gtco_probe(struct usb_interface *usbinterface,
 	 * HID report descriptor
 	 */
 	if (usb_get_extra_descriptor(usbinterface->cur_altsetting,
+<<<<<<< HEAD
 				     HID_DEVICE_TYPE, &hid_desc) != 0){
+=======
+				     HID_DEVICE_TYPE, &hid_desc) != 0) {
+>>>>>>> common/deprecated/android-3.18
 		dev_err(&usbinterface->dev,
 			"Can't retrieve exta USB descriptor to get hid report descriptor length\n");
 		error = -EIO;
@@ -962,7 +1008,11 @@ static int gtco_probe(struct usb_interface *usbinterface,
 	input_dev->dev.parent = &usbinterface->dev;
 
 	/* Setup the URB, it will be posted later on open of input device */
+<<<<<<< HEAD
 	endpoint = &usbinterface->altsetting[0].endpoint[0].desc;
+=======
+	endpoint = &usbinterface->cur_altsetting->endpoint[0].desc;
+>>>>>>> common/deprecated/android-3.18
 
 	usb_fill_int_urb(gtco->urbinfo,
 			 gtco->usbdev,

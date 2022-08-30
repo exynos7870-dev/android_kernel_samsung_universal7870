@@ -75,7 +75,11 @@ struct s5h1432_config {
 	u8 status_mode;
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_S5H1432)
+=======
+#if IS_REACHABLE(CONFIG_DVB_S5H1432)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend *s5h1432_attach(const struct s5h1432_config *config,
 					   struct i2c_adapter *i2c);
 #else

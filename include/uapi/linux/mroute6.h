@@ -3,6 +3,10 @@
 
 #include <linux/types.h>
 #include <linux/sockios.h>
+<<<<<<< HEAD
+=======
+#include <linux/in6.h>		/* For struct sockaddr_in6. */
+>>>>>>> common/deprecated/android-3.18
 
 /*
  *	Based on the MROUTING 3.5 defines primarily to keep

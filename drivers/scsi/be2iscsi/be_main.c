@@ -48,7 +48,10 @@ static unsigned int be_iopoll_budget = 10;
 static unsigned int be_max_phys_size = 64;
 static unsigned int enable_msix = 1;
 
+<<<<<<< HEAD
 MODULE_DEVICE_TABLE(pci, beiscsi_pci_id_table);
+=======
+>>>>>>> common/deprecated/android-3.18
 MODULE_DESCRIPTION(DRV_DESC " " BUILD_STR);
 MODULE_VERSION(BUILD_STR);
 MODULE_AUTHOR("Emulex Corporation");
@@ -3166,7 +3169,11 @@ be_sgl_create_contiguous(void *virtual_address,
 {
 	WARN_ON(!virtual_address);
 	WARN_ON(!physical_address);
+<<<<<<< HEAD
 	WARN_ON(!length > 0);
+=======
+	WARN_ON(!length);
+>>>>>>> common/deprecated/android-3.18
 	WARN_ON(!sgl);
 
 	sgl->va = virtual_address;
@@ -4435,6 +4442,10 @@ put_shost:
 	scsi_host_put(phba->shost);
 free_kset:
 	iscsi_boot_destroy_kset(phba->boot_kset);
+<<<<<<< HEAD
+=======
+	phba->boot_kset = NULL;
+>>>>>>> common/deprecated/android-3.18
 	return -ENOMEM;
 }
 

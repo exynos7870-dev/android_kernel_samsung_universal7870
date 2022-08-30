@@ -187,8 +187,14 @@ acpi_tb_install_fixed_table(acpi_physical_address address,
 	status = acpi_tb_acquire_temp_table(&new_table_desc, address,
 					    ACPI_TABLE_ORIGIN_INTERNAL_PHYSICAL);
 	if (ACPI_FAILURE(status)) {
+<<<<<<< HEAD
 		ACPI_ERROR((AE_INFO, "Could not acquire table length at %p",
 			    ACPI_CAST_PTR(void, address)));
+=======
+		ACPI_ERROR((AE_INFO,
+			    "Could not acquire table length at %8.8X%8.8X",
+			    ACPI_FORMAT_UINT64(address)));
+>>>>>>> common/deprecated/android-3.18
 		return_ACPI_STATUS(status);
 	}
 
@@ -246,8 +252,14 @@ acpi_tb_install_standard_table(acpi_physical_address address,
 
 	status = acpi_tb_acquire_temp_table(&new_table_desc, address, flags);
 	if (ACPI_FAILURE(status)) {
+<<<<<<< HEAD
 		ACPI_ERROR((AE_INFO, "Could not acquire table length at %p",
 			    ACPI_CAST_PTR(void, address)));
+=======
+		ACPI_ERROR((AE_INFO,
+			    "Could not acquire table length at %8.8X%8.8X",
+			    ACPI_FORMAT_UINT64(address)));
+>>>>>>> common/deprecated/android-3.18
 		return_ACPI_STATUS(status);
 	}
 
@@ -258,9 +270,16 @@ acpi_tb_install_standard_table(acpi_physical_address address,
 	if (!reload &&
 	    acpi_gbl_disable_ssdt_table_install &&
 	    ACPI_COMPARE_NAME(&new_table_desc.signature, ACPI_SIG_SSDT)) {
+<<<<<<< HEAD
 		ACPI_INFO((AE_INFO, "Ignoring installation of %4.4s at %p",
 			   new_table_desc.signature.ascii, ACPI_CAST_PTR(void,
 									 address)));
+=======
+		ACPI_INFO((AE_INFO,
+			   "Ignoring installation of %4.4s at %8.8X%8.8X",
+			   new_table_desc.signature.ascii,
+			   ACPI_FORMAT_UINT64(address)));
+>>>>>>> common/deprecated/android-3.18
 		goto release_and_exit;
 	}
 
@@ -428,11 +447,19 @@ finish_override:
 		return;
 	}
 
+<<<<<<< HEAD
 	ACPI_INFO((AE_INFO, "%4.4s " ACPI_PRINTF_UINT
 		   " %s table override, new table: " ACPI_PRINTF_UINT,
 		   old_table_desc->signature.ascii,
 		   ACPI_FORMAT_TO_UINT(old_table_desc->address),
 		   override_type, ACPI_FORMAT_TO_UINT(new_table_desc.address)));
+=======
+	ACPI_INFO((AE_INFO, "%4.4s 0x%8.8X%8.8X"
+		   " %s table override, new table: 0x%8.8X%8.8X",
+		   old_table_desc->signature.ascii,
+		   ACPI_FORMAT_UINT64(old_table_desc->address),
+		   override_type, ACPI_FORMAT_UINT64(new_table_desc.address)));
+>>>>>>> common/deprecated/android-3.18
 
 	/* We can now uninstall the original table */
 
@@ -516,7 +543,11 @@ void acpi_tb_uninstall_table(struct acpi_table_desc *table_desc)
 
 	if ((table_desc->flags & ACPI_TABLE_ORIGIN_MASK) ==
 	    ACPI_TABLE_ORIGIN_INTERNAL_VIRTUAL) {
+<<<<<<< HEAD
 		ACPI_FREE(ACPI_CAST_PTR(void, table_desc->address));
+=======
+		ACPI_FREE(ACPI_PHYSADDR_TO_PTR(table_desc->address));
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	table_desc->address = ACPI_PTR_TO_PHYSADDR(NULL);

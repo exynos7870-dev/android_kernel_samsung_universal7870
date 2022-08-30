@@ -142,6 +142,22 @@ static inline bool is_ereg(u32 reg)
 		return false;
 }
 
+<<<<<<< HEAD
+=======
+/*
+ * is_ereg_8l() == true if BPF register 'reg' is mapped to access x86-64
+ * lower 8-bit registers dil,sil,bpl,spl,r8b..r15b, which need extra byte
+ * of encoding. al,cl,dl,bl have simpler encoding.
+ */
+static bool is_ereg_8l(u32 reg)
+{
+	return is_ereg(reg) ||
+	    (1 << reg) & (BIT(BPF_REG_1) |
+			  BIT(BPF_REG_2) |
+			  BIT(BPF_REG_FP));
+}
+
+>>>>>>> common/deprecated/android-3.18
 /* add modifiers if 'reg' maps to x64 registers r8..r15 */
 static inline u8 add_1mod(u8 byte, u32 reg)
 {
@@ -558,6 +574,16 @@ static int do_jit(struct bpf_prog *bpf_prog, int *addrs, u8 *image,
 				if (is_ereg(dst_reg))
 					EMIT1(0x41);
 				EMIT3(0xC1, add_1reg(0xC8, dst_reg), 8);
+<<<<<<< HEAD
+=======
+
+				/* emit 'movzwl eax, ax' */
+				if (is_ereg(dst_reg))
+					EMIT3(0x45, 0x0F, 0xB7);
+				else
+					EMIT2(0x0F, 0xB7);
+				EMIT1(add_2reg(0xC0, dst_reg, dst_reg));
+>>>>>>> common/deprecated/android-3.18
 				break;
 			case 32:
 				/* emit 'bswap eax' to swap lower 4 bytes */
@@ -576,6 +602,30 @@ static int do_jit(struct bpf_prog *bpf_prog, int *addrs, u8 *image,
 			break;
 
 		case BPF_ALU | BPF_END | BPF_FROM_LE:
+<<<<<<< HEAD
+=======
+			switch (imm32) {
+			case 16:
+				/* emit 'movzwl eax, ax' to zero extend 16-bit
+				 * into 64 bit
+				 */
+				if (is_ereg(dst_reg))
+					EMIT3(0x45, 0x0F, 0xB7);
+				else
+					EMIT2(0x0F, 0xB7);
+				EMIT1(add_2reg(0xC0, dst_reg, dst_reg));
+				break;
+			case 32:
+				/* emit 'mov eax, eax' to clear upper 32-bits */
+				if (is_ereg(dst_reg))
+					EMIT1(0x45);
+				EMIT2(0x89, add_2reg(0xC0, dst_reg, dst_reg));
+				break;
+			case 64:
+				/* nop */
+				break;
+			}
+>>>>>>> common/deprecated/android-3.18
 			break;
 
 			/* ST: *(u8*)(dst_reg + off) = imm */
@@ -611,9 +661,14 @@ st:			if (is_imm8(insn->off))
 			/* STX: *(u8*)(dst_reg + off) = src_reg */
 		case BPF_STX | BPF_MEM | BPF_B:
 			/* emit 'mov byte ptr [rax + off], al' */
+<<<<<<< HEAD
 			if (is_ereg(dst_reg) || is_ereg(src_reg) ||
 			    /* have to add extra byte for x86 SIL, DIL regs */
 			    src_reg == BPF_REG_1 || src_reg == BPF_REG_2)
+=======
+			if (is_ereg(dst_reg) || is_ereg_8l(src_reg))
+				/* Add extra byte for eregs or SIL,DIL,BPL in src_reg */
+>>>>>>> common/deprecated/android-3.18
 				EMIT2(add_2mod(0x40, dst_reg, src_reg), 0x88);
 			else
 				EMIT1(0x88);
@@ -890,7 +945,20 @@ common_load:
 		}
 
 		if (image) {
+<<<<<<< HEAD
 			if (unlikely(proglen + ilen > oldproglen)) {
+=======
+			/*
+			 * When populating the image, assert that:
+			 *
+			 *  i) We do not write beyond the allocated space, and
+			 * ii) addrs[i] did not change from the prior run, in order
+			 *     to validate assumptions made for computing branch
+			 *     displacements.
+			 */
+			if (unlikely(proglen + ilen > oldproglen ||
+				     proglen + ilen != addrs[i])) {
+>>>>>>> common/deprecated/android-3.18
 				pr_err("bpf_jit_compile fatal error\n");
 				return -EFAULT;
 			}
@@ -936,7 +1004,16 @@ void bpf_int_jit_compile(struct bpf_prog *prog)
 	}
 	ctx.cleanup_addr = proglen;
 
+<<<<<<< HEAD
 	for (pass = 0; pass < 10; pass++) {
+=======
+	/* JITed image shrinks with every pass and the loop iterates
+	 * until the image stops shrinking. Very large bpf programs
+	 * may converge on the last pass. In such case do one more
+	 * pass to emit the final image
+	 */
+	for (pass = 0; pass < 20 || image; pass++) {
+>>>>>>> common/deprecated/android-3.18
 		proglen = do_jit(prog, addrs, image, oldproglen, &ctx);
 		if (proglen <= 0) {
 			image = NULL;
@@ -959,6 +1036,10 @@ void bpf_int_jit_compile(struct bpf_prog *prog)
 				goto out;
 		}
 		oldproglen = proglen;
+<<<<<<< HEAD
+=======
+		cond_resched();
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (bpf_jit_enable > 1)

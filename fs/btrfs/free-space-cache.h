@@ -23,6 +23,10 @@ struct btrfs_free_space {
 	struct rb_node offset_index;
 	u64 offset;
 	u64 bytes;
+<<<<<<< HEAD
+=======
+	u64 max_extent_size;
+>>>>>>> common/deprecated/android-3.18
 	unsigned long *bitmap;
 	struct list_head list;
 };

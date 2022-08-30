@@ -2798,7 +2798,11 @@ static int pkt_setup_dev(dev_t dev, dev_t* pkt_dev)
 	pd->pkt_dev = MKDEV(pktdev_major, idx);
 	ret = pkt_new_dev(pd, dev);
 	if (ret)
+<<<<<<< HEAD
 		goto out_new_dev;
+=======
+		goto out_mem2;
+>>>>>>> common/deprecated/android-3.18
 
 	/* inherit events of the host device */
 	disk->events = pd->bdev->bd_disk->events;
@@ -2816,8 +2820,11 @@ static int pkt_setup_dev(dev_t dev, dev_t* pkt_dev)
 	mutex_unlock(&ctl_mutex);
 	return 0;
 
+<<<<<<< HEAD
 out_new_dev:
 	blk_cleanup_queue(disk->queue);
+=======
+>>>>>>> common/deprecated/android-3.18
 out_mem2:
 	put_disk(disk);
 out_mem:

@@ -13,6 +13,7 @@
 #include <uapi/linux/input.h>
 /* Implementation details, userspace should not care about these */
 #define ABS_MT_FIRST		ABS_MT_TOUCH_MAJOR
+<<<<<<< HEAD
 #define ABS_MT_LAST		ABS_MT_GRIP
 
 /*
@@ -104,6 +105,9 @@
 #define input_raw_info(mode, dev, fmt, ...) input_info(mode, dev, fmt, ## __VA_ARGS__)
 #define input_raw_data_clear() {}
 #endif
+=======
+#define ABS_MT_LAST		ABS_MT_TOOL_Y
+>>>>>>> common/deprecated/android-3.18
 
 /*
  * In-kernel definitions.
@@ -265,9 +269,13 @@ struct input_dev {
 	struct mutex mutex;
 
 	unsigned int users;
+<<<<<<< HEAD
 	unsigned int users_private;
 	bool going_away;
 	bool disabled;
+=======
+	bool going_away;
+>>>>>>> common/deprecated/android-3.18
 
 	struct device dev;
 
@@ -619,6 +627,10 @@ int input_ff_event(struct input_dev *dev, unsigned int type, unsigned int code, 
 
 int input_ff_upload(struct input_dev *dev, struct ff_effect *effect, struct file *file);
 int input_ff_erase(struct input_dev *dev, int effect_id, struct file *file);
+<<<<<<< HEAD
+=======
+int input_ff_flush(struct input_dev *dev, struct file *file);
+>>>>>>> common/deprecated/android-3.18
 
 int input_ff_create_memless(struct input_dev *dev, void *data,
 		int (*play_effect)(struct input_dev *, void *, struct ff_effect *));

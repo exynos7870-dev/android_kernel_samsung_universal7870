@@ -23,16 +23,23 @@
 #include <linux/sysrq.h>
 #include <linux/init.h>
 #include <linux/nmi.h>
+<<<<<<< HEAD
 #include <linux/exynos-ss.h>
 #include <asm/core_regs.h>
 #include "sched/sched.h"
+=======
+#include <linux/console.h>
+>>>>>>> common/deprecated/android-3.18
 
 #define PANIC_TIMER_STEP 100
 #define PANIC_BLINK_SPD 18
 
+<<<<<<< HEAD
 /* Machine specific panic information string */
 char *mach_panic_string;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 int panic_on_oops = CONFIG_PANIC_ON_OOPS_VALUE;
 static unsigned long tainted_mask;
 static int pause_on_oops;
@@ -81,8 +88,11 @@ void panic(const char *fmt, ...)
 	long i, i_next = 0;
 	int state = 0;
 
+<<<<<<< HEAD
 	 exynos_trace_stop();
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Disable local interrupts. This will prevent panic_smp_self_stop
 	 * from deadlocking the first cpu that invokes the panic, since
@@ -90,6 +100,10 @@ void panic(const char *fmt, ...)
 	 * after the panic_lock is acquired) from invoking panic again.
 	 */
 	local_irq_disable();
+<<<<<<< HEAD
+=======
+	preempt_disable_notrace();
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * It's possible to come here directly from a panic-assertion and
@@ -109,6 +123,7 @@ void panic(const char *fmt, ...)
 	va_start(args, fmt);
 	vsnprintf(buf, sizeof(buf), fmt, args);
 	va_end(args);
+<<<<<<< HEAD
 
 #ifdef CONFIG_SEC_DEBUG_AUTO_SUMMARY
 	if(buf[strlen(buf)-1] == '\n')
@@ -119,6 +134,9 @@ void panic(const char *fmt, ...)
 
 	exynos_ss_prepare_panic();
 	exynos_ss_dump_panic(buf, (size_t)strnlen(buf, sizeof(buf)));
+=======
+	pr_emerg("Kernel panic - not syncing: %s\n", buf);
+>>>>>>> common/deprecated/android-3.18
 #ifdef CONFIG_DEBUG_BUGVERBOSE
 	/*
 	 * Avoid nested stack-dumping if a panic occurs during oops processing
@@ -126,7 +144,11 @@ void panic(const char *fmt, ...)
 	if (!test_taint(TAINT_DIE) && oops_in_progress <= 1)
 		dump_stack();
 #endif
+<<<<<<< HEAD
 	sysrq_sched_debug_show();
+=======
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * If we have crashed and we have a crash kernel loaded let it handle
 	 * everything else.
@@ -151,10 +173,13 @@ void panic(const char *fmt, ...)
 
 	kmsg_dump(KMSG_DUMP_PANIC);
 
+<<<<<<< HEAD
 	exynos_cs_show_pcval();
 
 	exynos_ss_post_panic();
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * If you doubt kdump always works fine in any situation,
 	 * "crash_kexec_post_notifiers" offers you a chance to run
@@ -166,6 +191,20 @@ void panic(const char *fmt, ...)
 
 	bust_spinlocks(0);
 
+<<<<<<< HEAD
+=======
+	/*
+	 * We may have ended up stopping the CPU holding the lock (in
+	 * smp_send_stop()) while still having some valuable data in the console
+	 * buffer.  Try to acquire the lock then release it regardless of the
+	 * result.  The release will also print the buffers out.  Locks debug
+	 * should be disabled to avoid reporting bad unlock balance when
+	 * panic() is not being callled from OOPS.
+	 */
+	debug_locks_off();
+	console_flush_on_panic();
+
+>>>>>>> common/deprecated/android-3.18
 	if (!panic_blink)
 		panic_blink = no_blink;
 
@@ -174,7 +213,11 @@ void panic(const char *fmt, ...)
 		 * Delay timeout seconds before rebooting the machine.
 		 * We can't use the "normal" timers since we just panicked.
 		 */
+<<<<<<< HEAD
 		pr_emerg("Rebooting in %d seconds..", panic_timeout);
+=======
+		pr_emerg("Rebooting in %d seconds..\n", panic_timeout);
+>>>>>>> common/deprecated/android-3.18
 
 		for (i = 0; i < panic_timeout * 1000; i += PANIC_TIMER_STEP) {
 			touch_nmi_watchdog();
@@ -417,11 +460,14 @@ late_initcall(init_oops_id);
 void print_oops_end_marker(void)
 {
 	init_oops_id();
+<<<<<<< HEAD
 
 	if (mach_panic_string)
 		printk(KERN_WARNING "Board Information: %s\n",
 		       mach_panic_string);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	pr_warn("---[ end trace %016llx ]---\n", (unsigned long long)oops_id);
 }
 
@@ -446,11 +492,18 @@ static void warn_slowpath_common(const char *file, int line, void *caller,
 				 unsigned taint, struct slowpath_args *args)
 {
 	disable_trace_on_warning();
+<<<<<<< HEAD
 #if defined(CONFIG_SEC_BAT_AUT) && !defined(CONFIG_SAMSUNG_PRODUCT_SHIP)
 	printk(BAT_AUTOMAION_TEST_PREFIX_WARN "KERNEL WARN START\n");
 #endif
 	printk(KERN_WARNING "------------[ cut here ]------------\n");
 	printk(KERN_WARNING "WARNING: at %s:%d %pS()\n", file, line, caller);
+=======
+
+	pr_warn("------------[ cut here ]------------\n");
+	pr_warn("WARNING: CPU: %d PID: %d at %s:%d %pS()\n",
+		raw_smp_processor_id(), current->pid, file, line, caller);
+>>>>>>> common/deprecated/android-3.18
 
 	if (args)
 		vprintk(args->fmt, args->args);
@@ -460,9 +513,12 @@ static void warn_slowpath_common(const char *file, int line, void *caller,
 	print_oops_end_marker();
 	/* Just a warning, don't kill lockdep. */
 	add_taint(taint, LOCKDEP_STILL_OK);
+<<<<<<< HEAD
 #if defined(CONFIG_SEC_BAT_AUT) && !defined(CONFIG_SAMSUNG_PRODUCT_SHIP)
 	printk(BAT_AUTOMAION_TEST_PREFIX_WARN "KERNEL WARN END\n");
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 
 void warn_slowpath_fmt(const char *file, int line, const char *fmt, ...)

@@ -19,12 +19,19 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <sys/wait.h>
+<<<<<<< HEAD
 #include <linux/unistd.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
 #include <sys/time.h>
 #include <sys/types.h>
+<<<<<<< HEAD
+=======
+#include <sys/syscall.h>
+>>>>>>> common/deprecated/android-3.18
 
 #include <pthread.h>
 

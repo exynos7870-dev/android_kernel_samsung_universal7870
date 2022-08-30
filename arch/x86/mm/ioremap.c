@@ -296,11 +296,19 @@ void iounmap(volatile void __iomem *addr)
 	    (void __force *)addr < phys_to_virt(ISA_END_ADDRESS))
 		return;
 
+<<<<<<< HEAD
 	addr = (volatile void __iomem *)
 		(PAGE_MASK & (unsigned long __force)addr);
 
 	mmiotrace_iounmap(addr);
 
+=======
+	mmiotrace_iounmap(addr);
+
+	addr = (volatile void __iomem *)
+		(PAGE_MASK & (unsigned long __force)addr);
+
+>>>>>>> common/deprecated/android-3.18
 	/* Use the vm area unlocked, assuming the caller
 	   ensures there isn't another iounmap for the same address
 	   in parallel. Reuse of the virtual address is prevented by

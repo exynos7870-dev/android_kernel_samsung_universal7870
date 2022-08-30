@@ -192,7 +192,12 @@ static void rose_kill_by_device(struct net_device *dev)
 
 		if (rose->device == dev) {
 			rose_disconnect(s, ENETUNREACH, ROSE_OUT_OF_ORDER, 0);
+<<<<<<< HEAD
 			rose->neighbour->use--;
+=======
+			if (rose->neighbour)
+				rose->neighbour->use--;
+>>>>>>> common/deprecated/android-3.18
 			rose->device = NULL;
 		}
 	}

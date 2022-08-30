@@ -61,7 +61,11 @@ struct au8522_config {
 	enum au8522_if_freq qam_if;
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_AU8522_DTV)
+=======
+#if IS_REACHABLE(CONFIG_DVB_AU8522_DTV)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend *au8522_attach(const struct au8522_config *config,
 					  struct i2c_adapter *i2c);
 #else

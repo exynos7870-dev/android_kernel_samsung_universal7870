@@ -157,10 +157,13 @@ struct fuse_file {
 
 	/** Has flock been performed on this file? */
 	bool flock:1;
+<<<<<<< HEAD
 
 	/* the read write file */
 	struct file *rw_lower_file;
 	bool shortcircuit_enabled;
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 /** One input argument of a request */
@@ -245,6 +248,10 @@ struct fuse_io_priv {
 	size_t size;
 	__u64 offset;
 	bool write;
+<<<<<<< HEAD
+=======
+	bool should_dirty;
+>>>>>>> common/deprecated/android-3.18
 	int err;
 	struct kiocb *iocb;
 	struct file *file;
@@ -355,6 +362,12 @@ struct fuse_req {
 	/** Inode used in the request or NULL */
 	struct inode *inode;
 
+<<<<<<< HEAD
+=======
+	/** Path used for completing d_canonical_path */
+	struct path *canonical_path;
+
+>>>>>>> common/deprecated/android-3.18
 	/** AIO control block */
 	struct fuse_io_priv *io;
 
@@ -366,9 +379,12 @@ struct fuse_req {
 
 	/** Request is stolen from fuse_file->reserved_req */
 	struct file *stolen_file;
+<<<<<<< HEAD
 
 	/** fuse shortcircuit file  */
 	struct file *private_lower_rw_file;
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 /**
@@ -402,9 +418,12 @@ struct fuse_conn {
 	/** Maximum write size */
 	unsigned max_write;
 
+<<<<<<< HEAD
 	/** Free space reserve size */
 	unsigned reserved_space_mb;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/** Readers of the connection are waiting on this */
 	wait_queue_head_t waitq;
 
@@ -493,9 +512,12 @@ struct fuse_conn {
 	/** write-back cache policy (default is write-through) */
 	unsigned writeback_cache:1;
 
+<<<<<<< HEAD
 	/** Shortcircuited IO. */
 	unsigned shortcircuit_io:1;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * The following bitfields are only for optimization purposes
 	 * and hence races in setting them will not cause malfunction
@@ -844,6 +866,11 @@ void fuse_ctl_remove_conn(struct fuse_conn *fc);
  */
 int fuse_valid_type(int m);
 
+<<<<<<< HEAD
+=======
+bool fuse_invalid_attr(struct fuse_attr *attr);
+
+>>>>>>> common/deprecated/android-3.18
 /**
  * Is current process allowed to perform filesystem operation?
  */
@@ -907,7 +934,11 @@ bool fuse_write_update_size(struct inode *inode, loff_t pos);
 int fuse_flush_times(struct inode *inode, struct fuse_file *ff);
 int fuse_write_inode(struct inode *inode, struct writeback_control *wbc);
 
+<<<<<<< HEAD
 int fuse_do_setattr(struct inode *inode, struct iattr *attr,
+=======
+int fuse_do_setattr(struct dentry *dentry, struct iattr *attr,
+>>>>>>> common/deprecated/android-3.18
 		    struct file *file);
 
 #endif /* _FS_FUSE_I_H */

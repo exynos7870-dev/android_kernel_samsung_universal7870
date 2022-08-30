@@ -123,6 +123,10 @@ xfs_dir3_block_write_verify(
 }
 
 const struct xfs_buf_ops xfs_dir3_block_buf_ops = {
+<<<<<<< HEAD
+=======
+	.name = "xfs_dir3_block",
+>>>>>>> common/deprecated/android-3.18
 	.verify_read = xfs_dir3_block_read_verify,
 	.verify_write = xfs_dir3_block_write_verify,
 };

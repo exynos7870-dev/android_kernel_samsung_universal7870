@@ -5320,7 +5320,11 @@ static void b43_nphy_restore_cal(struct b43_wldev *dev)
 
 	for (i = 0; i < 4; i++) {
 		if (dev->phy.rev >= 3)
+<<<<<<< HEAD
 			table[i] = coef[i];
+=======
+			coef[i] = table[i];
+>>>>>>> common/deprecated/android-3.18
 		else
 			coef[i] = 0;
 	}

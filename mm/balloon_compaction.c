@@ -61,6 +61,10 @@ struct page *balloon_page_dequeue(struct balloon_dev_info *b_dev_info)
 	bool dequeued_page;
 
 	dequeued_page = false;
+<<<<<<< HEAD
+=======
+	spin_lock_irqsave(&b_dev_info->pages_lock, flags);
+>>>>>>> common/deprecated/android-3.18
 	list_for_each_entry_safe(page, tmp, &b_dev_info->pages, lru) {
 		/*
 		 * Block others from accessing the 'page' while we get around
@@ -75,15 +79,24 @@ struct page *balloon_page_dequeue(struct balloon_dev_info *b_dev_info)
 				continue;
 			}
 #endif
+<<<<<<< HEAD
 			spin_lock_irqsave(&b_dev_info->pages_lock, flags);
 			balloon_page_delete(page);
 			__count_vm_event(BALLOON_DEFLATE);
 			spin_unlock_irqrestore(&b_dev_info->pages_lock, flags);
+=======
+			balloon_page_delete(page);
+			__count_vm_event(BALLOON_DEFLATE);
+>>>>>>> common/deprecated/android-3.18
 			unlock_page(page);
 			dequeued_page = true;
 			break;
 		}
 	}
+<<<<<<< HEAD
+=======
+	spin_unlock_irqrestore(&b_dev_info->pages_lock, flags);
+>>>>>>> common/deprecated/android-3.18
 
 	if (!dequeued_page) {
 		/*

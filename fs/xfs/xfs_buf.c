@@ -376,6 +376,10 @@ retry:
 out_free_pages:
 	for (i = 0; i < bp->b_page_count; i++)
 		__free_page(bp->b_pages[i]);
+<<<<<<< HEAD
+=======
+	bp->b_flags &= ~_XBF_PAGES;
+>>>>>>> common/deprecated/android-3.18
 	return error;
 }
 
@@ -607,6 +611,16 @@ found:
 		}
 	}
 
+<<<<<<< HEAD
+=======
+	/*
+	 * Clear b_error if this is a lookup from a caller that doesn't expect
+	 * valid data to be found in the buffer.
+	 */
+	if (!(flags & XBF_READ))
+		xfs_buf_ioerror(bp, 0);
+
+>>>>>>> common/deprecated/android-3.18
 	XFS_STATS_INC(xb_get);
 	trace_xfs_buf_get(bp, flags, _RET_IP_);
 	return bp;
@@ -974,6 +988,11 @@ void
 xfs_buf_unlock(
 	struct xfs_buf		*bp)
 {
+<<<<<<< HEAD
+=======
+	ASSERT(xfs_buf_islocked(bp));
+
+>>>>>>> common/deprecated/android-3.18
 	XB_CLEAR_OWNER(bp);
 	up(&bp->b_sema);
 
@@ -1558,7 +1577,11 @@ xfs_buftarg_isolate(
 	 * zero. If the value is already zero, we need to reclaim the
 	 * buffer, otherwise it gets another trip through the LRU.
 	 */
+<<<<<<< HEAD
 	if (!atomic_add_unless(&bp->b_lru_ref, -1, 0)) {
+=======
+	if (atomic_add_unless(&bp->b_lru_ref, -1, 0)) {
+>>>>>>> common/deprecated/android-3.18
 		spin_unlock(&bp->b_lock);
 		return LRU_ROTATE;
 	}
@@ -1690,6 +1713,31 @@ error:
 }
 
 /*
+<<<<<<< HEAD
+=======
+ * Cancel a delayed write list.
+ *
+ * Remove each buffer from the list, clear the delwri queue flag and drop the
+ * associated buffer reference.
+ */
+void
+xfs_buf_delwri_cancel(
+	struct list_head	*list)
+{
+	struct xfs_buf		*bp;
+
+	while (!list_empty(list)) {
+		bp = list_first_entry(list, struct xfs_buf, b_list);
+
+		xfs_buf_lock(bp);
+		bp->b_flags &= ~_XBF_DELWRI_Q;
+		list_del_init(&bp->b_list);
+		xfs_buf_relse(bp);
+	}
+}
+
+/*
+>>>>>>> common/deprecated/android-3.18
  * Add a buffer to the delayed write list.
  *
  * This queues a buffer for writeout if it hasn't already been.  Note that

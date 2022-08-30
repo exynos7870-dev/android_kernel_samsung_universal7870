@@ -5,7 +5,11 @@
  * Return the address of a given character within a null-terminated
  * string, or null if it is not found.
  */
+<<<<<<< HEAD
 
+=======
+#include <asm/export.h>
+>>>>>>> common/deprecated/android-3.18
 #include <asm/regdef.h>
 
 	.set noreorder
@@ -68,3 +72,7 @@ $retnull:
 	ret			# .. e1 :
 
 	.end strchr
+<<<<<<< HEAD
+=======
+	EXPORT_SYMBOL(strchr)
+>>>>>>> common/deprecated/android-3.18

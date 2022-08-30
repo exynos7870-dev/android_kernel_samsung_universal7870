@@ -96,8 +96,15 @@ define archhelp
   echo '* unwcheck	- Check vmlinux for invalid unwind info'
 endef
 
+<<<<<<< HEAD
 archprepare: make_nr_irqs_h FORCE
 PHONY += make_nr_irqs_h FORCE
 
 make_nr_irqs_h: FORCE
+=======
+archprepare: make_nr_irqs_h
+PHONY += make_nr_irqs_h FORCE
+
+make_nr_irqs_h:
+>>>>>>> common/deprecated/android-3.18
 	$(Q)$(MAKE) $(build)=arch/ia64/kernel include/generated/nr-irqs.h

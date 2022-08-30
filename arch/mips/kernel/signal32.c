@@ -220,7 +220,11 @@ static int restore_sigcontext32(struct pt_regs *regs,
 	int i;
 
 	/* Always make any pending restarted system calls return -EINTR */
+<<<<<<< HEAD
 	current_thread_info()->restart_block.fn = do_no_restart_syscall;
+=======
+	current->restart_block.fn = do_no_restart_syscall;
+>>>>>>> common/deprecated/android-3.18
 
 	err |= __get_user(regs->cp0_epc, &sc->sc_pc);
 	err |= __get_user(regs->hi, &sc->sc_mdhi);
@@ -409,8 +413,11 @@ int copy_siginfo_to_user32(compat_siginfo_t __user *to, const siginfo_t *from)
 
 int copy_siginfo_from_user32(siginfo_t *to, compat_siginfo_t __user *from)
 {
+<<<<<<< HEAD
 	memset(to, 0, sizeof *to);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (copy_from_user(to, from, 3*sizeof(int)) ||
 	    copy_from_user(to->_sifields._pad,
 			   from->_sifields._pad, SI_PAD_SIZE32))

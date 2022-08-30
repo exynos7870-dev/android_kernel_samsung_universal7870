@@ -166,6 +166,13 @@ static unsigned int ipv4_conntrack_local(const struct nf_hook_ops *ops,
 	if (skb->len < sizeof(struct iphdr) ||
 	    ip_hdrlen(skb) < sizeof(struct iphdr))
 		return NF_ACCEPT;
+<<<<<<< HEAD
+=======
+
+	if (ip_is_fragment(ip_hdr(skb))) /* IP_NODEFRAG setsockopt set */
+		return NF_ACCEPT;
+
+>>>>>>> common/deprecated/android-3.18
 	return nf_conntrack_in(dev_net(out), PF_INET, ops->hooknum, skb);
 }
 
@@ -269,15 +276,28 @@ getorigdst(struct sock *sk, int optval, void __user *user, int *len)
 	struct nf_conntrack_tuple tuple;
 
 	memset(&tuple, 0, sizeof(tuple));
+<<<<<<< HEAD
+=======
+
+	lock_sock(sk);
+>>>>>>> common/deprecated/android-3.18
 	tuple.src.u3.ip = inet->inet_rcv_saddr;
 	tuple.src.u.tcp.port = inet->inet_sport;
 	tuple.dst.u3.ip = inet->inet_daddr;
 	tuple.dst.u.tcp.port = inet->inet_dport;
 	tuple.src.l3num = PF_INET;
 	tuple.dst.protonum = sk->sk_protocol;
+<<<<<<< HEAD
 
 	/* We only do TCP and SCTP at the moment: is there a better way? */
 	if (sk->sk_protocol != IPPROTO_TCP && sk->sk_protocol != IPPROTO_SCTP) {
+=======
+	release_sock(sk);
+
+	/* We only do TCP and SCTP at the moment: is there a better way? */
+	if (tuple.dst.protonum != IPPROTO_TCP &&
+	    tuple.dst.protonum != IPPROTO_SCTP) {
+>>>>>>> common/deprecated/android-3.18
 		pr_debug("SO_ORIGINAL_DST: Not a TCP/SCTP socket\n");
 		return -ENOPROTOOPT;
 	}

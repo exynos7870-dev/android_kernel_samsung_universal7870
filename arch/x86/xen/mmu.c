@@ -1147,7 +1147,11 @@ static void __init xen_cleanhighmap(unsigned long vaddr,
 
 	/* NOTE: The loop is more greedy than the cleanup_highmap variant.
 	 * We include the PMD passed in on _both_ boundaries. */
+<<<<<<< HEAD
 	for (; vaddr <= vaddr_end && (pmd < (level2_kernel_pgt + PAGE_SIZE));
+=======
+	for (; vaddr <= vaddr_end && (pmd < (level2_kernel_pgt + PTRS_PER_PMD));
+>>>>>>> common/deprecated/android-3.18
 			pmd++, vaddr += PMD_SIZE) {
 		if (pmd_none(*pmd))
 			continue;
@@ -1246,8 +1250,11 @@ void xen_flush_tlb_all(void)
 	struct mmuext_op *op;
 	struct multicall_space mcs;
 
+<<<<<<< HEAD
 	trace_xen_mmu_flush_tlb_all(0);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	preempt_disable();
 
 	mcs = xen_mc_entry(sizeof(*op));
@@ -1265,8 +1272,11 @@ static void xen_flush_tlb(void)
 	struct mmuext_op *op;
 	struct multicall_space mcs;
 
+<<<<<<< HEAD
 	trace_xen_mmu_flush_tlb(0);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	preempt_disable();
 
 	mcs = xen_mc_entry(sizeof(*op));

@@ -13,7 +13,11 @@
  * The scheduling comments are according to the EV5 documentation (and done by 
  * hand, so they might well be incorrect, please do tell me about it..)
  */
+<<<<<<< HEAD
 
+=======
+#include <asm/export.h>
+>>>>>>> common/deprecated/android-3.18
 	.set noat
 	.set noreorder
 .text
@@ -106,6 +110,11 @@ within_one_quad:
 end:
 	ret $31,($26),1		/* E1 */
 	.end ___memset
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL(___memset)
+EXPORT_SYMBOL(__constant_c_memset)
+>>>>>>> common/deprecated/android-3.18
 
 	.align 5
 	.ent __memsetw
@@ -122,6 +131,15 @@ __memsetw:
 	br __constant_c_memset	/* .. E1 */
 
 	.end __memsetw
+<<<<<<< HEAD
 
 memset = ___memset
 __memset = ___memset
+=======
+EXPORT_SYMBOL(__memsetw)
+
+memset = ___memset
+__memset = ___memset
+	EXPORT_SYMBOL(memset)
+	EXPORT_SYMBOL(__memset)
+>>>>>>> common/deprecated/android-3.18

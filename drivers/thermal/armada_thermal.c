@@ -240,9 +240,15 @@ static const struct armada_thermal_data armada380_data = {
 	.is_valid_shift = 10,
 	.temp_shift = 0,
 	.temp_mask = 0x3ff,
+<<<<<<< HEAD
 	.coef_b = 1169498786UL,
 	.coef_m = 2000000UL,
 	.coef_div = 4289,
+=======
+	.coef_b = 2931108200UL,
+	.coef_m = 5000000UL,
+	.coef_div = 10502,
+>>>>>>> common/deprecated/android-3.18
 	.inverted = true,
 };
 

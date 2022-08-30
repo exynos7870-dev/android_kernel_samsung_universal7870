@@ -174,7 +174,11 @@ static int __init orion_nand_probe(struct platform_device *pdev)
 	ret = mtd_device_parse_register(mtd, NULL, &ppdata,
 			board->parts, board->nr_parts);
 	if (ret) {
+<<<<<<< HEAD
 		nand_release(mtd);
+=======
+		nand_cleanup(nc);
+>>>>>>> common/deprecated/android-3.18
 		goto no_dev;
 	}
 

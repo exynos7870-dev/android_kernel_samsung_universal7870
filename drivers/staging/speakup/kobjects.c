@@ -386,7 +386,11 @@ static ssize_t synth_store(struct kobject *kobj, struct kobj_attribute *attr,
 	len = strlen(buf);
 	if (len < 2 || len > 9)
 		return -EINVAL;
+<<<<<<< HEAD
 	strncpy(new_synth_name, buf, len);
+=======
+	memcpy(new_synth_name, buf, len);
+>>>>>>> common/deprecated/android-3.18
 	if (new_synth_name[len - 1] == '\n')
 		len--;
 	new_synth_name[len] = '\0';
@@ -513,7 +517,11 @@ static ssize_t punc_store(struct kobject *kobj, struct kobj_attribute *attr,
 		return -EINVAL;
 	}
 
+<<<<<<< HEAD
 	strncpy(punc_buf, buf, x);
+=======
+	memcpy(punc_buf, buf, x);
+>>>>>>> common/deprecated/android-3.18
 
 	while (x && punc_buf[x - 1] == '\n')
 		x--;
@@ -830,7 +838,13 @@ static ssize_t message_show(struct kobject *kobj,
 	struct msg_group_t *group = spk_find_msg_group(attr->attr.name);
 	unsigned long flags;
 
+<<<<<<< HEAD
 	BUG_ON(!group);
+=======
+	if (WARN_ON(!group))
+		return -EINVAL;
+
+>>>>>>> common/deprecated/android-3.18
 	spin_lock_irqsave(&speakup_info.spinlock, flags);
 	retval = message_show_helper(buf, group->start, group->end);
 	spin_unlock_irqrestore(&speakup_info.spinlock, flags);
@@ -843,7 +857,13 @@ static ssize_t message_store(struct kobject *kobj, struct kobj_attribute *attr,
 	ssize_t retval = 0;
 	struct msg_group_t *group = spk_find_msg_group(attr->attr.name);
 
+<<<<<<< HEAD
 	BUG_ON(!group);
+=======
+	if (WARN_ON(!group))
+		return -EINVAL;
+
+>>>>>>> common/deprecated/android-3.18
 	retval = message_store_helper(buf, count, group);
 	return retval;
 }

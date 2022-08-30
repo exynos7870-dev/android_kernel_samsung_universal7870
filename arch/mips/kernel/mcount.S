@@ -116,10 +116,27 @@ ftrace_stub:
 NESTED(_mcount, PT_SIZE, ra)
 	PTR_LA	t1, ftrace_stub
 	PTR_L	t2, ftrace_trace_function /* Prepare t2 for (1) */
+<<<<<<< HEAD
 	bne	t1, t2, static_trace
 	 nop
 
 #ifdef	CONFIG_FUNCTION_GRAPH_TRACER
+=======
+	beq	t1, t2, fgraph_trace
+	 nop
+
+	MCOUNT_SAVE_REGS
+
+	move	a0, ra		/* arg1: self return address */
+	jalr	t2		/* (1) call *ftrace_trace_function */
+	 move	a1, AT		/* arg2: parent's return address */
+
+	MCOUNT_RESTORE_REGS
+
+fgraph_trace:
+#ifdef	CONFIG_FUNCTION_GRAPH_TRACER
+	PTR_LA	t1, ftrace_stub
+>>>>>>> common/deprecated/android-3.18
 	PTR_L	t3, ftrace_graph_return
 	bne	t1, t3, ftrace_graph_caller
 	 nop
@@ -128,6 +145,7 @@ NESTED(_mcount, PT_SIZE, ra)
 	bne	t1, t3, ftrace_graph_caller
 	 nop
 #endif
+<<<<<<< HEAD
 	b	ftrace_stub
 #ifdef CONFIG_32BIT
 	 addiu sp, sp, 8
@@ -146,6 +164,13 @@ static_trace:
 #ifdef CONFIG_32BIT
 	addiu sp, sp, 8
 #endif
+=======
+
+#ifdef CONFIG_32BIT
+	addiu sp, sp, 8
+#endif
+
+>>>>>>> common/deprecated/android-3.18
 	.globl ftrace_stub
 ftrace_stub:
 	RETURN_BACK

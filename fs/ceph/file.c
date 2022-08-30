@@ -1263,6 +1263,10 @@ const struct file_operations ceph_file_fops = {
 	.mmap = ceph_mmap,
 	.fsync = ceph_fsync,
 	.lock = ceph_lock,
+<<<<<<< HEAD
+=======
+	.setlease = simple_nosetlease,
+>>>>>>> common/deprecated/android-3.18
 	.flock = ceph_flock,
 	.splice_read = generic_file_splice_read,
 	.splice_write = iter_file_splice_write,

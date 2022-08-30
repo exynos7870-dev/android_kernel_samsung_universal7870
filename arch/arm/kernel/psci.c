@@ -23,8 +23,11 @@
 
 #include <asm/compiler.h>
 #include <asm/errno.h>
+<<<<<<< HEAD
 #include <asm/opcodes-sec.h>
 #include <asm/opcodes-virt.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 #include <asm/psci.h>
 #include <asm/system_misc.h>
 
@@ -33,6 +36,12 @@ struct psci_operations psci_ops;
 static int (*invoke_psci_fn)(u32, u32, u32, u32);
 typedef int (*psci_initcall_t)(const struct device_node *);
 
+<<<<<<< HEAD
+=======
+asmlinkage int __invoke_psci_fn_hvc(u32, u32, u32, u32);
+asmlinkage int __invoke_psci_fn_smc(u32, u32, u32, u32);
+
+>>>>>>> common/deprecated/android-3.18
 enum psci_function {
 	PSCI_FN_CPU_SUSPEND,
 	PSCI_FN_CPU_ON,
@@ -71,6 +80,7 @@ static u32 psci_power_state_pack(struct psci_power_state state)
 		 & PSCI_0_2_POWER_STATE_AFFL_MASK);
 }
 
+<<<<<<< HEAD
 /*
  * The following two functions are invoked via the invoke_psci_fn pointer
  * and will not be inlined, allowing us to piggyback on the AAPCS.
@@ -105,6 +115,8 @@ static noinline int __invoke_psci_fn_smc(u32 function_id, u32 arg0, u32 arg1,
 	return function_id;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static int psci_get_version(void)
 {
 	int err;

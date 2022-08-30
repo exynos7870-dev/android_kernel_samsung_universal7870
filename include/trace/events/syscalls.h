@@ -1,5 +1,9 @@
 #undef TRACE_SYSTEM
 #define TRACE_SYSTEM raw_syscalls
+<<<<<<< HEAD
+=======
+#undef TRACE_INCLUDE_FILE
+>>>>>>> common/deprecated/android-3.18
 #define TRACE_INCLUDE_FILE syscalls
 
 #if !defined(_TRACE_EVENTS_SYSCALLS_H) || defined(TRACE_HEADER_MULTI_READ)

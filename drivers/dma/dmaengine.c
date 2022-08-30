@@ -976,12 +976,20 @@ static struct dmaengine_unmap_pool *__get_unmap_pool(int nr)
 	switch (order) {
 	case 0 ... 1:
 		return &unmap_pool[0];
+<<<<<<< HEAD
+=======
+#if IS_ENABLED(CONFIG_DMA_ENGINE_RAID)
+>>>>>>> common/deprecated/android-3.18
 	case 2 ... 4:
 		return &unmap_pool[1];
 	case 5 ... 7:
 		return &unmap_pool[2];
 	case 8:
 		return &unmap_pool[3];
+<<<<<<< HEAD
+=======
+#endif
+>>>>>>> common/deprecated/android-3.18
 	default:
 		BUG();
 		return NULL;

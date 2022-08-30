@@ -77,7 +77,13 @@ struct dst_entry *inet6_csk_route_req(struct sock *sk,
 	memset(fl6, 0, sizeof(*fl6));
 	fl6->flowi6_proto = IPPROTO_TCP;
 	fl6->daddr = ireq->ir_v6_rmt_addr;
+<<<<<<< HEAD
 	final_p = fl6_update_dst(fl6, np->opt, &final);
+=======
+	rcu_read_lock();
+	final_p = fl6_update_dst(fl6, rcu_dereference(np->opt), &final);
+	rcu_read_unlock();
+>>>>>>> common/deprecated/android-3.18
 	fl6->saddr = ireq->ir_v6_loc_addr;
 	fl6->flowi6_oif = ireq->ir_iif;
 	fl6->flowi6_mark = ireq->ir_mark;
@@ -86,7 +92,11 @@ struct dst_entry *inet6_csk_route_req(struct sock *sk,
 	fl6->flowi6_uid = sk->sk_uid;
 	security_req_classify_flow(req, flowi6_to_flowi(fl6));
 
+<<<<<<< HEAD
 	dst = ip6_dst_lookup_flow(sk, fl6, final_p);
+=======
+	dst = ip6_dst_lookup_flow(sock_net(sk), sk, fl6, final_p);
+>>>>>>> common/deprecated/android-3.18
 	if (IS_ERR(dst))
 		return NULL;
 
@@ -210,11 +220,21 @@ static struct dst_entry *inet6_csk_route_socket(struct sock *sk,
 	fl6->flowi6_uid = sk->sk_uid;
 	security_sk_classify_flow(sk, flowi6_to_flowi(fl6));
 
+<<<<<<< HEAD
 	final_p = fl6_update_dst(fl6, np->opt, &final);
 
 	dst = __inet6_csk_dst_check(sk, np->dst_cookie);
 	if (!dst) {
 		dst = ip6_dst_lookup_flow(sk, fl6, final_p);
+=======
+	rcu_read_lock();
+	final_p = fl6_update_dst(fl6, rcu_dereference(np->opt), &final);
+	rcu_read_unlock();
+
+	dst = __inet6_csk_dst_check(sk, np->dst_cookie);
+	if (!dst) {
+		dst = ip6_dst_lookup_flow(sock_net(sk), sk, fl6, final_p);
+>>>>>>> common/deprecated/android-3.18
 
 		if (!IS_ERR(dst))
 			__inet6_csk_dst_store(sk, dst, NULL, NULL);
@@ -243,7 +263,12 @@ int inet6_csk_xmit(struct sock *sk, struct sk_buff *skb, struct flowi *fl_unused
 	/* Restore final destination back after routing done */
 	fl6.daddr = sk->sk_v6_daddr;
 
+<<<<<<< HEAD
 	res = ip6_xmit(sk, skb, &fl6, np->opt, np->tclass);
+=======
+	res = ip6_xmit(sk, skb, &fl6, rcu_dereference(np->opt),
+		       np->tclass);
+>>>>>>> common/deprecated/android-3.18
 	rcu_read_unlock();
 	return res;
 }

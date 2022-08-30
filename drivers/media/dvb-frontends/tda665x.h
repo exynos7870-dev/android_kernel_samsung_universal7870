@@ -31,7 +31,11 @@ struct tda665x_config {
 	u32	ref_divider;
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_TDA665x)
+=======
+#if IS_REACHABLE(CONFIG_DVB_TDA665x)
+>>>>>>> common/deprecated/android-3.18
 
 extern struct dvb_frontend *tda665x_attach(struct dvb_frontend *fe,
 					   const struct tda665x_config *config,

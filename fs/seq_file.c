@@ -12,6 +12,10 @@
 #include <linux/slab.h>
 #include <linux/cred.h>
 #include <linux/mm.h>
+<<<<<<< HEAD
+=======
+#include <linux/pagemap.h>
+>>>>>>> common/deprecated/android-3.18
 
 #include <asm/uaccess.h>
 #include <asm/page.h>
@@ -36,6 +40,12 @@ static void *seq_buf_alloc(unsigned long size)
 {
 	void *buf;
 
+<<<<<<< HEAD
+=======
+	if (unlikely(size > MAX_RW_COUNT))
+		return NULL;
+
+>>>>>>> common/deprecated/android-3.18
 	buf = kmalloc(size, GFP_KERNEL | __GFP_NOWARN);
 	if (!buf && size > PAGE_SIZE)
 		buf = vmalloc(size);
@@ -69,9 +79,16 @@ int seq_open(struct file *file, const struct seq_operations *op)
 	memset(p, 0, sizeof(*p));
 	mutex_init(&p->lock);
 	p->op = op;
+<<<<<<< HEAD
 #ifdef CONFIG_USER_NS
 	p->user_ns = file->f_cred->user_ns;
 #endif
+=======
+
+	// No refcounting: the lifetime of 'p' is constrained
+	// to the lifetime of the file.
+	p->file = file;
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * Wrappers around seq_open(e.g. swaps_open) need to be
@@ -219,8 +236,15 @@ ssize_t seq_read(struct file *file, char __user *buf, size_t size, loff_t *ppos)
 		size -= n;
 		buf += n;
 		copied += n;
+<<<<<<< HEAD
 		if (!m->count)
 			m->index++;
+=======
+		if (!m->count) {
+			m->from = 0;
+			m->index++;
+		}
+>>>>>>> common/deprecated/android-3.18
 		if (!size)
 			goto Done;
 	}

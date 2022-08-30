@@ -51,7 +51,11 @@ struct drxk_config {
 	int		 qam_demod_parameter_count;
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_DVB_DRXK)
+=======
+#if IS_REACHABLE(CONFIG_DVB_DRXK)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend *drxk_attach(const struct drxk_config *config,
 					struct i2c_adapter *i2c);
 #else

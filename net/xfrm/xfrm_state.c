@@ -332,6 +332,10 @@ static void xfrm_state_gc_destroy(struct xfrm_state *x)
 {
 	tasklet_hrtimer_cancel(&x->mtimer);
 	del_timer_sync(&x->rtimer);
+<<<<<<< HEAD
+=======
+	kfree(x->aead);
+>>>>>>> common/deprecated/android-3.18
 	kfree(x->aalg);
 	kfree(x->ealg);
 	kfree(x->calg);
@@ -623,7 +627,11 @@ void xfrm_sad_getinfo(struct net *net, struct xfrmk_sadinfo *si)
 {
 	spin_lock_bh(&net->xfrm.xfrm_state_lock);
 	si->sadcnt = net->xfrm.state_num;
+<<<<<<< HEAD
 	si->sadhcnt = net->xfrm.state_hmask;
+=======
+	si->sadhcnt = net->xfrm.state_hmask + 1;
+>>>>>>> common/deprecated/android-3.18
 	si->sadhmcnt = xfrm_state_hashmax;
 	spin_unlock_bh(&net->xfrm.xfrm_state_lock);
 }
@@ -741,7 +749,12 @@ static void xfrm_state_look_at(struct xfrm_policy *pol, struct xfrm_state *x,
 	 */
 	if (x->km.state == XFRM_STATE_VALID) {
 		if ((x->sel.family &&
+<<<<<<< HEAD
 		     !xfrm_selector_match(&x->sel, fl, x->sel.family)) ||
+=======
+		     (x->sel.family != family ||
+		      !xfrm_selector_match(&x->sel, fl, family))) ||
+>>>>>>> common/deprecated/android-3.18
 		    !security_xfrm_state_pol_flow_match(x, pol, fl))
 			return;
 
@@ -754,7 +767,13 @@ static void xfrm_state_look_at(struct xfrm_policy *pol, struct xfrm_state *x,
 		*acq_in_progress = 1;
 	} else if (x->km.state == XFRM_STATE_ERROR ||
 		   x->km.state == XFRM_STATE_EXPIRED) {
+<<<<<<< HEAD
 		if (xfrm_selector_match(&x->sel, fl, x->sel.family) &&
+=======
+		if ((!x->sel.family ||
+		     (x->sel.family == family &&
+		      xfrm_selector_match(&x->sel, fl, family))) &&
+>>>>>>> common/deprecated/android-3.18
 		    security_xfrm_state_pol_flow_match(x, pol, fl))
 			*error = -ESRCH;
 	}
@@ -790,7 +809,11 @@ xfrm_state_find(const xfrm_address_t *daddr, const xfrm_address_t *saddr,
 		    tmpl->mode == x->props.mode &&
 		    tmpl->id.proto == x->id.proto &&
 		    (tmpl->id.spi == x->id.spi || !tmpl->id.spi))
+<<<<<<< HEAD
 			xfrm_state_look_at(pol, x, fl, encap_family,
+=======
+			xfrm_state_look_at(pol, x, fl, family,
+>>>>>>> common/deprecated/android-3.18
 					   &best, &acquire_in_progress, &error);
 	}
 	if (best || acquire_in_progress)
@@ -806,7 +829,11 @@ xfrm_state_find(const xfrm_address_t *daddr, const xfrm_address_t *saddr,
 		    tmpl->mode == x->props.mode &&
 		    tmpl->id.proto == x->id.proto &&
 		    (tmpl->id.spi == x->id.spi || !tmpl->id.spi))
+<<<<<<< HEAD
 			xfrm_state_look_at(pol, x, fl, encap_family,
+=======
+			xfrm_state_look_at(pol, x, fl, family,
+>>>>>>> common/deprecated/android-3.18
 					   &best, &acquire_in_progress, &error);
 	}
 
@@ -1205,9 +1232,17 @@ static struct xfrm_state *xfrm_state_clone(struct xfrm_state *orig)
 	x->tfcpad = orig->tfcpad;
 	x->replay_maxdiff = orig->replay_maxdiff;
 	x->replay_maxage = orig->replay_maxage;
+<<<<<<< HEAD
 	x->curlft.add_time = orig->curlft.add_time;
 	x->km.state = orig->km.state;
 	x->km.seq = orig->km.seq;
+=======
+	memcpy(&x->curlft, &orig->curlft, sizeof(x->curlft));
+	x->km.state = orig->km.state;
+	x->km.seq = orig->km.seq;
+	x->replay = orig->replay;
+	x->preplay = orig->preplay;
+>>>>>>> common/deprecated/android-3.18
 
 	return x;
 
@@ -1354,6 +1389,18 @@ out:
 		if (x1->curlft.use_time)
 			xfrm_state_check_expire(x1);
 
+<<<<<<< HEAD
+=======
+		if (x->props.output_mark) {
+			spin_lock_bh(&net->xfrm.xfrm_state_lock);
+
+			x1->props.output_mark = x->props.output_mark;
+
+			__xfrm_state_bump_genids(x1);
+			spin_unlock_bh(&net->xfrm.xfrm_state_lock);
+		}
+
+>>>>>>> common/deprecated/android-3.18
 		err = 0;
 		x->km.state = XFRM_STATE_DEAD;
 		__xfrm_state_put(x);
@@ -1547,6 +1594,10 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high)
 	int err = -ENOENT;
 	__be32 minspi = htonl(low);
 	__be32 maxspi = htonl(high);
+<<<<<<< HEAD
+=======
+	__be32 newspi = 0;
+>>>>>>> common/deprecated/android-3.18
 	u32 mark = x->mark.v & x->mark.m;
 
 	spin_lock_bh(&x->lock);
@@ -1565,21 +1616,35 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high)
 			xfrm_state_put(x0);
 			goto unlock;
 		}
+<<<<<<< HEAD
 		x->id.spi = minspi;
+=======
+		newspi = minspi;
+>>>>>>> common/deprecated/android-3.18
 	} else {
 		u32 spi = 0;
 		for (h = 0; h < high-low+1; h++) {
 			spi = low + prandom_u32()%(high-low+1);
 			x0 = xfrm_state_lookup(net, mark, &x->id.daddr, htonl(spi), x->id.proto, x->props.family);
 			if (x0 == NULL) {
+<<<<<<< HEAD
 				x->id.spi = htonl(spi);
+=======
+				newspi = htonl(spi);
+>>>>>>> common/deprecated/android-3.18
 				break;
 			}
 			xfrm_state_put(x0);
 		}
 	}
+<<<<<<< HEAD
 	if (x->id.spi) {
 		spin_lock_bh(&net->xfrm.xfrm_state_lock);
+=======
+	if (newspi) {
+		spin_lock_bh(&net->xfrm.xfrm_state_lock);
+		x->id.spi = newspi;
+>>>>>>> common/deprecated/android-3.18
 		h = xfrm_spi_hash(net, &x->id.daddr, x->id.spi, x->id.proto, x->props.family);
 		hlist_add_head(&x->byspi, net->xfrm.state_byspi+h);
 		spin_unlock_bh(&net->xfrm.xfrm_state_lock);
@@ -1845,6 +1910,16 @@ int xfrm_user_policy(struct sock *sk, int optname, u8 __user *optval, int optlen
 	struct xfrm_mgr *km;
 	struct xfrm_policy *pol = NULL;
 
+<<<<<<< HEAD
+=======
+	if (!optval && !optlen) {
+		xfrm_sk_policy_insert(sk, XFRM_POLICY_IN, NULL);
+		xfrm_sk_policy_insert(sk, XFRM_POLICY_OUT, NULL);
+		__sk_dst_reset(sk);
+		return 0;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	if (optlen <= 0 || optlen > PAGE_SIZE)
 		return -EMSGSIZE;
 
@@ -1869,6 +1944,10 @@ int xfrm_user_policy(struct sock *sk, int optname, u8 __user *optval, int optlen
 	if (err >= 0) {
 		xfrm_sk_policy_insert(sk, err, pol);
 		xfrm_pol_put(pol);
+<<<<<<< HEAD
+=======
+		__sk_dst_reset(sk);
+>>>>>>> common/deprecated/android-3.18
 		err = 0;
 	}
 
@@ -2117,7 +2196,11 @@ void xfrm_state_fini(struct net *net)
 	unsigned int sz;
 
 	flush_work(&net->xfrm.state_hash_work);
+<<<<<<< HEAD
 	xfrm_state_flush(net, IPSEC_PROTO_ANY, false);
+=======
+	xfrm_state_flush(net, 0, false);
+>>>>>>> common/deprecated/android-3.18
 	flush_work(&net->xfrm.state_gc_work);
 
 	WARN_ON(!list_empty(&net->xfrm.state_all));
@@ -2131,8 +2214,12 @@ void xfrm_state_fini(struct net *net)
 	xfrm_hash_free(net->xfrm.state_bydst, sz);
 }
 
+<<<<<<< HEAD
 // [ SEC_SELINUX_PORTING_COMMON - remove AUDIT_MAC_IPSEC_EVENT audit log, it conflict with security notification
 #if 0 // #ifdef CONFIG_AUDITSYSCALL
+=======
+#ifdef CONFIG_AUDITSYSCALL
+>>>>>>> common/deprecated/android-3.18
 static void xfrm_audit_helper_sainfo(struct xfrm_state *x,
 				     struct audit_buffer *audit_buf)
 {
@@ -2293,5 +2380,8 @@ void xfrm_audit_state_icvfail(struct xfrm_state *x,
 }
 EXPORT_SYMBOL_GPL(xfrm_audit_state_icvfail);
 #endif /* CONFIG_AUDITSYSCALL */
+<<<<<<< HEAD
 // ] SEC_SELINUX_PORTING_COMMON - remove AUDIT_MAC_IPSEC_EVENT audit log, it conflict with security notification
 
+=======
+>>>>>>> common/deprecated/android-3.18

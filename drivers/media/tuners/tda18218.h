@@ -30,7 +30,11 @@ struct tda18218_config {
 	u8 loop_through:1;
 };
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_MEDIA_TUNER_TDA18218)
+=======
+#if IS_REACHABLE(CONFIG_MEDIA_TUNER_TDA18218)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend *tda18218_attach(struct dvb_frontend *fe,
 	struct i2c_adapter *i2c, struct tda18218_config *cfg);
 #else

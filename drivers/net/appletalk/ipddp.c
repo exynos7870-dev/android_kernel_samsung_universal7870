@@ -191,7 +191,11 @@ static netdev_tx_t ipddp_xmit(struct sk_buff *skb, struct net_device *dev)
  */
 static int ipddp_create(struct ipddp_route *new_rt)
 {
+<<<<<<< HEAD
         struct ipddp_route *rt = kmalloc(sizeof(*rt), GFP_KERNEL);
+=======
+        struct ipddp_route *rt = kzalloc(sizeof(*rt), GFP_KERNEL);
+>>>>>>> common/deprecated/android-3.18
 
         if (rt == NULL)
                 return -ENOMEM;
@@ -284,8 +288,17 @@ static int ipddp_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
                 case SIOCFINDIPDDPRT:
 			spin_lock_bh(&ipddp_route_lock);
 			rp = __ipddp_find_route(&rcp);
+<<<<<<< HEAD
 			if (rp)
 				memcpy(&rcp2, rp, sizeof(rcp2));
+=======
+			if (rp) {
+				memset(&rcp2, 0, sizeof(rcp2));
+				rcp2.ip    = rp->ip;
+				rcp2.at    = rp->at;
+				rcp2.flags = rp->flags;
+			}
+>>>>>>> common/deprecated/android-3.18
 			spin_unlock_bh(&ipddp_route_lock);
 
 			if (rp) {

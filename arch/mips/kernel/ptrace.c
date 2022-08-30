@@ -400,6 +400,7 @@ static int gpr64_set(struct task_struct *target,
 
 #endif /* CONFIG_64BIT */
 
+<<<<<<< HEAD
 static int fpr_get(struct task_struct *target,
 		   const struct user_regset *regset,
 		   unsigned int pos, unsigned int count,
@@ -419,6 +420,40 @@ static int fpr_get(struct task_struct *target,
 	for (i = 0; i < NUM_FPU_REGS; i++) {
 		fpr_val = get_fpr64(&target->thread.fpu.fpr[i], 0);
 		err = user_regset_copyout(&pos, &count, &kbuf, &ubuf,
+=======
+/*
+ * Copy the floating-point context to the supplied NT_PRFPREG buffer,
+ * !CONFIG_CPU_HAS_MSA variant.  FP context's general register slots
+ * correspond 1:1 to buffer slots.  Only general registers are copied.
+ */
+static int fpr_get_fpa(struct task_struct *target,
+		       unsigned int *pos, unsigned int *count,
+		       void **kbuf, void __user **ubuf)
+{
+	return user_regset_copyout(pos, count, kbuf, ubuf,
+				   &target->thread.fpu,
+				   0, NUM_FPU_REGS * sizeof(elf_fpreg_t));
+}
+
+/*
+ * Copy the floating-point context to the supplied NT_PRFPREG buffer,
+ * CONFIG_CPU_HAS_MSA variant.  Only lower 64 bits of FP context's
+ * general register slots are copied to buffer slots.  Only general
+ * registers are copied.
+ */
+static int fpr_get_msa(struct task_struct *target,
+		       unsigned int *pos, unsigned int *count,
+		       void **kbuf, void __user **ubuf)
+{
+	unsigned int i;
+	u64 fpr_val;
+	int err;
+
+	BUILD_BUG_ON(sizeof(fpr_val) != sizeof(elf_fpreg_t));
+	for (i = 0; i < NUM_FPU_REGS; i++) {
+		fpr_val = get_fpr64(&target->thread.fpu.fpr[i], 0);
+		err = user_regset_copyout(pos, count, kbuf, ubuf,
+>>>>>>> common/deprecated/android-3.18
 					  &fpr_val, i * sizeof(elf_fpreg_t),
 					  (i + 1) * sizeof(elf_fpreg_t));
 		if (err)
@@ -428,6 +463,7 @@ static int fpr_get(struct task_struct *target,
 	return 0;
 }
 
+<<<<<<< HEAD
 static int fpr_set(struct task_struct *target,
 		   const struct user_regset *regset,
 		   unsigned int pos, unsigned int count,
@@ -446,6 +482,73 @@ static int fpr_set(struct task_struct *target,
 
 	for (i = 0; i < NUM_FPU_REGS; i++) {
 		err = user_regset_copyin(&pos, &count, &kbuf, &ubuf,
+=======
+/*
+ * Copy the floating-point context to the supplied NT_PRFPREG buffer.
+ * Choose the appropriate helper for general registers, and then copy
+ * the FCSR and FIR registers separately.
+ */
+static int fpr_get(struct task_struct *target,
+		   const struct user_regset *regset,
+		   unsigned int pos, unsigned int count,
+		   void *kbuf, void __user *ubuf)
+{
+	const int fcr31_pos = NUM_FPU_REGS * sizeof(elf_fpreg_t);
+	const int fir_pos = fcr31_pos + sizeof(u32);
+	int err;
+
+	if (sizeof(target->thread.fpu.fpr[0]) == sizeof(elf_fpreg_t))
+		err = fpr_get_fpa(target, &pos, &count, &kbuf, &ubuf);
+	else
+		err = fpr_get_msa(target, &pos, &count, &kbuf, &ubuf);
+	if (err)
+		return err;
+
+	err = user_regset_copyout(&pos, &count, &kbuf, &ubuf,
+				  &target->thread.fpu.fcr31,
+				  fcr31_pos, fcr31_pos + sizeof(u32));
+	if (err)
+		return err;
+
+	err = user_regset_copyout(&pos, &count, &kbuf, &ubuf,
+				  &boot_cpu_data.fpu_id,
+				  fir_pos, fir_pos + sizeof(u32));
+
+	return err;
+}
+
+/*
+ * Copy the supplied NT_PRFPREG buffer to the floating-point context,
+ * !CONFIG_CPU_HAS_MSA variant.   Buffer slots correspond 1:1 to FP
+ * context's general register slots.  Only general registers are copied.
+ */
+static int fpr_set_fpa(struct task_struct *target,
+		       unsigned int *pos, unsigned int *count,
+		       const void **kbuf, const void __user **ubuf)
+{
+	return user_regset_copyin(pos, count, kbuf, ubuf,
+				  &target->thread.fpu,
+				  0, NUM_FPU_REGS * sizeof(elf_fpreg_t));
+}
+
+/*
+ * Copy the supplied NT_PRFPREG buffer to the floating-point context,
+ * CONFIG_CPU_HAS_MSA variant.  Buffer slots are copied to lower 64
+ * bits only of FP context's general register slots.  Only general
+ * registers are copied.
+ */
+static int fpr_set_msa(struct task_struct *target,
+		       unsigned int *pos, unsigned int *count,
+		       const void **kbuf, const void __user **ubuf)
+{
+	unsigned int i;
+	u64 fpr_val;
+	int err;
+
+	BUILD_BUG_ON(sizeof(fpr_val) != sizeof(elf_fpreg_t));
+	for (i = 0; i < NUM_FPU_REGS && *count > 0; i++) {
+		err = user_regset_copyin(pos, count, kbuf, ubuf,
+>>>>>>> common/deprecated/android-3.18
 					 &fpr_val, i * sizeof(elf_fpreg_t),
 					 (i + 1) * sizeof(elf_fpreg_t));
 		if (err)
@@ -456,6 +559,61 @@ static int fpr_set(struct task_struct *target,
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+/*
+ * Copy the supplied NT_PRFPREG buffer to the floating-point context.
+ * Choose the appropriate helper for general registers, and then copy
+ * the FCSR register separately.  Ignore the incoming FIR register
+ * contents though, as the register is read-only.
+ *
+ * We optimize for the case where `count % sizeof(elf_fpreg_t) == 0',
+ * which is supposed to have been guaranteed by the kernel before
+ * calling us, e.g. in `ptrace_regset'.  We enforce that requirement,
+ * so that we can safely avoid preinitializing temporaries for
+ * partial register writes.
+ */
+static int fpr_set(struct task_struct *target,
+		   const struct user_regset *regset,
+		   unsigned int pos, unsigned int count,
+		   const void *kbuf, const void __user *ubuf)
+{
+	const int fcr31_pos = NUM_FPU_REGS * sizeof(elf_fpreg_t);
+	const int fir_pos = fcr31_pos + sizeof(u32);
+	u32 fcr31;
+	int err;
+
+	BUG_ON(count % sizeof(elf_fpreg_t));
+
+	if (pos + count > sizeof(elf_fpregset_t))
+		return -EIO;
+
+	if (sizeof(target->thread.fpu.fpr[0]) == sizeof(elf_fpreg_t))
+		err = fpr_set_fpa(target, &pos, &count, &kbuf, &ubuf);
+	else
+		err = fpr_set_msa(target, &pos, &count, &kbuf, &ubuf);
+	if (err)
+		return err;
+
+	if (count > 0) {
+		err = user_regset_copyin(&pos, &count, &kbuf, &ubuf,
+					 &fcr31,
+					 fcr31_pos, fcr31_pos + sizeof(u32));
+		if (err)
+			return err;
+
+		target->thread.fpu.fcr31 = fcr31 & ~FPU_CSR_ALL_X;
+	}
+
+	if (count > 0)
+		err = user_regset_copyin_ignore(&pos, &count, &kbuf, &ubuf,
+						fir_pos,
+						fir_pos + sizeof(u32));
+
+	return err;
+}
+
+>>>>>>> common/deprecated/android-3.18
 enum mips_regset {
 	REGSET_GPR,
 	REGSET_FPR,
@@ -521,6 +679,22 @@ static const struct user_regset_view user_mips64_view = {
 	.n		= ARRAY_SIZE(mips64_regsets),
 };
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_MIPS32_N32
+
+static const struct user_regset_view user_mipsn32_view = {
+	.name		= "mipsn32",
+	.e_flags	= EF_MIPS_ABI2,
+	.e_machine	= ELF_ARCH,
+	.ei_osabi	= ELF_OSABI,
+	.regsets	= mips64_regsets,
+	.n		= ARRAY_SIZE(mips64_regsets),
+};
+
+#endif /* CONFIG_MIPS32_N32 */
+
+>>>>>>> common/deprecated/android-3.18
 #endif /* CONFIG_64BIT */
 
 const struct user_regset_view *task_user_regset_view(struct task_struct *task)
@@ -532,6 +706,13 @@ const struct user_regset_view *task_user_regset_view(struct task_struct *task)
 	if (test_tsk_thread_flag(task, TIF_32BIT_REGS))
 		return &user_mips_view;
 #endif
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_MIPS32_N32
+	if (test_tsk_thread_flag(task, TIF_32BIT_ADDR))
+		return &user_mipsn32_view;
+#endif
+>>>>>>> common/deprecated/android-3.18
 	return &user_mips64_view;
 #endif
 }
@@ -573,7 +754,11 @@ long arch_ptrace(struct task_struct *child, long request,
 			fregs = get_fpu_regs(child);
 
 #ifdef CONFIG_32BIT
+<<<<<<< HEAD
 			if (test_thread_flag(TIF_32BIT_FPREGS)) {
+=======
+			if (test_tsk_thread_flag(child, TIF_32BIT_FPREGS)) {
+>>>>>>> common/deprecated/android-3.18
 				/*
 				 * The odd registers are actually the high
 				 * order bits of the values stored in the even
@@ -584,7 +769,11 @@ long arch_ptrace(struct task_struct *child, long request,
 				break;
 			}
 #endif
+<<<<<<< HEAD
 			tmp = get_fpr32(&fregs[addr - FPR_BASE], 0);
+=======
+			tmp = get_fpr64(&fregs[addr - FPR_BASE], 0);
+>>>>>>> common/deprecated/android-3.18
 			break;
 		case PC:
 			tmp = regs->cp0_epc;
@@ -622,7 +811,11 @@ long arch_ptrace(struct task_struct *child, long request,
 				goto out;
 			}
 			dregs = __get_dsp_regs(child);
+<<<<<<< HEAD
 			tmp = (unsigned long) (dregs[addr - DSP_BASE]);
+=======
+			tmp = dregs[addr - DSP_BASE];
+>>>>>>> common/deprecated/android-3.18
 			break;
 		}
 		case DSP_CONTROL:
@@ -667,7 +860,11 @@ long arch_ptrace(struct task_struct *child, long request,
 				child->thread.fpu.fcr31 = 0;
 			}
 #ifdef CONFIG_32BIT
+<<<<<<< HEAD
 			if (test_thread_flag(TIF_32BIT_FPREGS)) {
+=======
+			if (test_tsk_thread_flag(child, TIF_32BIT_FPREGS)) {
+>>>>>>> common/deprecated/android-3.18
 				/*
 				 * The odd registers are actually the high
 				 * order bits of the values stored in the even
@@ -770,7 +967,11 @@ asmlinkage long syscall_trace_enter(struct pt_regs *regs, long syscall)
 	long ret = 0;
 	user_exit();
 
+<<<<<<< HEAD
 	if (secure_computing() == -1)
+=======
+	if (secure_computing(NULL) == -1)
+>>>>>>> common/deprecated/android-3.18
 		return -1;
 
 	if (test_thread_flag(TIF_SYSCALL_TRACE) &&
@@ -801,7 +1002,11 @@ asmlinkage void syscall_trace_leave(struct pt_regs *regs)
 	audit_syscall_exit(regs);
 
 	if (unlikely(test_thread_flag(TIF_SYSCALL_TRACEPOINT)))
+<<<<<<< HEAD
 		trace_sys_exit(regs, regs->regs[2]);
+=======
+		trace_sys_exit(regs, regs_return_value(regs));
+>>>>>>> common/deprecated/android-3.18
 
 	if (test_thread_flag(TIF_SYSCALL_TRACE))
 		tracehook_report_syscall_exit(regs, 0);

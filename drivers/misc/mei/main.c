@@ -556,7 +556,10 @@ static long mei_ioctl(struct file *file, unsigned int cmd, unsigned long data)
 		break;
 
 	default:
+<<<<<<< HEAD
 		dev_err(dev->dev, ": unsupported ioctl %d.\n", cmd);
+=======
+>>>>>>> common/deprecated/android-3.18
 		rets = -ENOIOCTLCMD;
 	}
 

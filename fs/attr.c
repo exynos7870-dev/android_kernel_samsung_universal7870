@@ -15,7 +15,10 @@
 #include <linux/security.h>
 #include <linux/evm.h>
 #include <linux/ima.h>
+<<<<<<< HEAD
 #include <linux/task_integrity.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 
 /**
  * inode_change_ok - check if attribute changes to an inode are allowed
@@ -188,7 +191,11 @@ EXPORT_SYMBOL(setattr_copy);
  * the file open for write, as there can be no conflicting delegation in
  * that case.
  */
+<<<<<<< HEAD
 int notify_change2(struct vfsmount *mnt, struct dentry *dentry, struct iattr *attr, struct inode **delegated_inode)
+=======
+int notify_change2(struct vfsmount *mnt, struct dentry * dentry, struct iattr * attr, struct inode **delegated_inode)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct inode *inode = dentry->d_inode;
 	umode_t mode = inode->i_mode;
@@ -203,6 +210,24 @@ int notify_change2(struct vfsmount *mnt, struct dentry *dentry, struct iattr *at
 			return -EPERM;
 	}
 
+<<<<<<< HEAD
+=======
+	/*
+	 * If utimes(2) and friends are called with times == NULL (or both
+	 * times are UTIME_NOW), then we need to check for write permission
+	 */
+	if (ia_valid & ATTR_TOUCH) {
+		if (IS_IMMUTABLE(inode))
+			return -EPERM;
+
+		if (!inode_owner_or_capable(inode)) {
+			error = inode_permission(inode, MAY_WRITE);
+			if (error)
+				return error;
+		}
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	if ((ia_valid & ATTR_MODE)) {
 		umode_t amode = attr->ia_mode;
 		/* Flag setting protected by i_mutex */
@@ -272,7 +297,10 @@ int notify_change2(struct vfsmount *mnt, struct dentry *dentry, struct iattr *at
 
 	if (!error) {
 		fsnotify_change(dentry, ia_valid);
+<<<<<<< HEAD
 		five_inode_post_setattr(current, dentry);
+=======
+>>>>>>> common/deprecated/android-3.18
 		ima_inode_post_setattr(dentry);
 		evm_inode_post_setattr(dentry, ia_valid);
 	}
@@ -281,7 +309,11 @@ int notify_change2(struct vfsmount *mnt, struct dentry *dentry, struct iattr *at
 }
 EXPORT_SYMBOL(notify_change2);
 
+<<<<<<< HEAD
 int notify_change(struct dentry *dentry, struct iattr *attr, struct inode **delegated_inode)
+=======
+int notify_change(struct dentry * dentry, struct iattr * attr, struct inode **delegated_inode)
+>>>>>>> common/deprecated/android-3.18
 {
 	return notify_change2(NULL, dentry, attr, delegated_inode);
 }

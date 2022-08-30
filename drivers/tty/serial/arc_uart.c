@@ -597,6 +597,14 @@ static int arc_serial_probe(struct platform_device *pdev)
 	if (dev_id < 0)
 		dev_id = 0;
 
+<<<<<<< HEAD
+=======
+	if (dev_id >= ARRAY_SIZE(arc_uart_ports)) {
+		dev_err(&pdev->dev, "serial%d out of range\n", dev_id);
+		return -EINVAL;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	uart = &arc_uart_ports[dev_id];
 	port = &uart->port;
 

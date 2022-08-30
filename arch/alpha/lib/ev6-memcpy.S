@@ -19,7 +19,11 @@
  * Temp usage notes:
  *	$1,$2,		- scratch
  */
+<<<<<<< HEAD
 
+=======
+#include <asm/export.h>
+>>>>>>> common/deprecated/android-3.18
 	.set noreorder
 	.set noat
 
@@ -242,6 +246,10 @@ $nomoredata:
 	nop				# E :
 
 	.end memcpy
+<<<<<<< HEAD
+=======
+	EXPORT_SYMBOL(memcpy)
+>>>>>>> common/deprecated/android-3.18
 
 /* For backwards module compatibility.  */
 __memcpy = memcpy

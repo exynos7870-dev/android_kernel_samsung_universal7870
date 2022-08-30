@@ -22,6 +22,11 @@
 #include <linux/lockdep.h>
 #include <trace/events/power.h>
 
+<<<<<<< HEAD
+=======
+#include <trace/events/sched.h>
+
+>>>>>>> common/deprecated/android-3.18
 #include "smpboot.h"
 
 #ifdef CONFIG_SMP
@@ -64,6 +69,11 @@ static struct {
 	 * an ongoing cpu hotplug operation.
 	 */
 	int refcount;
+<<<<<<< HEAD
+=======
+	/* And allows lockless put_online_cpus(). */
+	atomic_t puts_pending;
+>>>>>>> common/deprecated/android-3.18
 
 #ifdef CONFIG_DEBUG_LOCK_ALLOC
 	struct lockdep_map dep_map;
@@ -79,6 +89,11 @@ static struct {
 
 /* Lockdep annotations for get/put_online_cpus() and cpu_hotplug_begin/end() */
 #define cpuhp_lock_acquire_read() lock_map_acquire_read(&cpu_hotplug.dep_map)
+<<<<<<< HEAD
+=======
+#define cpuhp_lock_acquire_tryread() \
+				  lock_map_acquire_tryread(&cpu_hotplug.dep_map)
+>>>>>>> common/deprecated/android-3.18
 #define cpuhp_lock_acquire()      lock_map_acquire(&cpu_hotplug.dep_map)
 #define cpuhp_lock_release()      lock_map_release(&cpu_hotplug.dep_map)
 
@@ -91,15 +106,42 @@ void get_online_cpus(void)
 	mutex_lock(&cpu_hotplug.lock);
 	cpu_hotplug.refcount++;
 	mutex_unlock(&cpu_hotplug.lock);
+<<<<<<< HEAD
 
 }
 EXPORT_SYMBOL_GPL(get_online_cpus);
 
+=======
+}
+EXPORT_SYMBOL_GPL(get_online_cpus);
+
+bool try_get_online_cpus(void)
+{
+	if (cpu_hotplug.active_writer == current)
+		return true;
+	if (!mutex_trylock(&cpu_hotplug.lock))
+		return false;
+	cpuhp_lock_acquire_tryread();
+	cpu_hotplug.refcount++;
+	mutex_unlock(&cpu_hotplug.lock);
+	return true;
+}
+EXPORT_SYMBOL_GPL(try_get_online_cpus);
+
+>>>>>>> common/deprecated/android-3.18
 void put_online_cpus(void)
 {
 	if (cpu_hotplug.active_writer == current)
 		return;
+<<<<<<< HEAD
 	mutex_lock(&cpu_hotplug.lock);
+=======
+	if (!mutex_trylock(&cpu_hotplug.lock)) {
+		atomic_inc(&cpu_hotplug.puts_pending);
+		cpuhp_lock_release();
+		return;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	if (WARN_ON(!cpu_hotplug.refcount))
 		cpu_hotplug.refcount++; /* try to fix things up */
@@ -141,6 +183,15 @@ void cpu_hotplug_begin(void)
 	cpuhp_lock_acquire();
 	for (;;) {
 		mutex_lock(&cpu_hotplug.lock);
+<<<<<<< HEAD
+=======
+		if (atomic_read(&cpu_hotplug.puts_pending)) {
+			int delta;
+
+			delta = atomic_xchg(&cpu_hotplug.puts_pending, 0);
+			cpu_hotplug.refcount -= delta;
+		}
+>>>>>>> common/deprecated/android-3.18
 		if (likely(!cpu_hotplug.refcount))
 			break;
 		__set_current_state(TASK_UNINTERRUPTIBLE);
@@ -210,12 +261,15 @@ static int cpu_notify(unsigned long val, void *v)
 	return __cpu_notify(val, v, -1, NULL);
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_HOTPLUG_CPU
 
 static void cpu_notify_nofail(unsigned long val, void *v)
 {
 	BUG_ON(cpu_notify(val, v));
 }
+=======
+>>>>>>> common/deprecated/android-3.18
 EXPORT_SYMBOL(register_cpu_notifier);
 EXPORT_SYMBOL(__register_cpu_notifier);
 
@@ -233,6 +287,15 @@ void __ref __unregister_cpu_notifier(struct notifier_block *nb)
 }
 EXPORT_SYMBOL(__unregister_cpu_notifier);
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_HOTPLUG_CPU
+static void cpu_notify_nofail(unsigned long val, void *v)
+{
+	BUG_ON(cpu_notify(val, v));
+}
+
+>>>>>>> common/deprecated/android-3.18
 /**
  * clear_tasks_mm_cpumask - Safely clear tasks' mm_cpumask for a CPU
  * @cpu: a CPU id
@@ -347,8 +410,33 @@ static int __ref _cpu_down(unsigned int cpu, int tasks_frozen)
 			__func__, cpu);
 		goto out_release;
 	}
+<<<<<<< HEAD
 	smpboot_park_threads(cpu);
 
+=======
+
+	/*
+	 * By now we've cleared cpu_active_mask, wait for all preempt-disabled
+	 * and RCU users of this state to go away such that all new such users
+	 * will observe it.
+	 *
+	 * For CONFIG_PREEMPT we have preemptible RCU and its sync_rcu() might
+	 * not imply sync_sched(), so explicitly call both.
+	 *
+	 * Do sync before park smpboot threads to take care the rcu boost case.
+	 */
+#ifdef CONFIG_PREEMPT
+	synchronize_sched();
+#endif
+	synchronize_rcu();
+
+	smpboot_park_threads(cpu);
+
+	/*
+	 * So now all preempt/rcu users must observe !cpu_active().
+	 */
+
+>>>>>>> common/deprecated/android-3.18
 	err = __stop_machine(take_cpu_down, &tcd_param, cpumask_of(cpu));
 	if (err) {
 		/* CPU didn't die: tell everyone.  Can't complain. */
@@ -378,6 +466,10 @@ static int __ref _cpu_down(unsigned int cpu, int tasks_frozen)
 
 out_release:
 	cpu_hotplug_done();
+<<<<<<< HEAD
+=======
+	trace_sched_cpu_hotplug(cpu, err, 0);
+>>>>>>> common/deprecated/android-3.18
 	if (!err)
 		cpu_notify_nofail(CPU_POST_DEAD | mod, hcpu);
 	return err;
@@ -453,6 +545,10 @@ out_notify:
 		__cpu_notify(CPU_UP_CANCELED | mod, hcpu, nr_calls, NULL);
 out:
 	cpu_hotplug_done();
+<<<<<<< HEAD
+=======
+	trace_sched_cpu_hotplug(cpu, ret, 1);
+>>>>>>> common/deprecated/android-3.18
 
 	return ret;
 }
@@ -495,9 +591,12 @@ static cpumask_var_t frozen_cpus;
 int disable_nonboot_cpus(void)
 {
 	int cpu, first_cpu, error = 0;
+<<<<<<< HEAD
 #ifdef CONFIG_ARM_EXYNOS_MP_CPUFREQ
 	int nonboot_cluster_first_cpu = 4;
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	cpu_maps_update_begin();
 	first_cpu = cpumask_first(cpu_online_mask);
@@ -509,11 +608,15 @@ int disable_nonboot_cpus(void)
 
 	pr_info("Disabling non-boot CPUs ...\n");
 	for_each_online_cpu(cpu) {
+<<<<<<< HEAD
 #if defined(CONFIG_ARM_EXYNOS_MP_CPUFREQ)
 		if (cpu == first_cpu || cpu == nonboot_cluster_first_cpu)
 #else
 		if (cpu == first_cpu)
 #endif
+=======
+		if (cpu == first_cpu)
+>>>>>>> common/deprecated/android-3.18
 			continue;
 		trace_suspend_resume(TPS("CPU_OFF"), cpu, true);
 		error = _cpu_down(cpu, 1);
@@ -526,6 +629,7 @@ int disable_nonboot_cpus(void)
 		}
 	}
 
+<<<<<<< HEAD
 #if defined(CONFIG_ARM_EXYNOS_MP_CPUFREQ)
 	if (num_online_cpus() > 1) {
 		error = _cpu_down(nonboot_cluster_first_cpu, 1);
@@ -537,6 +641,8 @@ int disable_nonboot_cpus(void)
 	}
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (!error) {
 		BUG_ON(num_online_cpus() > 1);
 		/* Make sure the CPUs won't be enabled by someone else */
@@ -559,6 +665,10 @@ void __weak arch_enable_nonboot_cpus_end(void)
 void __ref enable_nonboot_cpus(void)
 {
 	int cpu, error;
+<<<<<<< HEAD
+=======
+	struct device *cpu_device;
+>>>>>>> common/deprecated/android-3.18
 
 	/* Allow everyone to use the CPU hotplug again */
 	cpu_maps_update_begin();
@@ -576,6 +686,15 @@ void __ref enable_nonboot_cpus(void)
 		trace_suspend_resume(TPS("CPU_ON"), cpu, false);
 		if (!error) {
 			pr_info("CPU%d is up\n", cpu);
+<<<<<<< HEAD
+=======
+			cpu_device = get_cpu_device(cpu);
+			if (!cpu_device)
+				pr_err("%s: failed to get cpu%d device\n",
+				       __func__, cpu);
+			else
+				kobject_uevent(&cpu_device->kobj, KOBJ_ONLINE);
+>>>>>>> common/deprecated/android-3.18
 			continue;
 		}
 		pr_warn("Error taking CPU%d up: %d\n", cpu, error);

@@ -173,6 +173,11 @@ mtrr_ioctl(struct file *file, unsigned int cmd, unsigned long __arg)
 	struct mtrr_gentry gentry;
 	void __user *arg = (void __user *) __arg;
 
+<<<<<<< HEAD
+=======
+	memset(&gentry, 0, sizeof(gentry));
+
+>>>>>>> common/deprecated/android-3.18
 	switch (cmd) {
 	case MTRRIOC_ADD_ENTRY:
 	case MTRRIOC_SET_ENTRY:

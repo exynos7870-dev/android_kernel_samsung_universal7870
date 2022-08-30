@@ -160,6 +160,15 @@ static void rt6_release(struct rt6_info *rt)
 		dst_free(&rt->dst);
 }
 
+<<<<<<< HEAD
+=======
+static void fib6_free_table(struct fib6_table *table)
+{
+	inetpeer_invalidate_tree(&table->tb6_peers);
+	kfree(table);
+}
+
+>>>>>>> common/deprecated/android-3.18
 static void fib6_link_table(struct net *net, struct fib6_table *tb)
 {
 	unsigned int h;
@@ -803,7 +812,11 @@ add:
 		}
 		rt->dst.rt6_next = iter;
 		*ins = rt;
+<<<<<<< HEAD
 		rt->rt6i_node = fn;
+=======
+		rcu_assign_pointer(rt->rt6i_node, fn);
+>>>>>>> common/deprecated/android-3.18
 		atomic_inc(&rt->rt6i_ref);
 		inet6_rt_notify(RTM_NEWROUTE, rt, info);
 		info->nl_net->ipv6.rt6_stats->fib_rt_entries++;
@@ -826,7 +839,11 @@ add:
 				return err;
 		}
 		*ins = rt;
+<<<<<<< HEAD
 		rt->rt6i_node = fn;
+=======
+		rcu_assign_pointer(rt->rt6i_node, fn);
+>>>>>>> common/deprecated/android-3.18
 		rt->dst.rt6_next = iter->dst.rt6_next;
 		atomic_inc(&rt->rt6i_ref);
 		inet6_rt_notify(RTM_NEWROUTE, rt, info);
@@ -835,6 +852,11 @@ add:
 			fn->fn_flags |= RTN_RTINFO;
 		}
 		fib6_purge_rt(iter, fn, info->nl_net);
+<<<<<<< HEAD
+=======
+		if (fn->rr_ptr == iter)
+			fn->rr_ptr = NULL;
+>>>>>>> common/deprecated/android-3.18
 		rt6_release(iter);
 	}
 
@@ -911,7 +933,11 @@ int fib6_add(struct fib6_node *root, struct rt6_info *rt, struct nl_info *info,
 			/* Create subtree root node */
 			sfn = node_alloc();
 			if (!sfn)
+<<<<<<< HEAD
 				goto st_failure;
+=======
+				goto failure;
+>>>>>>> common/deprecated/android-3.18
 
 			sfn->leaf = info->nl_net->ipv6.ip6_null_entry;
 			atomic_inc(&info->nl_net->ipv6.ip6_null_entry->rt6i_ref);
@@ -927,12 +953,20 @@ int fib6_add(struct fib6_node *root, struct rt6_info *rt, struct nl_info *info,
 
 			if (IS_ERR(sn)) {
 				/* If it is failed, discard just allocated
+<<<<<<< HEAD
 				   root, and then (in st_failure) stale node
+=======
+				   root, and then (in failure) stale node
+>>>>>>> common/deprecated/android-3.18
 				   in main tree.
 				 */
 				node_free(sfn);
 				err = PTR_ERR(sn);
+<<<<<<< HEAD
 				goto st_failure;
+=======
+				goto failure;
+>>>>>>> common/deprecated/android-3.18
 			}
 
 			/* Now link new subtree to main tree */
@@ -946,7 +980,11 @@ int fib6_add(struct fib6_node *root, struct rt6_info *rt, struct nl_info *info,
 
 			if (IS_ERR(sn)) {
 				err = PTR_ERR(sn);
+<<<<<<< HEAD
 				goto st_failure;
+=======
+				goto failure;
+>>>>>>> common/deprecated/android-3.18
 			}
 		}
 
@@ -987,6 +1025,7 @@ out:
 			atomic_inc(&pn->leaf->rt6i_ref);
 		}
 #endif
+<<<<<<< HEAD
 		dst_free(&rt->dst);
 	}
 	return err;
@@ -996,11 +1035,27 @@ out:
 	   is orphan. If it is, shoot it.
 	 */
 st_failure:
+=======
+		goto failure;
+	}
+	return err;
+
+failure:
+	/* fn->leaf could be NULL if fn is an intermediate node and we
+	 * failed to add the new route to it in both subtree creation
+	 * failure and fib6_add_rt2node() failure case.
+	 * In both cases, fib6_repair_tree() should be called to fix
+	 * fn->leaf.
+	 */
+>>>>>>> common/deprecated/android-3.18
 	if (fn && !(fn->fn_flags & (RTN_RTINFO|RTN_ROOT)))
 		fib6_repair_tree(info->nl_net, fn);
 	dst_free(&rt->dst);
 	return err;
+<<<<<<< HEAD
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
@@ -1354,8 +1409,14 @@ static void fib6_del_route(struct fib6_node *fn, struct rt6_info **rtp,
 
 int fib6_del(struct rt6_info *rt, struct nl_info *info)
 {
+<<<<<<< HEAD
 	struct net *net = info->nl_net;
 	struct fib6_node *fn = rt->rt6i_node;
+=======
+	struct fib6_node *fn = rcu_dereference_protected(rt->rt6i_node,
+				    lockdep_is_held(&rt->rt6i_table->tb6_lock));
+	struct net *net = info->nl_net;
+>>>>>>> common/deprecated/android-3.18
 	struct rt6_info **rtp;
 
 #if RT6_DEBUG >= 2
@@ -1544,7 +1605,13 @@ static int fib6_clean_node(struct fib6_walker *w)
 			if (res) {
 #if RT6_DEBUG >= 2
 				pr_debug("%s: del failed: rt=%p@%p err=%d\n",
+<<<<<<< HEAD
 					 __func__, rt, rt->rt6i_node, res);
+=======
+					 __func__, rt,
+					 rcu_access_pointer(rt->rt6i_node),
+					 res);
+>>>>>>> common/deprecated/android-3.18
 #endif
 				continue;
 			}
@@ -1782,6 +1849,7 @@ out_timer:
 
 static void fib6_net_exit(struct net *net)
 {
+<<<<<<< HEAD
 	rt6_ifdown(net, NULL);
 	del_timer_sync(&net->ipv6.ip6_fib_timer);
 
@@ -1791,6 +1859,24 @@ static void fib6_net_exit(struct net *net)
 #endif
 	inetpeer_invalidate_tree(&net->ipv6.fib6_main_tbl->tb6_peers);
 	kfree(net->ipv6.fib6_main_tbl);
+=======
+	unsigned int i;
+
+	rt6_ifdown(net, NULL);
+	del_timer_sync(&net->ipv6.ip6_fib_timer);
+
+	for (i = 0; i < FIB6_TABLE_HASHSZ; i++) {
+		struct hlist_head *head = &net->ipv6.fib_table_hash[i];
+		struct hlist_node *tmp;
+		struct fib6_table *tb;
+
+		hlist_for_each_entry_safe(tb, tmp, head, tb6_hlist) {
+			hlist_del(&tb->tb6_hlist);
+			fib6_free_table(tb);
+		}
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	kfree(net->ipv6.fib_table_hash);
 	kfree(net->ipv6.rt6_stats);
 }

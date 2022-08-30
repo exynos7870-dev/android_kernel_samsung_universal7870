@@ -58,6 +58,10 @@
 #define MMX_SIZE		(0x98)
 
 	.text
+<<<<<<< HEAD
+=======
+	.arm
+>>>>>>> common/deprecated/android-3.18
 
 /*
  * Lazy switching of Concan coprocessor context
@@ -182,6 +186,11 @@ concan_load:
 	tmcr	wCon, r2
 	ret	lr
 
+<<<<<<< HEAD
+=======
+ENDPROC(iwmmxt_task_enable)
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Back up Concan regs to save area and disable access to them
  * (mainly for gdb or sleep mode usage)
@@ -232,6 +241,11 @@ ENTRY(iwmmxt_task_disable)
 1:	msr	cpsr_c, ip			@ restore interrupt mode
 	ldmfd	sp!, {r4, pc}
 
+<<<<<<< HEAD
+=======
+ENDPROC(iwmmxt_task_disable)
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Copy Concan state to given memory address
  *
@@ -268,6 +282,11 @@ ENTRY(iwmmxt_task_copy)
 	msr	cpsr_c, ip			@ restore interrupt mode
 	ret	r3
 
+<<<<<<< HEAD
+=======
+ENDPROC(iwmmxt_task_copy)
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Restore Concan state from given memory address
  *
@@ -304,6 +323,11 @@ ENTRY(iwmmxt_task_restore)
 	msr	cpsr_c, ip			@ restore interrupt mode
 	ret	r3
 
+<<<<<<< HEAD
+=======
+ENDPROC(iwmmxt_task_restore)
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Concan handling on task switch
  *
@@ -335,6 +359,11 @@ ENTRY(iwmmxt_task_switch)
 	mrc	p15, 0, r1, c2, c0, 0
 	sub	pc, lr, r1, lsr #32		@ cpwait and return
 
+<<<<<<< HEAD
+=======
+ENDPROC(iwmmxt_task_switch)
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Remove Concan ownership of given task
  *
@@ -353,6 +382,11 @@ ENTRY(iwmmxt_task_release)
 	msr	cpsr_c, r2			@ restore interrupts
 	ret	lr
 
+<<<<<<< HEAD
+=======
+ENDPROC(iwmmxt_task_release)
+
+>>>>>>> common/deprecated/android-3.18
 	.data
 concan_owner:
 	.word	0

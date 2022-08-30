@@ -11,6 +11,10 @@
 #ifndef __BCM_SYSPORT_H
 #define __BCM_SYSPORT_H
 
+<<<<<<< HEAD
+=======
+#include <linux/ethtool.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/if_vlan.h>
 
 /* Receive/transmit descriptor format */
@@ -633,7 +637,11 @@ struct bcm_sysport_tx_ring {
 	unsigned int	desc_count;	/* Number of descriptors */
 	unsigned int	curr_desc;	/* Current descriptor */
 	unsigned int	c_index;	/* Last consumer index */
+<<<<<<< HEAD
 	unsigned int	p_index;	/* Current producer index */
+=======
+	unsigned int	clean_index;	/* Current clean index */
+>>>>>>> common/deprecated/android-3.18
 	struct bcm_sysport_cb *cbs;	/* Transmit control blocks */
 	struct dma_desc	*desc_cpu;	/* CPU view of the descriptor */
 	struct bcm_sysport_priv *priv;	/* private context backpointer */
@@ -679,6 +687,10 @@ struct bcm_sysport_priv {
 	unsigned int		crc_fwd:1;
 	u16			rev;
 	u32			wolopts;
+<<<<<<< HEAD
+=======
+	u8			sopass[SOPASS_MAX];
+>>>>>>> common/deprecated/android-3.18
 	unsigned int		wol_irq_disabled:1;
 
 	/* MIB related fields */

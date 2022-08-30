@@ -212,8 +212,15 @@ err_unlock:
 	spin_unlock_bh(&chain->lock);
 
 err:
+<<<<<<< HEAD
 	if (!ret)
 		kfree(frag_entry_new);
+=======
+	if (!ret) {
+		kfree(frag_entry_new);
+		kfree_skb(skb);
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	return ret;
 }
@@ -260,7 +267,12 @@ batadv_frag_merge_packets(struct hlist_head *chain, struct sk_buff *skb)
 	/* Move the existing MAC header to just before the payload. (Override
 	 * the fragment header.)
 	 */
+<<<<<<< HEAD
 	skb_pull_rcsum(skb_out, hdr_size);
+=======
+	skb_pull(skb_out, hdr_size);
+	skb_out->ip_summed = CHECKSUM_NONE;
+>>>>>>> common/deprecated/android-3.18
 	memmove(skb_out->data - ETH_HLEN, skb_mac_header(skb_out), ETH_HLEN);
 	skb_set_mac_header(skb_out, -ETH_HLEN);
 	skb_reset_network_header(skb_out);
@@ -310,9 +322,15 @@ bool batadv_frag_skb_buffer(struct sk_buff **skb,
 		goto out_err;
 
 out:
+<<<<<<< HEAD
 	*skb = skb_out;
 	ret = true;
 out_err:
+=======
+	ret = true;
+out_err:
+	*skb = skb_out;
+>>>>>>> common/deprecated/android-3.18
 	return ret;
 }
 
@@ -459,6 +477,13 @@ bool batadv_frag_send_packet(struct sk_buff *skb,
 
 	/* Eat and send fragments from the tail of skb */
 	while (skb->len > max_fragment_size) {
+<<<<<<< HEAD
+=======
+		/* The initial check in this function should cover this case */
+		if (frag_header.no == BATADV_FRAG_MAX_FRAGMENTS - 1)
+			goto out_err;
+
+>>>>>>> common/deprecated/android-3.18
 		skb_fragment = batadv_frag_create(skb, &frag_header, mtu);
 		if (!skb_fragment)
 			goto out_err;
@@ -469,10 +494,13 @@ bool batadv_frag_send_packet(struct sk_buff *skb,
 		batadv_send_skb_packet(skb_fragment, neigh_node->if_incoming,
 				       neigh_node->addr);
 		frag_header.no++;
+<<<<<<< HEAD
 
 		/* The initial check in this function should cover this case */
 		if (frag_header.no == BATADV_FRAG_MAX_FRAGMENTS - 1)
 			goto out_err;
+=======
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	/* Make room for the fragment header. */

@@ -3748,8 +3748,15 @@ static struct usb_hcd *oxu_create(struct platform_device *pdev,
 	oxu->is_otg = otg;
 
 	ret = usb_add_hcd(hcd, irq, IRQF_SHARED);
+<<<<<<< HEAD
 	if (ret < 0)
 		return ERR_PTR(ret);
+=======
+	if (ret < 0) {
+		usb_put_hcd(hcd);
+		return ERR_PTR(ret);
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	device_wakeup_enable(hcd->self.controller);
 	return hcd;

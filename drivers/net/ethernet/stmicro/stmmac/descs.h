@@ -158,6 +158,11 @@ struct dma_desc {
 			u32 buffer2_size:13;
 			u32 reserved4:3;
 		} etx;		/* -- enhanced -- */
+<<<<<<< HEAD
+=======
+
+		u64 all_flags;
+>>>>>>> common/deprecated/android-3.18
 	} des01;
 	unsigned int des2;
 	unsigned int des3;

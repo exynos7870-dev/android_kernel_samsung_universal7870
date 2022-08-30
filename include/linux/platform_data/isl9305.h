@@ -24,7 +24,11 @@
 struct regulator_init_data;
 
 struct isl9305_pdata {
+<<<<<<< HEAD
 	struct regulator_init_data *init_data[ISL9305_MAX_REGULATOR];
+=======
+	struct regulator_init_data *init_data[ISL9305_MAX_REGULATOR + 1];
+>>>>>>> common/deprecated/android-3.18
 };
 
 #endif

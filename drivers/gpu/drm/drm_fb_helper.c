@@ -822,9 +822,20 @@ int drm_fb_helper_check_var(struct fb_var_screeninfo *var,
 	struct drm_framebuffer *fb = fb_helper->fb;
 	int depth;
 
+<<<<<<< HEAD
 	if (var->pixclock != 0 || in_dbg_master())
 		return -EINVAL;
 
+=======
+	if (in_dbg_master())
+		return -EINVAL;
+
+	if (var->pixclock != 0) {
+		DRM_DEBUG("fbdev emulation doesn't support changing the pixel clock, value of pixclock is ignored\n");
+		var->pixclock = 0;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	/* Need to resize the fb object !!! */
 	if (var->bits_per_pixel > fb->bits_per_pixel ||
 	    var->xres > fb->width || var->yres > fb->height ||
@@ -1453,7 +1464,10 @@ static int drm_pick_crtcs(struct drm_fb_helper *fb_helper,
 			  int n, int width, int height)
 {
 	int c, o;
+<<<<<<< HEAD
 	struct drm_device *dev = fb_helper->dev;
+=======
+>>>>>>> common/deprecated/android-3.18
 	struct drm_connector *connector;
 	struct drm_connector_helper_funcs *connector_funcs;
 	struct drm_encoder *encoder;
@@ -1472,7 +1486,11 @@ static int drm_pick_crtcs(struct drm_fb_helper *fb_helper,
 	if (modes[n] == NULL)
 		return best_score;
 
+<<<<<<< HEAD
 	crtcs = kzalloc(dev->mode_config.num_connector *
+=======
+	crtcs = kzalloc(fb_helper->connector_count *
+>>>>>>> common/deprecated/android-3.18
 			sizeof(struct drm_fb_helper_crtc *), GFP_KERNEL);
 	if (!crtcs)
 		return best_score;
@@ -1518,7 +1536,11 @@ static int drm_pick_crtcs(struct drm_fb_helper *fb_helper,
 		if (score > best_score) {
 			best_score = score;
 			memcpy(best_crtcs, crtcs,
+<<<<<<< HEAD
 			       dev->mode_config.num_connector *
+=======
+			       fb_helper->connector_count *
+>>>>>>> common/deprecated/android-3.18
 			       sizeof(struct drm_fb_helper_crtc *));
 		}
 	}
@@ -1638,7 +1660,11 @@ out:
  * RETURNS:
  * Zero if everything went ok, nonzero otherwise.
  */
+<<<<<<< HEAD
 bool drm_fb_helper_initial_config(struct drm_fb_helper *fb_helper, int bpp_sel)
+=======
+int drm_fb_helper_initial_config(struct drm_fb_helper *fb_helper, int bpp_sel)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct drm_device *dev = fb_helper->dev;
 	int count = 0;

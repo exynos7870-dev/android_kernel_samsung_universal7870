@@ -444,7 +444,11 @@ static int mcp23s08_irq_reqres(struct irq_data *data)
 {
 	struct mcp23s08 *mcp = irq_data_get_irq_chip_data(data);
 
+<<<<<<< HEAD
 	if (gpio_lock_as_irq(&mcp->chip, data->hwirq)) {
+=======
+	if (gpiochip_lock_as_irq(&mcp->chip, data->hwirq)) {
+>>>>>>> common/deprecated/android-3.18
 		dev_err(mcp->chip.dev,
 			"unable to lock HW IRQ %lu for IRQ usage\n",
 			data->hwirq);
@@ -458,7 +462,11 @@ static void mcp23s08_irq_relres(struct irq_data *data)
 {
 	struct mcp23s08 *mcp = irq_data_get_irq_chip_data(data);
 
+<<<<<<< HEAD
 	gpio_unlock_as_irq(&mcp->chip, data->hwirq);
+=======
+	gpiochip_unlock_as_irq(&mcp->chip, data->hwirq);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static struct irq_chip mcp23s08_irq_chip = {

@@ -888,7 +888,11 @@ err_put:
 	free_port_list_attributes(device);
 
 err_unregister:
+<<<<<<< HEAD
 	device_unregister(class_dev);
+=======
+	device_del(class_dev);
+>>>>>>> common/deprecated/android-3.18
 
 err:
 	return ret;

@@ -1018,11 +1018,17 @@ static struct rt6_info *ip6_pol_route_output(struct net *net, struct fib6_table 
 	return ip6_pol_route(net, table, fl6->flowi6_oif, fl6, flags);
 }
 
+<<<<<<< HEAD
 struct dst_entry *ip6_route_output(struct net *net, const struct sock *sk,
 				    struct flowi6 *fl6)
 {
 	int flags = 0;
 
+=======
+struct dst_entry *ip6_route_output_flags(struct net *net, const struct sock *sk,
+					 struct flowi6 *fl6, int flags)
+{
+>>>>>>> common/deprecated/android-3.18
 	fl6->flowi6_iif = LOOPBACK_IFINDEX;
 
 	if ((sk && sk->sk_bound_dev_if) || rt6_need_strict(&fl6->daddr))
@@ -1035,7 +1041,11 @@ struct dst_entry *ip6_route_output(struct net *net, const struct sock *sk,
 
 	return fib6_rule_lookup(net, fl6, flags, ip6_pol_route_output);
 }
+<<<<<<< HEAD
 EXPORT_SYMBOL(ip6_route_output);
+=======
+EXPORT_SYMBOL_GPL(ip6_route_output_flags);
+>>>>>>> common/deprecated/android-3.18
 
 struct dst_entry *ip6_blackhole_route(struct net *net, struct dst_entry *dst_orig)
 {
@@ -1255,7 +1265,11 @@ static struct dst_entry *ip6_route_redirect(struct net *net,
 }
 
 void ip6_redirect(struct sk_buff *skb, struct net *net, int oif, u32 mark,
+<<<<<<< HEAD
 					kuid_t uid)
+=======
+		  kuid_t uid)
+>>>>>>> common/deprecated/android-3.18
 {
 	const struct ipv6hdr *iph = (struct ipv6hdr *) skb->data;
 	struct dst_entry *dst;
@@ -1300,7 +1314,11 @@ void ip6_redirect_no_header(struct sk_buff *skb, struct net *net, int oif,
 void ip6_sk_redirect(struct sk_buff *skb, struct sock *sk)
 {
 	ip6_redirect(skb, sock_net(sk), sk->sk_bound_dev_if, sk->sk_mark,
+<<<<<<< HEAD
 					sk->sk_uid);
+=======
+		     sk->sk_uid);
+>>>>>>> common/deprecated/android-3.18
 }
 EXPORT_SYMBOL_GPL(ip6_sk_redirect);
 
@@ -1368,6 +1386,10 @@ struct dst_entry *icmp6_dst_alloc(struct net_device *dev,
 	}
 
 	rt->dst.flags |= DST_HOST;
+<<<<<<< HEAD
+=======
+	rt->dst.input = ip6_input;
+>>>>>>> common/deprecated/android-3.18
 	rt->dst.output  = ip6_output;
 	atomic_set(&rt->dst.__refcnt, 1);
 	rt->rt6i_gateway  = fl6->daddr;
@@ -1732,6 +1754,11 @@ static int ip6_route_del(struct fib6_config *cfg)
 				continue;
 			if (cfg->fc_metric && cfg->fc_metric != rt->rt6i_metric)
 				continue;
+<<<<<<< HEAD
+=======
+			if (cfg->fc_protocol && cfg->fc_protocol != rt->rt6i_protocol)
+				continue;
+>>>>>>> common/deprecated/android-3.18
 			dst_hold(&rt->dst);
 			read_unlock_bh(&table->tb6_lock);
 
@@ -2321,12 +2348,20 @@ void rt6_mtu_change(struct net_device *dev, unsigned int mtu)
 
 static const struct nla_policy rtm_ipv6_policy[RTA_MAX+1] = {
 	[RTA_GATEWAY]           = { .len = sizeof(struct in6_addr) },
+<<<<<<< HEAD
+=======
+	[RTA_PREFSRC]		= { .len = sizeof(struct in6_addr) },
+>>>>>>> common/deprecated/android-3.18
 	[RTA_OIF]               = { .type = NLA_U32 },
 	[RTA_IIF]		= { .type = NLA_U32 },
 	[RTA_PRIORITY]          = { .type = NLA_U32 },
 	[RTA_METRICS]           = { .type = NLA_NESTED },
 	[RTA_MULTIPATH]		= { .len = sizeof(struct rtnexthop) },
 	[RTA_UID]		= { .type = NLA_U32 },
+<<<<<<< HEAD
+=======
+	[RTA_TABLE]		= { .type = NLA_U32 },
+>>>>>>> common/deprecated/android-3.18
 };
 
 static int rtm_to_fib6_config(struct sk_buff *skb, struct nlmsghdr *nlh,
@@ -2545,7 +2580,11 @@ static int rt6_fill_node(struct net *net,
 		table = rt->rt6i_table->tb6_id;
 	else
 		table = RT6_TABLE_UNSPEC;
+<<<<<<< HEAD
 	rtm->rtm_table = table;
+=======
+	rtm->rtm_table = table < 256 ? table : RT_TABLE_COMPAT;
+>>>>>>> common/deprecated/android-3.18
 	if (nla_put_u32(skb, RTA_TABLE, table))
 		goto nla_put_failure;
 	if (rt->rt6i_flags & RTF_REJECT) {
@@ -2604,7 +2643,13 @@ static int rt6_fill_node(struct net *net,
 	if (iif) {
 #ifdef CONFIG_IPV6_MROUTE
 		if (ipv6_addr_is_multicast(&rt->rt6i_dst.addr)) {
+<<<<<<< HEAD
 			int err = ip6mr_get_route(net, skb, rtm, nowait);
+=======
+			int err = ip6mr_get_route(net, skb, rtm, nowait,
+						  portid);
+
+>>>>>>> common/deprecated/android-3.18
 			if (err <= 0) {
 				if (!nowait) {
 					if (err == 0)
@@ -2809,7 +2854,14 @@ static int ip6_route_dev_notify(struct notifier_block *this,
 	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
 	struct net *net = dev_net(dev);
 
+<<<<<<< HEAD
 	if (event == NETDEV_REGISTER && (dev->flags & IFF_LOOPBACK)) {
+=======
+	if (!(dev->flags & IFF_LOOPBACK))
+		return NOTIFY_OK;
+
+	if (event == NETDEV_REGISTER) {
+>>>>>>> common/deprecated/android-3.18
 		net->ipv6.ip6_null_entry->dst.dev = dev;
 		net->ipv6.ip6_null_entry->rt6i_idev = in6_dev_get(dev);
 #ifdef CONFIG_IPV6_MULTIPLE_TABLES
@@ -2818,6 +2870,19 @@ static int ip6_route_dev_notify(struct notifier_block *this,
 		net->ipv6.ip6_blk_hole_entry->dst.dev = dev;
 		net->ipv6.ip6_blk_hole_entry->rt6i_idev = in6_dev_get(dev);
 #endif
+<<<<<<< HEAD
+=======
+	 } else if (event == NETDEV_UNREGISTER &&
+		    dev->reg_state != NETREG_UNREGISTERED) {
+		/* NETDEV_UNREGISTER could be fired for multiple times by
+		 * netdev_wait_allrefs(). Make sure we only call this once.
+		 */
+		in6_dev_put(net->ipv6.ip6_null_entry->rt6i_idev);
+#ifdef CONFIG_IPV6_MULTIPLE_TABLES
+		in6_dev_put(net->ipv6.ip6_prohibit_entry->rt6i_idev);
+		in6_dev_put(net->ipv6.ip6_blk_hole_entry->rt6i_idev);
+#endif
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	return NOTIFY_OK;
@@ -3124,9 +3189,30 @@ static struct pernet_operations ip6_route_net_late_ops = {
 
 static struct notifier_block ip6_route_dev_notifier = {
 	.notifier_call = ip6_route_dev_notify,
+<<<<<<< HEAD
 	.priority = 0,
 };
 
+=======
+	.priority = ADDRCONF_NOTIFY_PRIORITY - 10,
+};
+
+void __init ip6_route_init_special_entries(void)
+{
+	/* Registering of the loopback is done before this portion of code,
+	 * the loopback reference in rt6_info will not be taken, do it
+	 * manually for init_net */
+	init_net.ipv6.ip6_null_entry->dst.dev = init_net.loopback_dev;
+	init_net.ipv6.ip6_null_entry->rt6i_idev = in6_dev_get(init_net.loopback_dev);
+  #ifdef CONFIG_IPV6_MULTIPLE_TABLES
+	init_net.ipv6.ip6_prohibit_entry->dst.dev = init_net.loopback_dev;
+	init_net.ipv6.ip6_prohibit_entry->rt6i_idev = in6_dev_get(init_net.loopback_dev);
+	init_net.ipv6.ip6_blk_hole_entry->dst.dev = init_net.loopback_dev;
+	init_net.ipv6.ip6_blk_hole_entry->rt6i_idev = in6_dev_get(init_net.loopback_dev);
+  #endif
+}
+
+>>>>>>> common/deprecated/android-3.18
 int __init ip6_route_init(void)
 {
 	int ret;
@@ -3152,6 +3238,7 @@ int __init ip6_route_init(void)
 
 	ip6_dst_blackhole_ops.kmem_cachep = ip6_dst_ops_template.kmem_cachep;
 
+<<<<<<< HEAD
 	/* Registering of the loopback is done before this portion of code,
 	 * the loopback reference in rt6_info will not be taken, do it
 	 * manually for init_net */
@@ -3163,6 +3250,8 @@ int __init ip6_route_init(void)
 	init_net.ipv6.ip6_blk_hole_entry->dst.dev = init_net.loopback_dev;
 	init_net.ipv6.ip6_blk_hole_entry->rt6i_idev = in6_dev_get(init_net.loopback_dev);
   #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	ret = fib6_init();
 	if (ret)
 		goto out_register_subsys;

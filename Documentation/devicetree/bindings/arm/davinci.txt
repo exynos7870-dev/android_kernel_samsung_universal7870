@@ -9,6 +9,13 @@ EnBW AM1808 based CMC board
 Required root node properties:
     - compatible = "enbw,cmc", "ti,da850;
 
+<<<<<<< HEAD
+=======
+LEGO MINDSTORMS EV3 (AM1808 based)
+Required root node properties:
+    - compatible = "lego,ev3", "ti,da850";
+
+>>>>>>> common/deprecated/android-3.18
 Generic DaVinci Boards
 ----------------------
 

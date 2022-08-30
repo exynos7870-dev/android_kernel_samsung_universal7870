@@ -78,7 +78,11 @@ static int set_up_temporary_mappings(void)
 	return 0;
 }
 
+<<<<<<< HEAD
 int swsusp_arch_resume(void)
+=======
+asmlinkage int swsusp_arch_resume(void)
+>>>>>>> common/deprecated/android-3.18
 {
 	int error;
 

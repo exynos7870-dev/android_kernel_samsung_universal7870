@@ -123,6 +123,7 @@ int pvr2_eeprom_analyze(struct pvr2_hdw *hdw)
 	memset(&tvdata,0,sizeof(tvdata));
 
 	eeprom = pvr2_eeprom_fetch(hdw);
+<<<<<<< HEAD
 	if (!eeprom) return -EINVAL;
 
 	{
@@ -132,6 +133,12 @@ int pvr2_eeprom_analyze(struct pvr2_hdw *hdw)
 		fake_client.adapter = &hdw->i2c_adap;
 		tveeprom_hauppauge_analog(&fake_client,&tvdata,eeprom);
 	}
+=======
+	if (!eeprom)
+		return -EINVAL;
+
+	tveeprom_hauppauge_analog(NULL, &tvdata, eeprom);
+>>>>>>> common/deprecated/android-3.18
 
 	trace_eeprom("eeprom assumed v4l tveeprom module");
 	trace_eeprom("eeprom direct call results:");

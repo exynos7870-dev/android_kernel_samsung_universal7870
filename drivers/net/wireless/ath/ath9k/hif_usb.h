@@ -112,5 +112,9 @@ struct hif_device_usb {
 
 int ath9k_hif_usb_init(void);
 void ath9k_hif_usb_exit(void);
+<<<<<<< HEAD
+=======
+void ath9k_hif_usb_dealloc_urbs(struct hif_device_usb *hif_dev);
+>>>>>>> common/deprecated/android-3.18
 
 #endif /* HTC_USB_H */

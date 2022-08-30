@@ -383,6 +383,12 @@ static int ipmmu_domain_init_context(struct ipmmu_vmsa_domain *domain)
 
 static void ipmmu_domain_destroy_context(struct ipmmu_vmsa_domain *domain)
 {
+<<<<<<< HEAD
+=======
+	if (!domain->mmu)
+		return;
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * Disable the context. Flush the TLB as required when modifying the
 	 * context registers.

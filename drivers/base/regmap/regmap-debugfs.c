@@ -32,8 +32,12 @@ static DEFINE_MUTEX(regmap_debugfs_early_lock);
 /* Calculate the length of a fixed format  */
 static size_t regmap_calc_reg_len(int max_val, char *buf, size_t buf_size)
 {
+<<<<<<< HEAD
 	snprintf(buf, buf_size, "%x", max_val);
 	return strlen(buf);
+=======
+	return snprintf(NULL, 0, "%x", max_val);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static ssize_t regmap_name_read_file(struct file *file,
@@ -196,6 +200,12 @@ static ssize_t regmap_read_debugfs(struct regmap *map, unsigned int from,
 	if (*ppos < 0 || !count)
 		return -EINVAL;
 
+<<<<<<< HEAD
+=======
+	if (count > (PAGE_SIZE << (MAX_ORDER - 1)))
+		count = PAGE_SIZE << (MAX_ORDER - 1);
+
+>>>>>>> common/deprecated/android-3.18
 	buf = kmalloc(count, GFP_KERNEL);
 	if (!buf)
 		return -ENOMEM;
@@ -343,6 +353,12 @@ static ssize_t regmap_reg_ranges_read_file(struct file *file,
 	if (*ppos < 0 || !count)
 		return -EINVAL;
 
+<<<<<<< HEAD
+=======
+	if (count > (PAGE_SIZE << (MAX_ORDER - 1)))
+		count = PAGE_SIZE << (MAX_ORDER - 1);
+
+>>>>>>> common/deprecated/android-3.18
 	buf = kmalloc(count, GFP_KERNEL);
 	if (!buf)
 		return -ENOMEM;
@@ -432,7 +448,11 @@ static ssize_t regmap_access_read_file(struct file *file,
 		/* If we're in the region the user is trying to read */
 		if (p >= *ppos) {
 			/* ...but not beyond it */
+<<<<<<< HEAD
 			if (buf_pos >= count - 1 - tot_len)
+=======
+			if (buf_pos + tot_len + 1 >= count)
+>>>>>>> common/deprecated/android-3.18
 				break;
 
 			/* Format the register */
@@ -521,7 +541,11 @@ void regmap_debugfs_init(struct regmap *map, const char *name)
 		if (IS_ENABLED(REGMAP_ALLOW_WRITE_DEBUGFS))
 			registers_mode = 0600;
 		else
+<<<<<<< HEAD
 			registers_mode = 0404;
+=======
+			registers_mode = 0400;
+>>>>>>> common/deprecated/android-3.18
 
 		debugfs_create_file("registers", registers_mode, map->debugfs,
 				    map, &regmap_map_fops);

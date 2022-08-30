@@ -61,6 +61,10 @@ struct cfg80211_registered_device {
 	struct list_head bss_list;
 	struct rb_root bss_tree;
 	u32 bss_generation;
+<<<<<<< HEAD
+=======
+	u32 bss_entries;
+>>>>>>> common/deprecated/android-3.18
 	struct cfg80211_scan_request *scan_req; /* protected by RTNL */
 	struct sk_buff *scan_msg;
 	struct cfg80211_sched_scan_request *sched_scan_req;
@@ -84,6 +88,11 @@ struct cfg80211_registered_device {
 	struct list_head destroy_list;
 	struct work_struct destroy_work;
 
+<<<<<<< HEAD
+=======
+	struct work_struct sched_scan_stop_wk;
+
+>>>>>>> common/deprecated/android-3.18
 	/* must be last because of the way we do wiphy_priv(),
 	 * and it should at least be aligned to NETDEV_ALIGN */
 	struct wiphy wiphy __aligned(NETDEV_ALIGN);
@@ -111,10 +120,15 @@ cfg80211_rdev_free_wowlan(struct cfg80211_registered_device *rdev)
 	    rdev->wiphy.wowlan_config->tcp->sock)
 		sock_release(rdev->wiphy.wowlan_config->tcp->sock);
 	kfree(rdev->wiphy.wowlan_config->tcp);
+<<<<<<< HEAD
 #ifndef CONFIG_QCOM_WIFI
 	kfree(rdev->wiphy.wowlan_config);
 #endif
 #endif
+=======
+	kfree(rdev->wiphy.wowlan_config);
+#endif
+>>>>>>> common/deprecated/android-3.18
 }
 
 extern struct workqueue_struct *cfg80211_wq;

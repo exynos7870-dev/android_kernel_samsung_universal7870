@@ -195,6 +195,29 @@ TRACE_EVENT(ext4_drop_inode,
 		  (unsigned long) __entry->ino, __entry->drop)
 );
 
+<<<<<<< HEAD
+=======
+TRACE_EVENT(ext4_nfs_commit_metadata,
+	TP_PROTO(struct inode *inode),
+
+	TP_ARGS(inode),
+
+	TP_STRUCT__entry(
+		__field(	dev_t,	dev			)
+		__field(	ino_t,	ino			)
+	),
+
+	TP_fast_assign(
+		__entry->dev	= inode->i_sb->s_dev;
+		__entry->ino	= inode->i_ino;
+	),
+
+	TP_printk("dev %d,%d ino %lu",
+		  MAJOR(__entry->dev), MINOR(__entry->dev),
+		  (unsigned long) __entry->ino)
+);
+
+>>>>>>> common/deprecated/android-3.18
 TRACE_EVENT(ext4_mark_inode_dirty,
 	TP_PROTO(struct inode *inode, unsigned long IP),
 
@@ -839,7 +862,10 @@ TRACE_EVENT(ext4_sync_file_enter,
 		__field(	ino_t,	ino			)
 		__field(	ino_t,	parent			)
 		__field(	int,	datasync		)
+<<<<<<< HEAD
 		__array(unsigned char,	d_name,	EXT4_NAME_LEN)
+=======
+>>>>>>> common/deprecated/android-3.18
 	),
 
 	TP_fast_assign(
@@ -849,6 +875,7 @@ TRACE_EVENT(ext4_sync_file_enter,
 		__entry->ino		= dentry->d_inode->i_ino;
 		__entry->datasync	= datasync;
 		__entry->parent		= dentry->d_parent->d_inode->i_ino;
+<<<<<<< HEAD
 		memcpy(__entry->d_name, dentry->d_name.name, EXT4_NAME_LEN);
 	),
 
@@ -857,6 +884,14 @@ TRACE_EVENT(ext4_sync_file_enter,
 		  (unsigned long) __entry->ino,
 		  (unsigned long) __entry->parent, __entry->datasync,
 		  __entry->d_name)
+=======
+	),
+
+	TP_printk("dev %d,%d ino %lu parent %lu datasync %d ",
+		  MAJOR(__entry->dev), MINOR(__entry->dev),
+		  (unsigned long) __entry->ino,
+		  (unsigned long) __entry->parent, __entry->datasync)
+>>>>>>> common/deprecated/android-3.18
 );
 
 TRACE_EVENT(ext4_sync_file_exit,
@@ -1425,7 +1460,10 @@ TRACE_EVENT(ext4_unlink_enter,
 		__field(	ino_t,	ino			)
 		__field(	ino_t,	parent			)
 		__field(	loff_t,	size			)
+<<<<<<< HEAD
 		__array(unsigned char,	d_name,	EXT4_NAME_LEN)
+=======
+>>>>>>> common/deprecated/android-3.18
 	),
 
 	TP_fast_assign(
@@ -1433,6 +1471,7 @@ TRACE_EVENT(ext4_unlink_enter,
 		__entry->ino		= dentry->d_inode->i_ino;
 		__entry->parent		= parent->i_ino;
 		__entry->size		= dentry->d_inode->i_size;
+<<<<<<< HEAD
 		memcpy(__entry->d_name, dentry->d_name.name, EXT4_NAME_LEN);
 	),
 
@@ -1440,6 +1479,14 @@ TRACE_EVENT(ext4_unlink_enter,
 		  MAJOR(__entry->dev), MINOR(__entry->dev),
 		  (unsigned long) __entry->ino, __entry->size,
 		  (unsigned long) __entry->parent, __entry->d_name)
+=======
+	),
+
+	TP_printk("dev %d,%d ino %lu size %lld parent %lu",
+		  MAJOR(__entry->dev), MINOR(__entry->dev),
+		  (unsigned long) __entry->ino, __entry->size,
+		  (unsigned long) __entry->parent)
+>>>>>>> common/deprecated/android-3.18
 );
 
 TRACE_EVENT(ext4_unlink_exit,
@@ -1451,13 +1498,17 @@ TRACE_EVENT(ext4_unlink_exit,
 		__field(	dev_t,	dev			)
 		__field(	ino_t,	ino			)
 		__field(	int,	ret			)
+<<<<<<< HEAD
 		__array(unsigned char,	d_name,	EXT4_NAME_LEN)
+=======
+>>>>>>> common/deprecated/android-3.18
 	),
 
 	TP_fast_assign(
 		__entry->dev		= dentry->d_inode->i_sb->s_dev;
 		__entry->ino		= dentry->d_inode->i_ino;
 		__entry->ret		= ret;
+<<<<<<< HEAD
 		memcpy(__entry->d_name, dentry->d_name.name, EXT4_NAME_LEN);
 	),
 
@@ -1465,6 +1516,14 @@ TRACE_EVENT(ext4_unlink_exit,
 		  MAJOR(__entry->dev), MINOR(__entry->dev),
 		  (unsigned long) __entry->ino,
 		  __entry->ret, __entry->d_name)
+=======
+	),
+
+	TP_printk("dev %d,%d ino %lu ret %d",
+		  MAJOR(__entry->dev), MINOR(__entry->dev),
+		  (unsigned long) __entry->ino,
+		  __entry->ret)
+>>>>>>> common/deprecated/android-3.18
 );
 
 DECLARE_EVENT_CLASS(ext4__truncate,

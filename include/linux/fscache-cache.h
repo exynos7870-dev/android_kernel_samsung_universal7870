@@ -371,6 +371,10 @@ struct fscache_object {
 #define FSCACHE_OBJECT_IS_LOOKED_UP	4	/* T if object has been looked up */
 #define FSCACHE_OBJECT_IS_AVAILABLE	5	/* T if object has become active */
 #define FSCACHE_OBJECT_RETIRED		6	/* T if object was retired on relinquishment */
+<<<<<<< HEAD
+=======
+#define FSCACHE_OBJECT_RUN_AFTER_DEAD	8	/* T if object has been dispatched after death */
+>>>>>>> common/deprecated/android-3.18
 
 	struct list_head	cache_link;	/* link in cache->object_list */
 	struct hlist_node	cookie_link;	/* link in cookie->backing_objects */

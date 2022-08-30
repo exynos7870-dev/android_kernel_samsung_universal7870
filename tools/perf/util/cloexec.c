@@ -7,11 +7,21 @@
 
 static unsigned long flag = PERF_FLAG_FD_CLOEXEC;
 
+<<<<<<< HEAD
+=======
+#ifdef __GLIBC_PREREQ
+#if !__GLIBC_PREREQ(2, 6)
+>>>>>>> common/deprecated/android-3.18
 int __weak sched_getcpu(void)
 {
 	errno = ENOSYS;
 	return -1;
 }
+<<<<<<< HEAD
+=======
+#endif
+#endif
+>>>>>>> common/deprecated/android-3.18
 
 static int perf_flag_probe(void)
 {

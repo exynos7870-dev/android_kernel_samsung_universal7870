@@ -7,6 +7,10 @@
 #define KMSG_COMPONENT "sclp_early"
 #define pr_fmt(fmt) KMSG_COMPONENT ": " fmt
 
+<<<<<<< HEAD
+=======
+#include <linux/errno.h>
+>>>>>>> common/deprecated/android-3.18
 #include <asm/ctl_reg.h>
 #include <asm/sclp.h>
 #include <asm/ipl.h>

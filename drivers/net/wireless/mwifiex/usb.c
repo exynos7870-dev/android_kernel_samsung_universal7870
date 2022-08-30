@@ -556,6 +556,12 @@ static void mwifiex_usb_disconnect(struct usb_interface *intf)
 					 MWIFIEX_FUNC_SHUTDOWN);
 	}
 
+<<<<<<< HEAD
+=======
+	if (adapter->workqueue)
+		flush_workqueue(adapter->workqueue);
+
+>>>>>>> common/deprecated/android-3.18
 	mwifiex_usb_free(card);
 
 	dev_dbg(adapter->dev, "%s: removing card\n", __func__);

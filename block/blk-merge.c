@@ -97,6 +97,7 @@ void blk_recalc_rq_segments(struct request *rq)
 
 void blk_recount_segments(struct request_queue *q, struct bio *bio)
 {
+<<<<<<< HEAD
 	unsigned short seg_cnt;
 
 	/* estimate segment number by bi_vcnt for non-cloned bio */
@@ -104,6 +105,9 @@ void blk_recount_segments(struct request_queue *q, struct bio *bio)
 		seg_cnt = bio_segments(bio);
 	else
 		seg_cnt = bio->bi_vcnt;
+=======
+	unsigned short seg_cnt = bio_segments(bio);
+>>>>>>> common/deprecated/android-3.18
 
 	if (test_bit(QUEUE_FLAG_NO_SG_MERGE, &q->queue_flags) &&
 			(seg_cnt < queue_max_segments(q)))
@@ -606,6 +610,7 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
 	    !blk_write_same_mergeable(rq->bio, bio))
 		return false;
 
+<<<<<<< HEAD
 #ifdef CONFIG_JOURNAL_DATA_TAG
 	/* journal tagged bio can only be merged to REQ_META request */
 	if ((bio_flagged(bio, BIO_JMETA) || bio_flagged(bio, BIO_JOURNAL))
@@ -613,6 +618,8 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
 		return false;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (q->queue_flags & (1 << QUEUE_FLAG_SG_GAPS)) {
 		struct bio_vec *bprev;
 

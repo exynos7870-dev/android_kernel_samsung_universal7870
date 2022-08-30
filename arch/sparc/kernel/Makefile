@@ -21,6 +21,10 @@ CFLAGS_REMOVE_perf_event.o := -pg
 CFLAGS_REMOVE_pcr.o := -pg
 endif
 
+<<<<<<< HEAD
+=======
+obj-$(CONFIG_SPARC64)   += urtt_fill.o
+>>>>>>> common/deprecated/android-3.18
 obj-$(CONFIG_SPARC32)   += entry.o wof.o wuf.o
 obj-$(CONFIG_SPARC32)   += etrap_32.o
 obj-$(CONFIG_SPARC32)   += rtrap_32.o

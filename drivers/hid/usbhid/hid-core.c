@@ -94,10 +94,13 @@ static int hid_start_in(struct hid_device *hid)
 		} else {
 			clear_bit(HID_NO_BANDWIDTH, &usbhid->iofl);
 		}
+<<<<<<< HEAD
 #ifdef CONFIG_USB_DEBUG_DETAILED_LOG
 		usbhid->in_err_isr = 0;
 		hid_info(hid, "%s submit urb rc=%d\n", __func__, rc);
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	}
 	spin_unlock_irqrestore(&usbhid->lock, flags);
 	return rc;
@@ -168,7 +171,11 @@ static void hid_io_error(struct hid_device *hid)
 	if (time_after(jiffies, usbhid->stop_retry)) {
 
 		/* Retries failed, so do a port reset unless we lack bandwidth*/
+<<<<<<< HEAD
 		if (test_bit(HID_NO_BANDWIDTH, &usbhid->iofl)
+=======
+		if (!test_bit(HID_NO_BANDWIDTH, &usbhid->iofl)
+>>>>>>> common/deprecated/android-3.18
 		     && !test_and_set_bit(HID_RESET_PENDING, &usbhid->iofl)) {
 
 			schedule_work(&usbhid->reset_work);
@@ -273,7 +280,11 @@ static int usbhid_restart_ctrl_queue(struct usbhid_device *usbhid)
 static void hid_irq_in(struct urb *urb)
 {
 	struct hid_device	*hid = urb->context;
+<<<<<<< HEAD
 	struct usbhid_device	*usbhid = hid->driver_data;
+=======
+	struct usbhid_device 	*usbhid = hid->driver_data;
+>>>>>>> common/deprecated/android-3.18
 	int			status;
 
 	switch (urb->status) {
@@ -282,6 +293,7 @@ static void hid_irq_in(struct urb *urb)
 		usbhid->retry_delay = 0;
 		if ((hid->quirks & HID_QUIRK_ALWAYS_POLL) && !hid->open)
 			break;
+<<<<<<< HEAD
 #ifdef CONFIG_USB_DEBUG_DETAILED_LOG
 		status = hid_input_report(urb->context, HID_INPUT_REPORT,
 				 urb->transfer_buffer,
@@ -305,6 +317,11 @@ static void hid_irq_in(struct urb *urb)
 				 urb->transfer_buffer,
 				 urb->actual_length, 1);
 #endif
+=======
+		hid_input_report(urb->context, HID_INPUT_REPORT,
+				 urb->transfer_buffer,
+				 urb->actual_length, 1);
+>>>>>>> common/deprecated/android-3.18
 		/*
 		 * autosuspend refused while keys are pressed
 		 * because most keyboards don't wake up when
@@ -316,9 +333,12 @@ static void hid_irq_in(struct urb *urb)
 			clear_bit(HID_KEYS_PRESSED, &usbhid->iofl);
 		break;
 	case -EPIPE:		/* stall */
+<<<<<<< HEAD
 #ifdef CONFIG_USB_DEBUG_DETAILED_LOG
 		hid_err(urb->dev, "usbhid: %s: stall\n", __func__);
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 		usbhid_mark_busy(usbhid);
 		clear_bit(HID_IN_RUNNING, &usbhid->iofl);
 		set_bit(HID_CLEAR_HALT, &usbhid->iofl);
@@ -327,20 +347,26 @@ static void hid_irq_in(struct urb *urb)
 	case -ECONNRESET:	/* unlink */
 	case -ENOENT:
 	case -ESHUTDOWN:	/* unplug */
+<<<<<<< HEAD
 #ifdef CONFIG_USB_DEBUG_DETAILED_LOG
 		hid_err(urb->dev, "usbhid: %s: unlink %d\n",
 					__func__, urb->status);
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 		clear_bit(HID_IN_RUNNING, &usbhid->iofl);
 		return;
 	case -EILSEQ:		/* protocol error or unplug */
 	case -EPROTO:		/* protocol error or unplug */
 	case -ETIME:		/* protocol error or unplug */
 	case -ETIMEDOUT:	/* Should never happen, but... */
+<<<<<<< HEAD
 #ifdef CONFIG_USB_DEBUG_DETAILED_LOG
 		hid_err(urb->dev, "usbhid: %s: protocol error %d\n",
 					__func__, urb->status);
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 		usbhid_mark_busy(usbhid);
 		clear_bit(HID_IN_RUNNING, &usbhid->iofl);
 		hid_io_error(hid);
@@ -511,8 +537,11 @@ static void hid_ctrl(struct urb *urb)
 	struct usbhid_device *usbhid = hid->driver_data;
 	int unplug = 0, status = urb->status;
 
+<<<<<<< HEAD
 	spin_lock(&usbhid->lock);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	switch (status) {
 	case 0:			/* success */
 		if (usbhid->ctrl[usbhid->ctrltail].dir == USB_DIR_IN)
@@ -532,6 +561,11 @@ static void hid_ctrl(struct urb *urb)
 		hid_warn(urb->dev, "ctrl urb status %d received\n", status);
 	}
 
+<<<<<<< HEAD
+=======
+	spin_lock(&usbhid->lock);
+
+>>>>>>> common/deprecated/android-3.18
 	if (unplug) {
 		usbhid->ctrltail = usbhid->ctrlhead;
 	} else {
@@ -713,9 +747,12 @@ int usbhid_open(struct hid_device *hid)
 	struct usbhid_device *usbhid = hid->driver_data;
 	int res = 0;
 
+<<<<<<< HEAD
 #ifdef CONFIG_USB_DEBUG_DETAILED_LOG
 	hid_info(hid, "%s hid->open %d\n", __func__, hid->open);
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	mutex_lock(&hid_open_mut);
 	if (!hid->open++) {
 		res = usb_autopm_get_interface(usbhid->intf);
@@ -742,10 +779,13 @@ int usbhid_open(struct hid_device *hid)
 	}
 done:
 	mutex_unlock(&hid_open_mut);
+<<<<<<< HEAD
 #ifdef CONFIG_USB_DEBUG_DETAILED_LOG
 	if (res < 0)
 		hid_err(hid, "%s error res %d\n", __func__, res);
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	return res;
 }
 
@@ -981,6 +1021,7 @@ static int usbhid_output_report(struct hid_device *hid, __u8 *buf, size_t count)
 	return ret;
 }
 
+<<<<<<< HEAD
 static void usbhid_restart_queues(struct usbhid_device *usbhid)
 {
 	if (usbhid->urbout && !test_bit(HID_OUT_RUNNING, &usbhid->iofl))
@@ -989,6 +1030,8 @@ static void usbhid_restart_queues(struct usbhid_device *usbhid)
 		usbhid_restart_ctrl_queue(usbhid);
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static void hid_free_buffers(struct usb_device *dev, struct hid_device *hid)
 {
 	struct usbhid_device *usbhid = hid->driver_data;
@@ -1009,8 +1052,13 @@ static int usbhid_parse(struct hid_device *hid)
 	unsigned int rsize = 0;
 	char *rdesc;
 	int ret, n;
+<<<<<<< HEAD
 	int num_descriptors;  
 	size_t offset = offsetof(struct hid_descriptor, desc);  
+=======
+	int num_descriptors;
+	size_t offset = offsetof(struct hid_descriptor, desc);
+>>>>>>> common/deprecated/android-3.18
 
 	quirks = usbhid_lookup_quirk(le16_to_cpu(dev->descriptor.idVendor),
 			le16_to_cpu(dev->descriptor.idProduct));
@@ -1033,18 +1081,32 @@ static int usbhid_parse(struct hid_device *hid)
 		return -ENODEV;
 	}
 
+<<<<<<< HEAD
 	if (hdesc->bLength < sizeof(struct hid_descriptor)) {  
 		dbg_hid("hid descriptor is too short\n");  
 		return -EINVAL;  
 	}  
+=======
+	if (hdesc->bLength < sizeof(struct hid_descriptor)) {
+		dbg_hid("hid descriptor is too short\n");
+		return -EINVAL;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	hid->version = le16_to_cpu(hdesc->bcdHID);
 	hid->country = hdesc->bCountryCode;
 
+<<<<<<< HEAD
 	num_descriptors = min_t(int, hdesc->bNumDescriptors,  
 	       (hdesc->bLength - offset) / sizeof(struct hid_class_descriptor));  
   
 	for (n = 0; n < num_descriptors; n++)  
+=======
+	num_descriptors = min_t(int, hdesc->bNumDescriptors,
+	       (hdesc->bLength - offset) / sizeof(struct hid_class_descriptor));
+
+	for (n = 0; n < num_descriptors; n++)
+>>>>>>> common/deprecated/android-3.18
 		if (hdesc->desc[n].bDescriptorType == HID_DT_REPORT)
 			rsize = le16_to_cpu(hdesc->desc[n].wDescriptorLength);
 
@@ -1444,6 +1506,40 @@ static void hid_cease_io(struct usbhid_device *usbhid)
 	usb_kill_urb(usbhid->urbout);
 }
 
+<<<<<<< HEAD
+=======
+static void hid_restart_io(struct hid_device *hid)
+{
+	struct usbhid_device *usbhid = hid->driver_data;
+	int clear_halt = test_bit(HID_CLEAR_HALT, &usbhid->iofl);
+	int reset_pending = test_bit(HID_RESET_PENDING, &usbhid->iofl);
+
+	spin_lock_irq(&usbhid->lock);
+	clear_bit(HID_SUSPENDED, &usbhid->iofl);
+	usbhid_mark_busy(usbhid);
+
+	if (clear_halt || reset_pending)
+		schedule_work(&usbhid->reset_work);
+	usbhid->retry_delay = 0;
+	spin_unlock_irq(&usbhid->lock);
+
+	if (reset_pending || !test_bit(HID_STARTED, &usbhid->iofl))
+		return;
+
+	if (!clear_halt) {
+		if (hid_start_in(hid) < 0)
+			hid_io_error(hid);
+	}
+
+	spin_lock_irq(&usbhid->lock);
+	if (usbhid->urbout && !test_bit(HID_OUT_RUNNING, &usbhid->iofl))
+		usbhid_restart_out_queue(usbhid);
+	if (!test_bit(HID_CTRL_RUNNING, &usbhid->iofl))
+		usbhid_restart_ctrl_queue(usbhid);
+	spin_unlock_irq(&usbhid->lock);
+}
+
+>>>>>>> common/deprecated/android-3.18
 /* Treat USB reset pretty much the same as suspend/resume */
 static int hid_pre_reset(struct usb_interface *intf)
 {
@@ -1493,6 +1589,7 @@ static int hid_post_reset(struct usb_interface *intf)
 		return 1;
 	}
 
+<<<<<<< HEAD
 	spin_lock_irq(&usbhid->lock);
 	clear_bit(HID_RESET_PENDING, &usbhid->iofl);
 	spin_unlock_irq(&usbhid->lock);
@@ -1501,6 +1598,16 @@ static int hid_post_reset(struct usb_interface *intf)
 	if (status < 0)
 		hid_io_error(hid);
 	usbhid_restart_queues(usbhid);
+=======
+	/* No need to do another reset or clear a halted endpoint */
+	spin_lock_irq(&usbhid->lock);
+	clear_bit(HID_RESET_PENDING, &usbhid->iofl);
+	clear_bit(HID_CLEAR_HALT, &usbhid->iofl);
+	spin_unlock_irq(&usbhid->lock);
+	hid_set_idle(dev, intf->cur_altsetting->desc.bInterfaceNumber, 0, 0);
+
+	hid_restart_io(hid);
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }
@@ -1523,6 +1630,7 @@ void usbhid_put_power(struct hid_device *hid)
 #ifdef CONFIG_PM
 static int hid_resume_common(struct hid_device *hid, bool driver_suspended)
 {
+<<<<<<< HEAD
 	struct usbhid_device *usbhid = hid->driver_data;
 	int status;
 
@@ -1542,6 +1650,11 @@ static int hid_resume_common(struct hid_device *hid, bool driver_suspended)
 	if (status < 0)
 		hid_io_error(hid);
 
+=======
+	int status = 0;
+
+	hid_restart_io(hid);
+>>>>>>> common/deprecated/android-3.18
 	if (driver_suspended && hid->driver && hid->driver->resume)
 		status = hid->driver->resume(hid);
 	return status;
@@ -1610,12 +1723,17 @@ static int hid_suspend(struct usb_interface *intf, pm_message_t message)
 static int hid_resume(struct usb_interface *intf)
 {
 	struct hid_device *hid = usb_get_intfdata (intf);
+<<<<<<< HEAD
 	struct usbhid_device *usbhid = hid->driver_data;
 	int status;
 
 	if (!test_bit(HID_STARTED, &usbhid->iofl))
 		return 0;
 
+=======
+	int status;
+
+>>>>>>> common/deprecated/android-3.18
 	status = hid_resume_common(hid, true);
 	dev_dbg(&intf->dev, "resume status %d\n", status);
 	return 0;
@@ -1624,10 +1742,15 @@ static int hid_resume(struct usb_interface *intf)
 static int hid_reset_resume(struct usb_interface *intf)
 {
 	struct hid_device *hid = usb_get_intfdata(intf);
+<<<<<<< HEAD
 	struct usbhid_device *usbhid = hid->driver_data;
 	int status;
 
 	clear_bit(HID_SUSPENDED, &usbhid->iofl);
+=======
+	int status;
+
+>>>>>>> common/deprecated/android-3.18
 	status = hid_post_reset(intf);
 	if (status >= 0 && hid->driver && hid->driver->reset_resume) {
 		int ret = hid->driver->reset_resume(hid);

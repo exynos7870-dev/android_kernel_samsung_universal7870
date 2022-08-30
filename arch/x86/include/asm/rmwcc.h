@@ -5,7 +5,11 @@
 
 #define __GEN_RMWcc(fullop, var, cc, ...)				\
 do {									\
+<<<<<<< HEAD
 	asm_volatile_goto (fullop "; j" cc " %l[cc_label]"		\
+=======
+	asm_volatile_goto (fullop "; j" #cc " %l[cc_label]"		\
+>>>>>>> common/deprecated/android-3.18
 			: : "m" (var), ## __VA_ARGS__ 			\
 			: "memory" : cc_label);				\
 	return 0;							\
@@ -24,7 +28,11 @@ cc_label:								\
 #define __GEN_RMWcc(fullop, var, cc, ...)				\
 do {									\
 	char c;								\
+<<<<<<< HEAD
 	asm volatile (fullop "; set" cc " %1"				\
+=======
+	asm volatile (fullop "; set" #cc " %1"				\
+>>>>>>> common/deprecated/android-3.18
 			: "+m" (var), "=qm" (c)				\
 			: __VA_ARGS__ : "memory");			\
 	return c != 0;							\

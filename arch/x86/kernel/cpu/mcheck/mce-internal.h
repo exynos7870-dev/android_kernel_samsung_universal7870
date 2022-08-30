@@ -3,6 +3,11 @@
 
 enum severity_level {
 	MCE_NO_SEVERITY,
+<<<<<<< HEAD
+=======
+	MCE_DEFERRED_SEVERITY,
+	MCE_UCNA_SEVERITY = MCE_DEFERRED_SEVERITY,
+>>>>>>> common/deprecated/android-3.18
 	MCE_KEEP_SEVERITY,
 	MCE_SOME_SEVERITY,
 	MCE_AO_SEVERITY,
@@ -21,7 +26,11 @@ struct mce_bank {
 	char			attrname[ATTR_LEN];	/* attribute name */
 };
 
+<<<<<<< HEAD
 int mce_severity(struct mce *a, int tolerant, char **msg);
+=======
+int mce_severity(struct mce *a, int tolerant, char **msg, bool is_excp);
+>>>>>>> common/deprecated/android-3.18
 struct dentry *mce_get_debugfs_dir(void);
 
 extern struct mce_bank *mce_banks;

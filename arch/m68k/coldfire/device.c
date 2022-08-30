@@ -135,7 +135,15 @@ static struct platform_device mcf_fec0 = {
 	.id			= 0,
 	.num_resources		= ARRAY_SIZE(mcf_fec0_resources),
 	.resource		= mcf_fec0_resources,
+<<<<<<< HEAD
 	.dev.platform_data	= FEC_PDATA,
+=======
+	.dev = {
+		.dma_mask		= &mcf_fec0.dev.coherent_dma_mask,
+		.coherent_dma_mask	= DMA_BIT_MASK(32),
+		.platform_data		= FEC_PDATA,
+	}
+>>>>>>> common/deprecated/android-3.18
 };
 
 #ifdef MCFFEC_BASE1
@@ -167,7 +175,15 @@ static struct platform_device mcf_fec1 = {
 	.id			= 1,
 	.num_resources		= ARRAY_SIZE(mcf_fec1_resources),
 	.resource		= mcf_fec1_resources,
+<<<<<<< HEAD
 	.dev.platform_data	= FEC_PDATA,
+=======
+	.dev = {
+		.dma_mask		= &mcf_fec1.dev.coherent_dma_mask,
+		.coherent_dma_mask	= DMA_BIT_MASK(32),
+		.platform_data		= FEC_PDATA,
+	}
+>>>>>>> common/deprecated/android-3.18
 };
 #endif /* MCFFEC_BASE1 */
 #endif /* CONFIG_FEC */

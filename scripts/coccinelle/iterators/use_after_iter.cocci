@@ -123,7 +123,11 @@ list_remove_head(x,c,...)
 |
 sizeof(<+...c...+>)
 |
+<<<<<<< HEAD
 &c->member
+=======
+ &c->member
+>>>>>>> common/deprecated/android-3.18
 |
 c = E
 |

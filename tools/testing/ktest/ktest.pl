@@ -2450,7 +2450,11 @@ sub do_run_test {
     }
 
     waitpid $child_pid, 0;
+<<<<<<< HEAD
     $child_exit = $?;
+=======
+    $child_exit = $? >> 8;
+>>>>>>> common/deprecated/android-3.18
 
     if (!$bug && $in_bisect) {
 	if (defined($bisect_ret_good)) {

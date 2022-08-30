@@ -847,7 +847,11 @@ nfulnl_recv_config(struct sock *ctnl, struct sk_buff *skb,
 			goto out_put;
 		default:
 			ret = -ENOTSUPP;
+<<<<<<< HEAD
 			break;
+=======
+			goto out_put;
+>>>>>>> common/deprecated/android-3.18
 		}
 	}
 

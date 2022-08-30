@@ -14,7 +14,11 @@
  * to GMT.  Thus  we should always be correct.
  */
 
+<<<<<<< HEAD
 int iso_date(char * p, int flag)
+=======
+int iso_date(u8 *p, int flag)
+>>>>>>> common/deprecated/android-3.18
 {
 	int year, month, day, hour, minute, second, tz;
 	int crtime, days, i;

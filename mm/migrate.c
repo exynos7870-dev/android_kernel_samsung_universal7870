@@ -30,7 +30,10 @@
 #include <linux/mempolicy.h>
 #include <linux/vmalloc.h>
 #include <linux/security.h>
+<<<<<<< HEAD
 #include <linux/backing-dev.h>
+=======
+>>>>>>> common/deprecated/android-3.18
 #include <linux/memcontrol.h>
 #include <linux/syscalls.h>
 #include <linux/hugetlb.h>
@@ -344,8 +347,11 @@ int migrate_page_move_mapping(struct address_space *mapping,
 		struct buffer_head *head, enum migrate_mode mode,
 		int extra_count)
 {
+<<<<<<< HEAD
 	struct zone *oldzone, *newzone;
 	int dirty;
+=======
+>>>>>>> common/deprecated/android-3.18
 	int expected_count = 1 + extra_count;
 	void **pslot;
 
@@ -356,9 +362,12 @@ int migrate_page_move_mapping(struct address_space *mapping,
 		return MIGRATEPAGE_SUCCESS;
 	}
 
+<<<<<<< HEAD
 	oldzone = page_zone(page);
 	newzone = page_zone(newpage);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	spin_lock_irq(&mapping->tree_lock);
 
 	pslot = radix_tree_lookup_slot(&mapping->page_tree,
@@ -399,6 +408,7 @@ int migrate_page_move_mapping(struct address_space *mapping,
 		set_page_private(newpage, page_private(page));
 	}
 
+<<<<<<< HEAD
 	/* Move dirty while page refs frozen and newpage not yet exposed */
 	dirty = PageDirty(page);
 	if (dirty) {
@@ -406,6 +416,8 @@ int migrate_page_move_mapping(struct address_space *mapping,
 		SetPageDirty(newpage);
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	radix_tree_replace_slot(pslot, newpage);
 
 	/*
@@ -415,9 +427,12 @@ int migrate_page_move_mapping(struct address_space *mapping,
 	 */
 	page_unfreeze_refs(page, expected_count - 1);
 
+<<<<<<< HEAD
 	spin_unlock(&mapping->tree_lock);
 	/* Leave irq disabled to prevent preemption while updating stats */
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * If moved to a different zone then also account
 	 * the page for that zone. Other VM counters will be
@@ -428,6 +443,7 @@ int migrate_page_move_mapping(struct address_space *mapping,
 	 * via NR_FILE_PAGES and NR_ANON_PAGES if they
 	 * are mapped to swap space.
 	 */
+<<<<<<< HEAD
 	if (newzone != oldzone) {
 		__dec_zone_state(oldzone, NR_FILE_PAGES);
 		__inc_zone_state(newzone, NR_FILE_PAGES);
@@ -444,6 +460,19 @@ int migrate_page_move_mapping(struct address_space *mapping,
 
 	return MIGRATEPAGE_SUCCESS;
 }
+=======
+	__dec_zone_page_state(page, NR_FILE_PAGES);
+	__inc_zone_page_state(newpage, NR_FILE_PAGES);
+	if (!PageSwapCache(page) && PageSwapBacked(page)) {
+		__dec_zone_page_state(page, NR_SHMEM);
+		__inc_zone_page_state(newpage, NR_SHMEM);
+	}
+	spin_unlock_irq(&mapping->tree_lock);
+
+	return MIGRATEPAGE_SUCCESS;
+}
+EXPORT_SYMBOL(migrate_page_move_mapping);
+>>>>>>> common/deprecated/android-3.18
 
 /*
  * The expected number of remaining references is the same as that
@@ -564,9 +593,26 @@ void migrate_page_copy(struct page *newpage, struct page *page)
 	if (PageMappedToDisk(page))
 		SetPageMappedToDisk(newpage);
 
+<<<<<<< HEAD
 	/* Move dirty on pages not done by migrate_page_move_mapping() */
 	if (PageDirty(page))
 		SetPageDirty(newpage);
+=======
+	if (PageDirty(page)) {
+		clear_page_dirty_for_io(page);
+		/*
+		 * Want to mark the page and the radix tree as dirty, and
+		 * redo the accounting that clear_page_dirty_for_io undid,
+		 * but we can't use set_page_dirty because that function
+		 * is actually a signal that all of the page has become dirty.
+		 * Whereas only part of our page may be dirty.
+		 */
+		if (PageSwapBacked(page))
+			SetPageDirty(newpage);
+		else
+			__set_page_dirty_nobuffers(newpage);
+ 	}
+>>>>>>> common/deprecated/android-3.18
 
 	/*
 	 * Copy NUMA information to the new page, to prevent over-eager
@@ -592,6 +638,10 @@ void migrate_page_copy(struct page *newpage, struct page *page)
 	if (PageWriteback(newpage))
 		end_page_writeback(newpage);
 }
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL(migrate_page_copy);
+>>>>>>> common/deprecated/android-3.18
 
 /************************************************************
  *                    Migration functions
@@ -952,6 +1002,10 @@ static int unmap_and_move(new_page_t get_new_page, free_page_t put_new_page,
 	int rc = 0;
 	int *result = NULL;
 	struct page *newpage = get_new_page(page, private, &result);
+<<<<<<< HEAD
+=======
+	bool is_lru = !isolated_balloon_page(page);
+>>>>>>> common/deprecated/android-3.18
 
 	if (!newpage)
 		return -ENOMEM;
@@ -984,12 +1038,22 @@ out:
 	/*
 	 * If migration was not successful and there's a freeing callback, use
 	 * it.  Otherwise, putback_lru_page() will drop the reference grabbed
+<<<<<<< HEAD
 	 * during isolation.
+=======
+	 * during isolation. Use the old state of the isolated source page to
+	 * determine if we migrated a LRU page. newpage was already unlocked
+	 * and possibly modified by its owner - don't rely on the page state.
+>>>>>>> common/deprecated/android-3.18
 	 */
 	if (rc != MIGRATEPAGE_SUCCESS && put_new_page) {
 		ClearPageSwapBacked(newpage);
 		put_new_page(newpage, private);
+<<<<<<< HEAD
 	} else if (unlikely(__is_movable_balloon_page(newpage))) {
+=======
+	} else if (rc == MIGRATEPAGE_SUCCESS && unlikely(!is_lru)) {
+>>>>>>> common/deprecated/android-3.18
 		/* drop our reference, page already in the balloon */
 		put_page(newpage);
 	} else
@@ -1056,6 +1120,19 @@ static int unmap_and_move_huge_page(new_page_t get_new_page,
 		lock_page(hpage);
 	}
 
+<<<<<<< HEAD
+=======
+	/*
+	 * Check for pages which are in the process of being freed.  Without
+	 * page_mapping() set, hugetlbfs specific move page routine will not
+	 * be called and we could leak usage counts for subpools.
+	 */
+	if (page_private(hpage) && !page_mapping(hpage)) {
+		rc = -EBUSY;
+		goto out_unlock;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	if (PageAnon(hpage))
 		anon_vma = page_get_anon_vma(hpage);
 
@@ -1073,6 +1150,10 @@ static int unmap_and_move_huge_page(new_page_t get_new_page,
 	if (rc == MIGRATEPAGE_SUCCESS)
 		hugetlb_cgroup_migrate(hpage, new_hpage);
 
+<<<<<<< HEAD
+=======
+out_unlock:
+>>>>>>> common/deprecated/android-3.18
 	unlock_page(hpage);
 out:
 	if (rc != -EAGAIN)
@@ -1086,7 +1167,11 @@ out:
 	if (rc != MIGRATEPAGE_SUCCESS && put_new_page)
 		put_new_page(new_hpage, private);
 	else
+<<<<<<< HEAD
 		put_page(new_hpage);
+=======
+		putback_active_hugepage(new_hpage);
+>>>>>>> common/deprecated/android-3.18
 
 	if (result) {
 		if (rc)

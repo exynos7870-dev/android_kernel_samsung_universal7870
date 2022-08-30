@@ -324,8 +324,12 @@ static struct file_system_type cpuset_fs_type = {
 /*
  * Return in pmask the portion of a cpusets's cpus_allowed that
  * are online.  If none are online, walk up the cpuset hierarchy
+<<<<<<< HEAD
  * until we find one that does have some online cpus.  The top
  * cpuset always has some cpus online.
+=======
+ * until we find one that does have some online cpus.
+>>>>>>> common/deprecated/android-3.18
  *
  * One way or another, we guarantee to return some non-empty subset
  * of cpu_online_mask.
@@ -334,8 +338,25 @@ static struct file_system_type cpuset_fs_type = {
  */
 static void guarantee_online_cpus(struct cpuset *cs, struct cpumask *pmask)
 {
+<<<<<<< HEAD
 	while (!cpumask_intersects(cs->effective_cpus, cpu_online_mask))
 		cs = parent_cs(cs);
+=======
+	while (!cpumask_intersects(cs->effective_cpus, cpu_online_mask)) {
+		cs = parent_cs(cs);
+		if (unlikely(!cs)) {
+			/*
+			 * The top cpuset doesn't have any online cpu as a
+			 * consequence of a race between cpuset_hotplug_work
+			 * and cpu hotplug notifier.  But we know the top
+			 * cpuset's effective_cpus is on its way to to be
+			 * identical to cpu_online_mask.
+			 */
+			cpumask_copy(pmask, cpu_online_mask);
+			return;
+		}
+	}
+>>>>>>> common/deprecated/android-3.18
 	cpumask_and(pmask, cs->effective_cpus, cpu_online_mask);
 }
 
@@ -1207,7 +1228,11 @@ static int update_nodemask(struct cpuset *cs, struct cpuset *trialcs,
 	mutex_unlock(&callback_mutex);
 
 	/* use trialcs->mems_allowed as a temp variable */
+<<<<<<< HEAD
 	update_nodemasks_hier(cs, &cs->mems_allowed);
+=======
+	update_nodemasks_hier(cs, &trialcs->mems_allowed);
+>>>>>>> common/deprecated/android-3.18
 done:
 	return retval;
 }
@@ -1457,6 +1482,7 @@ out_unlock:
 	return ret;
 }
 
+<<<<<<< HEAD
 static int cpuset_allow_attach(struct cgroup_subsys_state *css,
 			       struct cgroup_taskset *tset)
 {
@@ -1475,6 +1501,8 @@ static int cpuset_allow_attach(struct cgroup_subsys_state *css,
 	return 0;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static void cpuset_cancel_attach(struct cgroup_subsys_state *css,
 				 struct cgroup_taskset *tset)
 {
@@ -2016,8 +2044,13 @@ static int cpuset_css_online(struct cgroup_subsys_state *css)
 	cs->mems_allowed = parent->mems_allowed;
 	cs->effective_mems = parent->mems_allowed;
 	cpumask_copy(cs->cpus_allowed, parent->cpus_allowed);
+<<<<<<< HEAD
 	cpumask_copy(cs->cpus_requested, parent->cpus_requested);
 	cpumask_copy(cs->effective_cpus, parent->cpus_allowed);
+=======
+	cpumask_copy(cs->effective_cpus, parent->cpus_allowed);
+	cpumask_copy(cs->cpus_requested, parent->cpus_requested);
+>>>>>>> common/deprecated/android-3.18
 	mutex_unlock(&callback_mutex);
 out_unlock:
 	mutex_unlock(&cpuset_mutex);
@@ -2073,16 +2106,40 @@ static void cpuset_bind(struct cgroup_subsys_state *root_css)
 	mutex_unlock(&cpuset_mutex);
 }
 
+<<<<<<< HEAD
+=======
+/*
+ * Make sure the new task conform to the current state of its parent,
+ * which could have been changed by cpuset just after it inherits the
+ * state from the parent and before it sits on the cgroup's task list.
+ */
+void cpuset_fork(struct task_struct *task)
+{
+	if (task_css_is_root(task, cpuset_cgrp_id))
+		return;
+
+	set_cpus_allowed_ptr(task, &current->cpus_allowed);
+	task->mems_allowed = current->mems_allowed;
+}
+
+>>>>>>> common/deprecated/android-3.18
 struct cgroup_subsys cpuset_cgrp_subsys = {
 	.css_alloc	= cpuset_css_alloc,
 	.css_online	= cpuset_css_online,
 	.css_offline	= cpuset_css_offline,
 	.css_free	= cpuset_css_free,
 	.can_attach	= cpuset_can_attach,
+<<<<<<< HEAD
 	.allow_attach   = cpuset_allow_attach,
 	.cancel_attach	= cpuset_cancel_attach,
 	.attach		= cpuset_attach,
 	.bind		= cpuset_bind,
+=======
+	.cancel_attach	= cpuset_cancel_attach,
+	.attach		= cpuset_attach,
+	.bind		= cpuset_bind,
+	.fork		= cpuset_fork,
+>>>>>>> common/deprecated/android-3.18
 	.legacy_cftypes	= files,
 	.early_init	= 1,
 };
@@ -2255,6 +2312,16 @@ retry:
 	mutex_unlock(&cpuset_mutex);
 }
 
+<<<<<<< HEAD
+=======
+static bool force_rebuild;
+
+void cpuset_force_rebuild(void)
+{
+	force_rebuild = true;
+}
+
+>>>>>>> common/deprecated/android-3.18
 /**
  * cpuset_hotplug_workfn - handle CPU/memory hotunplug for a cpuset
  *
@@ -2329,8 +2396,15 @@ static void cpuset_hotplug_workfn(struct work_struct *work)
 	}
 
 	/* rebuild sched domains if cpus_allowed has changed */
+<<<<<<< HEAD
 	if (cpus_updated)
 		rebuild_sched_domains();
+=======
+	if (cpus_updated || force_rebuild) {
+		force_rebuild = false;
+		rebuild_sched_domains();
+	}
+>>>>>>> common/deprecated/android-3.18
 }
 
 void cpuset_update_active_cpus(bool cpu_online)
@@ -2349,6 +2423,14 @@ void cpuset_update_active_cpus(bool cpu_online)
 	schedule_work(&cpuset_hotplug_work);
 }
 
+<<<<<<< HEAD
+=======
+void cpuset_wait_for_hotplug(void)
+{
+	flush_work(&cpuset_hotplug_work);
+}
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Keep top_cpuset.mems_allowed tracking node_states[N_MEMORY].
  * Call this routine anytime after node_states[N_MEMORY] changes.

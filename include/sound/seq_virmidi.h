@@ -60,6 +60,10 @@ struct snd_virmidi_dev {
 	int port;			/* created/attached port */
 	unsigned int flags;		/* SNDRV_VIRMIDI_* */
 	rwlock_t filelist_lock;
+<<<<<<< HEAD
+=======
+	struct rw_semaphore filelist_sem;
+>>>>>>> common/deprecated/android-3.18
 	struct list_head filelist;
 };
 

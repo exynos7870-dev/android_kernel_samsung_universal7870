@@ -147,7 +147,13 @@ static int xhci_start(struct xhci_hcd *xhci)
 				"waited %u microseconds.\n",
 				XHCI_MAX_HALT_USEC);
 	if (!ret)
+<<<<<<< HEAD
 		xhci->xhc_state &= ~XHCI_STATE_HALTED;
+=======
+		/* clear state flags. Including dying, halted or removing */
+		xhci->xhc_state = 0;
+
+>>>>>>> common/deprecated/android-3.18
 	return ret;
 }
 
@@ -657,6 +663,24 @@ int xhci_run(struct usb_hcd *hcd)
 }
 EXPORT_SYMBOL_GPL(xhci_run);
 
+<<<<<<< HEAD
+=======
+static void xhci_only_stop_hcd(struct usb_hcd *hcd)
+{
+	struct xhci_hcd *xhci = hcd_to_xhci(hcd);
+
+	spin_lock_irq(&xhci->lock);
+	xhci_halt(xhci);
+
+	/* The shared_hcd is going to be deallocated shortly (the USB core only
+	 * calls this function when allocation fails in usb_add_hcd(), or
+	 * usb_remove_hcd() is called).  So we need to unset xHCI's pointer.
+	 */
+	xhci->shared_hcd = NULL;
+	spin_unlock_irq(&xhci->lock);
+}
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Stop xHCI driver.
  *
@@ -672,6 +696,10 @@ void xhci_stop(struct usb_hcd *hcd)
 	struct xhci_hcd *xhci = hcd_to_xhci(hcd);
 
 	if (!usb_hcd_is_primary_hcd(hcd)) {
+<<<<<<< HEAD
+=======
+		xhci_only_stop_hcd(xhci->shared_hcd);
+>>>>>>> common/deprecated/android-3.18
 		return;
 	}
 
@@ -740,11 +768,16 @@ void xhci_shutdown(struct usb_hcd *hcd)
 	xhci_dbg_trace(xhci, trace_xhci_dbg_init,
 			"xhci_shutdown completed - status = %x",
 			readl(&xhci->op_regs->status));
+<<<<<<< HEAD
 
 	/* Yet another workaround for spurious wakeups at shutdown with HSW */
 	if (xhci->quirks & XHCI_SPURIOUS_WAKEUP)
 		pci_set_power_state(to_pci_dev(hcd->self.controller), PCI_D3hot);
 }
+=======
+}
+EXPORT_SYMBOL_GPL(xhci_shutdown);
+>>>>>>> common/deprecated/android-3.18
 
 #ifdef CONFIG_PM
 static void xhci_save_registers(struct xhci_hcd *xhci)
@@ -871,6 +904,44 @@ static void xhci_disable_port_wake_on_bits(struct xhci_hcd *xhci)
 	spin_unlock_irqrestore(&xhci->lock, flags);
 }
 
+<<<<<<< HEAD
+=======
+static bool xhci_pending_portevent(struct xhci_hcd *xhci)
+{
+	__le32 __iomem		**port_array;
+	int			port_index;
+	u32			status;
+	u32			portsc;
+
+	status = readl(&xhci->op_regs->status);
+	if (status & STS_EINT)
+		return true;
+	/*
+	 * Checking STS_EINT is not enough as there is a lag between a change
+	 * bit being set and the Port Status Change Event that it generated
+	 * being written to the Event Ring. See note in xhci 1.1 section 4.19.2.
+	 */
+
+	port_index = xhci->num_usb2_ports;
+	port_array = xhci->usb2_ports;
+	while (port_index--) {
+		portsc = readl(port_array[port_index]);
+		if (portsc & PORT_CHANGE_MASK ||
+		    (portsc & PORT_PLS_MASK) == XDEV_RESUME)
+			return true;
+	}
+	port_index = xhci->num_usb3_ports;
+	port_array = xhci->usb3_ports;
+	while (port_index--) {
+		portsc = readl(port_array[port_index]);
+		if (portsc & PORT_CHANGE_MASK ||
+		    (portsc & PORT_PLS_MASK) == XDEV_RESUME)
+			return true;
+	}
+	return false;
+}
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Stop HC (not bus-specific)
  *
@@ -880,7 +951,11 @@ static void xhci_disable_port_wake_on_bits(struct xhci_hcd *xhci)
 int xhci_suspend(struct xhci_hcd *xhci, bool do_wakeup)
 {
 	int			rc = 0;
+<<<<<<< HEAD
 	unsigned int		delay = XHCI_MAX_HALT_USEC;
+=======
+	unsigned int		delay = XHCI_MAX_HALT_USEC * 2;
+>>>>>>> common/deprecated/android-3.18
 	struct usb_hcd		*hcd = xhci_to_hcd(xhci);
 	u32			command;
 
@@ -964,11 +1039,19 @@ EXPORT_SYMBOL_GPL(xhci_suspend);
  */
 int xhci_resume(struct xhci_hcd *xhci, bool hibernated)
 {
+<<<<<<< HEAD
 	u32			command, temp = 0, status;
+=======
+	u32			command, temp = 0;
+>>>>>>> common/deprecated/android-3.18
 	struct usb_hcd		*hcd = xhci_to_hcd(xhci);
 	struct usb_hcd		*secondary_hcd;
 	int			retval = 0;
 	bool			comp_timer_running = false;
+<<<<<<< HEAD
+=======
+	bool			pending_portevent = false;
+>>>>>>> common/deprecated/android-3.18
 
 	/* Wait a bit if either of the roothubs need to settle from the
 	 * transition into bus suspend.
@@ -986,6 +1069,21 @@ int xhci_resume(struct xhci_hcd *xhci, bool hibernated)
 		hibernated = true;
 
 	if (!hibernated) {
+<<<<<<< HEAD
+=======
+		/*
+		 * Some controllers might lose power during suspend, so wait
+		 * for controller not ready bit to clear, just as in xHC init.
+		 */
+		retval = xhci_handshake(xhci, &xhci->op_regs->status,
+					STS_CNR, 0, 10 * 1000 * 1000);
+		if (retval) {
+			xhci_warn(xhci, "Controller not ready at resume %d\n",
+				  retval);
+			spin_unlock_irq(&xhci->lock);
+			return retval;
+		}
+>>>>>>> common/deprecated/android-3.18
 		/* step 1: restore register */
 		xhci_restore_registers(xhci);
 		/* step 2: initialize command ring buffer */
@@ -995,8 +1093,18 @@ int xhci_resume(struct xhci_hcd *xhci, bool hibernated)
 		command = readl(&xhci->op_regs->command);
 		command |= CMD_CRS;
 		writel(command, &xhci->op_regs->command);
+<<<<<<< HEAD
 		if (xhci_handshake(xhci, &xhci->op_regs->status,
 			      STS_RESTORE, 0, 10 * 1000)) {
+=======
+		/*
+		 * Some controllers take up to 55+ ms to complete the controller
+		 * restore so setting the timeout to 100ms. Xhci specification
+		 * doesn't mention any timeout value.
+		 */
+		if (xhci_handshake(xhci, &xhci->op_regs->status,
+			      STS_RESTORE, 0, 100 * 1000)) {
+>>>>>>> common/deprecated/android-3.18
 			xhci_warn(xhci, "WARN: xHC restore state timeout\n");
 			spin_unlock_irq(&xhci->lock);
 			return -ETIMEDOUT;
@@ -1082,6 +1190,7 @@ int xhci_resume(struct xhci_hcd *xhci, bool hibernated)
 
  done:
 	if (retval == 0) {
+<<<<<<< HEAD
 		/* Resume root hubs only when have pending events. */
 		status = readl(&xhci->op_regs->status);
 		if (status & STS_EINT) {
@@ -1090,6 +1199,24 @@ int xhci_resume(struct xhci_hcd *xhci, bool hibernated)
 		}
 	}
 
+=======
+		/*
+		 * Resume roothubs only if there are pending events.
+		 * USB 3 devices resend U3 LFPS wake after a 100ms delay if
+		 * the first wake signalling failed, give it that chance.
+		 */
+		pending_portevent = xhci_pending_portevent(xhci);
+		if (!pending_portevent) {
+			msleep(120);
+			pending_portevent = xhci_pending_portevent(xhci);
+		}
+
+		if (pending_portevent) {
+			usb_hcd_resume_root_hub(xhci->shared_hcd);
+			usb_hcd_resume_root_hub(hcd);
+		}
+	}
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * If system is subject to the Quirk, Compliance Mode Timer needs to
 	 * be re-initialized Always after a system resume. Ports are subject
@@ -1101,10 +1228,17 @@ int xhci_resume(struct xhci_hcd *xhci, bool hibernated)
 
 	/* Re-enable port polling. */
 	xhci_dbg(xhci, "%s: starting port polling.\n", __func__);
+<<<<<<< HEAD
 	set_bit(HCD_FLAG_POLL_RH, &hcd->flags);
 	usb_hcd_poll_rh_status(hcd);
 	set_bit(HCD_FLAG_POLL_RH, &xhci->shared_hcd->flags);
 	usb_hcd_poll_rh_status(xhci->shared_hcd);
+=======
+	set_bit(HCD_FLAG_POLL_RH, &xhci->shared_hcd->flags);
+	usb_hcd_poll_rh_status(xhci->shared_hcd);
+	set_bit(HCD_FLAG_POLL_RH, &hcd->flags);
+	usb_hcd_poll_rh_status(hcd);
+>>>>>>> common/deprecated/android-3.18
 
 	return retval;
 }
@@ -1224,7 +1358,11 @@ static int xhci_configure_endpoint(struct xhci_hcd *xhci,
  * we need to issue an evaluate context command and wait on it.
  */
 static int xhci_check_maxpacket(struct xhci_hcd *xhci, unsigned int slot_id,
+<<<<<<< HEAD
 		unsigned int ep_index, struct urb *urb)
+=======
+		unsigned int ep_index, struct urb *urb, gfp_t mem_flags)
+>>>>>>> common/deprecated/android-3.18
 {
 	struct xhci_container_ctx *out_ctx;
 	struct xhci_input_control_ctx *ctrl_ctx;
@@ -1255,7 +1393,11 @@ static int xhci_check_maxpacket(struct xhci_hcd *xhci, unsigned int slot_id,
 		 * changes max packet sizes.
 		 */
 
+<<<<<<< HEAD
 		command = xhci_alloc_command(xhci, false, true, GFP_KERNEL);
+=======
+		command = xhci_alloc_command(xhci, false, true, mem_flags);
+>>>>>>> common/deprecated/android-3.18
 		if (!command)
 			return -ENOMEM;
 
@@ -1272,6 +1414,10 @@ static int xhci_check_maxpacket(struct xhci_hcd *xhci, unsigned int slot_id,
 				xhci->devs[slot_id]->out_ctx, ep_index);
 
 		ep_ctx = xhci_get_ep_ctx(xhci, command->in_ctx, ep_index);
+<<<<<<< HEAD
+=======
+		ep_ctx->ep_info &= cpu_to_le32(~EP_STATE_MASK);/* must clear */
+>>>>>>> common/deprecated/android-3.18
 		ep_ctx->ep_info2 &= cpu_to_le32(~MAX_PACKET_MASK);
 		ep_ctx->ep_info2 |= cpu_to_le32(MAX_PACKET(max_packet_size));
 
@@ -1297,6 +1443,7 @@ command_cleanup:
 	return ret;
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_HOST_COMPLIANT_TEST
 int xhci_urb_enqueue_single_step(struct usb_hcd *hcd,
 		struct urb *urb, gfp_t mem_flags, int get_dev_desc)
@@ -1358,6 +1505,8 @@ free_priv:
 }
 #endif/* CONFIG_HOST_COMPLIANT_TEST */
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * non-error returns are a promise to giveback() the urb later
  * we drop ownership so next owner (or urb unlink) can get it
@@ -1388,6 +1537,14 @@ int xhci_urb_enqueue(struct usb_hcd *hcd, struct urb *urb, gfp_t mem_flags)
 
 	if (usb_endpoint_xfer_isoc(&urb->ep->desc))
 		size = urb->number_of_packets;
+<<<<<<< HEAD
+=======
+	else if (usb_endpoint_is_bulk_out(&urb->ep->desc) &&
+	    urb->transfer_buffer_length > 0 &&
+	    urb->transfer_flags & URB_ZERO_PACKET &&
+	    !(urb->transfer_buffer_length % usb_endpoint_maxp(&urb->ep->desc)))
+		size = 2;
+>>>>>>> common/deprecated/android-3.18
 	else
 		size = 1;
 
@@ -1417,7 +1574,11 @@ int xhci_urb_enqueue(struct usb_hcd *hcd, struct urb *urb, gfp_t mem_flags)
 		 */
 		if (urb->dev->speed == USB_SPEED_FULL) {
 			ret = xhci_check_maxpacket(xhci, slot_id,
+<<<<<<< HEAD
 					ep_index, urb);
+=======
+					ep_index, urb, mem_flags);
+>>>>>>> common/deprecated/android-3.18
 			if (ret < 0) {
 				xhci_urb_free_priv(xhci, urb_priv);
 				urb->hcpriv = NULL;
@@ -1587,7 +1748,13 @@ int xhci_urb_dequeue(struct usb_hcd *hcd, struct urb *urb, int status)
 		xhci_dbg_trace(xhci, trace_xhci_dbg_cancel_urb,
 				"HW died, freeing TD.");
 		urb_priv = urb->hcpriv;
+<<<<<<< HEAD
 		for (i = urb_priv->td_cnt; i < urb_priv->length; i++) {
+=======
+		for (i = urb_priv->td_cnt;
+		     i < urb_priv->length && xhci->devs[urb->dev->slot_id];
+		     i++) {
+>>>>>>> common/deprecated/android-3.18
 			td = urb_priv->td[i];
 			if (!list_empty(&td->td_list))
 				list_del_init(&td->td_list);
@@ -1601,6 +1768,7 @@ int xhci_urb_dequeue(struct usb_hcd *hcd, struct urb *urb, int status)
 		xhci_urb_free_priv(xhci, urb_priv);
 		return ret;
 	}
+<<<<<<< HEAD
 	if ((xhci->xhc_state & XHCI_STATE_DYING) ||
 			(xhci->xhc_state & XHCI_STATE_HALTED)) {
 		xhci_dbg_trace(xhci, trace_xhci_dbg_cancel_urb,
@@ -1614,6 +1782,8 @@ int xhci_urb_dequeue(struct usb_hcd *hcd, struct urb *urb, int status)
 		 */
 		goto done;
 	}
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	ep_index = xhci_get_endpoint_index(&urb->ep->desc);
 	ep = &xhci->devs[urb->dev->slot_id]->eps[ep_index];
@@ -2106,6 +2276,10 @@ static unsigned int xhci_get_block_size(struct usb_device *udev)
 	case USB_SPEED_HIGH:
 		return HS_BLOCK;
 	case USB_SPEED_SUPER:
+<<<<<<< HEAD
+=======
+	case USB_SPEED_SUPER_PLUS:
+>>>>>>> common/deprecated/android-3.18
 		return SS_BLOCK;
 	case USB_SPEED_UNKNOWN:
 	case USB_SPEED_WIRELESS:
@@ -2231,7 +2405,11 @@ static int xhci_check_bw_table(struct xhci_hcd *xhci,
 	unsigned int packets_remaining = 0;
 	unsigned int i;
 
+<<<<<<< HEAD
 	if (virt_dev->udev->speed == USB_SPEED_SUPER)
+=======
+	if (virt_dev->udev->speed >= USB_SPEED_SUPER)
+>>>>>>> common/deprecated/android-3.18
 		return xhci_check_ss_bw(xhci, virt_dev);
 
 	if (virt_dev->udev->speed == USB_SPEED_HIGH) {
@@ -2432,7 +2610,11 @@ void xhci_drop_ep_from_interval_table(struct xhci_hcd *xhci,
 	if (xhci_is_async_ep(ep_bw->type))
 		return;
 
+<<<<<<< HEAD
 	if (udev->speed == USB_SPEED_SUPER) {
+=======
+	if (udev->speed >= USB_SPEED_SUPER) {
+>>>>>>> common/deprecated/android-3.18
 		if (xhci_is_sync_in_ep(ep_bw->type))
 			xhci->devs[udev->slot_id]->bw_table->ss_bw_in -=
 				xhci_get_ss_bw_consumed(ep_bw);
@@ -2470,6 +2652,10 @@ void xhci_drop_ep_from_interval_table(struct xhci_hcd *xhci,
 		interval_bw->overhead[HS_OVERHEAD_TYPE] -= 1;
 		break;
 	case USB_SPEED_SUPER:
+<<<<<<< HEAD
+=======
+	case USB_SPEED_SUPER_PLUS:
+>>>>>>> common/deprecated/android-3.18
 	case USB_SPEED_UNKNOWN:
 	case USB_SPEED_WIRELESS:
 		/* Should never happen because only LS/FS/HS endpoints will get
@@ -2529,6 +2715,10 @@ static void xhci_add_ep_to_interval_table(struct xhci_hcd *xhci,
 		interval_bw->overhead[HS_OVERHEAD_TYPE] += 1;
 		break;
 	case USB_SPEED_SUPER:
+<<<<<<< HEAD
+=======
+	case USB_SPEED_SUPER_PLUS:
+>>>>>>> common/deprecated/android-3.18
 	case USB_SPEED_UNKNOWN:
 	case USB_SPEED_WIRELESS:
 		/* Should never happen because only LS/FS/HS endpoints will get
@@ -3503,6 +3693,12 @@ int xhci_discover_or_reset_device(struct usb_hcd *hcd, struct usb_device *udev)
 			return -EINVAL;
 	}
 
+<<<<<<< HEAD
+=======
+	if (virt_dev->tt_info)
+		old_active_eps = virt_dev->tt_info->active_eps;
+
+>>>>>>> common/deprecated/android-3.18
 	if (virt_dev->udev != udev) {
 		/* If the virt_dev and the udev does not match, this virt_dev
 		 * may belong to another udev.
@@ -3676,6 +3872,12 @@ void xhci_free_dev(struct usb_hcd *hcd, struct usb_device *udev)
 	}
 
 	spin_lock_irqsave(&xhci->lock, flags);
+<<<<<<< HEAD
+=======
+
+	virt_dev->udev = NULL;
+
+>>>>>>> common/deprecated/android-3.18
 	/* Don't disable the slot if the host controller is dead. */
 	state = readl(&xhci->op_regs->status);
 	if (state == 0xffffffff || (xhci->xhc_state & XHCI_STATE_DYING) ||
@@ -3830,6 +4032,12 @@ static int xhci_setup_device(struct usb_hcd *hcd, struct usb_device *udev,
 	u64 temp_64;
 	struct xhci_command *command;
 
+<<<<<<< HEAD
+=======
+	if (xhci->xhc_state)	/* dying, removing or halted */
+		return -EINVAL;
+
+>>>>>>> common/deprecated/android-3.18
 	if (!udev->slot_id) {
 		xhci_dbg_trace(xhci, trace_xhci_dbg_address,
 				"Bad Slot ID %d", udev->slot_id);
@@ -4170,11 +4378,14 @@ int xhci_set_usb2_hardware_lpm(struct usb_hcd *hcd,
 	if (udev->usb2_hw_lpm_capable != 1)
 		return -EPERM;
 
+<<<<<<< HEAD
 	/* some USB3.0 memory stick doesn't support L1 mode,
 	  * so we add XHCI_LPM_L1_DISABLE quirks for disabling L1 mode */
 	if (!(xhci->quirks & XHCI_LPM_L1_SUPPORT))
 		return -EPERM;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	spin_lock_irqsave(&xhci->lock, flags);
 
 	port_array = xhci->usb2_ports;
@@ -4182,7 +4393,10 @@ int xhci_set_usb2_hardware_lpm(struct usb_hcd *hcd,
 	pm_addr = port_array[port_num] + PORTPMSC;
 	pm_val = readl(pm_addr);
 	hlpm_addr = port_array[port_num] + PORTHLPMC;
+<<<<<<< HEAD
 	field = le32_to_cpu(udev->bos->ext_cap->bmAttributes);
+=======
+>>>>>>> common/deprecated/android-3.18
 
 	xhci_dbg(xhci, "%s port %d USB2 hardware LPM\n",
 			enable ? "enable" : "disable", port_num + 1);
@@ -4194,6 +4408,10 @@ int xhci_set_usb2_hardware_lpm(struct usb_hcd *hcd,
 			 * default one which works with mixed HIRD and BESL
 			 * systems. See XHCI_DEFAULT_BESL definition in xhci.h
 			 */
+<<<<<<< HEAD
+=======
+			field = le32_to_cpu(udev->bos->ext_cap->bmAttributes);
+>>>>>>> common/deprecated/android-3.18
 			if ((field & USB_BESL_SUPPORT) &&
 			    (field & USB_BESL_BASELINE_VALID))
 				hird = USB_GET_BESL_BASELINE(field);
@@ -4427,6 +4645,17 @@ static u16 xhci_calculate_u1_timeout(struct xhci_hcd *xhci,
 	else
 		timeout_ns = udev->u1_params.sel;
 
+<<<<<<< HEAD
+=======
+	/* Prevent U1 if service interval is shorter than U1 exit latency */
+	if (usb_endpoint_xfer_int(desc) || usb_endpoint_xfer_isoc(desc)) {
+		if (xhci_service_interval_to_ns(desc) <= timeout_ns) {
+			dev_dbg(&udev->dev, "Disable U1, ESIT shorter than exit latency\n");
+			return USB3_LPM_DISABLED;
+		}
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	/* The U1 timeout is encoded in 1us intervals.
 	 * Don't return a timeout of zero, because that's USB3_LPM_DISABLED.
 	 */
@@ -4483,6 +4712,17 @@ static u16 xhci_calculate_u2_timeout(struct xhci_hcd *xhci,
 	else
 		timeout_ns = udev->u2_params.sel;
 
+<<<<<<< HEAD
+=======
+	/* Prevent U2 if service interval is shorter than U2 exit latency */
+	if (usb_endpoint_xfer_int(desc) || usb_endpoint_xfer_isoc(desc)) {
+		if (xhci_service_interval_to_ns(desc) <= timeout_ns) {
+			dev_dbg(&udev->dev, "Disable U2, ESIT shorter than exit latency\n");
+			return USB3_LPM_DISABLED;
+		}
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	/* The U2 timeout is encoded in 256us intervals */
 	timeout_ns = DIV_ROUND_UP_ULL(timeout_ns, 256 * 1000);
 	/* If the necessary timeout value is bigger than what we can set in the
@@ -4520,12 +4760,21 @@ static int xhci_update_timeout_for_endpoint(struct xhci_hcd *xhci,
 	alt_timeout = xhci_call_host_update_timeout_for_endpoint(xhci, udev,
 		desc, state, timeout);
 
+<<<<<<< HEAD
 	/* If we found we can't enable hub-initiated LPM, or
 	 * the U1 or U2 exit latency was too high to allow
 	 * device-initiated LPM as well, just stop searching.
 	 */
 	if (alt_timeout == USB3_LPM_DISABLED ||
 			alt_timeout == USB3_LPM_DEVICE_INITIATED) {
+=======
+	/* If we found we can't enable hub-initiated LPM, and
+	 * the U1 or U2 exit latency was too high to allow
+	 * device-initiated LPM as well, then we will disable LPM
+	 * for this device, so stop searching any further.
+	 */
+	if (alt_timeout == USB3_LPM_DISABLED) {
+>>>>>>> common/deprecated/android-3.18
 		*timeout = alt_timeout;
 		return -E2BIG;
 	}
@@ -4636,10 +4885,19 @@ static u16 xhci_calculate_lpm_timeout(struct usb_hcd *hcd,
 		if (intf->dev.driver) {
 			driver = to_usb_driver(intf->dev.driver);
 			if (driver && driver->disable_hub_initiated_lpm) {
+<<<<<<< HEAD
 				dev_dbg(&udev->dev, "Hub-initiated %s disabled "
 						"at request of driver %s\n",
 						state_name, driver->name);
 				return xhci_get_timeout_no_hub_lpm(udev, state);
+=======
+				dev_dbg(&udev->dev, "Hub-initiated %s disabled at request of driver %s\n",
+					state_name, driver->name);
+				timeout = xhci_get_timeout_no_hub_lpm(udev,
+								      state);
+				if (timeout == USB3_LPM_DISABLED)
+					return timeout;
+>>>>>>> common/deprecated/android-3.18
 			}
 		}
 
@@ -4951,6 +5209,19 @@ int xhci_gen_setup(struct usb_hcd *hcd, xhci_get_quirks_t get_quirks)
 		goto error;
 	xhci_dbg(xhci, "Reset complete\n");
 
+<<<<<<< HEAD
+=======
+	/*
+	 * On some xHCI controllers (e.g. R-Car SoCs), the AC64 bit (bit 0)
+	 * of HCCPARAMS1 is set to 1. However, the xHCs don't support 64-bit
+	 * address memory pointers actually. So, this driver clears the AC64
+	 * bit of xhci->hcc_params to call dma_set_coherent_mask(dev,
+	 * DMA_BIT_MASK(32)) in this xhci_gen_setup().
+	 */
+	if (xhci->quirks & XHCI_NO_64BIT_SUPPORT)
+		xhci->hcc_params &= ~BIT(0);
+
+>>>>>>> common/deprecated/android-3.18
 	/* Set dma_mask and coherent_dma_mask to 64-bits,
 	 * if xHC supports 64-bit addressing */
 	if (HCC_64BIT_ADDR(xhci->hcc_params) &&
@@ -5064,6 +5335,13 @@ static int __init xhci_hcd_init(void)
 	BUILD_BUG_ON(sizeof(struct xhci_intr_reg) != 8*32/8);
 	/* xhci_run_regs has eight fields and embeds 128 xhci_intr_regs */
 	BUILD_BUG_ON(sizeof(struct xhci_run_regs) != (8+8*128)*32/8);
+<<<<<<< HEAD
+=======
+
+	if (usb_disabled())
+		return -ENODEV;
+
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 module_init(xhci_hcd_init);

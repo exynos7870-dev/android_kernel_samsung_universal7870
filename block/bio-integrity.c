@@ -165,6 +165,12 @@ bool bio_integrity_enabled(struct bio *bio)
 	if (!bio_is_rw(bio))
 		return false;
 
+<<<<<<< HEAD
+=======
+	if (!bio_sectors(bio))
+		return false;
+
+>>>>>>> common/deprecated/android-3.18
 	/* Already protected? */
 	if (bio_integrity(bio))
 		return false;

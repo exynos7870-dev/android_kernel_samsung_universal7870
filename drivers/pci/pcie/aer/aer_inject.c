@@ -283,6 +283,7 @@ out:
 	return 0;
 }
 
+<<<<<<< HEAD
 static struct pci_dev *pcie_find_root_port(struct pci_dev *dev)
 {
 	while (1) {
@@ -297,6 +298,8 @@ static struct pci_dev *pcie_find_root_port(struct pci_dev *dev)
 	return NULL;
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static int find_aer_device_iter(struct device *device, void *data)
 {
 	struct pcie_device **result = data;

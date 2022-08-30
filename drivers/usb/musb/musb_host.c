@@ -583,6 +583,7 @@ musb_rx_reinit(struct musb *musb, struct musb_qh *qh, struct musb_hw_ep *ep)
 		musb_writew(ep->regs, MUSB_TXCSR, 0);
 
 	/* scrub all previous state, clearing toggle */
+<<<<<<< HEAD
 	} else {
 		csr = musb_readw(ep->regs, MUSB_RXCSR);
 		if (csr & MUSB_RXCSR_RXPKTRDY)
@@ -591,6 +592,15 @@ musb_rx_reinit(struct musb *musb, struct musb_qh *qh, struct musb_hw_ep *ep)
 
 		musb_h_flush_rxfifo(ep, MUSB_RXCSR_CLRDATATOG);
 	}
+=======
+	}
+	csr = musb_readw(ep->regs, MUSB_RXCSR);
+	if (csr & MUSB_RXCSR_RXPKTRDY)
+		WARNING("rx%d, packet/%d ready?\n", ep->epnum,
+			musb_readw(ep->regs, MUSB_RXCOUNT));
+
+	musb_h_flush_rxfifo(ep, MUSB_RXCSR_CLRDATATOG);
+>>>>>>> common/deprecated/android-3.18
 
 	/* target addr and (for multipoint) hub addr/port */
 	if (musb->is_multipoint) {
@@ -950,9 +960,21 @@ static void musb_bulk_nak_timeout(struct musb *musb, struct musb_hw_ep *ep,
 	if (is_in) {
 		dma = is_dma_capable() ? ep->rx_channel : NULL;
 
+<<<<<<< HEAD
 		/* clear nak timeout bit */
 		rx_csr = musb_readw(epio, MUSB_RXCSR);
 		rx_csr |= MUSB_RXCSR_H_WZC_BITS;
+=======
+		/*
+		 * Need to stop the transaction by clearing REQPKT first
+		 * then the NAK Timeout bit ref MUSBMHDRC USB 2.0 HIGH-SPEED
+		 * DUAL-ROLE CONTROLLER Programmer's Guide, section 9.2.2
+		 */
+		rx_csr = musb_readw(epio, MUSB_RXCSR);
+		rx_csr |= MUSB_RXCSR_H_WZC_BITS;
+		rx_csr &= ~MUSB_RXCSR_H_REQPKT;
+		musb_writew(epio, MUSB_RXCSR, rx_csr);
+>>>>>>> common/deprecated/android-3.18
 		rx_csr &= ~MUSB_RXCSR_DATAERROR;
 		musb_writew(epio, MUSB_RXCSR, rx_csr);
 
@@ -997,7 +1019,13 @@ static void musb_bulk_nak_timeout(struct musb *musb, struct musb_hw_ep *ep,
 			/* set tx_reinit and schedule the next qh */
 			ep->tx_reinit = 1;
 		}
+<<<<<<< HEAD
 		musb_start_urb(musb, is_in, next_qh);
+=======
+
+		if (next_qh)
+			musb_start_urb(musb, is_in, next_qh);
+>>>>>>> common/deprecated/android-3.18
 	}
 }
 
@@ -1466,10 +1494,14 @@ done:
 	 * We need to map sg if the transfer_buffer is
 	 * NULL.
 	 */
+<<<<<<< HEAD
 	if (!urb->transfer_buffer)
 		qh->use_sg = true;
 
 	if (qh->use_sg) {
+=======
+	if (!urb->transfer_buffer) {
+>>>>>>> common/deprecated/android-3.18
 		/* sg_miter_start is already done in musb_ep_program */
 		if (!sg_miter_next(&qh->sg_miter)) {
 			dev_err(musb->controller, "error: sg list empty\n");
@@ -1477,9 +1509,14 @@ done:
 			status = -EINVAL;
 			goto done;
 		}
+<<<<<<< HEAD
 		urb->transfer_buffer = qh->sg_miter.addr;
 		length = min_t(u32, length, qh->sg_miter.length);
 		musb_write_fifo(hw_ep, length, urb->transfer_buffer);
+=======
+		length = min_t(u32, length, qh->sg_miter.length);
+		musb_write_fifo(hw_ep, length, qh->sg_miter.addr);
+>>>>>>> common/deprecated/android-3.18
 		qh->sg_miter.consumed = length;
 		sg_miter_stop(&qh->sg_miter);
 	} else {
@@ -1488,11 +1525,14 @@ done:
 
 	qh->segsize = length;
 
+<<<<<<< HEAD
 	if (qh->use_sg) {
 		if (offset + length >= urb->transfer_buffer_length)
 			qh->use_sg = false;
 	}
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	musb_ep_select(mbase, epnum);
 	musb_writew(epio, MUSB_TXCSR,
 			MUSB_TXCSR_H_WZC_BITS | MUSB_TXCSR_TXPKTRDY);
@@ -1939,8 +1979,15 @@ finish:
 	urb->actual_length += xfer_len;
 	qh->offset += xfer_len;
 	if (done) {
+<<<<<<< HEAD
 		if (qh->use_sg)
 			qh->use_sg = false;
+=======
+		if (qh->use_sg) {
+			qh->use_sg = false;
+			urb->transfer_buffer = NULL;
+		}
+>>>>>>> common/deprecated/android-3.18
 
 		if (urb->status == -EINPROGRESS)
 			urb->status = status;
@@ -2268,12 +2315,19 @@ static int musb_cleanup_urb(struct urb *urb, struct musb_qh *qh)
 	int			is_in = usb_pipein(urb->pipe);
 	int			status = 0;
 	u16			csr;
+<<<<<<< HEAD
+=======
+	struct dma_channel	*dma = NULL;
+>>>>>>> common/deprecated/android-3.18
 
 	musb_ep_select(regs, hw_end);
 
 	if (is_dma_capable()) {
+<<<<<<< HEAD
 		struct dma_channel	*dma;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 		dma = is_in ? ep->rx_channel : ep->tx_channel;
 		if (dma) {
 			status = ep->musb->dma_controller->channel_abort(dma);
@@ -2290,10 +2344,16 @@ static int musb_cleanup_urb(struct urb *urb, struct musb_qh *qh)
 		/* giveback saves bulk toggle */
 		csr = musb_h_flush_rxfifo(ep, 0);
 
+<<<<<<< HEAD
 		/* REVISIT we still get an irq; should likely clear the
 		 * endpoint's irq status here to avoid bogus irqs.
 		 * clearing that status is platform-specific...
 		 */
+=======
+		/* clear the endpoint's irq status here to avoid bogus irqs */
+		if (is_dma_capable() && dma)
+			musb_platform_clear_ep_rxintr(musb, ep->epnum);
+>>>>>>> common/deprecated/android-3.18
 	} else if (ep->epnum) {
 		musb_h_tx_flush_fifo(ep);
 		csr = musb_readw(epio, MUSB_TXCSR);
@@ -2457,8 +2517,16 @@ static int musb_bus_suspend(struct usb_hcd *hcd)
 {
 	struct musb	*musb = hcd_to_musb(hcd);
 	u8		devctl;
+<<<<<<< HEAD
 
 	musb_port_suspend(musb, true);
+=======
+	int		ret;
+
+	ret = musb_port_suspend(musb, true);
+	if (ret)
+		return ret;
+>>>>>>> common/deprecated/android-3.18
 
 	if (!is_host_active(musb))
 		return 0;

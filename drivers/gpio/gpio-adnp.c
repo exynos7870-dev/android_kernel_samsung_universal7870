@@ -137,8 +137,15 @@ static int adnp_gpio_direction_input(struct gpio_chip *chip, unsigned offset)
 	if (err < 0)
 		goto out;
 
+<<<<<<< HEAD
 	if (err & BIT(pos))
 		err = -EACCES;
+=======
+	if (value & BIT(pos)) {
+		err = -EPERM;
+		goto out;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	err = 0;
 

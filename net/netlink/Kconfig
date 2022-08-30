@@ -2,6 +2,7 @@
 # Netlink Sockets
 #
 
+<<<<<<< HEAD
 config NETLINK_MMAP
 	bool "NETLINK: mmaped IO"
 	---help---
@@ -11,6 +12,8 @@ config NETLINK_MMAP
 
 	  If unsure, say N.
 
+=======
+>>>>>>> common/deprecated/android-3.18
 config NETLINK_DIAG
 	tristate "NETLINK: socket monitoring interface"
 	default n

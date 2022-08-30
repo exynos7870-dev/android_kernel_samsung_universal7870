@@ -37,6 +37,10 @@
 #include <linux/of.h>
 #include <net/netlink.h>
 #include <net/genetlink.h>
+<<<<<<< HEAD
+=======
+#include <linux/suspend.h>
+>>>>>>> common/deprecated/android-3.18
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/thermal.h>
@@ -59,6 +63,7 @@ static LIST_HEAD(thermal_governor_list);
 static DEFINE_MUTEX(thermal_list_lock);
 static DEFINE_MUTEX(thermal_governor_lock);
 
+<<<<<<< HEAD
 #ifdef CONFIG_SCHED_MC
 #define BOUNDED_CPU		1
 static void start_poll_queue(struct thermal_zone_device *tz, int delay)
@@ -67,6 +72,9 @@ static void start_poll_queue(struct thermal_zone_device *tz, int delay)
 			msecs_to_jiffies(delay));
 }
 #endif
+=======
+static atomic_t in_suspend;
+>>>>>>> common/deprecated/android-3.18
 
 static struct thermal_governor *def_governor;
 
@@ -339,6 +347,7 @@ static void thermal_zone_device_set_polling(struct thermal_zone_device *tz,
 					    int delay)
 {
 	if (delay > 1000)
+<<<<<<< HEAD
 #ifdef CONFIG_SCHED_MC
 		start_poll_queue(tz, delay);
 #else
@@ -352,6 +361,13 @@ static void thermal_zone_device_set_polling(struct thermal_zone_device *tz,
 		mod_delayed_work(system_freezable_wq, &tz->poll_queue,
 				 msecs_to_jiffies(delay));
 #endif
+=======
+		mod_delayed_work(system_freezable_wq, &tz->poll_queue,
+				 round_jiffies(msecs_to_jiffies(delay)));
+	else if (delay)
+		mod_delayed_work(system_freezable_wq, &tz->poll_queue,
+				 msecs_to_jiffies(delay));
+>>>>>>> common/deprecated/android-3.18
 	else
 		cancel_delayed_work(&tz->poll_queue);
 }
@@ -405,6 +421,13 @@ static void handle_thermal_trip(struct thermal_zone_device *tz, int trip)
 {
 	enum thermal_trip_type type;
 
+<<<<<<< HEAD
+=======
+	/* Ignore disabled trip points */
+	if (test_bit(trip, &tz->trips_disabled))
+		return;
+
+>>>>>>> common/deprecated/android-3.18
 	tz->ops->get_trip_type(tz, trip, &type);
 
 	if (type == THERMAL_TRIP_CRITICAL || type == THERMAL_TRIP_HOT)
@@ -486,14 +509,39 @@ static void update_temperature(struct thermal_zone_device *tz)
 	mutex_unlock(&tz->lock);
 
 	trace_thermal_temperature(tz);
+<<<<<<< HEAD
 	dev_dbg(&tz->device, "last_temperature=%d, current_temperature=%d\n",
 				tz->last_temperature, tz->temperature);
+=======
+	if (tz->last_temperature == THERMAL_TEMP_INVALID)
+		dev_dbg(&tz->device, "last_temperature N/A, current_temperature=%d\n",
+			tz->temperature);
+	else
+		dev_dbg(&tz->device, "last_temperature=%d, current_temperature=%d\n",
+			tz->last_temperature, tz->temperature);
+}
+
+static void thermal_zone_device_reset(struct thermal_zone_device *tz)
+{
+	struct thermal_instance *pos;
+
+	tz->temperature = THERMAL_TEMP_INVALID;
+	tz->passive = 0;
+	list_for_each_entry(pos, &tz->thermal_instances, tz_node)
+		pos->initialized = false;
+>>>>>>> common/deprecated/android-3.18
 }
 
 void thermal_zone_device_update(struct thermal_zone_device *tz)
 {
 	int count;
 
+<<<<<<< HEAD
+=======
+	if (atomic_read(&in_suspend))
+		return;
+
+>>>>>>> common/deprecated/android-3.18
 	if (!tz->ops->get_temp)
 		return;
 
@@ -540,6 +588,7 @@ temp_show(struct device *dev, struct device_attribute *attr, char *buf)
 	return sprintf(buf, "%ld\n", temperature);
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_SEC_PM
 static ssize_t
 curr_temp_show(struct device *dev, struct device_attribute *attr, char *buf)
@@ -566,6 +615,8 @@ curr_temp_show(struct device *dev, struct device_attribute *attr, char *buf)
 }
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static ssize_t
 mode_show(struct device *dev, struct device_attribute *attr, char *buf)
 {
@@ -854,9 +905,12 @@ static DEVICE_ATTR(temp, 0444, temp_show, NULL);
 static DEVICE_ATTR(mode, 0644, mode_show, mode_store);
 static DEVICE_ATTR(passive, S_IRUGO | S_IWUSR, passive_show, passive_store);
 static DEVICE_ATTR(policy, S_IRUGO | S_IWUSR, policy_show, policy_store);
+<<<<<<< HEAD
 #ifdef CONFIG_SEC_PM
 static DEVICE_ATTR(curr_temp, 0444, curr_temp_show, NULL);
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 
 /* sys I/F for cooling device */
 #define to_cooling_device(_dev)	\
@@ -1040,6 +1094,10 @@ int thermal_zone_bind_cooling_device(struct thermal_zone_device *tz,
 	if (!result) {
 		list_add_tail(&dev->tz_node, &tz->thermal_instances);
 		list_add_tail(&dev->cdev_node, &cdev->thermal_instances);
+<<<<<<< HEAD
+=======
+		atomic_set(&tz->need_update, 1);
+>>>>>>> common/deprecated/android-3.18
 	}
 	mutex_unlock(&cdev->lock);
 	mutex_unlock(&tz->lock);
@@ -1146,6 +1204,10 @@ __thermal_cooling_device_register(struct device_node *np,
 				  const struct thermal_cooling_device_ops *ops)
 {
 	struct thermal_cooling_device *cdev;
+<<<<<<< HEAD
+=======
+	struct thermal_zone_device *pos = NULL;
+>>>>>>> common/deprecated/android-3.18
 	int result;
 
 	if (type && strlen(type) >= THERMAL_NAME_LENGTH)
@@ -1204,6 +1266,15 @@ __thermal_cooling_device_register(struct device_node *np,
 	/* Update binding information for 'this' new cdev */
 	bind_cdev(cdev);
 
+<<<<<<< HEAD
+=======
+	mutex_lock(&thermal_list_lock);
+	list_for_each_entry(pos, &thermal_tz_list, node)
+		if (atomic_cmpxchg(&pos->need_update, 1, 0))
+			thermal_zone_device_update(pos);
+	mutex_unlock(&thermal_list_lock);
+
+>>>>>>> common/deprecated/android-3.18
 	return cdev;
 
 unregister:
@@ -1502,6 +1573,10 @@ struct thermal_zone_device *thermal_zone_device_register(const char *type,
 {
 	struct thermal_zone_device *tz;
 	enum thermal_trip_type trip_type;
+<<<<<<< HEAD
+=======
+	unsigned long trip_temp;
+>>>>>>> common/deprecated/android-3.18
 	int result;
 	int count;
 	int passive = 0;
@@ -1539,9 +1614,14 @@ struct thermal_zone_device *thermal_zone_device_register(const char *type,
 	tz->trips = trips;
 	tz->passive_delay = passive_delay;
 	tz->polling_delay = polling_delay;
+<<<<<<< HEAD
 #ifdef CONFIG_SCHED_MC
 	tz->poll_queue_cpu = BOUNDED_CPU;
 #endif
+=======
+	/* A new thermal zone needs to be updated anyway. */
+	atomic_set(&tz->need_update, 1);
+>>>>>>> common/deprecated/android-3.18
 
 	dev_set_name(&tz->device, "thermal_zone%d", tz->id);
 	result = device_register(&tz->device);
@@ -1562,12 +1642,15 @@ struct thermal_zone_device *thermal_zone_device_register(const char *type,
 	if (result)
 		goto unregister;
 
+<<<<<<< HEAD
 #ifdef CONFIG_SEC_PM
 	result = device_create_file(&tz->device, &dev_attr_curr_temp);
 	if (result)
 		goto unregister;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (ops->get_mode) {
 		result = device_create_file(&tz->device, &dev_attr_mode);
 		if (result)
@@ -1579,9 +1662,21 @@ struct thermal_zone_device *thermal_zone_device_register(const char *type,
 		goto unregister;
 
 	for (count = 0; count < trips; count++) {
+<<<<<<< HEAD
 		tz->ops->get_trip_type(tz, count, &trip_type);
 		if (trip_type == THERMAL_TRIP_PASSIVE)
 			passive = 1;
+=======
+		if (tz->ops->get_trip_type(tz, count, &trip_type))
+			set_bit(count, &tz->trips_disabled);
+		if (trip_type == THERMAL_TRIP_PASSIVE)
+			passive = 1;
+		if (tz->ops->get_trip_temp(tz, count, &trip_temp))
+			set_bit(count, &tz->trips_disabled);
+		/* Check for bogus trip points */
+		if (trip_temp == 0)
+			set_bit(count, &tz->trips_disabled);
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (!passive) {
@@ -1628,7 +1723,14 @@ struct thermal_zone_device *thermal_zone_device_register(const char *type,
 	if (!tz->ops->get_temp)
 		thermal_zone_device_set_polling(tz, 0);
 
+<<<<<<< HEAD
 	thermal_zone_device_update(tz);
+=======
+	thermal_zone_device_reset(tz);
+	/* Update the new thermal zone and mark it as already updated. */
+	if (atomic_cmpxchg(&tz->need_update, 1, 0))
+		thermal_zone_device_update(tz);
+>>>>>>> common/deprecated/android-3.18
 
 	return tz;
 
@@ -1686,7 +1788,11 @@ void thermal_zone_device_unregister(struct thermal_zone_device *tz)
 
 	mutex_unlock(&thermal_list_lock);
 
+<<<<<<< HEAD
 	thermal_zone_device_set_polling(tz, 0);
+=======
+	cancel_delayed_work_sync(&tz->poll_queue);
+>>>>>>> common/deprecated/android-3.18
 
 	if (tz->type[0])
 		device_remove_file(&tz->device, &dev_attr_type);
@@ -1866,6 +1972,7 @@ static void thermal_unregister_governors(void)
 	thermal_gov_user_space_unregister();
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_SCHED_MC
 static int __cpuinit thermal_cpu_callback(struct notifier_block *nfb,
 					unsigned long action, void *hcpu)
@@ -1899,6 +2006,37 @@ static struct notifier_block __cpuinitdata thermal_cpu_notifier =
 	.notifier_call = thermal_cpu_callback,
 };
 #endif
+=======
+static int thermal_pm_notify(struct notifier_block *nb,
+				unsigned long mode, void *_unused)
+{
+	struct thermal_zone_device *tz;
+
+	switch (mode) {
+	case PM_HIBERNATION_PREPARE:
+	case PM_RESTORE_PREPARE:
+	case PM_SUSPEND_PREPARE:
+		atomic_set(&in_suspend, 1);
+		break;
+	case PM_POST_HIBERNATION:
+	case PM_POST_RESTORE:
+	case PM_POST_SUSPEND:
+		atomic_set(&in_suspend, 0);
+		list_for_each_entry(tz, &thermal_tz_list, node) {
+			thermal_zone_device_reset(tz);
+			thermal_zone_device_update(tz);
+		}
+		break;
+	default:
+		break;
+	}
+	return 0;
+}
+
+static struct notifier_block thermal_pm_nb = {
+	.notifier_call = thermal_pm_notify,
+};
+>>>>>>> common/deprecated/android-3.18
 
 static int __init thermal_init(void)
 {
@@ -1920,9 +2058,16 @@ static int __init thermal_init(void)
 	if (result)
 		goto exit_netlink;
 
+<<<<<<< HEAD
 #ifdef CONFIG_SCHED_MC
 	register_hotcpu_notifier(&thermal_cpu_notifier);
 #endif
+=======
+	result = register_pm_notifier(&thermal_pm_nb);
+	if (result)
+		pr_warn("Thermal: Can not register suspend notifier, return %d\n",
+			result);
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 
@@ -1943,6 +2088,10 @@ error:
 
 static void __exit thermal_exit(void)
 {
+<<<<<<< HEAD
+=======
+	unregister_pm_notifier(&thermal_pm_nb);
+>>>>>>> common/deprecated/android-3.18
 	of_thermal_destroy_zones();
 	genetlink_exit();
 	class_unregister(&thermal_class);

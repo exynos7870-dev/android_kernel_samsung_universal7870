@@ -13,6 +13,10 @@
 #include <asm/sigcontext.h>
 #include <asm/processor.h>
 #include <asm/math_emu.h>
+<<<<<<< HEAD
+=======
+#include <asm/tlbflush.h>
+>>>>>>> common/deprecated/android-3.18
 #include <asm/uaccess.h>
 #include <asm/ptrace.h>
 #include <asm/i387.h>
@@ -155,6 +159,24 @@ static void init_thread_xstate(void)
 		xstate_size = sizeof(struct i387_fxsave_struct);
 	else
 		xstate_size = sizeof(struct i387_fsave_struct);
+<<<<<<< HEAD
+=======
+
+	/*
+	 * Quirk: we don't yet handle the XSAVES* instructions
+	 * correctly, as we don't correctly convert between
+	 * standard and compacted format when interfacing
+	 * with user-space - so disable it for now.
+	 *
+	 * The difference is small: with recent CPUs the
+	 * compacted format is only marginally smaller than
+	 * the standard FPU state format.
+	 *
+	 * ( This is easy to backport while we are fixing
+	 *   XSAVES* support. )
+	 */
+	setup_clear_cpu_cap(X86_FEATURE_XSAVES);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
@@ -180,7 +202,11 @@ void fpu_init(void)
 	if (cpu_has_xmm)
 		cr4_mask |= X86_CR4_OSXMMEXCPT;
 	if (cr4_mask)
+<<<<<<< HEAD
 		set_in_cr4(cr4_mask);
+=======
+		cr4_set_bits(cr4_mask);
+>>>>>>> common/deprecated/android-3.18
 
 	cr0 = read_cr0();
 	cr0 &= ~(X86_CR0_TS|X86_CR0_EM); /* clear TS and EM */
@@ -372,11 +398,28 @@ int xstateregs_set(struct task_struct *target, const struct user_regset *regset,
 	xsave_hdr = &target->thread.fpu.state->xsave.xsave_hdr;
 
 	xsave_hdr->xstate_bv &= pcntxt_mask;
+<<<<<<< HEAD
+=======
+
+	/* xcomp_bv must be 0 when using uncompacted format */
+	if (!ret && xsave_hdr->xcomp_bv)
+		ret = -EINVAL;
+
+>>>>>>> common/deprecated/android-3.18
 	/*
 	 * These bits must be zero.
 	 */
 	memset(xsave_hdr->reserved, 0, 48);
 
+<<<<<<< HEAD
+=======
+	/*
+	 * In case of failure, mark all states as init:
+	 */
+	if (ret)
+		fpu_finit(&target->thread.fpu);
+
+>>>>>>> common/deprecated/android-3.18
 	return ret;
 }
 

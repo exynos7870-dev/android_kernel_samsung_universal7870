@@ -30,11 +30,57 @@
 
 static DEFINE_PER_CPU(struct clk, sh_cpuclk);
 
+<<<<<<< HEAD
+=======
+struct cpufreq_target {
+	struct cpufreq_policy	*policy;
+	unsigned int		freq;
+};
+
+>>>>>>> common/deprecated/android-3.18
 static unsigned int sh_cpufreq_get(unsigned int cpu)
 {
 	return (clk_get_rate(&per_cpu(sh_cpuclk, cpu)) + 500) / 1000;
 }
 
+<<<<<<< HEAD
+=======
+static long __sh_cpufreq_target(void *arg)
+{
+	struct cpufreq_target *target = arg;
+	struct cpufreq_policy *policy = target->policy;
+	int cpu = policy->cpu;
+	struct clk *cpuclk = &per_cpu(sh_cpuclk, cpu);
+	struct cpufreq_freqs freqs;
+	struct device *dev;
+	long freq;
+
+	if (smp_processor_id() != cpu)
+		return -ENODEV;
+
+	dev = get_cpu_device(cpu);
+
+	/* Convert target_freq from kHz to Hz */
+	freq = clk_round_rate(cpuclk, target->freq * 1000);
+
+	if (freq < (policy->min * 1000) || freq > (policy->max * 1000))
+		return -EINVAL;
+
+	dev_dbg(dev, "requested frequency %u Hz\n", target->freq * 1000);
+
+	freqs.old	= sh_cpufreq_get(cpu);
+	freqs.new	= (freq + 500) / 1000;
+	freqs.flags	= 0;
+
+	cpufreq_freq_transition_begin(target->policy, &freqs);
+	clk_set_rate(cpuclk, freq);
+	cpufreq_freq_transition_end(target->policy, &freqs, 0);
+
+	dev_dbg(dev, "set frequency %lu Hz\n", freq);
+	return 0;
+}
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Here we notify other drivers of the proposed change and the final change.
  */
@@ -42,6 +88,7 @@ static int sh_cpufreq_target(struct cpufreq_policy *policy,
 			     unsigned int target_freq,
 			     unsigned int relation)
 {
+<<<<<<< HEAD
 	unsigned int cpu = policy->cpu;
 	struct clk *cpuclk = &per_cpu(sh_cpuclk, cpu);
 	cpumask_t cpus_allowed;
@@ -76,6 +123,11 @@ static int sh_cpufreq_target(struct cpufreq_policy *policy,
 	dev_dbg(dev, "set frequency %lu Hz\n", freq);
 
 	return 0;
+=======
+	struct cpufreq_target data = { .policy = policy, .freq = target_freq };
+
+	return work_on_cpu(policy->cpu, __sh_cpufreq_target, &data);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int sh_cpufreq_verify(struct cpufreq_policy *policy)

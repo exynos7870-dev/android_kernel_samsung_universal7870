@@ -157,6 +157,10 @@ out2:
 out1:
 	return ERR_PTR(ret);
 }
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL_GPL(soc_device_register);
+>>>>>>> common/deprecated/android-3.18
 
 /* Ensure soc_dev->attr is freed prior to calling soc_device_unregister. */
 void soc_device_unregister(struct soc_device *soc_dev)
@@ -165,6 +169,10 @@ void soc_device_unregister(struct soc_device *soc_dev)
 
 	device_unregister(&soc_dev->dev);
 }
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL_GPL(soc_device_unregister);
+>>>>>>> common/deprecated/android-3.18
 
 static int __init soc_bus_register(void)
 {

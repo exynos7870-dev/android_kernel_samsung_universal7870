@@ -50,7 +50,11 @@ struct xc4000_config {
  * it's passed back to a bridge during tuner_callback().
  */
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_MEDIA_TUNER_XC4000)
+=======
+#if IS_REACHABLE(CONFIG_MEDIA_TUNER_XC4000)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend *xc4000_attach(struct dvb_frontend *fe,
 					  struct i2c_adapter *i2c,
 					  struct xc4000_config *cfg);

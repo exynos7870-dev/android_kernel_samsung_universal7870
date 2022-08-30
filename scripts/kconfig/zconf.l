@@ -180,6 +180,11 @@ n	[A-Za-z0-9_]
 	}
 	<<EOF>>	{
 		BEGIN(INITIAL);
+<<<<<<< HEAD
+=======
+		yylval.string = text;
+		return T_WORD_QUOTE;
+>>>>>>> common/deprecated/android-3.18
 	}
 }
 

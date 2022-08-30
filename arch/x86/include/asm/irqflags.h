@@ -8,7 +8,13 @@
  * Interrupt control:
  */
 
+<<<<<<< HEAD
 static inline unsigned long native_save_fl(void)
+=======
+/* Declaration required for gcc < 4.9 to prevent -Werror=missing-prototypes */
+extern inline unsigned long native_save_fl(void);
+extern inline unsigned long native_save_fl(void)
+>>>>>>> common/deprecated/android-3.18
 {
 	unsigned long flags;
 
@@ -26,7 +32,12 @@ static inline unsigned long native_save_fl(void)
 	return flags;
 }
 
+<<<<<<< HEAD
 static inline void native_restore_fl(unsigned long flags)
+=======
+extern inline void native_restore_fl(unsigned long flags);
+extern inline void native_restore_fl(unsigned long flags)
+>>>>>>> common/deprecated/android-3.18
 {
 	asm volatile("push %0 ; popf"
 		     : /* no output */

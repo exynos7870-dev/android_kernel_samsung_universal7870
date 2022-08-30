@@ -11,6 +11,10 @@
 
 #define DEBUG
 
+<<<<<<< HEAD
+=======
+#include <linux/delay.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/kernel.h>
 #include <linux/init.h>
 #include <linux/of.h>
@@ -42,6 +46,13 @@ static ssize_t opal_nvram_read(char *buf, size_t count, loff_t *index)
 	return count;
 }
 
+<<<<<<< HEAD
+=======
+/*
+ * This can be called in the panic path with interrupts off, so use
+ * mdelay in that case.
+ */
+>>>>>>> common/deprecated/android-3.18
 static ssize_t opal_nvram_write(char *buf, size_t count, loff_t *index)
 {
 	s64 rc = OPAL_BUSY;
@@ -55,9 +66,29 @@ static ssize_t opal_nvram_write(char *buf, size_t count, loff_t *index)
 
 	while (rc == OPAL_BUSY || rc == OPAL_BUSY_EVENT) {
 		rc = opal_write_nvram(__pa(buf), count, off);
+<<<<<<< HEAD
 		if (rc == OPAL_BUSY_EVENT)
 			opal_poll_events(NULL);
 	}
+=======
+		if (rc == OPAL_BUSY_EVENT) {
+			if (in_interrupt() || irqs_disabled())
+				mdelay(OPAL_BUSY_DELAY_MS);
+			else
+				msleep(OPAL_BUSY_DELAY_MS);
+			opal_poll_events(NULL);
+		} else if (rc == OPAL_BUSY) {
+			if (in_interrupt() || irqs_disabled())
+				mdelay(OPAL_BUSY_DELAY_MS);
+			else
+				msleep(OPAL_BUSY_DELAY_MS);
+		}
+	}
+
+	if (rc)
+		return -EIO;
+
+>>>>>>> common/deprecated/android-3.18
 	*index += count;
 	return count;
 }

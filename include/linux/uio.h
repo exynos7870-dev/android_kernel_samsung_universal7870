@@ -97,6 +97,22 @@ static inline size_t iov_iter_count(struct iov_iter *i)
 	return i->count;
 }
 
+<<<<<<< HEAD
+=======
+static inline bool iter_is_iovec(struct iov_iter *i)
+{
+	return !(i->type & (ITER_BVEC | ITER_KVEC));
+}
+
+/*
+ * Get one of READ or WRITE out of iter->type without any other flags OR'd in
+ * with it.
+ *
+ * The ?: is just for type safety.
+ */
+#define iov_iter_rw(i) ((0 ? (struct iov_iter *)0 : (i))->type & RW_MASK)
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * Cap the iov_iter by given limit; note that the second argument is
  * *not* the new size - it's upper limit for such.  Passing it a value

@@ -646,6 +646,12 @@ static int atk_read_value(struct atk_sensor_data *sensor, u64 *value)
 		else
 			err = atk_read_value_new(sensor, value);
 
+<<<<<<< HEAD
+=======
+		if (err)
+			return err;
+
+>>>>>>> common/deprecated/android-3.18
 		sensor->is_valid = true;
 		sensor->last_updated = jiffies;
 		sensor->cached_value = *value;

@@ -155,6 +155,10 @@ static int drm_open_helper(struct file *filp, struct drm_minor *minor)
 		return -ENOMEM;
 
 	filp->private_data = priv;
+<<<<<<< HEAD
+=======
+	filp->f_mode |= FMODE_UNSIGNED_OFFSET;
+>>>>>>> common/deprecated/android-3.18
 	priv->filp = filp;
 	priv->uid = current_euid();
 	priv->pid = get_pid(task_pid(current));

@@ -375,11 +375,23 @@ static int ext4_valid_extent(struct inode *inode, struct ext4_extent *ext)
 	ext4_fsblk_t block = ext4_ext_pblock(ext);
 	int len = ext4_ext_get_actual_len(ext);
 	ext4_lblk_t lblock = le32_to_cpu(ext->ee_block);
+<<<<<<< HEAD
 	ext4_lblk_t last = lblock + len - 1;
 
 	if (lblock > last)
 		return 0;
 	return ext4_data_block_valid(EXT4_SB(inode->i_sb), block, len);
+=======
+
+	/*
+	 * We allow neither:
+	 *  - zero length
+	 *  - overflow/wrap-around
+	 */
+	if (lblock + len <= lblock)
+		return 0;
+	return ext4_inode_block_valid(inode, block, len);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int ext4_valid_extent_idx(struct inode *inode,
@@ -387,7 +399,11 @@ static int ext4_valid_extent_idx(struct inode *inode,
 {
 	ext4_fsblk_t block = ext4_idx_pblock(ext_idx);
 
+<<<<<<< HEAD
 	return ext4_data_block_valid(EXT4_SB(inode->i_sb), block, 1);
+=======
+	return ext4_inode_block_valid(inode, block, 1);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int ext4_valid_extent_entries(struct inode *inode,
@@ -436,6 +452,7 @@ static int ext4_valid_extent_entries(struct inode *inode,
 	return 1;
 }
 
+<<<<<<< HEAD
 /* for debugging if ext4_extent is not valid */
 static void
 ext4_ext_show_eh(struct inode *inode, struct ext4_extent_header *eh)
@@ -481,6 +498,11 @@ ext4_ext_show_eh(struct inode *inode, struct ext4_extent_header *eh)
 static int __ext4_ext_check(const char *function, unsigned int line,
 			    struct inode *inode, struct ext4_extent_header *eh,
 			    int depth, ext4_fsblk_t pblk, struct buffer_head *bh)
+=======
+static int __ext4_ext_check(const char *function, unsigned int line,
+			    struct inode *inode, struct ext4_extent_header *eh,
+			    int depth, ext4_fsblk_t pblk)
+>>>>>>> common/deprecated/android-3.18
 {
 	const char *error_msg;
 	int max = 0;
@@ -510,6 +532,13 @@ static int __ext4_ext_check(const char *function, unsigned int line,
 		error_msg = "invalid extent entries";
 		goto corrupted;
 	}
+<<<<<<< HEAD
+=======
+	if (unlikely(depth > 32)) {
+		error_msg = "too large eh_depth";
+		goto corrupted;
+	}
+>>>>>>> common/deprecated/android-3.18
 	/* Verify checksum on non-root extent tree nodes */
 	if (ext_depth(inode) != depth &&
 	    !ext4_extent_block_csum_verify(inode, eh)) {
@@ -519,6 +548,7 @@ static int __ext4_ext_check(const char *function, unsigned int line,
 	return 0;
 
 corrupted:
+<<<<<<< HEAD
 	if (bh) {
 		printk(KERN_ERR "Print invalid extent bh: %s\n", error_msg);
 		print_bh(inode->i_sb, bh, 0, EXT4_BLOCK_SIZE(inode->i_sb));
@@ -526,6 +556,8 @@ corrupted:
 		printk(KERN_ERR "Print invalid extent entries\n");
 		ext4_ext_show_eh(inode, eh);
 	}
+=======
+>>>>>>> common/deprecated/android-3.18
 	ext4_error_inode(inode, function, line, 0,
 			 "pblk %llu bad header/extent: %s - magic %x, "
 			 "entries %u, max %u(%u), depth %u(%u)",
@@ -537,13 +569,44 @@ corrupted:
 }
 
 #define ext4_ext_check(inode, eh, depth, pblk)			\
+<<<<<<< HEAD
 	__ext4_ext_check(__func__, __LINE__, (inode), (eh), (depth), (pblk), (NULL))
+=======
+	__ext4_ext_check(__func__, __LINE__, (inode), (eh), (depth), (pblk))
+>>>>>>> common/deprecated/android-3.18
 
 int ext4_ext_check_inode(struct inode *inode)
 {
 	return ext4_ext_check(inode, ext_inode_hdr(inode), ext_depth(inode), 0);
 }
 
+<<<<<<< HEAD
+=======
+static void ext4_cache_extents(struct inode *inode,
+			       struct ext4_extent_header *eh)
+{
+	struct ext4_extent *ex = EXT_FIRST_EXTENT(eh);
+	ext4_lblk_t prev = 0;
+	int i;
+
+	for (i = le16_to_cpu(eh->eh_entries); i > 0; i--, ex++) {
+		unsigned int status = EXTENT_STATUS_WRITTEN;
+		ext4_lblk_t lblk = le32_to_cpu(ex->ee_block);
+		int len = ext4_ext_get_actual_len(ex);
+
+		if (prev && (prev != lblk))
+			ext4_es_cache_extent(inode, prev, lblk - prev, ~0,
+					     EXTENT_STATUS_HOLE);
+
+		if (ext4_ext_is_unwritten(ex))
+			status = EXTENT_STATUS_UNWRITTEN;
+		ext4_es_cache_extent(inode, lblk, len,
+				     ext4_ext_pblock(ex), status);
+		prev = lblk + len;
+	}
+}
+
+>>>>>>> common/deprecated/android-3.18
 static struct buffer_head *
 __read_extent_tree_block(const char *function, unsigned int line,
 			 struct inode *inode, ext4_fsblk_t pblk, int depth,
@@ -565,7 +628,11 @@ __read_extent_tree_block(const char *function, unsigned int line,
 	if (buffer_verified(bh) && !(flags & EXT4_EX_FORCE_CACHE))
 		return bh;
 	err = __ext4_ext_check(function, line, inode,
+<<<<<<< HEAD
 			       ext_block_hdr(bh), depth, pblk, bh);
+=======
+			       ext_block_hdr(bh), depth, pblk);
+>>>>>>> common/deprecated/android-3.18
 	if (err)
 		goto errout;
 	set_buffer_verified(bh);
@@ -574,6 +641,7 @@ __read_extent_tree_block(const char *function, unsigned int line,
 	 */
 	if (!(flags & EXT4_EX_NOCACHE) && depth == 0) {
 		struct ext4_extent_header *eh = ext_block_hdr(bh);
+<<<<<<< HEAD
 		struct ext4_extent *ex = EXT_FIRST_EXTENT(eh);
 		ext4_lblk_t prev = 0;
 		int i;
@@ -594,6 +662,9 @@ __read_extent_tree_block(const char *function, unsigned int line,
 					     ext4_ext_pblock(ex), status);
 			prev = lblk + len;
 		}
+=======
+		ext4_cache_extents(inode, eh);
+>>>>>>> common/deprecated/android-3.18
 	}
 	return bh;
 errout:
@@ -899,6 +970,10 @@ int ext4_ext_tree_init(handle_t *handle, struct inode *inode)
 	eh->eh_entries = 0;
 	eh->eh_magic = EXT4_EXT_MAGIC;
 	eh->eh_max = cpu_to_le16(ext4_ext_space_root(inode, 0));
+<<<<<<< HEAD
+=======
+	eh->eh_generation = 0;
+>>>>>>> common/deprecated/android-3.18
 	ext4_mark_inode_dirty(handle, inode);
 	return 0;
 }
@@ -915,6 +990,15 @@ ext4_find_extent(struct inode *inode, ext4_lblk_t block,
 
 	eh = ext_inode_hdr(inode);
 	depth = ext_depth(inode);
+<<<<<<< HEAD
+=======
+	if (depth < 0 || depth > EXT4_MAX_EXTENT_DEPTH) {
+		EXT4_ERROR_INODE(inode, "inode has invalid extent depth: %d",
+				 depth);
+		ret = -EIO;
+		goto err;
+	}
+>>>>>>> common/deprecated/android-3.18
 
 	if (path) {
 		ext4_ext_drop_refs(path);
@@ -935,6 +1019,11 @@ ext4_find_extent(struct inode *inode, ext4_lblk_t block,
 	path[0].p_bh = NULL;
 
 	i = depth;
+<<<<<<< HEAD
+=======
+	if (!(flags & EXT4_EX_NOCACHE) && depth == 0)
+		ext4_cache_extents(inode, eh);
+>>>>>>> common/deprecated/android-3.18
 	/* walk through the tree */
 	while (i) {
 		ext_debug("depth %d: num %d, max %d\n",
@@ -1082,6 +1171,10 @@ static int ext4_ext_split(handle_t *handle, struct inode *inode,
 	__le32 border;
 	ext4_fsblk_t *ablocks = NULL; /* array of allocated blocks */
 	int err = 0;
+<<<<<<< HEAD
+=======
+	size_t ext_size = 0;
+>>>>>>> common/deprecated/android-3.18
 
 	/* make decision: where to split? */
 	/* FIXME: now decision is simplest: at current extent */
@@ -1153,6 +1246,10 @@ static int ext4_ext_split(handle_t *handle, struct inode *inode,
 	neh->eh_max = cpu_to_le16(ext4_ext_space_block(inode, 0));
 	neh->eh_magic = EXT4_EXT_MAGIC;
 	neh->eh_depth = 0;
+<<<<<<< HEAD
+=======
+	neh->eh_generation = 0;
+>>>>>>> common/deprecated/android-3.18
 
 	/* move remainder of path[depth] to the new leaf */
 	if (unlikely(path[depth].p_hdr->eh_entries !=
@@ -1173,6 +1270,13 @@ static int ext4_ext_split(handle_t *handle, struct inode *inode,
 		le16_add_cpu(&neh->eh_entries, m);
 	}
 
+<<<<<<< HEAD
+=======
+	/* zero out unused area in the extent block */
+	ext_size = sizeof(struct ext4_extent_header) +
+		sizeof(struct ext4_extent) * le16_to_cpu(neh->eh_entries);
+	memset(bh->b_data + ext_size, 0, inode->i_sb->s_blocksize - ext_size);
+>>>>>>> common/deprecated/android-3.18
 	ext4_extent_block_csum_set(inode, neh);
 	set_buffer_uptodate(bh);
 	unlock_buffer(bh);
@@ -1226,6 +1330,10 @@ static int ext4_ext_split(handle_t *handle, struct inode *inode,
 		neh->eh_magic = EXT4_EXT_MAGIC;
 		neh->eh_max = cpu_to_le16(ext4_ext_space_block_idx(inode, 0));
 		neh->eh_depth = cpu_to_le16(depth - i);
+<<<<<<< HEAD
+=======
+		neh->eh_generation = 0;
+>>>>>>> common/deprecated/android-3.18
 		fidx = EXT_FIRST_INDEX(neh);
 		fidx->ei_block = border;
 		ext4_idx_store_pblock(fidx, oldblock);
@@ -1252,6 +1360,14 @@ static int ext4_ext_split(handle_t *handle, struct inode *inode,
 				sizeof(struct ext4_extent_idx) * m);
 			le16_add_cpu(&neh->eh_entries, m);
 		}
+<<<<<<< HEAD
+=======
+		/* zero out unused area in the extent block */
+		ext_size = sizeof(struct ext4_extent_header) +
+		   (sizeof(struct ext4_extent) * le16_to_cpu(neh->eh_entries));
+		memset(bh->b_data + ext_size, 0,
+			inode->i_sb->s_blocksize - ext_size);
+>>>>>>> common/deprecated/android-3.18
 		ext4_extent_block_csum_set(inode, neh);
 		set_buffer_uptodate(bh);
 		unlock_buffer(bh);
@@ -1317,6 +1433,10 @@ static int ext4_ext_grow_indepth(handle_t *handle, struct inode *inode,
 	ext4_fsblk_t newblock, goal = 0;
 	struct ext4_super_block *es = EXT4_SB(inode->i_sb)->s_es;
 	int err = 0;
+<<<<<<< HEAD
+=======
+	size_t ext_size = 0;
+>>>>>>> common/deprecated/android-3.18
 
 	/* Try to prepend new index to old one */
 	if (ext_depth(inode))
@@ -1342,9 +1462,17 @@ static int ext4_ext_grow_indepth(handle_t *handle, struct inode *inode,
 		goto out;
 	}
 
+<<<<<<< HEAD
 	/* move top-level index/leaf into new block */
 	memmove(bh->b_data, EXT4_I(inode)->i_data,
 		sizeof(EXT4_I(inode)->i_data));
+=======
+	ext_size = sizeof(EXT4_I(inode)->i_data);
+	/* move top-level index/leaf into new block */
+	memmove(bh->b_data, EXT4_I(inode)->i_data, ext_size);
+	/* zero out unused area in the extent block */
+	memset(bh->b_data + ext_size, 0, inode->i_sb->s_blocksize - ext_size);
+>>>>>>> common/deprecated/android-3.18
 
 	/* set size of new block */
 	neh = ext_block_hdr(bh);
@@ -3160,6 +3288,12 @@ static int ext4_ext_zeroout(struct inode *inode, struct ext4_extent *ex)
 	ee_len    = ext4_ext_get_actual_len(ex);
 	ee_pblock = ext4_ext_pblock(ex);
 
+<<<<<<< HEAD
+=======
+	if (ext4_encrypted_inode(inode))
+		return ext4_encrypted_zeroout(inode, ex);
+
+>>>>>>> common/deprecated/android-3.18
 	ret = sb_issue_zeroout(inode->i_sb, ee_pblock, ee_len, GFP_NOFS);
 	if (ret > 0)
 		ret = 0;
@@ -3267,7 +3401,14 @@ static int ext4_split_extent_at(handle_t *handle,
 		ext4_ext_mark_unwritten(ex2);
 
 	err = ext4_ext_insert_extent(handle, inode, ppath, &newex, flags);
+<<<<<<< HEAD
 	if (err == -ENOSPC && (EXT4_EXT_MAY_ZEROOUT & split_flag)) {
+=======
+	if (err != -ENOSPC && err != -EDQUOT)
+		goto out;
+
+	if (EXT4_EXT_MAY_ZEROOUT & split_flag) {
+>>>>>>> common/deprecated/android-3.18
 		if (split_flag & (EXT4_EXT_DATA_VALID1|EXT4_EXT_DATA_VALID2)) {
 			if (split_flag & EXT4_EXT_DATA_VALID1) {
 				err = ext4_ext_zeroout(inode, ex2);
@@ -3293,6 +3434,7 @@ static int ext4_split_extent_at(handle_t *handle,
 					      ext4_ext_pblock(&orig_ex));
 		}
 
+<<<<<<< HEAD
 		if (err)
 			goto fix_extent_len;
 		/* update the extent length and mark as initialized */
@@ -3312,11 +3454,35 @@ static int ext4_split_extent_at(handle_t *handle,
 out:
 	ext4_ext_show_leaf(inode, path);
 	return err;
+=======
+		if (!err) {
+			/* update the extent length and mark as initialized */
+			ex->ee_len = cpu_to_le16(ee_len);
+			ext4_ext_try_to_merge(handle, inode, path, ex);
+			err = ext4_ext_dirty(handle, inode, path + path->p_depth);
+			if (!err)
+				/* update extent status tree */
+				err = ext4_zeroout_es(inode, &zero_ex);
+			/* If we failed at this point, we don't know in which
+			 * state the extent tree exactly is so don't try to fix
+			 * length of the original extent as it may do even more
+			 * damage.
+			 */
+			goto out;
+		}
+	}
+>>>>>>> common/deprecated/android-3.18
 
 fix_extent_len:
 	ex->ee_len = orig_ex.ee_len;
 	ext4_ext_dirty(handle, inode, path + path->p_depth);
 	return err;
+<<<<<<< HEAD
+=======
+out:
+	ext4_ext_show_leaf(inode, path);
+	return err;
+>>>>>>> common/deprecated/android-3.18
 }
 
 /*
@@ -3445,8 +3611,13 @@ static int ext4_ext_convert_to_initialized(handle_t *handle,
 		(unsigned long long)map->m_lblk, map_len);
 
 	sbi = EXT4_SB(inode->i_sb);
+<<<<<<< HEAD
 	eof_block = (inode->i_size + inode->i_sb->s_blocksize - 1) >>
 		inode->i_sb->s_blocksize_bits;
+=======
+	eof_block = (EXT4_I(inode)->i_disksize + inode->i_sb->s_blocksize - 1)
+			>> inode->i_sb->s_blocksize_bits;
+>>>>>>> common/deprecated/android-3.18
 	if (eof_block < map->m_lblk + map_len)
 		eof_block = map->m_lblk + map_len;
 
@@ -3588,10 +3759,21 @@ static int ext4_ext_convert_to_initialized(handle_t *handle,
 	 */
 	split_flag |= ee_block + ee_len <= eof_block ? EXT4_EXT_MAY_ZEROOUT : 0;
 
+<<<<<<< HEAD
 	if (EXT4_EXT_MAY_ZEROOUT & split_flag)
 		max_zeroout = sbi->s_extent_max_zeroout_kb >>
 			(inode->i_sb->s_blocksize_bits - 10);
 
+=======
+	if ((EXT4_EXT_MAY_ZEROOUT & split_flag) &&
+	    !ext4_encrypted_inode(inode))
+		max_zeroout = sbi->s_extent_max_zeroout_kb >>
+			(inode->i_sb->s_blocksize_bits - 10);
+
+	if (ext4_encrypted_inode(inode))
+		max_zeroout = 0;
+
+>>>>>>> common/deprecated/android-3.18
 	/* If extent is less than s_max_zeroout_kb, zeroout directly */
 	if (max_zeroout && (ee_len <= max_zeroout)) {
 		err = ext4_ext_zeroout(inode, ex);
@@ -3704,8 +3886,13 @@ static int ext4_split_convert_extents(handle_t *handle,
 		  __func__, inode->i_ino,
 		  (unsigned long long)map->m_lblk, map->m_len);
 
+<<<<<<< HEAD
 	eof_block = (inode->i_size + inode->i_sb->s_blocksize - 1) >>
 		inode->i_sb->s_blocksize_bits;
+=======
+	eof_block = (EXT4_I(inode)->i_disksize + inode->i_sb->s_blocksize - 1)
+			>> inode->i_sb->s_blocksize_bits;
+>>>>>>> common/deprecated/android-3.18
 	if (eof_block < map->m_lblk + map->m_len)
 		eof_block = map->m_lblk + map->m_len;
 	/*
@@ -4768,6 +4955,10 @@ retry:
 						    EXT4_INODE_EOFBLOCKS);
 		}
 		ext4_mark_inode_dirty(handle, inode);
+<<<<<<< HEAD
+=======
+		ext4_update_inode_fsync_trans(handle, inode, 1);
+>>>>>>> common/deprecated/android-3.18
 		ret2 = ext4_journal_stop(handle);
 		if (ret2)
 			break;
@@ -4841,12 +5032,15 @@ static long ext4_zero_range(struct file *file, loff_t offset,
 	else
 		max_blocks -= lblk;
 
+<<<<<<< HEAD
 	flags = EXT4_GET_BLOCKS_CREATE_UNWRIT_EXT |
 		EXT4_GET_BLOCKS_CONVERT_UNWRITTEN |
 		EXT4_EX_NOCACHE;
 	if (mode & FALLOC_FL_KEEP_SIZE)
 		flags |= EXT4_GET_BLOCKS_KEEP_SIZE;
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	mutex_lock(&inode->i_mutex);
 
 	/*
@@ -4858,11 +5052,17 @@ static long ext4_zero_range(struct file *file, loff_t offset,
 	}
 
 	if (!(mode & FALLOC_FL_KEEP_SIZE) &&
+<<<<<<< HEAD
 	     offset + len > i_size_read(inode)) {
+=======
+	    (offset + len > i_size_read(inode) ||
+	     offset + len > EXT4_I(inode)->i_disksize)) {
+>>>>>>> common/deprecated/android-3.18
 		new_size = offset + len;
 		ret = inode_newsize_ok(inode, new_size);
 		if (ret)
 			goto out_mutex;
+<<<<<<< HEAD
 		/*
 		 * If we have a partial block after EOF we have to allocate
 		 * the entire block.
@@ -4872,6 +5072,33 @@ static long ext4_zero_range(struct file *file, loff_t offset,
 	}
 
 	if (max_blocks > 0) {
+=======
+	}
+
+	flags = EXT4_GET_BLOCKS_CREATE_UNWRIT_EXT;
+	if (mode & FALLOC_FL_KEEP_SIZE)
+		flags |= EXT4_GET_BLOCKS_KEEP_SIZE;
+
+	/* Preallocate the range including the unaligned edges */
+	if (partial_begin || partial_end) {
+		ret = ext4_alloc_file_blocks(file,
+				round_down(offset, 1 << blkbits) >> blkbits,
+				(round_up((offset + len), 1 << blkbits) -
+				 round_down(offset, 1 << blkbits)) >> blkbits,
+				new_size, flags, mode);
+		if (ret)
+			goto out_mutex;
+
+	}
+
+	/* Zero range excluding the unaligned edges */
+	if (max_blocks > 0) {
+		flags |= (EXT4_GET_BLOCKS_CONVERT_UNWRITTEN |
+			  EXT4_EX_NOCACHE);
+		ret = ext4_update_disksize_before_punch(inode, offset, len);
+		if (ret)
+			goto out_dio;
+>>>>>>> common/deprecated/android-3.18
 
 		/* Now release the pages and zero block aligned part of pages*/
 		truncate_pagecache_range(inode, start, end - 1);
@@ -4885,6 +5112,7 @@ static long ext4_zero_range(struct file *file, loff_t offset,
 					     flags, mode);
 		if (ret)
 			goto out_dio;
+<<<<<<< HEAD
 		/*
 		 * Remove entire range from the extent status tree.
 		 *
@@ -4898,6 +5126,8 @@ static long ext4_zero_range(struct file *file, loff_t offset,
 		ret = ext4_es_remove_extent(inode, 0, EXT_MAX_BLOCKS);
 		if (ret)
 			goto out_dio;
+=======
+>>>>>>> common/deprecated/android-3.18
 	}
 	if (!partial_begin && !partial_end)
 		goto out_dio;
@@ -4960,6 +5190,23 @@ long ext4_fallocate(struct file *file, int mode, loff_t offset, loff_t len)
 	ext4_lblk_t lblk;
 	unsigned int blkbits = inode->i_blkbits;
 
+<<<<<<< HEAD
+=======
+	/*
+	 * Encrypted inodes can't handle collapse range or insert
+	 * range since we would need to re-encrypt blocks with a
+	 * different IV or XTS tweak (which are based on the logical
+	 * block number).
+	 *
+	 * XXX It's not clear why zero range isn't working, but we'll
+	 * leave it disabled for encrypted inodes for now.  This is a
+	 * bug we should fix....
+	 */
+	if (ext4_encrypted_inode(inode) &&
+	    (mode & (FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_ZERO_RANGE)))
+		return -EOPNOTSUPP;
+
+>>>>>>> common/deprecated/android-3.18
 	/* Return error if mode is not supported */
 	if (mode & ~(FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE |
 		     FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_ZERO_RANGE))
@@ -5002,7 +5249,12 @@ long ext4_fallocate(struct file *file, int mode, loff_t offset, loff_t len)
 	}
 
 	if (!(mode & FALLOC_FL_KEEP_SIZE) &&
+<<<<<<< HEAD
 	     offset + len > i_size_read(inode)) {
+=======
+	    (offset + len > i_size_read(inode) ||
+	     offset + len > EXT4_I(inode)->i_disksize)) {
+>>>>>>> common/deprecated/android-3.18
 		new_size = offset + len;
 		ret = inode_newsize_ok(inode, new_size);
 		if (ret)
@@ -5359,7 +5611,12 @@ ext4_ext_shift_extents(struct inode *inode, handle_t *handle,
 	ext4_lblk_t ex_start, ex_end;
 
 	/* Let path point to the last extent */
+<<<<<<< HEAD
 	path = ext4_find_extent(inode, EXT_MAX_BLOCKS - 1, NULL, 0);
+=======
+	path = ext4_find_extent(inode, EXT_MAX_BLOCKS - 1, NULL,
+				EXT4_EX_NOCACHE);
+>>>>>>> common/deprecated/android-3.18
 	if (IS_ERR(path))
 		return PTR_ERR(path);
 
@@ -5379,7 +5636,12 @@ ext4_ext_shift_extents(struct inode *inode, handle_t *handle,
 	 * Don't start shifting extents until we make sure the hole is big
 	 * enough to accomodate the shift.
 	 */
+<<<<<<< HEAD
 	path = ext4_find_extent(inode, start - 1, &path, 0);
+=======
+	path = ext4_find_extent(inode, start - 1, &path,
+				EXT4_EX_NOCACHE);
+>>>>>>> common/deprecated/android-3.18
 	if (IS_ERR(path))
 		return PTR_ERR(path);
 	depth = path->p_depth;
@@ -5399,7 +5661,12 @@ ext4_ext_shift_extents(struct inode *inode, handle_t *handle,
 
 	/* Its safe to start updating extents */
 	while (start < stop_block) {
+<<<<<<< HEAD
 		path = ext4_find_extent(inode, start, &path, 0);
+=======
+		path = ext4_find_extent(inode, start, &path,
+					EXT4_EX_NOCACHE);
+>>>>>>> common/deprecated/android-3.18
 		if (IS_ERR(path))
 			return PTR_ERR(path);
 		depth = path->p_depth;
@@ -5443,6 +5710,17 @@ int ext4_collapse_range(struct inode *inode, loff_t offset, loff_t len)
 	loff_t new_size, ioffset;
 	int ret;
 
+<<<<<<< HEAD
+=======
+	/*
+	 * We need to test this early because xfstests assumes that a
+	 * collapse range of (0, 1) will return EOPNOTSUPP if the file
+	 * system does not support collapse range.
+	 */
+	if (!ext4_test_inode_flag(inode, EXT4_INODE_EXTENTS))
+		return -EOPNOTSUPP;
+
+>>>>>>> common/deprecated/android-3.18
 	/* Collapse range works only on fs block size aligned offsets. */
 	if (offset & (EXT4_CLUSTER_SIZE(sb) - 1) ||
 	    len & (EXT4_CLUSTER_SIZE(sb) - 1))

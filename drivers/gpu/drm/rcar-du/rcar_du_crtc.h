@@ -43,8 +43,11 @@ struct rcar_du_crtc {
 
 int rcar_du_crtc_create(struct rcar_du_group *rgrp, unsigned int index);
 void rcar_du_crtc_enable_vblank(struct rcar_du_crtc *rcrtc, bool enable);
+<<<<<<< HEAD
 void rcar_du_crtc_cancel_page_flip(struct rcar_du_crtc *rcrtc,
 				   struct drm_file *file);
+=======
+>>>>>>> common/deprecated/android-3.18
 void rcar_du_crtc_suspend(struct rcar_du_crtc *rcrtc);
 void rcar_du_crtc_resume(struct rcar_du_crtc *rcrtc);
 

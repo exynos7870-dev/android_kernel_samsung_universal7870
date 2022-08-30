@@ -3533,6 +3533,19 @@ static void bnx2x_drv_info_iscsi_stat(struct bnx2x *bp)
  */
 static void bnx2x_config_mf_bw(struct bnx2x *bp)
 {
+<<<<<<< HEAD
+=======
+	/* Workaround for MFW bug.
+	 * MFW is not supposed to generate BW attention in
+	 * single function mode.
+	 */
+	if (!IS_MF(bp)) {
+		DP(BNX2X_MSG_MCP,
+		   "Ignoring MF BW config in single function mode\n");
+		return;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	if (bp->link_vars.link_up) {
 		bnx2x_cmng_fns_init(bp, true, CMNG_FNS_MINMAX);
 		bnx2x_link_sync_notify(bp);
@@ -9307,7 +9320,12 @@ unload_error:
 	 * function stop ramrod is sent, since as part of this ramrod FW access
 	 * PTP registers.
 	 */
+<<<<<<< HEAD
 	bnx2x_stop_ptp(bp);
+=======
+	if (bp->flags & PTP_SUPPORTED)
+		bnx2x_stop_ptp(bp);
+>>>>>>> common/deprecated/android-3.18
 
 	/* Disable HW interrupts, NAPI */
 	bnx2x_netif_stop(bp, 1);
@@ -9471,6 +9489,18 @@ static int bnx2x_init_shmem(struct bnx2x *bp)
 
 	do {
 		bp->common.shmem_base = REG_RD(bp, MISC_REG_SHARED_MEM_ADDR);
+<<<<<<< HEAD
+=======
+
+		/* If we read all 0xFFs, means we are in PCI error state and
+		 * should bail out to avoid crashes on adapter's FW reads.
+		 */
+		if (bp->common.shmem_base == 0xFFFFFFFF) {
+			bp->flags |= NO_MCP_FLAG;
+			return -ENODEV;
+		}
+
+>>>>>>> common/deprecated/android-3.18
 		if (bp->common.shmem_base) {
 			val = SHMEM_RD(bp, validity_map[BP_PORT(bp)]);
 			if (val & SHR_MEM_VALIDITY_MB)
@@ -9824,10 +9854,25 @@ static void bnx2x_recovery_failed(struct bnx2x *bp)
  */
 static void bnx2x_parity_recover(struct bnx2x *bp)
 {
+<<<<<<< HEAD
 	bool global = false;
 	u32 error_recovered, error_unrecovered;
 	bool is_parity;
 
+=======
+	u32 error_recovered, error_unrecovered;
+	bool is_parity, global = false;
+#ifdef CONFIG_BNX2X_SRIOV
+	int vf_idx;
+
+	for (vf_idx = 0; vf_idx < bp->requested_nr_virtfn; vf_idx++) {
+		struct bnx2x_virtf *vf = BP_VF(bp, vf_idx);
+
+		if (vf)
+			vf->state = VF_LOST;
+	}
+#endif
+>>>>>>> common/deprecated/android-3.18
 	DP(NETIF_MSG_HW, "Handling parity\n");
 	while (1) {
 		switch (bp->recovery_state) {
@@ -10026,6 +10071,15 @@ static void bnx2x_sp_rtnl_task(struct work_struct *work)
 		bp->sp_rtnl_state = 0;
 		smp_mb();
 
+<<<<<<< HEAD
+=======
+		/* Immediately indicate link as down */
+		bp->link_vars.link_up = 0;
+		bp->force_link_down = true;
+		netif_carrier_off(bp->dev);
+		BNX2X_ERR("Indicating link is down due to Tx-timeout\n");
+
+>>>>>>> common/deprecated/android-3.18
 		bnx2x_nic_unload(bp, UNLOAD_NORMAL, true);
 		bnx2x_nic_load(bp, LOAD_NORMAL);
 
@@ -13201,7 +13255,11 @@ static int bnx2x_ptp_adjfreq(struct ptp_clock_info *ptp, s32 ppb)
 	if (!netif_running(bp->dev)) {
 		DP(BNX2X_MSG_PTP,
 		   "PTP adjfreq called while the interface is down\n");
+<<<<<<< HEAD
 		return -EFAULT;
+=======
+		return -ENETDOWN;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	if (ppb < 0) {
@@ -13261,6 +13319,15 @@ static int bnx2x_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
 	struct bnx2x *bp = container_of(ptp, struct bnx2x, ptp_clock_info);
 	u64 now;
 
+<<<<<<< HEAD
+=======
+	if (!netif_running(bp->dev)) {
+		DP(BNX2X_MSG_PTP,
+		   "PTP adjtime called while the interface is down\n");
+		return -ENETDOWN;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	DP(BNX2X_MSG_PTP, "PTP adjtime called, delta = %llx\n", delta);
 
 	now = timecounter_read(&bp->timecounter);
@@ -13277,6 +13344,15 @@ static int bnx2x_ptp_gettime(struct ptp_clock_info *ptp, struct timespec *ts)
 	u64 ns;
 	u32 remainder;
 
+<<<<<<< HEAD
+=======
+	if (!netif_running(bp->dev)) {
+		DP(BNX2X_MSG_PTP,
+		   "PTP gettime called while the interface is down\n");
+		return -ENETDOWN;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	ns = timecounter_read(&bp->timecounter);
 
 	DP(BNX2X_MSG_PTP, "PTP gettime called, ns = %llu\n", ns);
@@ -13293,6 +13369,15 @@ static int bnx2x_ptp_settime(struct ptp_clock_info *ptp,
 	struct bnx2x *bp = container_of(ptp, struct bnx2x, ptp_clock_info);
 	u64 ns;
 
+<<<<<<< HEAD
+=======
+	if (!netif_running(bp->dev)) {
+		DP(BNX2X_MSG_PTP,
+		   "PTP settime called while the interface is down\n");
+		return -ENETDOWN;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	ns = ts->tv_sec * 1000000000ULL;
 	ns += ts->tv_nsec;
 
@@ -13742,7 +13827,14 @@ static pci_ers_result_t bnx2x_io_slot_reset(struct pci_dev *pdev)
 		BNX2X_ERR("IO slot reset --> driver unload\n");
 
 		/* MCP should have been reset; Need to wait for validity */
+<<<<<<< HEAD
 		bnx2x_init_shmem(bp);
+=======
+		if (bnx2x_init_shmem(bp)) {
+			rtnl_unlock();
+			return PCI_ERS_RESULT_DISCONNECT;
+		}
+>>>>>>> common/deprecated/android-3.18
 
 		if (IS_PF(bp) && SHMEM2_HAS(bp, drv_capabilities_flag)) {
 			u32 v;
@@ -14606,7 +14698,11 @@ static void bnx2x_init_cyclecounter(struct bnx2x *bp)
 {
 	memset(&bp->cyclecounter, 0, sizeof(bp->cyclecounter));
 	bp->cyclecounter.read = bnx2x_cyclecounter_read;
+<<<<<<< HEAD
 	bp->cyclecounter.mask = CLOCKSOURCE_MASK(64);
+=======
+	bp->cyclecounter.mask = CYCLECOUNTER_MASK(64);
+>>>>>>> common/deprecated/android-3.18
 	bp->cyclecounter.shift = 1;
 	bp->cyclecounter.mult = 1;
 }

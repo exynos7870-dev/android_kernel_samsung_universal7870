@@ -174,6 +174,11 @@ static int spufs_arch_write_note(struct spu_context *ctx, int i,
 	if (!dump_skip(cprm,
 		       roundup(cprm->written - total + sz, 4) - cprm->written))
 		goto Eio;
+<<<<<<< HEAD
+=======
+
+	rc = 0;
+>>>>>>> common/deprecated/android-3.18
 out:
 	free_page((unsigned long)buf);
 	return rc;

@@ -30,9 +30,12 @@ int sysctl_nr_open_min = BITS_PER_LONG;
 int sysctl_nr_open_max = __const_max(INT_MAX, ~(size_t)0/sizeof(void *)) &
 			 -BITS_PER_LONG;
 
+<<<<<<< HEAD
 #ifdef CONFIG_SEC_DEBUG_FILE_LEAK
 extern void	sec_debug_EMFILE_error_proc(unsigned long files_addr);
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 static void *alloc_fdmem(size_t size)
 {
 	/*
@@ -65,7 +68,11 @@ static void free_fdtable_rcu(struct rcu_head *rcu)
  */
 static void copy_fdtable(struct fdtable *nfdt, struct fdtable *ofdt)
 {
+<<<<<<< HEAD
 	unsigned int cpy, set;
+=======
+	size_t cpy, set;
+>>>>>>> common/deprecated/android-3.18
 
 	BUG_ON(nfdt->max_fds < ofdt->max_fds);
 
@@ -158,9 +165,12 @@ static int expand_fdtable(struct files_struct *files, int nr)
 	 * caller and alloc_fdtable().  Cheaper to catch it here...
 	 */
 	if (unlikely(new_fdt->max_fds <= nr)) {
+<<<<<<< HEAD
 #ifdef CONFIG_SEC_DEBUG_FILE_LEAK
 		sec_debug_EMFILE_error_proc((unsigned long)files);
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 		__free_fdtable(new_fdt);
 		return -EMFILE;
 	}
@@ -201,12 +211,17 @@ static int expand_files(struct files_struct *files, int nr)
 		return 0;
 
 	/* Can we expand? */
+<<<<<<< HEAD
 	if (nr >= sysctl_nr_open) {
 #ifdef CONFIG_SEC_DEBUG_FILE_LEAK
 		sec_debug_EMFILE_error_proc((unsigned long)files);
 #endif	
 		return -EMFILE;
 	}
+=======
+	if (nr >= sysctl_nr_open)
+		return -EMFILE;
+>>>>>>> common/deprecated/android-3.18
 
 	/* All good, so we try */
 	return expand_fdtable(files, nr);
@@ -294,9 +309,12 @@ struct files_struct *dup_fd(struct files_struct *oldf, int *errorp)
 
 		/* beyond sysctl_nr_open; nothing to do */
 		if (unlikely(new_fdt->max_fds < open_files)) {
+<<<<<<< HEAD
 #ifdef CONFIG_SEC_DEBUG_FILE_LEAK
 			sec_debug_EMFILE_error_proc((unsigned long)oldf);
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 			__free_fdtable(new_fdt);
 			*errorp = -EMFILE;
 			goto out_release;
@@ -477,12 +495,17 @@ repeat:
 	 * will limit the total number of files that can be opened.
 	 */
 	error = -EMFILE;
+<<<<<<< HEAD
 	if (fd >= end) {
 #ifdef CONFIG_SEC_DEBUG_FILE_LEAK
 		sec_debug_EMFILE_error_proc((unsigned long)files);
 #endif		
 		goto out;
 	}
+=======
+	if (fd >= end)
+		goto out;
+>>>>>>> common/deprecated/android-3.18
 
 	error = expand_files(files, fd);
 	if (error < 0)
@@ -843,12 +866,17 @@ SYSCALL_DEFINE3(dup3, unsigned int, oldfd, unsigned int, newfd, int, flags)
 	if (unlikely(oldfd == newfd))
 		return -EINVAL;
 
+<<<<<<< HEAD
 	if (newfd >= rlimit(RLIMIT_NOFILE)) {
 #ifdef CONFIG_SEC_DEBUG_FILE_LEAK
  		sec_debug_EMFILE_error_proc((unsigned long)files);
 #endif
 		return -EBADF;
 	}
+=======
+	if (newfd >= rlimit(RLIMIT_NOFILE))
+		return -EBADF;
+>>>>>>> common/deprecated/android-3.18
 
 	spin_lock(&files->file_lock);
 	err = expand_files(files, newfd);

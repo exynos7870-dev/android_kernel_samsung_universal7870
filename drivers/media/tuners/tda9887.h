@@ -21,7 +21,11 @@
 #include "dvb_frontend.h"
 
 /* ------------------------------------------------------------------------ */
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_MEDIA_TUNER_TDA9887)
+=======
+#if IS_REACHABLE(CONFIG_MEDIA_TUNER_TDA9887)
+>>>>>>> common/deprecated/android-3.18
 extern struct dvb_frontend *tda9887_attach(struct dvb_frontend *fe,
 					   struct i2c_adapter *i2c_adap,
 					   u8 i2c_addr);

@@ -255,7 +255,11 @@ debug_trap:
 	mov.l	@r8, r8
 	jsr	@r8
 	 nop
+<<<<<<< HEAD
 	bra	__restore_all
+=======
+	bra	ret_from_exception
+>>>>>>> common/deprecated/android-3.18
 	 nop
 	CFI_ENDPROC
 

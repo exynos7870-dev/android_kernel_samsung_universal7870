@@ -617,6 +617,7 @@ void mark_buffer_dirty_inode(struct buffer_head *bh, struct inode *inode)
 }
 EXPORT_SYMBOL(mark_buffer_dirty_inode);
 
+<<<<<<< HEAD
 void mark_buffer_dirty_inode_sync(struct buffer_head *bh, struct inode *inode)
 {
 	set_buffer_sync_flush(bh);
@@ -624,6 +625,8 @@ void mark_buffer_dirty_inode_sync(struct buffer_head *bh, struct inode *inode)
 }
 EXPORT_SYMBOL(mark_buffer_dirty_inode_sync);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * Mark the page dirty, and set it dirty in the radix tree, and mark the inode
  * dirty.
@@ -1174,6 +1177,7 @@ void mark_buffer_dirty(struct buffer_head *bh)
 }
 EXPORT_SYMBOL(mark_buffer_dirty);
 
+<<<<<<< HEAD
 void mark_buffer_dirty_sync(struct buffer_head *bh)
 {
 	WARN_ON_ONCE(!buffer_uptodate(bh));
@@ -1202,6 +1206,8 @@ void mark_buffer_dirty_sync(struct buffer_head *bh)
 }
 EXPORT_SYMBOL(mark_buffer_dirty_sync);
 
+=======
+>>>>>>> common/deprecated/android-3.18
 /*
  * Decrement a buffer_head's reference count.  If all buffers against a page
  * have zero reference count, are clean and unlocked, and if the page is clean
@@ -3021,6 +3027,16 @@ void guard_bio_eod(int rw, struct bio *bio)
 	/* Uhhuh. We've got a bio that straddles the device size! */
 	truncated_bytes = bio->bi_iter.bi_size - (maxsector << 9);
 
+<<<<<<< HEAD
+=======
+	/*
+	 * The bio contains more than one segment which spans EOD, just return
+	 * and let IO layer turn it into an EIO
+	 */
+	if (truncated_bytes > bvec->bv_len)
+		return;
+
+>>>>>>> common/deprecated/android-3.18
 	/* Truncate the bio.. */
 	bio->bi_iter.bi_size -= truncated_bytes;
 	bvec->bv_len -= truncated_bytes;
@@ -3076,6 +3092,7 @@ int _submit_bh(int rw, struct buffer_head *bh, unsigned long bio_flags)
 	if (buffer_prio(bh))
 		rw |= REQ_PRIO;
 
+<<<<<<< HEAD
 	if(buffer_sync_flush(bh)) {
 		rw |= REQ_SYNC;
 		clear_buffer_sync_flush(bh);
@@ -3092,6 +3109,8 @@ int _submit_bh(int rw, struct buffer_head *bh, unsigned long bio_flags)
 	}
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	bio_get(bio);
 	submit_bio(rw, bio);
 

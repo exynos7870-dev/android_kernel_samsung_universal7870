@@ -428,6 +428,10 @@
 
 			pwm4: pwm@53fc8000 {
 				compatible = "fsl,imx25-pwm", "fsl,imx27-pwm";
+<<<<<<< HEAD
+=======
+				#pwm-cells = <2>;
+>>>>>>> common/deprecated/android-3.18
 				reg = <0x53fc8000 0x4000>;
 				clocks = <&clks 108>, <&clks 52>;
 				clock-names = "ipg", "per";

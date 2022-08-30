@@ -1077,6 +1077,11 @@ static struct pci_driver snbep_uncore_pci_driver = {
 	.id_table	= snbep_uncore_pci_ids,
 };
 
+<<<<<<< HEAD
+=======
+#define NODE_ID_MASK	0x7
+
+>>>>>>> common/deprecated/android-3.18
 /*
  * build pci bus to socket mapping
  */
@@ -1097,7 +1102,11 @@ static int snbep_pci2phy_map_init(int devid)
 		err = pci_read_config_dword(ubox_dev, 0x40, &config);
 		if (err)
 			break;
+<<<<<<< HEAD
 		nodeid = config;
+=======
+		nodeid = config & NODE_ID_MASK;
+>>>>>>> common/deprecated/android-3.18
 		/* get the Node ID mapping */
 		err = pci_read_config_dword(ubox_dev, 0x54, &config);
 		if (err)

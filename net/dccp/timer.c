@@ -252,12 +252,19 @@ static void dccp_write_xmitlet(unsigned long data)
 	else
 		dccp_write_xmit(sk);
 	bh_unlock_sock(sk);
+<<<<<<< HEAD
+=======
+	sock_put(sk);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void dccp_write_xmit_timer(unsigned long data)
 {
 	dccp_write_xmitlet(data);
+<<<<<<< HEAD
 	sock_put((struct sock *)data);
+=======
+>>>>>>> common/deprecated/android-3.18
 }
 
 void dccp_init_xmit_timers(struct sock *sk)

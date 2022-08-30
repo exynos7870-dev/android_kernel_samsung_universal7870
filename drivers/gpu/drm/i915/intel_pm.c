@@ -2952,6 +2952,11 @@ static void ilk_pipe_wm_get_hw_state(struct drm_crtc *crtc)
 	if (IS_HASWELL(dev) || IS_BROADWELL(dev))
 		hw->wm_linetime[pipe] = I915_READ(PIPE_WM_LINETIME(pipe));
 
+<<<<<<< HEAD
+=======
+	memset(active, 0, sizeof(*active));
+
+>>>>>>> common/deprecated/android-3.18
 	active->pipe_enabled = intel_crtc_active(crtc);
 
 	if (active->pipe_enabled) {
@@ -5691,6 +5696,13 @@ static void haswell_init_clock_gating(struct drm_device *dev)
 	I915_WRITE(GEN7_GT_MODE,
 		   GEN6_WIZ_HASHING_MASK | GEN6_WIZ_HASHING_16x4);
 
+<<<<<<< HEAD
+=======
+	/* WaSampleCChickenBitEnable:hsw */
+	I915_WRITE(HALF_SLICE_CHICKEN3,
+		   _MASKED_BIT_ENABLE(HSW_SAMPLE_C_PERFORMANCE));
+
+>>>>>>> common/deprecated/android-3.18
 	/* WaSwitchSolVfFArbitrationPriority:hsw */
 	I915_WRITE(GAM_ECOCHK, I915_READ(GAM_ECOCHK) | HSW_ECOCHK_ARB_PRIO_SOL);
 

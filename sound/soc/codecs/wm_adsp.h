@@ -15,6 +15,7 @@
 
 #include <sound/soc.h>
 #include <sound/soc-dapm.h>
+<<<<<<< HEAD
 #include <sound/compress_driver.h>
 
 #include "wmfw.h"
@@ -39,6 +40,12 @@
 		WM_ADSP2_REGION_6 | WM_ADSP2_REGION_7 | \
 		WM_ADSP2_REGION_8 | WM_ADSP2_REGION_9)
 #define WM_ADSP2_REGION_ALL (WM_ADSP2_REGION_0 | WM_ADSP2_REGION_1_9)
+=======
+
+#include "wmfw.h"
+
+struct regulator;
+>>>>>>> common/deprecated/android-3.18
 
 struct wm_adsp_region {
 	int type;
@@ -50,6 +57,7 @@ struct wm_adsp_alg_region {
 	unsigned int alg;
 	int type;
 	unsigned int base;
+<<<<<<< HEAD
 };
 
 struct wm_adsp_compr;
@@ -58,37 +66,61 @@ struct wm_adsp_compr_buf;
 struct wm_adsp {
 	const char *part;
 	int rev;
+=======
+	size_t len;
+};
+
+struct wm_adsp {
+	const char *part;
+>>>>>>> common/deprecated/android-3.18
 	int num;
 	int type;
 	struct device *dev;
 	struct regmap *regmap;
+<<<<<<< HEAD
 	struct snd_soc_codec *codec;
 
 	int base;
 	int base_sysinfo;
+=======
+	struct snd_soc_card *card;
+
+	int base;
+>>>>>>> common/deprecated/android-3.18
 	int sysclk_reg;
 	int sysclk_mask;
 	int sysclk_shift;
 
 	struct list_head alg_regions;
 
+<<<<<<< HEAD
 	unsigned int fw_id;
 	unsigned int fw_id_version;
 	unsigned int fw_vendor_id;
+=======
+	int fw_id;
+>>>>>>> common/deprecated/android-3.18
 
 	const struct wm_adsp_region *mem;
 	int num_mems;
 
 	int fw;
+<<<<<<< HEAD
 	int fw_ver;
 
 	u32 preloaded;
 	u32 booted;
 	u32 running;
+=======
+	bool running;
+
+	struct regulator *dvfs;
+>>>>>>> common/deprecated/android-3.18
 
 	struct list_head ctl_list;
 
 	struct work_struct boot_work;
+<<<<<<< HEAD
 
 	struct wm_adsp_compr *compr;
 	struct wm_adsp_compr_buf *buffer;
@@ -112,12 +144,15 @@ struct wm_adsp {
 #endif
 
 	void (*fwevent_cb)(struct wm_adsp *dsp, int eventid);
+=======
+>>>>>>> common/deprecated/android-3.18
 };
 
 #define WM_ADSP1(wname, num) \
 	SND_SOC_DAPM_PGA_E(wname, SND_SOC_NOPM, num, 0, NULL, 0, \
 		wm_adsp1_event, SND_SOC_DAPM_POST_PMU | SND_SOC_DAPM_PRE_PMD)
 
+<<<<<<< HEAD
 #define WM_ADSP2_PRELOAD_SWITCH(wname, num) \
 	SOC_SINGLE_EXT(wname " Preload Switch", SND_SOC_NOPM, num, 1, 0, \
 		wm_adsp2_preloader_get, wm_adsp2_preloader_put)
@@ -128,10 +163,17 @@ struct wm_adsp {
 	.reg = SND_SOC_NOPM, .shift = num, .event = event_fn, \
 	.event_flags = SND_SOC_DAPM_PRE_PMU | SND_SOC_DAPM_PRE_PMD, \
 	.subseq = 100, /* Ensure we run after SYSCLK supply widget */ }, \
+=======
+#define WM_ADSP2(wname, num) \
+{	.id = snd_soc_dapm_dai_link, .name = wname " Preloader", \
+	.reg = SND_SOC_NOPM, .shift = num, .event = wm_adsp2_early_event, \
+	.event_flags = SND_SOC_DAPM_PRE_PMU }, \
+>>>>>>> common/deprecated/android-3.18
 {	.id = snd_soc_dapm_out_drv, .name = wname, \
 	.reg = SND_SOC_NOPM, .shift = num, .event = wm_adsp2_event, \
 	.event_flags = SND_SOC_DAPM_POST_PMU | SND_SOC_DAPM_PRE_PMD }
 
+<<<<<<< HEAD
 #define WM_HALO(wname, num, event_fn) \
 	SND_SOC_DAPM_SPK(wname " Preload", NULL), \
 {	.id = snd_soc_dapm_supply, .name = wname " Preloader", \
@@ -192,4 +234,18 @@ int wm_adsp_compr_copy(struct snd_compr_stream *stream,
 
 extern int wm_adsp_handle_fw_event(struct wm_adsp *dsp);
 
+=======
+extern const struct snd_kcontrol_new wm_adsp1_fw_controls[];
+extern const struct snd_kcontrol_new wm_adsp2_fw_controls[];
+
+int wm_adsp1_init(struct wm_adsp *adsp);
+int wm_adsp2_init(struct wm_adsp *adsp, bool dvfs);
+int wm_adsp1_event(struct snd_soc_dapm_widget *w,
+		   struct snd_kcontrol *kcontrol, int event);
+int wm_adsp2_early_event(struct snd_soc_dapm_widget *w,
+			 struct snd_kcontrol *kcontrol, int event);
+int wm_adsp2_event(struct snd_soc_dapm_widget *w,
+		   struct snd_kcontrol *kcontrol, int event);
+
+>>>>>>> common/deprecated/android-3.18
 #endif

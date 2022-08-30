@@ -23,6 +23,10 @@ armadeus	ARMadeus Systems SARL
 atmel	Atmel Corporation
 auo	AU Optronics Corporation
 avago	Avago Technologies
+<<<<<<< HEAD
+=======
+avia	avia semiconductor
+>>>>>>> common/deprecated/android-3.18
 bosch	Bosch Sensortec GmbH
 brcm	Broadcom Corporation
 buffalo	Buffalo, Inc.
@@ -83,6 +87,10 @@ karo	Ka-Ro electronics GmbH
 keymile	Keymile GmbH
 lacie	LaCie
 lantiq	Lantiq Semiconductor
+<<<<<<< HEAD
+=======
+lego	LEGO Systems A/S
+>>>>>>> common/deprecated/android-3.18
 lenovo	Lenovo Group Ltd.
 lg	LG Corporation
 linux	Linux-specific binding

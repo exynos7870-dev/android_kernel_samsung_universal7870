@@ -281,7 +281,11 @@ static int pca955x_probe(struct i2c_client *client,
 			"slave address 0x%02x\n",
 			id->name, chip->bits, client->addr);
 
+<<<<<<< HEAD
 	if (!i2c_check_functionality(adapter, I2C_FUNC_I2C))
+=======
+	if (!i2c_check_functionality(adapter, I2C_FUNC_SMBUS_BYTE_DATA))
+>>>>>>> common/deprecated/android-3.18
 		return -EIO;
 
 	if (pdata) {

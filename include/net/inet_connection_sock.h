@@ -98,7 +98,12 @@ struct inet_connection_sock {
 	const struct tcp_congestion_ops *icsk_ca_ops;
 	const struct inet_connection_sock_af_ops *icsk_af_ops;
 	unsigned int		  (*icsk_sync_mss)(struct sock *sk, u32 pmtu);
+<<<<<<< HEAD
 	__u8			  icsk_ca_state;
+=======
+	__u8			  icsk_ca_state:7,
+				  icsk_ca_setsockopt:1;
+>>>>>>> common/deprecated/android-3.18
 	__u8			  icsk_retransmits;
 	__u8			  icsk_pending;
 	__u8			  icsk_backoff;
@@ -296,11 +301,14 @@ static inline int inet_csk_reqsk_queue_len(const struct sock *sk)
 	return reqsk_queue_len(&inet_csk(sk)->icsk_accept_queue);
 }
 
+<<<<<<< HEAD
 static inline int inet_csk_reqsk_queue_young(const struct sock *sk)
 {
 	return reqsk_queue_len_young(&inet_csk(sk)->icsk_accept_queue);
 }
 
+=======
+>>>>>>> common/deprecated/android-3.18
 static inline int inet_csk_reqsk_queue_is_full(const struct sock *sk)
 {
 	return reqsk_queue_is_full(&inet_csk(sk)->icsk_accept_queue);
@@ -349,5 +357,12 @@ int inet_csk_compat_getsockopt(struct sock *sk, int level, int optname,
 int inet_csk_compat_setsockopt(struct sock *sk, int level, int optname,
 			       char __user *optval, unsigned int optlen);
 
+<<<<<<< HEAD
+=======
+/* update the fast reuse flag when adding a socket */
+void inet_csk_update_fastreuse(struct inet_bind_bucket *tb,
+			       struct sock *sk);
+
+>>>>>>> common/deprecated/android-3.18
 struct dst_entry *inet_csk_update_pmtu(struct sock *sk, u32 mtu);
 #endif /* _INET_CONNECTION_SOCK_H */

@@ -100,5 +100,9 @@ void __init initmem_init(void)
 	printk(KERN_DEBUG "High memory starts at vaddr %08lx\n",
 			(ulong) pfn_to_kaddr(highstart_pfn));
 
+<<<<<<< HEAD
+=======
+	__vmalloc_start_set = true;
+>>>>>>> common/deprecated/android-3.18
 	setup_bootmem_allocator();
 }

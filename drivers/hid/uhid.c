@@ -12,6 +12,10 @@
 
 #include <linux/atomic.h>
 #include <linux/compat.h>
+<<<<<<< HEAD
+=======
+#include <linux/cred.h>
+>>>>>>> common/deprecated/android-3.18
 #include <linux/device.h>
 #include <linux/fs.h>
 #include <linux/hid.h>
@@ -24,11 +28,21 @@
 #include <linux/spinlock.h>
 #include <linux/uhid.h>
 #include <linux/wait.h>
+<<<<<<< HEAD
 #include <linux/fb.h>
+=======
+#include <linux/uaccess.h>
+#include <linux/eventpoll.h>
+>>>>>>> common/deprecated/android-3.18
 
 #define UHID_NAME	"uhid"
 #define UHID_BUFSIZE	32
 
+<<<<<<< HEAD
+=======
+static DEFINE_MUTEX(uhid_open_mutex);
+
+>>>>>>> common/deprecated/android-3.18
 struct uhid_device {
 	struct mutex devlock;
 	bool running;
@@ -52,11 +66,32 @@ struct uhid_device {
 	u32 report_id;
 	u32 report_type;
 	struct uhid_event report_buf;
+<<<<<<< HEAD
+=======
+	struct work_struct worker;
+>>>>>>> common/deprecated/android-3.18
 };
 
 static struct miscdevice uhid_misc;
 
+<<<<<<< HEAD
 bool lcd_is_on = true;
+=======
+static void uhid_device_add_worker(struct work_struct *work)
+{
+	struct uhid_device *uhid = container_of(work, struct uhid_device, worker);
+	int ret;
+
+	ret = hid_add_device(uhid->hid);
+	if (ret) {
+		hid_err(uhid->hid, "Cannot register HID device: error %d\n", ret);
+
+		hid_destroy_device(uhid->hid);
+		uhid->hid = NULL;
+		uhid->running = false;
+	}
+}
+>>>>>>> common/deprecated/android-3.18
 
 static void uhid_queue(struct uhid_device *uhid, struct uhid_event *ev)
 {
@@ -129,15 +164,35 @@ static void uhid_hid_stop(struct hid_device *hid)
 static int uhid_hid_open(struct hid_device *hid)
 {
 	struct uhid_device *uhid = hid->driver_data;
+<<<<<<< HEAD
 
 	return uhid_queue_event(uhid, UHID_OPEN);
+=======
+	int retval = 0;
+
+	mutex_lock(&uhid_open_mutex);
+	if (!hid->open++) {
+		retval = uhid_queue_event(uhid, UHID_OPEN);
+		if (retval)
+			hid->open--;
+	}
+	mutex_unlock(&uhid_open_mutex);
+	return retval;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static void uhid_hid_close(struct hid_device *hid)
 {
 	struct uhid_device *uhid = hid->driver_data;
 
+<<<<<<< HEAD
 	uhid_queue_event(uhid, UHID_CLOSE);
+=======
+	mutex_lock(&uhid_open_mutex);
+	if (!--hid->open)
+		uhid_queue_event(uhid, UHID_CLOSE);
+	mutex_unlock(&uhid_open_mutex);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int uhid_hid_parse(struct hid_device *hid)
@@ -164,7 +219,11 @@ static int __uhid_report_queue_and_wait(struct uhid_device *uhid,
 
 	ret = wait_event_interruptible_timeout(uhid->report_wait,
 				!uhid->report_running || !uhid->running,
+<<<<<<< HEAD
 				10/*5 * HZ*/);  // from 5000 to 10 due to BT stuck when connecting apple magic mouse during a2dp playing
+=======
+				5 * HZ);
+>>>>>>> common/deprecated/android-3.18
 	if (!ret || !uhid->running || uhid->report_running)
 		ret = -EIO;
 	else if (ret < 0)
@@ -501,6 +560,7 @@ static int uhid_dev_create2(struct uhid_device *uhid,
 	uhid->hid = hid;
 	uhid->running = true;
 
+<<<<<<< HEAD
 	ret = hid_add_device(hid);
 	if (ret) {
 		hid_err(hid, "Cannot register HID device\n");
@@ -513,6 +573,16 @@ err_hid:
 	hid_destroy_device(hid);
 	uhid->hid = NULL;
 	uhid->running = false;
+=======
+	/* Adding of a HID device is done through a worker, to allow HID drivers
+	 * which use feature requests during .probe to work, without they would
+	 * be blocked on devlock, which is held by uhid_char_write.
+	 */
+	schedule_work(&uhid->worker);
+
+	return 0;
+
+>>>>>>> common/deprecated/android-3.18
 err_free:
 	kfree(uhid->rd_data);
 	uhid->rd_data = NULL;
@@ -553,6 +623,11 @@ static int uhid_dev_destroy(struct uhid_device *uhid)
 	uhid->running = false;
 	wake_up_interruptible(&uhid->report_wait);
 
+<<<<<<< HEAD
+=======
+	cancel_work_sync(&uhid->worker);
+
+>>>>>>> common/deprecated/android-3.18
 	hid_destroy_device(uhid->hid);
 	kfree(uhid->rd_data);
 
@@ -615,6 +690,10 @@ static int uhid_char_open(struct inode *inode, struct file *file)
 	init_waitqueue_head(&uhid->waitq);
 	init_waitqueue_head(&uhid->report_wait);
 	uhid->running = false;
+<<<<<<< HEAD
+=======
+	INIT_WORK(&uhid->worker, uhid_device_add_worker);
+>>>>>>> common/deprecated/android-3.18
 
 	file->private_data = uhid;
 	nonseekable_open(inode, file);
@@ -709,6 +788,20 @@ static ssize_t uhid_char_write(struct file *file, const char __user *buffer,
 
 	switch (uhid->input_buf.type) {
 	case UHID_CREATE:
+<<<<<<< HEAD
+=======
+		/*
+		 * 'struct uhid_create_req' contains a __user pointer which is
+		 * copied from, so it's unsafe to allow this with elevated
+		 * privileges (e.g. from a setuid binary) or via kernel_write().
+		 */
+		if (file->f_cred != current_cred() || uaccess_kernel()) {
+			pr_err_once("UHID_CREATE from different security context by process %d (%s), this is not allowed.\n",
+				    task_tgid_vnr(current), current->comm);
+			ret = -EACCES;
+			goto unlock;
+		}
+>>>>>>> common/deprecated/android-3.18
 		ret = uhid_dev_create(uhid, &uhid->input_buf);
 		break;
 	case UHID_CREATE2:
@@ -743,13 +836,23 @@ unlock:
 static unsigned int uhid_char_poll(struct file *file, poll_table *wait)
 {
 	struct uhid_device *uhid = file->private_data;
+<<<<<<< HEAD
+=======
+	unsigned int mask = POLLOUT | POLLWRNORM; /* uhid is always writable */
+>>>>>>> common/deprecated/android-3.18
 
 	poll_wait(file, &uhid->waitq, wait);
 
 	if (uhid->head != uhid->tail)
+<<<<<<< HEAD
 		return POLLIN | POLLRDNORM;
 
 	return 0;
+=======
+		mask |= POLLIN | POLLRDNORM;
+
+	return mask;
+>>>>>>> common/deprecated/android-3.18
 }
 
 static const struct file_operations uhid_fops = {
@@ -768,6 +871,7 @@ static struct miscdevice uhid_misc = {
 	.name		= UHID_NAME,
 };
 
+<<<<<<< HEAD
 static int fb_state_change(struct notifier_block *nb,
     unsigned long val, void *data)
 {
@@ -799,12 +903,19 @@ static struct notifier_block fb_block = {
 static int __init uhid_init(void)
 {
 	fb_register_client(&fb_block);
+=======
+static int __init uhid_init(void)
+{
+>>>>>>> common/deprecated/android-3.18
 	return misc_register(&uhid_misc);
 }
 
 static void __exit uhid_exit(void)
 {
+<<<<<<< HEAD
 	fb_unregister_client(&fb_block);
+=======
+>>>>>>> common/deprecated/android-3.18
 	misc_deregister(&uhid_misc);
 }
 

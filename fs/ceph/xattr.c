@@ -369,6 +369,10 @@ static int __set_xattr(struct ceph_inode_info *ci,
 
 	if (update_xattr) {
 		int err = 0;
+<<<<<<< HEAD
+=======
+
+>>>>>>> common/deprecated/android-3.18
 		if (xattr && (flags & XATTR_CREATE))
 			err = -EEXIST;
 		else if (!xattr && (flags & XATTR_REPLACE))
@@ -376,12 +380,20 @@ static int __set_xattr(struct ceph_inode_info *ci,
 		if (err) {
 			kfree(name);
 			kfree(val);
+<<<<<<< HEAD
+=======
+			kfree(*newxattr);
+>>>>>>> common/deprecated/android-3.18
 			return err;
 		}
 		if (update_xattr < 0) {
 			if (xattr)
 				__remove_xattr(ci, xattr);
 			kfree(name);
+<<<<<<< HEAD
+=======
+			kfree(*newxattr);
+>>>>>>> common/deprecated/android-3.18
 			return 0;
 		}
 	}
@@ -904,6 +916,10 @@ int __ceph_setxattr(struct dentry *dentry, const char *name,
 	struct inode *inode = dentry->d_inode;
 	struct ceph_vxattr *vxattr;
 	struct ceph_inode_info *ci = ceph_inode(inode);
+<<<<<<< HEAD
+=======
+	struct ceph_buffer *old_blob = NULL;
+>>>>>>> common/deprecated/android-3.18
 	int issued;
 	int err;
 	int dirty = 0;
@@ -956,13 +972,24 @@ retry:
 		struct ceph_buffer *blob;
 
 		spin_unlock(&ci->i_ceph_lock);
+<<<<<<< HEAD
 		dout(" preaallocating new blob size=%d\n", required_blob_size);
+=======
+		ceph_buffer_put(old_blob); /* Shouldn't be required */
+		dout(" pre-allocating new blob size=%d\n", required_blob_size);
+>>>>>>> common/deprecated/android-3.18
 		blob = ceph_buffer_new(required_blob_size, GFP_NOFS);
 		if (!blob)
 			goto out;
 		spin_lock(&ci->i_ceph_lock);
+<<<<<<< HEAD
 		if (ci->i_xattrs.prealloc_blob)
 			ceph_buffer_put(ci->i_xattrs.prealloc_blob);
+=======
+		/* prealloc_blob can't be released while holding i_ceph_lock */
+		if (ci->i_xattrs.prealloc_blob)
+			old_blob = ci->i_xattrs.prealloc_blob;
+>>>>>>> common/deprecated/android-3.18
 		ci->i_xattrs.prealloc_blob = blob;
 		goto retry;
 	}
@@ -977,6 +1004,10 @@ retry:
 	}
 
 	spin_unlock(&ci->i_ceph_lock);
+<<<<<<< HEAD
+=======
+	ceph_buffer_put(old_blob);
+>>>>>>> common/deprecated/android-3.18
 	if (dirty)
 		__mark_inode_dirty(inode, dirty);
 	return err;

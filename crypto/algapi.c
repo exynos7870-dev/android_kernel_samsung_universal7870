@@ -41,6 +41,7 @@ static inline int crypto_set_driver_name(struct crypto_alg *alg)
 	return 0;
 }
 
+<<<<<<< HEAD
 static int crypto_check_alg(struct crypto_alg *alg)
 {
 #ifdef CONFIG_CRYPTO_FIPS
@@ -52,6 +53,22 @@ static int crypto_check_alg(struct crypto_alg *alg)
 	}
 #endif
 	
+=======
+static inline void crypto_check_module_sig(struct module *mod)
+{
+#ifdef CONFIG_CRYPTO_FIPS
+	if (fips_enabled && mod && !mod->sig_ok)
+		panic("Module %s signature verification failed in FIPS mode\n",
+		      mod->name);
+#endif
+	return;
+}
+
+static int crypto_check_alg(struct crypto_alg *alg)
+{
+	crypto_check_module_sig(alg->cra_module);
+
+>>>>>>> common/deprecated/android-3.18
 	if (alg->cra_alignmask & (alg->cra_alignmask + 1))
 		return -EINVAL;
 
@@ -156,6 +173,21 @@ void crypto_remove_spawns(struct crypto_alg *alg, struct list_head *list,
 
 			spawn->alg = NULL;
 			spawns = &inst->alg.cra_users;
+<<<<<<< HEAD
+=======
+
+			/*
+			 * We may encounter an unregistered instance here, since
+			 * an instance's spawns are set up prior to the instance
+			 * being registered.  An unregistered instance will have
+			 * NULL ->cra_users.next, since ->cra_users isn't
+			 * properly initialized until registration.  But an
+			 * unregistered instance cannot have any users, so treat
+			 * it the same as ->cra_users being empty.
+			 */
+			if (spawns->next == NULL)
+				break;
+>>>>>>> common/deprecated/android-3.18
 		}
 	} while ((spawns = crypto_more_spawns(alg, &stack, &top,
 					      &secondary_spawns)));
@@ -256,6 +288,7 @@ void crypto_alg_tested(const char *name, int err)
 found:
 	q->cra_flags |= CRYPTO_ALG_DEAD;
 	alg = test->adult;
+<<<<<<< HEAD
 
 #ifndef CONFIG_CRYPTO_FIPS
 	if (err || list_empty(&alg->cra_list))
@@ -294,6 +327,8 @@ found:
 #endif
 	// change@dtl.ksingh - ends
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (err || list_empty(&alg->cra_list))
 		goto complete;
 
@@ -372,7 +407,11 @@ static void crypto_wait_for_test(struct crypto_larval *larval)
 		crypto_alg_tested(larval->alg.cra_driver_name, 0);
 	}
 
+<<<<<<< HEAD
 	err = wait_for_completion_interruptible(&larval->completion);
+=======
+	err = wait_for_completion_killable(&larval->completion);
+>>>>>>> common/deprecated/android-3.18
 	WARN_ON(err);
 
 out:
@@ -384,6 +423,7 @@ int crypto_register_alg(struct crypto_alg *alg)
 	struct crypto_larval *larval;
 	int err;
 
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 	if (unlikely(in_fips_err())) {
 		printk(KERN_ERR
@@ -393,6 +433,9 @@ int crypto_register_alg(struct crypto_alg *alg)
 	}
 #endif
 
+=======
+	alg->cra_flags &= ~CRYPTO_ALG_DEAD;
+>>>>>>> common/deprecated/android-3.18
 	err = crypto_check_alg(alg);
 	if (err)
 		return err;
@@ -484,6 +527,7 @@ int crypto_register_template(struct crypto_template *tmpl)
 	struct crypto_template *q;
 	int err = -EEXIST;
 
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 	if (unlikely(in_fips_err()))
 		return -EACCES;
@@ -492,6 +536,11 @@ int crypto_register_template(struct crypto_template *tmpl)
 	down_write(&crypto_alg_sem);
 
 	//crypto_check_module_sig(tmpl->module);
+=======
+	down_write(&crypto_alg_sem);
+
+	crypto_check_module_sig(tmpl->module);
+>>>>>>> common/deprecated/android-3.18
 
 	list_for_each_entry(q, &crypto_template_list, list) {
 		if (q == tmpl)
@@ -558,6 +607,7 @@ static struct crypto_template *__crypto_lookup_template(const char *name)
 
 struct crypto_template *crypto_lookup_template(const char *name)
 {
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 	if (unlikely(in_fips_err())) {
 		printk(KERN_ERR
@@ -565,6 +615,8 @@ struct crypto_template *crypto_lookup_template(const char *name)
 		return ERR_PTR(-EACCES);
 	}
 #endif
+=======
+>>>>>>> common/deprecated/android-3.18
 	return try_then_request_module(__crypto_lookup_template(name),
 				       "crypto-%s", name);
 }
@@ -576,11 +628,14 @@ int crypto_register_instance(struct crypto_template *tmpl,
 	struct crypto_larval *larval;
 	int err;
 
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 	if (unlikely(in_fips_err()))
 		return -EACCES;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	err = crypto_check_alg(&inst->alg);
 	if (err)
 		goto err;
@@ -646,11 +701,14 @@ int crypto_init_spawn(struct crypto_spawn *spawn, struct crypto_alg *alg,
 {
 	int err = -EAGAIN;
 
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 	if (unlikely(in_fips_err()))
 		return -EACCES;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	spawn->inst = inst;
 	spawn->mask = mask;
 
@@ -685,11 +743,17 @@ EXPORT_SYMBOL_GPL(crypto_init_spawn2);
 
 void crypto_drop_spawn(struct crypto_spawn *spawn)
 {
+<<<<<<< HEAD
 	if (!spawn->alg)
 		return;
 
 	down_write(&crypto_alg_sem);
 	list_del(&spawn->list);
+=======
+	down_write(&crypto_alg_sem);
+	if (spawn->alg)
+		list_del(&spawn->list);
+>>>>>>> common/deprecated/android-3.18
 	up_write(&crypto_alg_sem);
 }
 EXPORT_SYMBOL_GPL(crypto_drop_spawn);
@@ -697,6 +761,7 @@ EXPORT_SYMBOL_GPL(crypto_drop_spawn);
 static struct crypto_alg *crypto_spawn_alg(struct crypto_spawn *spawn)
 {
 	struct crypto_alg *alg;
+<<<<<<< HEAD
 	struct crypto_alg *alg2;
 
 	down_read(&crypto_alg_sem);
@@ -713,6 +778,18 @@ static struct crypto_alg *crypto_spawn_alg(struct crypto_spawn *spawn)
 	}
 
 	return alg;
+=======
+
+	down_read(&crypto_alg_sem);
+	alg = spawn->alg;
+	if (alg && !crypto_mod_get(alg)) {
+		alg->cra_flags |= CRYPTO_ALG_DYING;
+		alg = NULL;
+	}
+	up_read(&crypto_alg_sem);
+
+	return alg ?: ERR_PTR(-EAGAIN);
+>>>>>>> common/deprecated/android-3.18
 }
 
 struct crypto_tfm *crypto_spawn_tfm(struct crypto_spawn *spawn, u32 type,
@@ -864,11 +941,14 @@ void *crypto_alloc_instance2(const char *name, struct crypto_alg *alg,
 	char *p;
 	int err;
 
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 	if (unlikely(in_fips_err()))
 		return ERR_PTR(-EACCES);
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	p = kzalloc(head + sizeof(*inst) + sizeof(struct crypto_spawn),
 		    GFP_KERNEL);
 	if (!p)
@@ -900,11 +980,14 @@ struct crypto_instance *crypto_alloc_instance(const char *name,
 	struct crypto_spawn *spawn;
 	int err;
 
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 	if (unlikely(in_fips_err()))
 		return ERR_PTR(-EACCES);
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	inst = crypto_alloc_instance2(name, alg, 0);
 	if (IS_ERR(inst))
 		goto out;
@@ -941,11 +1024,14 @@ int crypto_enqueue_request(struct crypto_queue *queue,
 {
 	int err = -EINPROGRESS;
 
+<<<<<<< HEAD
 #ifdef CONFIG_CRYPTO_FIPS
 	if (unlikely(in_fips_err()))
 		return -EACCES;
 #endif
 
+=======
+>>>>>>> common/deprecated/android-3.18
 	if (unlikely(queue->qlen >= queue->max_qlen)) {
 		err = -EBUSY;
 		if (!(request->flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
@@ -1050,21 +1136,29 @@ EXPORT_SYMBOL_GPL(crypto_xor);
 
 static int __init crypto_algapi_init(void)
 {
+<<<<<<< HEAD
 #ifndef CONFIG_CRYPTO_FIPS
 	crypto_init_proc();
 #else
 	//Moved to testmgr
 #endif
+=======
+	crypto_init_proc();
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 
 static void __exit crypto_algapi_exit(void)
 {
+<<<<<<< HEAD
 #ifndef CONFIG_CRYPTO_FIPS
 	crypto_exit_proc();
 #else
 	//Moved to testmgr
 #endif
+=======
+	crypto_exit_proc();
+>>>>>>> common/deprecated/android-3.18
 }
 
 module_init(crypto_algapi_init);

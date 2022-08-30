@@ -38,6 +38,14 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu);
 void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
 void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
 
+<<<<<<< HEAD
+=======
+static inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+{
+	return !(vcpu->arch.hcr_el2 & HCR_RW);
+}
+
+>>>>>>> common/deprecated/android-3.18
 static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
 {
 	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS;
@@ -45,6 +53,19 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
 		vcpu->arch.hcr_el2 &= ~HCR_RW;
 }
 
+<<<<<<< HEAD
+=======
+static inline unsigned long vcpu_get_hcr(struct kvm_vcpu *vcpu)
+{
+	return vcpu->arch.hcr_el2;
+}
+
+static inline void vcpu_set_hcr(struct kvm_vcpu *vcpu, unsigned long hcr)
+{
+	vcpu->arch.hcr_el2 = hcr;
+}
+
+>>>>>>> common/deprecated/android-3.18
 static inline unsigned long *vcpu_pc(const struct kvm_vcpu *vcpu)
 {
 	return (unsigned long *)&vcpu_gp_regs(vcpu)->regs.pc;

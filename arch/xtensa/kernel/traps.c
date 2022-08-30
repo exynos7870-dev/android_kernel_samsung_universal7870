@@ -280,7 +280,11 @@ do_unaligned_user (struct pt_regs *regs)
 	info.si_errno = 0;
 	info.si_code = BUS_ADRALN;
 	info.si_addr = (void *) regs->excvaddr;
+<<<<<<< HEAD
 	force_sig_info(SIGSEGV, &info, current);
+=======
+	force_sig_info(SIGBUS, &info, current);
+>>>>>>> common/deprecated/android-3.18
 
 }
 #endif

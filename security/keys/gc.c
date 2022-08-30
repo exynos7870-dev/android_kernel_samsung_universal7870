@@ -129,16 +129,26 @@ static noinline void key_gc_unused_keys(struct list_head *keys)
 	while (!list_empty(keys)) {
 		struct key *key =
 			list_entry(keys->next, struct key, graveyard_link);
+<<<<<<< HEAD
+=======
+		short state = key->state;
+
+>>>>>>> common/deprecated/android-3.18
 		list_del(&key->graveyard_link);
 
 		kdebug("- %u", key->serial);
 		key_check(key);
 
 		/* Throw away the key data if the key is instantiated */
+<<<<<<< HEAD
 		if (test_bit(KEY_FLAG_INSTANTIATED, &key->flags) &&
 			!test_bit(KEY_FLAG_NEGATIVE, &key->flags) &&
 			key->type->destroy)
 				key->type->destroy(key);
+=======
+		if (state == KEY_IS_POSITIVE && key->type->destroy)
+			key->type->destroy(key);
+>>>>>>> common/deprecated/android-3.18
 
 		security_key_free(key);
 
@@ -151,7 +161,11 @@ static noinline void key_gc_unused_keys(struct list_head *keys)
 		}
 
 		atomic_dec(&key->user->nkeys);
+<<<<<<< HEAD
 		if (test_bit(KEY_FLAG_INSTANTIATED, &key->flags))
+=======
+		if (state != KEY_IS_UNINSTANTIATED)
+>>>>>>> common/deprecated/android-3.18
 			atomic_dec(&key->user->nikeys);
 
 		key_user_put(key->user);

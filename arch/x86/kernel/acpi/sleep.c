@@ -16,6 +16,10 @@
 #include <asm/cacheflush.h>
 #include <asm/realmode.h>
 
+<<<<<<< HEAD
+=======
+#include <linux/ftrace.h>
+>>>>>>> common/deprecated/android-3.18
 #include "../../realmode/rm/wakeup.h"
 #include "sleep.h"
 
@@ -78,7 +82,11 @@ int x86_acpi_suspend_lowlevel(void)
 
 	header->pmode_cr0 = read_cr0();
 	if (__this_cpu_read(cpu_info.cpuid_level) >= 0) {
+<<<<<<< HEAD
 		header->pmode_cr4 = read_cr4();
+=======
+		header->pmode_cr4 = __read_cr4();
+>>>>>>> common/deprecated/android-3.18
 		header->pmode_behavior |= (1 << WAKEUP_BEHAVIOR_RESTORE_CR4);
 	}
 	if (!rdmsr_safe(MSR_IA32_MISC_ENABLE,
@@ -107,7 +115,17 @@ int x86_acpi_suspend_lowlevel(void)
        saved_magic = 0x123456789abcdef0L;
 #endif /* CONFIG_64BIT */
 
+<<<<<<< HEAD
 	do_suspend_lowlevel();
+=======
+	/*
+	 * Pause/unpause graph tracing around do_suspend_lowlevel as it has
+	 * inconsistent call/return info after it jumps to the wakeup vector.
+	 */
+	pause_graph_tracing();
+	do_suspend_lowlevel();
+	unpause_graph_tracing();
+>>>>>>> common/deprecated/android-3.18
 	return 0;
 }
 

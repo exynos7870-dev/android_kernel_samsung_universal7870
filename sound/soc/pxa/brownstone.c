@@ -167,3 +167,7 @@ module_platform_driver(mmp_driver);
 MODULE_AUTHOR("Leo Yan <leoy@marvell.com>");
 MODULE_DESCRIPTION("ALSA SoC Brownstone");
 MODULE_LICENSE("GPL");
+<<<<<<< HEAD
+=======
+MODULE_ALIAS("platform:brownstone-audio");
+>>>>>>> common/deprecated/android-3.18

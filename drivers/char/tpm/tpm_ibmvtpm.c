@@ -542,6 +542,10 @@ static irqreturn_t ibmvtpm_interrupt(int irq, void *vtpm_instance)
 	 */
 	while ((crq = ibmvtpm_crq_get_next(ibmvtpm)) != NULL) {
 		ibmvtpm_crq_process(crq, ibmvtpm);
+<<<<<<< HEAD
+=======
+		wake_up_interruptible(&ibmvtpm->crq_queue.wq);
+>>>>>>> common/deprecated/android-3.18
 		crq->valid = 0;
 		smp_wmb();
 	}
@@ -579,6 +583,12 @@ static int tpm_ibmvtpm_probe(struct vio_dev *vio_dev,
 		goto cleanup;
 	}
 
+<<<<<<< HEAD
+=======
+	ibmvtpm->dev = dev;
+	ibmvtpm->vdev = vio_dev;
+
+>>>>>>> common/deprecated/android-3.18
 	crq_q = &ibmvtpm->crq_queue;
 	crq_q->crq_addr = (struct ibmvtpm_crq *)get_zeroed_page(GFP_KERNEL);
 	if (!crq_q->crq_addr) {
@@ -587,6 +597,10 @@ static int tpm_ibmvtpm_probe(struct vio_dev *vio_dev,
 	}
 
 	crq_q->num_entry = CRQ_RES_BUF_SIZE / sizeof(*crq_q->crq_addr);
+<<<<<<< HEAD
+=======
+	init_waitqueue_head(&crq_q->wq);
+>>>>>>> common/deprecated/android-3.18
 	ibmvtpm->crq_dma_handle = dma_map_single(dev, crq_q->crq_addr,
 						 CRQ_RES_BUF_SIZE,
 						 DMA_BIDIRECTIONAL);
@@ -623,8 +637,11 @@ static int tpm_ibmvtpm_probe(struct vio_dev *vio_dev,
 
 	crq_q->index = 0;
 
+<<<<<<< HEAD
 	ibmvtpm->dev = dev;
 	ibmvtpm->vdev = vio_dev;
+=======
+>>>>>>> common/deprecated/android-3.18
 	TPM_VPRIV(chip) = (void *)ibmvtpm;
 
 	spin_lock_init(&ibmvtpm->rtce_lock);
@@ -641,6 +658,16 @@ static int tpm_ibmvtpm_probe(struct vio_dev *vio_dev,
 	if (rc)
 		goto init_irq_cleanup;
 
+<<<<<<< HEAD
+=======
+	if (!wait_event_timeout(ibmvtpm->crq_queue.wq,
+				ibmvtpm->rtce_buf != NULL,
+				HZ)) {
+		dev_err(dev, "CRQ response timed out\n");
+		goto init_irq_cleanup;
+	}
+
+>>>>>>> common/deprecated/android-3.18
 	return rc;
 init_irq_cleanup:
 	do {

@@ -104,8 +104,12 @@ int sptlrpc_parse_flavor(const char *str, struct sptlrpc_flavor *flvr)
 		return 0;
 	}
 
+<<<<<<< HEAD
 	strncpy(buf, str, sizeof(buf));
 	buf[sizeof(buf) - 1] = '\0';
+=======
+	strlcpy(buf, str, sizeof(buf));
+>>>>>>> common/deprecated/android-3.18
 
 	bulk = strchr(buf, '-');
 	if (bulk)

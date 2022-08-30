@@ -24,6 +24,10 @@
  * Clobbers:
  *	$1,$2,$3,$4,$5,$6
  */
+<<<<<<< HEAD
+=======
+#include <asm/export.h>
+>>>>>>> common/deprecated/android-3.18
 
 /* Allow an exception for an insn; exit if we get one.  */
 #define EX(x,y...)			\
@@ -111,3 +115,7 @@ $exception:
 	ret	$31, ($28), 1	# .. e1 :
 
 	.end __do_clear_user
+<<<<<<< HEAD
+=======
+	EXPORT_SYMBOL(__do_clear_user)
+>>>>>>> common/deprecated/android-3.18

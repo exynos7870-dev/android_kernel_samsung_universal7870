@@ -17,7 +17,11 @@
 
 #define fd_outb(val,port)			\
 	do {					\
+<<<<<<< HEAD
 		if ((port) == FD_DOR)		\
+=======
+		if ((port) == (u32)FD_DOR)	\
+>>>>>>> common/deprecated/android-3.18
 			fd_setdor((val));	\
 		else				\
 			outb((val),(port));	\

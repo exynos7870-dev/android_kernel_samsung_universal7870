@@ -615,18 +615,34 @@ static void pch_udc_reconnect(struct pch_udc_dev *dev)
 static inline void pch_udc_vbus_session(struct pch_udc_dev *dev,
 					  int is_active)
 {
+<<<<<<< HEAD
+=======
+	unsigned long		iflags;
+
+	spin_lock_irqsave(&dev->lock, iflags);
+>>>>>>> common/deprecated/android-3.18
 	if (is_active) {
 		pch_udc_reconnect(dev);
 		dev->vbus_session = 1;
 	} else {
 		if (dev->driver && dev->driver->disconnect) {
+<<<<<<< HEAD
 			spin_unlock(&dev->lock);
 			dev->driver->disconnect(&dev->gadget);
 			spin_lock(&dev->lock);
+=======
+			spin_unlock_irqrestore(&dev->lock, iflags);
+			dev->driver->disconnect(&dev->gadget);
+			spin_lock_irqsave(&dev->lock, iflags);
+>>>>>>> common/deprecated/android-3.18
 		}
 		pch_udc_set_disconnect(dev);
 		dev->vbus_session = 0;
 	}
+<<<<<<< HEAD
+=======
+	spin_unlock_irqrestore(&dev->lock, iflags);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -1182,20 +1198,41 @@ static int pch_udc_pcd_selfpowered(struct usb_gadget *gadget, int value)
 static int pch_udc_pcd_pullup(struct usb_gadget *gadget, int is_on)
 {
 	struct pch_udc_dev	*dev;
+<<<<<<< HEAD
 
 	if (!gadget)
 		return -EINVAL;
 	dev = container_of(gadget, struct pch_udc_dev, gadget);
+=======
+	unsigned long		iflags;
+
+	if (!gadget)
+		return -EINVAL;
+
+	dev = container_of(gadget, struct pch_udc_dev, gadget);
+
+	spin_lock_irqsave(&dev->lock, iflags);
+>>>>>>> common/deprecated/android-3.18
 	if (is_on) {
 		pch_udc_reconnect(dev);
 	} else {
 		if (dev->driver && dev->driver->disconnect) {
+<<<<<<< HEAD
 			spin_unlock(&dev->lock);
 			dev->driver->disconnect(&dev->gadget);
 			spin_lock(&dev->lock);
 		}
 		pch_udc_set_disconnect(dev);
 	}
+=======
+			spin_unlock_irqrestore(&dev->lock, iflags);
+			dev->driver->disconnect(&dev->gadget);
+			spin_lock_irqsave(&dev->lock, iflags);
+		}
+		pch_udc_set_disconnect(dev);
+	}
+	spin_unlock_irqrestore(&dev->lock, iflags);
+>>>>>>> common/deprecated/android-3.18
 
 	return 0;
 }
@@ -1533,7 +1570,10 @@ static void pch_udc_free_dma_chain(struct pch_udc_dev *dev,
 		td = phys_to_virt(addr);
 		addr2 = (dma_addr_t)td->next;
 		pci_pool_free(dev->data_requests, td, addr);
+<<<<<<< HEAD
 		td->next = 0x00;
+=======
+>>>>>>> common/deprecated/android-3.18
 		addr = addr2;
 	}
 	req->chain_len = 1;
@@ -1792,7 +1832,11 @@ static struct usb_request *pch_udc_alloc_request(struct usb_ep *usbep,
 	}
 	/* prevent from using desc. - set HOST BUSY */
 	dma_desc->status |= PCH_UDC_BS_HST_BSY;
+<<<<<<< HEAD
 	dma_desc->dataptr = __constant_cpu_to_le32(DMA_ADDR_INVALID);
+=======
+	dma_desc->dataptr = lower_32_bits(DMA_ADDR_INVALID);
+>>>>>>> common/deprecated/android-3.18
 	req->td_data = dma_desc;
 	req->td_data_last = dma_desc;
 	req->chain_len = 1;
@@ -2342,6 +2386,24 @@ static void pch_udc_svc_data_out(struct pch_udc_dev *dev, int ep_num)
 		pch_udc_set_dma(dev, DMA_DIR_RX);
 }
 
+<<<<<<< HEAD
+=======
+static int pch_udc_gadget_setup(struct pch_udc_dev *dev)
+	__must_hold(&dev->lock)
+{
+	int rc;
+
+	/* In some cases we can get an interrupt before driver gets setup */
+	if (!dev->driver)
+		return -ESHUTDOWN;
+
+	spin_unlock(&dev->lock);
+	rc = dev->driver->setup(&dev->gadget, &dev->setup_data);
+	spin_lock(&dev->lock);
+	return rc;
+}
+
+>>>>>>> common/deprecated/android-3.18
 /**
  * pch_udc_svc_control_in() - Handle Control IN endpoint interrupts
  * @dev:	Reference to the device structure
@@ -2413,15 +2475,22 @@ static void pch_udc_svc_control_out(struct pch_udc_dev *dev)
 			dev->gadget.ep0 = &dev->ep[UDC_EP0IN_IDX].ep;
 		else /* OUT */
 			dev->gadget.ep0 = &ep->ep;
+<<<<<<< HEAD
 		spin_unlock(&dev->lock);
+=======
+>>>>>>> common/deprecated/android-3.18
 		/* If Mass storage Reset */
 		if ((dev->setup_data.bRequestType == 0x21) &&
 		    (dev->setup_data.bRequest == 0xFF))
 			dev->prot_stall = 0;
 		/* call gadget with setup data received */
+<<<<<<< HEAD
 		setup_supported = dev->driver->setup(&dev->gadget,
 						     &dev->setup_data);
 		spin_lock(&dev->lock);
+=======
+		setup_supported = pch_udc_gadget_setup(dev);
+>>>>>>> common/deprecated/android-3.18
 
 		if (dev->setup_data.bRequestType & USB_DIR_IN) {
 			ep->td_data->status = (ep->td_data->status &
@@ -2646,7 +2715,11 @@ static void pch_udc_svc_enum_interrupt(struct pch_udc_dev *dev)
 static void pch_udc_svc_intf_interrupt(struct pch_udc_dev *dev)
 {
 	u32 reg, dev_stat = 0;
+<<<<<<< HEAD
 	int i, ret;
+=======
+	int i;
+>>>>>>> common/deprecated/android-3.18
 
 	dev_stat = pch_udc_read_device_status(dev);
 	dev->cfg_data.cur_intf = (dev_stat & UDC_DEVSTS_INTF_MASK) >>
@@ -2674,9 +2747,13 @@ static void pch_udc_svc_intf_interrupt(struct pch_udc_dev *dev)
 		dev->ep[i].halted = 0;
 	}
 	dev->stall = 0;
+<<<<<<< HEAD
 	spin_unlock(&dev->lock);
 	ret = dev->driver->setup(&dev->gadget, &dev->setup_data);
 	spin_lock(&dev->lock);
+=======
+	pch_udc_gadget_setup(dev);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -2686,7 +2763,11 @@ static void pch_udc_svc_intf_interrupt(struct pch_udc_dev *dev)
  */
 static void pch_udc_svc_cfg_interrupt(struct pch_udc_dev *dev)
 {
+<<<<<<< HEAD
 	int i, ret;
+=======
+	int i;
+>>>>>>> common/deprecated/android-3.18
 	u32 reg, dev_stat = 0;
 
 	dev_stat = pch_udc_read_device_status(dev);
@@ -2711,9 +2792,13 @@ static void pch_udc_svc_cfg_interrupt(struct pch_udc_dev *dev)
 	dev->stall = 0;
 
 	/* call gadget zero with setup data received */
+<<<<<<< HEAD
 	spin_unlock(&dev->lock);
 	ret = dev->driver->setup(&dev->gadget, &dev->setup_data);
 	spin_lock(&dev->lock);
+=======
+	pch_udc_gadget_setup(dev);
+>>>>>>> common/deprecated/android-3.18
 }
 
 /**
@@ -2986,7 +3071,11 @@ static int init_dma_pools(struct pch_udc_dev *dev)
 	dev->dma_addr = dma_map_single(&dev->pdev->dev, dev->ep0out_buf,
 				       UDC_EP0OUT_BUFF_SIZE * 4,
 				       DMA_FROM_DEVICE);
+<<<<<<< HEAD
 	return 0;
+=======
+	return dma_mapping_error(&dev->pdev->dev, dev->dma_addr);
+>>>>>>> common/deprecated/android-3.18
 }
 
 static int pch_udc_start(struct usb_gadget *g,

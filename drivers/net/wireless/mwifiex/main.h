@@ -93,6 +93,10 @@ enum {
 
 #define MWIFIEX_MAX_TOTAL_SCAN_TIME	(MWIFIEX_TIMER_10S - MWIFIEX_TIMER_1S)
 
+<<<<<<< HEAD
+=======
+#define WPA_GTK_OUI_OFFSET				2
+>>>>>>> common/deprecated/android-3.18
 #define RSN_GTK_OUI_OFFSET				2
 
 #define MWIFIEX_OUI_NOT_PRESENT			0

@@ -36,6 +36,10 @@
 #include <asm/alternative.h>
 #include <asm/insn.h>
 #include <asm/debugreg.h>
+<<<<<<< HEAD
+=======
+#include <asm/nospec-branch.h>
+>>>>>>> common/deprecated/android-3.18
 
 #include "common.h"
 
@@ -177,7 +181,11 @@ static int copy_optimized_instructions(u8 *dest, u8 *src)
 
 	while (len < RELATIVEJUMP_SIZE) {
 		ret = __copy_instruction(dest + len, src + len);
+<<<<<<< HEAD
 		if (!ret || !can_boost(dest + len))
+=======
+		if (!ret || !can_boost(dest + len, src + len))
+>>>>>>> common/deprecated/android-3.18
 			return -EINVAL;
 		len += ret;
 	}
@@ -191,7 +199,11 @@ static int copy_optimized_instructions(u8 *dest, u8 *src)
 }
 
 /* Check whether insn is indirect jump */
+<<<<<<< HEAD
 static int insn_is_indirect_jump(struct insn *insn)
+=======
+static int __insn_is_indirect_jump(struct insn *insn)
+>>>>>>> common/deprecated/android-3.18
 {
 	return ((insn->opcode.bytes[0] == 0xff &&
 		(X86_MODRM_REG(insn->modrm.value) & 6) == 4) || /* Jump */
@@ -225,6 +237,29 @@ static int insn_jump_into_range(struct insn *insn, unsigned long start, int len)
 	return (start <= target && target <= start + len);
 }
 
+<<<<<<< HEAD
+=======
+static int insn_is_indirect_jump(struct insn *insn)
+{
+	int ret = __insn_is_indirect_jump(insn);
+
+#ifdef CONFIG_RETPOLINE
+	/*
+	 * Jump to x86_indirect_thunk_* is treated as an indirect jump.
+	 * Note that even with CONFIG_RETPOLINE=y, the kernel compiled with
+	 * older gcc may use indirect jump. So we add this check instead of
+	 * replace indirect-jump check.
+	 */
+	if (!ret)
+		ret = insn_jump_into_range(insn,
+				(unsigned long)__indirect_thunk_start,
+				(unsigned long)__indirect_thunk_end -
+				(unsigned long)__indirect_thunk_start);
+#endif
+	return ret;
+}
+
+>>>>>>> common/deprecated/android-3.18
 /* Decode whole function to ensure any instructions don't jump into target */
 static int can_optimize(unsigned long paddr)
 {
@@ -344,6 +379,10 @@ int arch_prepare_optimized_kprobe(struct optimized_kprobe *op)
 	}
 
 	buf = (u8 *)op->optinsn.insn;
+<<<<<<< HEAD
+=======
+	set_memory_rw((unsigned long)buf & PAGE_MASK, 1);
+>>>>>>> common/deprecated/android-3.18
 
 	/* Copy instructions into the out-of-line buffer */
 	ret = copy_optimized_instructions(buf + TMPL_END_IDX, op->kp.addr);
@@ -366,6 +405,11 @@ int arch_prepare_optimized_kprobe(struct optimized_kprobe *op)
 	synthesize_reljump(buf + TMPL_END_IDX + op->optinsn.size,
 			   (u8 *)op->kp.addr + op->optinsn.size);
 
+<<<<<<< HEAD
+=======
+	set_memory_ro((unsigned long)buf & PAGE_MASK, 1);
+
+>>>>>>> common/deprecated/android-3.18
 	flush_icache_range((unsigned long) buf,
 			   (unsigned long) buf + TMPL_END_IDX +
 			   op->optinsn.size + RELATIVEJUMP_SIZE);

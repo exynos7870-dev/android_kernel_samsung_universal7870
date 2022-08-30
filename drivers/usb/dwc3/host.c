@@ -60,6 +60,7 @@ int dwc3_host_init(struct dwc3 *dwc)
 		goto err1;
 	}
 
+<<<<<<< HEAD
 	/* If OTG is available, it will take care of this */
 	if (!dwc->dotg) {
 		ret = platform_device_add(xhci);
@@ -67,6 +68,12 @@ int dwc3_host_init(struct dwc3 *dwc)
 			dev_err(dwc->dev, "failed to register xHCI device\n");
 			goto err1;
 		}
+=======
+	ret = platform_device_add(xhci);
+	if (ret) {
+		dev_err(dwc->dev, "failed to register xHCI device\n");
+		goto err1;
+>>>>>>> common/deprecated/android-3.18
 	}
 
 	return 0;
@@ -80,6 +87,10 @@ err0:
 
 void dwc3_host_exit(struct dwc3 *dwc)
 {
+<<<<<<< HEAD
 	if (!dwc->dotg)
 		platform_device_unregister(dwc->xhci);
+=======
+	platform_device_unregister(dwc->xhci);
+>>>>>>> common/deprecated/android-3.18
 }

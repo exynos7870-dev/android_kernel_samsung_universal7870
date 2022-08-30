@@ -281,7 +281,11 @@ static int __sysv_write_inode(struct inode *inode, int wait)
                 }
         }
 	brelse(bh);
+<<<<<<< HEAD
 	return 0;
+=======
+	return err;
+>>>>>>> common/deprecated/android-3.18
 }
 
 int sysv_write_inode(struct inode *inode, struct writeback_control *wbc)
